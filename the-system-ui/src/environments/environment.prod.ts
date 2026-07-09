@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
   native: false,
-  apiUrl: '/api',
+  apiUrl: 'https://the-system-api.onrender.com/api',
 };
-

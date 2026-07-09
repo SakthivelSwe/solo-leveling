@@ -1,0 +1,30 @@
+# ── Render Blueprint ─────────────────────────────────────────────────────────
+# One-click deploy: https://render.com/deploy?repo=https://github.com/SakthivelSwe/solo-leveling
+#
+# This file defines the infrastructure for the backend API.
+# Render reads this on deploy and provisions services accordingly.
+
+services:
+  - type: web
+    name: the-system-api
+    runtime: docker
+    region: singapore           # Closest to Asia/Kolkata timezone
+    plan: free                  # Free tier — upgrade when needed
+    dockerfilePath: ./the-system-api/Dockerfile
+    dockerContext: ./the-system-api
+    healthCheckPath: /api/auth/login    # Any public endpoint for health check
+    envVars:
+      - key: DB_URL
+        value: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
+      - key: DB_USERNAME
+        value: postgres.yipgagmkgunnvzsxvnkq
+      - key: DB_PASSWORD
+        sync: false             # Render prompts for this on deploy
+      - key: JWT_SECRET
+        generateValue: true     # Render auto-generates a secure random value
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JAVA_OPTS
+        value: "-Xmx512m"

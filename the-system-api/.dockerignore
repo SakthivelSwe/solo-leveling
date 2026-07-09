@@ -1,0 +1,12 @@
+target/
+data/
+*.log
+*.mv.db
+*.trace.db
+.idea/
+.vscode/
+*.iml
+application-local.yml
+.git/
+.gitignore
+README.md

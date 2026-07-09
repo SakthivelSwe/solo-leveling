@@ -8,17 +8,13 @@ const config: CapacitorConfig = {
   backgroundColor: '#060610',
   android: {
     backgroundColor: '#060610',
-    // Mixed content DISABLED for production. The Angular bundle is served from
-    // the app's WebView origin (http://localhost inside Capacitor) and only
-    // talks to the private LAN backend allow-listed in network_security_config.xml.
+    // Mixed content DISABLED — the backend is now served over HTTPS (Render).
     allowMixedContent: false,
   },
   server: {
-    // Use the http scheme so the WebView (origin http://localhost) can call the
-    // cleartext dev backend without mixed-content blocking. For a production
-    // release with an HTTPS backend, switch androidScheme back to 'https'.
-    androidScheme: 'http',
-    cleartext: true,
+    // Use HTTPS scheme for production — the Render backend is HTTPS-only.
+    androidScheme: 'https',
+    cleartext: false,
   },
   plugins: {
     SplashScreen: {
@@ -36,4 +32,3 @@ const config: CapacitorConfig = {
 };
 
 export default config;
-

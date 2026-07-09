@@ -5,12 +5,8 @@ export const environment = {
   // and switches on the native glue in NativeService.
   native: true,
   // ── Android backend URL ──────────────────────────────────────────────
-  // The Android EMULATOR maps 10.0.2.2 → your PC's localhost, so this reaches
-  // the Spring Boot API running on the host at :8080.
-  //
-  // For a PHYSICAL device on the same Wi-Fi, change this to your PC's LAN IP,
-  // e.g.  http://192.168.1.20:8080/api   (run `ipconfig` to find it).
-  // For production, point this at your deployed HTTPS backend.
-  apiUrl: 'http://10.0.2.2:8080/api',
+  // Points to the deployed backend on Render (HTTPS).
+  // For local dev, change this back to http://10.0.2.2:8080/api (emulator)
+  // or http://<your-lan-ip>:8080/api (physical device).
+  apiUrl: 'https://the-system-api.onrender.com/api',
 };
-

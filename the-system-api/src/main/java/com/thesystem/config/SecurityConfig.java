@@ -41,7 +41,6 @@ public class SecurityConfig {
         List<String> publicPaths = new ArrayList<>();
         publicPaths.add("/api/auth/**");
         if (devToolsEnabled) {
-            publicPaths.add("/h2-console/**");
             publicPaths.add("/swagger-ui/**");
             publicPaths.add("/swagger-ui.html");
             publicPaths.add("/v3/api-docs/**");
@@ -52,12 +51,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .headers(headers -> {
-                // H2 console needs frame; otherwise deny to block clickjacking.
-                if (devToolsEnabled) {
-                    headers.frameOptions(frame -> frame.sameOrigin());
-                } else {
-                    headers.frameOptions(frame -> frame.deny());
-                }
+                headers.frameOptions(frame -> frame.deny());
                 headers
                     .contentTypeOptions(opts -> {}) // X-Content-Type-Options: nosniff
                     .referrerPolicy(r -> r.policy(
@@ -86,7 +80,9 @@ public class SecurityConfig {
                 "http://localhost",
                 "https://localhost",
                 "capacitor://localhost",
-                "http://10.0.2.2:*"
+                "http://10.0.2.2:*",
+                "https://*.pages.dev",
+                "https://*.onrender.com"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
