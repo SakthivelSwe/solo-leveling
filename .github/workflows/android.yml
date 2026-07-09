@@ -1,13 +1,12 @@
 name: Android APK
 
-# Builds the Capacitor Android app whenever the UI changes on main, on tags, or
-# on manual dispatch. Produces a downloadable debug APK as a workflow artifact,
-# so you don't need a local Android SDK to get an installable build.
+# Builds the Capacitor Android app whenever the UI changes on main, or
+# on manual dispatch. Produces downloadable debug and release APKs as workflow artifacts,
+# and automatically updates the "latest" release on GitHub.
 
 on:
   push:
     branches: [main]
-    tags: ['v*']
     paths:
       - 'the-system-ui/**'
       - '.github/workflows/android.yml'
@@ -19,7 +18,7 @@ on:
 
 jobs:
   build:
-    name: Build debug APK
+    name: Build APKs
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,20 +58,35 @@ jobs:
       - name: Grant gradlew execute permission
         run: chmod +x android/gradlew
 
-      - name: Build debug APK
+      - name: Build Debug APK
         working-directory: the-system-ui/android
         run: ./gradlew --no-daemon assembleDebug
 
-      - name: Upload APK artifact
+      - name: Build Release APK
+        working-directory: the-system-ui/android
+        run: ./gradlew --no-daemon assembleRelease
+
+      - name: Upload Debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: the-system-debug-apk
           path: the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          
+      - name: Upload Release APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: the-system-release-unsigned-apk
+          path: the-system-ui/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
 
-      - name: Attach APK to GitHub release (on tag)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Update Latest Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          files: the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
-
+          name: Latest Build
+          tag_name: latest
+          make_latest: true
+          files: |
+            the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
+            the-system-ui/android/app/build/outputs/apk/release/app-release-unsigned.apk

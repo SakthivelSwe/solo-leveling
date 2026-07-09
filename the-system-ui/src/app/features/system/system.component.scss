@@ -22,8 +22,8 @@
   position: sticky; top: 0; z-index: 20;
 }
 .brand { display: flex; align-items: center; gap: 10px; }
-.diamond { font-size: 1.5rem; color: var(--system-blue); text-shadow: 0 0 20px var(--system-blue); animation: spin360 10s linear infinite; }
-@keyframes spin360 { to { transform: rotate(360deg); } }
+.brand-logo { width: 32px; height: 32px; filter: drop-shadow(0 0 10px var(--system-blue)); animation: floatLogo 5s ease-in-out infinite; }
+@keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 .name { font-weight: 900; letter-spacing: 5px; font-size: 1.05rem; }
 .rank-badge-mini {
   font-size: .6rem; letter-spacing: 2px; padding: 3px 8px; border-radius: 6px;
