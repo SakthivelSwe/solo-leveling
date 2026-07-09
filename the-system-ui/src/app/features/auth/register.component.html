@@ -1,0 +1,69 @@
+<div class="auth-wrap">
+  <div class="grid-bg"></div>
+  <div class="auth-card system-card">
+    <div class="brand">
+      <div class="brand-diamond mono">◈</div>
+      <h1 class="mono brand-title glow-text">ARISE</h1>
+      <p class="tech brand-sub">AWAKEN AS A PLAYER</p>
+    </div>
+
+    <div class="notice tech">
+      <span class="blink">▸</span> THE SYSTEM HAS SELECTED YOU. REGISTER TO BEGIN THE HUNT.
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+      <label class="field" for="reg-username">
+        <span class="tech">HUNTER ID</span>
+        <input id="reg-username" formControlName="username" autocomplete="username" placeholder="username"
+               [attr.aria-invalid]="invalid('username')"
+               [attr.aria-describedby]="invalid('username') ? 'err-reg-username' : null" />
+        <span id="err-reg-username" class="field-error tech" role="alert" *ngIf="invalid('username')">
+          {{ form.get('username')?.errors?.['required'] ? 'Hunter ID is required.' : 'At least 3 characters.' }}
+        </span>
+      </label>
+      <label class="field" for="reg-display">
+        <span class="tech">DISPLAY NAME</span>
+        <input id="reg-display" formControlName="displayName" placeholder="Sakthivel" />
+      </label>
+      <label class="field" for="reg-email">
+        <span class="tech">EMAIL</span>
+        <input id="reg-email" formControlName="email" type="email" autocomplete="email"
+               placeholder="hunter@thesystem.io"
+               [attr.aria-invalid]="invalid('email')"
+               [attr.aria-describedby]="invalid('email') ? 'err-reg-email' : null" />
+        <span id="err-reg-email" class="field-error tech" role="alert" *ngIf="invalid('email')">
+          {{ form.get('email')?.errors?.['required'] ? 'Email is required.' : 'Enter a valid email.' }}
+        </span>
+      </label>
+      <label class="field" for="reg-password">
+        <span class="tech">ACCESS KEY</span>
+        <input id="reg-password" formControlName="password" type="password" autocomplete="new-password"
+               placeholder="••••••••"
+               [attr.aria-invalid]="invalid('password')"
+               [attr.aria-describedby]="invalid('password') ? 'err-reg-password' : null" />
+        <div class="pw-meter" [class]="'pw-meter lvl-' + passwordStrength().level"
+             *ngIf="form.get('password')?.value" [attr.aria-hidden]="true">
+          <span class="pw-seg" [class.on]="passwordStrength().level >= 0"></span>
+          <span class="pw-seg" [class.on]="passwordStrength().level >= 1"></span>
+          <span class="pw-seg" [class.on]="passwordStrength().level >= 2"></span>
+          <span class="pw-label tech" [attr.data-lvl]="passwordStrength().level">{{ passwordStrength().label }}</span>
+        </div>
+        <span id="err-reg-password" class="field-error tech" role="alert" *ngIf="invalid('password')">
+          {{ form.get('password')?.errors?.['required'] ? 'Access key is required.' : 'At least 6 characters.' }}
+        </span>
+      </label>
+
+      <div class="error tech" *ngIf="error()" role="alert" aria-live="assertive">⚠ {{ error() }}</div>
+
+      <button type="submit" class="submit mono" [disabled]="loading()" [attr.aria-busy]="loading()">
+        <span *ngIf="!loading()">◈ AWAKEN</span>
+        <span *ngIf="loading()" class="loading">AWAKENING<span class="dots"></span></span>
+      </button>
+    </form>
+
+    <p class="switch tech">
+      ALREADY A HUNTER? <a routerLink="/login">ENTER THE SYSTEM →</a>
+    </p>
+  </div>
+</div>
+

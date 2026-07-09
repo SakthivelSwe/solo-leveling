@@ -1,0 +1,245 @@
+<div class="life-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">LIFE OS</span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system">STATUS</a>
+      <a routerLink="/life" class="active">LIFE OS</a>
+      <a routerLink="/achievements">ACHIEVEMENTS</a>
+    </nav>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist" aria-label="Life OS modules">
+    <button *ngFor="let t of tabs" class="tab tech"
+            role="tab"
+            [id]="'tab-' + t.key"
+            [attr.aria-selected]="active() === t.key"
+            [attr.aria-controls]="'panel-' + t.key"
+            [attr.tabindex]="active() === t.key ? 0 : -1"
+            [class.active]="active() === t.key"
+            [style.--tc]="t.color"
+            (click)="select(t.key)">
+      <span class="ic" aria-hidden="true">{{ t.icon }}</span>{{ t.label }}
+    </button>
+  </div>
+
+  <!-- ===================== CAREER ===================== -->
+  <section class="panel" *ngIf="active() === 'CAREER'" @fadeInUp
+           role="tabpanel" id="panel-CAREER" aria-labelledby="tab-CAREER">
+    <div class="cards">
+      <!-- LeetCode stats -->
+      <div class="system-card block">
+        <h3 class="mono head">◈ DSA GRIND</h3>
+        <div class="leet-stats" *ngIf="leetStats() as ls">
+          <div class="stat-pill"><span class="v mono">{{ ls.total }}</span><span class="k tech">TOTAL</span></div>
+          <div class="stat-pill easy"><span class="v mono">{{ ls.easy }}</span><span class="k tech">EASY</span></div>
+          <div class="stat-pill medium"><span class="v mono">{{ ls.medium }}</span><span class="k tech">MED</span></div>
+          <div class="stat-pill hard"><span class="v mono">{{ ls.hard }}</span><span class="k tech">HARD</span></div>
+          <div class="stat-pill streak"><span class="v mono">{{ ls.streak }}🔥</span><span class="k tech">STREAK</span></div>
+        </div>
+        <div class="form-row">
+          <input class="fin" placeholder="Problem name" [(ngModel)]="newLeet.problemName" />
+          <select class="fin" [(ngModel)]="newLeet.difficulty">
+            <option value="EASY">Easy</option><option value="MEDIUM">Medium</option><option value="HARD">Hard</option>
+          </select>
+          <input class="fin sm" placeholder="Topic" [(ngModel)]="newLeet.topic" />
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="newLeet.solvedWithoutAi" /> No AI</label>
+          <button class="btn" (click)="addLeet()">+ LOG</button>
+        </div>
+        <ul class="mini-list" @listStagger>
+          <li *ngFor="let l of leetHistory()">
+            <span class="badge" [class.easy]="l.difficulty==='EASY'" [class.medium]="l.difficulty==='MEDIUM'" [class.hard]="l.difficulty==='HARD'">{{ l.difficulty }}</span>
+            <span class="pn">{{ l.problemName }}</span>
+            <span class="tech dt">{{ l.solvedDate }}</span>
+          </li>
+          <li *ngIf="!leetHistory().length" class="empty tech">No problems logged yet. Begin the grind.</li>
+        </ul>
+      </div>
+
+      <!-- Skills gap -->
+      <div class="system-card block" *ngIf="gap() as g">
+        <h3 class="mono head">◈ SKILLS GAP — TARGET ROLE</h3>
+        <div class="gap-row" *ngFor="let it of g.items">
+          <div class="gap-head">
+            <span class="sn">{{ it.skillName }}</span>
+            <span class="urg" [style.color]="urgencyColor(it.urgency)">{{ it.urgency }}</span>
+          </div>
+          <div class="gap-track">
+            <div class="gap-fill" [style.width.%]="(it.current/it.target)*100" [style.background]="urgencyColor(it.urgency)"></div>
+            <div class="gap-target" [style.left.%]="98"></div>
+          </div>
+          <span class="tech gv">{{ it.current }} / {{ it.target }} · gap {{ it.gap }}</span>
+        </div>
+      </div>
+
+      <!-- Job applications -->
+      <div class="system-card block wide">
+        <h3 class="mono head">◈ JOB APPLICATIONS</h3>
+        <div class="form-row">
+          <input class="fin" placeholder="Company" [(ngModel)]="newJob.company" />
+          <input class="fin" placeholder="Role" [(ngModel)]="newJob.role" />
+          <input class="fin sm" type="number" placeholder="CTC" [(ngModel)]="newJob.ctcOffered" />
+          <button class="btn" (click)="addJob()">+ APPLY</button>
+        </div>
+        <ul class="mini-list" @listStagger>
+          <li *ngFor="let j of jobs()" class="job">
+            <div class="jinfo"><span class="pn">{{ j.company }}</span><span class="tech role">{{ j.role }}</span></div>
+            <select class="fin status" [ngModel]="j.status" (ngModelChange)="changeStatus(j, $event)">
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+          </li>
+          <li *ngIf="!jobs().length" class="empty tech">No applications yet. The first job app is a Side Quest — +300 XP.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HEALTH ===================== -->
+  <section class="panel" *ngIf="active() === 'HEALTH'" @fadeInUp
+           role="tabpanel" id="panel-HEALTH" aria-labelledby="tab-HEALTH">
+    <div class="cards">
+      <div class="system-card block" *ngIf="health() as h">
+        <h3 class="mono head">◈ WATER INTAKE</h3>
+        <div class="water">
+          <div class="drops">
+            <span *ngFor="let d of [1,2,3,4,5,6,7,8]" class="drop" [class.filled]="d <= (h.waterGlasses || 0)">💧</span>
+          </div>
+          <div class="water-actions">
+            <span class="mono big">{{ h.waterGlasses || 0 }}/8</span>
+            <button class="btn" (click)="addWater()">+ GLASS</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="system-card block" *ngIf="health() as h">
+        <h3 class="mono head">◈ MEALS & SLEEP</h3>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="h.breakfastEaten" /> Breakfast eaten</label>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="h.lunchEaten" /> Lunch eaten</label>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="h.dinnerEaten" /> Dinner eaten</label>
+        <div class="slider-row"><span class="tech">Sleep quality</span>
+          <input type="range" min="0" max="10" [(ngModel)]="h.sleepQuality" /><span class="mono">{{ h.sleepQuality || 0 }}</span></div>
+        <div class="slider-row"><span class="tech">Morning energy</span>
+          <input type="range" min="0" max="5" [(ngModel)]="h.energyMorning" /><span class="mono">{{ h.energyMorning || 0 }}</span></div>
+        <button class="btn full" (click)="saveHealth()">SAVE HEALTH LOG</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MIND ===================== -->
+  <section class="panel" *ngIf="active() === 'MIND'" @fadeInUp
+           role="tabpanel" id="panel-MIND" aria-labelledby="tab-MIND">
+    <div class="cards">
+      <div class="system-card block wide">
+        <h3 class="mono head">◈ DAILY REFLECTION</h3>
+        <div class="slider-row"><span class="tech">Mood</span>
+          <input type="range" min="1" max="10" [(ngModel)]="mind.moodEvening" /><span class="mono">{{ mind.moodEvening || 5 }}</span></div>
+        <div class="slider-row"><span class="tech">Anxiety</span>
+          <input type="range" min="1" max="10" [(ngModel)]="mind.anxietyLevel" /><span class="mono">{{ mind.anxietyLevel || 1 }}</span></div>
+        <textarea class="fin ta" placeholder="Today's win — one good thing that happened" [(ngModel)]="mind.todayWin"></textarea>
+        <textarea class="fin ta" placeholder="Grateful for..." [(ngModel)]="mind.gratitude"></textarea>
+        <textarea class="fin ta" placeholder="Evening reflection" [(ngModel)]="mind.eveningReflection"></textarea>
+        <button class="btn full" (click)="saveMind()">SAVE REFLECTION</button>
+      </div>
+
+      <div class="system-card block">
+        <h3 class="mono head">◈ EVIDENCE vs SELF-DOUBT</h3>
+        <p class="tech hint">When the mind says "you can't" — the record says otherwise.</p>
+        <ul class="mini-list" @listStagger>
+          <li *ngFor="let e of evidence()" class="ev">
+            <span class="ev-cat" [attr.data-cat]="e.category">{{ e.category }}</span>
+            <span class="pn">{{ e.evidence }}</span>
+          </li>
+          <li *ngIf="!evidence().length" class="empty tech">Complete skill quests to build undeniable evidence.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WEALTH ===================== -->
+  <section class="panel" *ngIf="active() === 'WEALTH'" @fadeInUp
+           role="tabpanel" id="panel-WEALTH" aria-labelledby="tab-WEALTH">
+    <div class="cards">
+      <div class="system-card block wide">
+        <h3 class="mono head">◈ SAVINGS GOALS</h3>
+        <div class="goal" *ngFor="let g of goals()">
+          <div class="goal-head">
+            <span class="pn">{{ g.goalName }}</span>
+            <span class="mono gv">₹{{ g.current }} / ₹{{ g.target }}</span>
+          </div>
+          <div class="gap-track">
+            <div class="gap-fill gold" [style.width.%]="goalPct(g)"></div>
+          </div>
+          <div class="goal-actions">
+            <span class="tech dl" *ngIf="g.deadline">due {{ g.deadline }}</span>
+            <span class="done tech" *ngIf="g.achieved">✓ ACHIEVED</span>
+            <span class="spacer"></span>
+            <button class="btn sm" (click)="bumpGoal(g, 500)">+₹500</button>
+            <button class="btn sm" (click)="bumpGoal(g, 100)">+₹100</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ENGLISH ===================== -->
+  <section class="panel" *ngIf="active() === 'ENGLISH'" @fadeInUp
+           role="tabpanel" id="panel-ENGLISH" aria-labelledby="tab-ENGLISH">
+    <div class="cards">
+      <div class="system-card block wide">
+        <h3 class="mono head">◈ ENGLISH SESSION</h3>
+        <div class="slider-row"><span class="tech">Speaking minutes</span>
+          <input type="range" min="0" max="60" step="5" [(ngModel)]="english.speakingMin" /><span class="mono">{{ english.speakingMin }}m</span></div>
+        <input class="fin" placeholder="Resource (Vanessa YouTube, BBC...)" [(ngModel)]="english.resourceUsed" />
+        <input class="fin" placeholder="Topic practiced" [(ngModel)]="english.topicPracticed" />
+        <div class="slider-row"><span class="tech">New words</span>
+          <input type="number" class="fin sm" [(ngModel)]="english.newWords" /></div>
+        <div class="slider-row"><span class="tech">Confidence</span>
+          <input type="range" min="1" max="10" [(ngModel)]="english.selfRating" /><span class="mono">{{ english.selfRating || 5 }}</span></div>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="english.mockInterview" /> Mock interview done</label>
+        <button class="btn full" (click)="saveEnglish()">LOG ENGLISH SESSION</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BODY ===================== -->
+  <section class="panel" *ngIf="active() === 'BODY'" @fadeInUp
+           role="tabpanel" id="panel-BODY" aria-labelledby="tab-BODY">
+    <div class="cards">
+      <div class="system-card block wide" *ngIf="body() as b">
+        <h3 class="mono head">◈ TESTOSTERONE — 7 PILLARS</h3>
+        <div class="pillars">
+          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.coldShower" /> ❄️ Cold shower</label>
+          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.exerciseDone" /> 🏋️ Exercise</label>
+          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.zincMeal" /> 🥚 Zinc meal</label>
+          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.noSoda" /> 🚫 No soda</label>
+          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.noPorn" /> 🧠 No porn</label>
+          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.sleptBefore1130" /> 😴 Slept &lt; 11:30</label>
+        </div>
+        <div class="slider-row"><span class="tech">Morning sun (min)</span>
+          <input type="range" min="0" max="40" step="5" [(ngModel)]="b.morningSunMin" /><span class="mono">{{ b.morningSunMin }}m</span></div>
+        <button class="btn full" (click)="saveBody()">LOCK IN PILLARS</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RELATIONSHIP ===================== -->
+  <section class="panel" *ngIf="active() === 'RELATIONSHIP'" @fadeInUp
+           role="tabpanel" id="panel-RELATIONSHIP" aria-labelledby="tab-RELATIONSHIP">
+    <div class="cards">
+      <div class="system-card block wide" *ngIf="relationship() as r">
+        <h3 class="mono head">◈ BONDS</h3>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="r.gfCalled" /> Called / messaged girlfriend</label>
+        <div class="slider-row"><span class="tech">Call minutes</span>
+          <input type="number" class="fin sm" [(ngModel)]="r.callDurationMin" /></div>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="r.familyContact" /> Contacted family</label>
+        <label class="chk tech"><input type="checkbox" [(ngModel)]="r.friendMessage" /> Messaged a friend</label>
+        <input class="fin" placeholder="Friend name" [(ngModel)]="r.friendName" />
+        <button class="btn full" (click)="saveRel()">SAVE BONDS</button>
+      </div>
+    </div>
+  </section>
+</div>
+

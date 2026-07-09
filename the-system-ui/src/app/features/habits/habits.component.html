@@ -1,0 +1,412 @@
+<div class="habits-shell">
+
+  <!-- Top nav -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">THE SYSTEM</span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system">STATUS</a>
+      <a routerLink="/habits" class="active">HABITS</a>
+      <a routerLink="/life">LIFE OS</a>
+      <a routerLink="/insights">INSIGHTS</a>
+      <a routerLink="/achievements">RANKS</a>
+    </nav>
+  </header>
+
+  <!-- Header + KPIs -->
+  <section class="hero">
+    <h1 class="mono title glow-text">DISCIPLINE GRID</h1>
+    <p class="tech sub">
+      Atomic Habits engine · Cue → Craving → Routine → Reward · 66-day mastery cycle
+    </p>
+
+    <div class="kpi-row" *ngIf="overview() as o">
+      <div class="kpi">
+        <span class="kpi-val mono">{{ o.completedToday }}/{{ o.dueToday }}</span>
+        <span class="kpi-lbl tech">TODAY</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-val mono">{{ o.longestGlobalStreak }}</span>
+        <span class="kpi-lbl tech">LONGEST STREAK</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-val mono">{{ o.totalCompletions }}</span>
+        <span class="kpi-lbl tech">TOTAL CHECK-INS</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-val mono">×{{ o.compoundingFactor | number:'1.2-2' }}</span>
+        <span class="kpi-lbl tech">1% COMPOUNDING</span>
+      </div>
+    </div>
+
+    <p class="verdict tech" *ngIf="overview() as o">{{ o.systemVerdict }}</p>
+
+    <!-- 1% compounding curve — Atomic Habits signature chart -->
+    <div class="compound-card" *ngIf="overview() as o">
+      <div class="compound-head">
+        <span class="tech c-lbl">◈ 1% BETTER vs 1% WORSE — {{ o.compoundingFactor > 0 ? 'compound trajectory' : 'projection' }}</span>
+        <span class="tech c-nums">
+          ×{{ o.compoundingFactor | number:'1.2-2' }} <span class="c-down">/ ×{{ o.decayFactor | number:'1.2-2' }}</span>
+        </span>
+      </div>
+      <svg class="compound-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <polyline class="c-up" fill="none" stroke-width="1.4" [attr.points]="compoundingCurve().upPath"></polyline>
+        <polyline class="c-down-line" fill="none" stroke-width="1.4"
+                  stroke-dasharray="2,2" [attr.points]="compoundingCurve().downPath"></polyline>
+      </svg>
+      <span class="tech c-caption">30-day projection · every 1% choice compounds</span>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn primary tech" (click)="openCreate()">＋ FORGE HABIT</button>
+      <button class="btn ghost tech" (click)="openTemplates()">◈ BROWSE TEMPLATES</button>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <div class="loader" *ngIf="loading() && !overview()">
+    <div class="loader-ring"></div>
+    <p class="mono">CALIBRATING HABIT GRID<span class="dots"></span></p>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty" *ngIf="!loading() && overview() && !hasHabits()">
+    <div class="empty-icon mono">◈</div>
+    <h2 class="mono">NO HABITS FORGED YET</h2>
+    <p class="tech">
+      Every habit is a vote for the identity you want to become.
+      Adopt a curated template or forge your own.
+    </p>
+    <button class="btn primary tech" (click)="openTemplates()">◈ ADOPT STARTER PACK</button>
+  </div>
+
+  <!-- Identity progress rings -->
+  <section class="identity-row" *ngIf="hasHabits() && identityKeys().length > 0">
+    <h3 class="mono section-title">◈ IDENTITY PROGRESS</h3>
+    <div class="identity-grid">
+      <div class="identity-card" *ngFor="let tag of identityKeys()">
+        <div class="ring" [style.--color]="identityColor(tag)"
+             [style.--pct.%]="overview()!.identityScores[tag]">
+          <span class="ring-val mono">{{ overview()!.identityScores[tag] }}%</span>
+        </div>
+        <span class="identity-tag tech">{{ tag }}</span>
+        <span class="identity-hint tech">I am becoming a {{ tag | lowercase }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Habits list -->
+  <section class="habits-grid" *ngIf="hasHabits()">
+    <h3 class="mono section-title">◈ TODAY'S HABITS</h3>
+
+    <div class="habit-card system-card" *ngFor="let h of overview()!.habits; let i = index"
+         [class.done]="h.completedToday" [class.keystone]="h.keystone"
+         [style.--accent]="identityColor(h.identityTag)"
+         [style.animationDelay.ms]="i * 60">
+
+      <!-- Header -->
+      <div class="h-head">
+        <div class="h-name">
+          <span class="keystone-badge tech" *ngIf="h.keystone" title="Keystone habit — 2× XP">★</span>
+          <span class="mono">{{ h.name }}</span>
+        </div>
+        <div class="h-tag tech" [style.color]="identityColor(h.identityTag)">
+          {{ h.identityTag || '—' }}
+        </div>
+      </div>
+
+      <!-- 4 Laws detail -->
+      <div class="h-loop" *ngIf="h.cue || h.craving || h.routine || h.reward">
+        <div class="loop-item" *ngIf="h.cue">
+          <span class="loop-lbl tech">CUE</span>
+          <span class="loop-val">{{ h.cue }}<span *ngIf="h.cueTime"> · {{ h.cueTime }}</span></span>
+        </div>
+        <div class="loop-item" *ngIf="h.stackAfterHabitId">
+          <span class="loop-lbl tech">STACK</span>
+          <span class="loop-val">After: {{ habitName(h.stackAfterHabitId) }}</span>
+        </div>
+        <div class="loop-item" *ngIf="h.craving">
+          <span class="loop-lbl tech">CRAVING</span>
+          <span class="loop-val">{{ h.craving }}</span>
+        </div>
+        <div class="loop-item" *ngIf="h.routine">
+          <span class="loop-lbl tech">ROUTINE</span>
+          <span class="loop-val">{{ h.routine }}</span>
+        </div>
+        <div class="loop-item" *ngIf="h.reward">
+          <span class="loop-lbl tech">REWARD</span>
+          <span class="loop-val">{{ h.reward }}</span>
+        </div>
+      </div>
+
+      <!-- Streak + mastery -->
+      <div class="h-metrics">
+        <div class="metric">
+          <span class="mono metric-val">{{ streakEmoji(h.currentStreak) }} {{ h.currentStreak }}</span>
+          <span class="tech metric-lbl">STREAK</span>
+        </div>
+        <div class="metric">
+          <span class="mono metric-val">{{ h.longestStreak }}</span>
+          <span class="tech metric-lbl">BEST</span>
+        </div>
+        <div class="metric">
+          <span class="mono metric-val">{{ h.masteryPct | number:'1.0-0' }}%</span>
+          <span class="tech metric-lbl">MASTERY</span>
+        </div>
+        <div class="metric">
+          <span class="mono metric-val">{{ h.consistencyPct | number:'1.0-0' }}%</span>
+          <span class="tech metric-lbl">30-DAY</span>
+        </div>
+      </div>
+
+      <!-- Mastery bar (66 day cycle) -->
+      <div class="mastery-track" [attr.aria-label]="'Mastery ' + h.masteryPct + '%'">
+        <div class="mastery-fill" [style.width.%]="h.masteryPct"></div>
+      </div>
+
+      <!-- Last 30 mini-heat -->
+      <div class="mini-heat" [attr.aria-label]="'Last 30 days'">
+        <span *ngFor="let v of h.last30" class="mini-dot"
+              [class.done]="v === 1" [class.two-min]="v === 2"
+              [attr.title]="v === 0 ? 'miss' : (v === 2 ? '2-min rule' : 'done')"></span>
+      </div>
+
+      <!-- Actions -->
+      <div class="h-actions">
+        <button class="btn primary tech" (click)="completeHabit(h)"
+                [disabled]="h.completedToday">
+          {{ h.completedToday ? '✓ CLEARED' : '◈ COMPLETE' }}
+        </button>
+        <button class="btn ghost tech" (click)="completeHabit(h, true)"
+                *ngIf="!h.completedToday && h.twoMinuteVersion"
+                [title]="'2-Minute rule: ' + h.twoMinuteVersion">
+          2-MIN
+        </button>
+        <button class="btn ghost tech" (click)="openCompleteModal(h)"
+                *ngIf="!h.completedToday" title="Complete with reflection + note">
+          ✎ REFLECT
+        </button>
+        <button class="btn icon" (click)="openHistory(h)" title="Cue Log history">📜</button>
+        <button class="btn icon" (click)="openEdit(h)" title="Edit">✎</button>
+        <button class="btn icon" (click)="archive(h)" title="Archive">✕</button>
+      </div>
+
+      <div class="active-days tech">{{ activeDayLabels(h.activeDays) }}</div>
+    </div>
+  </section>
+
+  <!-- =============== EDITOR MODAL =============== -->
+  <div class="modal-backdrop" *ngIf="showEditor()" (click)="closeEditor()"></div>
+  <div class="modal system-card" *ngIf="showEditor()" role="dialog"
+       aria-modal="true" aria-labelledby="editor-title">
+    <header class="modal-head">
+      <h2 id="editor-title" class="mono">
+        {{ editorMode() === 'create' ? '◈ FORGE HABIT' : '◈ EDIT HABIT' }}
+      </h2>
+      <button class="btn icon" (click)="closeEditor()" aria-label="Close">✕</button>
+    </header>
+
+    <div class="modal-body">
+      <label class="field">
+        <span class="tech f-lbl">HABIT NAME *</span>
+        <input class="input" [ngModel]="form().name"
+               (ngModelChange)="updateForm('name', $event)"
+               placeholder="e.g. Cold shower" />
+      </label>
+
+      <label class="field">
+        <span class="tech f-lbl">IDENTITY TAG</span>
+        <select class="input" [ngModel]="form().identityTag"
+                (ngModelChange)="updateForm('identityTag', $event)">
+          <option value="Hunter">Hunter (physical)</option>
+          <option value="Scholar">Scholar (mind / skill)</option>
+          <option value="Monk">Monk (meditation)</option>
+          <option value="Warrior">Warrior (discipline / money)</option>
+          <option value="Custom">Custom</option>
+        </select>
+        <span class="tech f-hint">"I am becoming a {{ form().identityTag | lowercase }}"</span>
+      </label>
+
+      <fieldset class="laws">
+        <legend class="mono">◈ THE 4 LAWS — Atomic Habits loop</legend>
+
+        <label class="field">
+          <span class="tech f-lbl">1️⃣ CUE — Make it Obvious</span>
+          <input class="input" [ngModel]="form().cue"
+                 (ngModelChange)="updateForm('cue', $event)"
+                 placeholder="I will [X] at [TIME] in [PLACE]" />
+        </label>
+        <label class="field">
+          <span class="tech f-lbl">2️⃣ CRAVING — Make it Attractive</span>
+          <input class="input" [ngModel]="form().craving"
+                 (ngModelChange)="updateForm('craving', $event)"
+                 placeholder="Why it matters + temptation bundle" />
+        </label>
+        <label class="field">
+          <span class="tech f-lbl">3️⃣ ROUTINE — Make it Easy (the action itself)</span>
+          <input class="input" [ngModel]="form().routine"
+                 (ngModelChange)="updateForm('routine', $event)"
+                 placeholder="The exact action" />
+        </label>
+        <label class="field">
+          <span class="tech f-lbl">4️⃣ REWARD — Make it Satisfying</span>
+          <input class="input" [ngModel]="form().reward"
+                 (ngModelChange)="updateForm('reward', $event)"
+                 placeholder="Immediate reward after doing it" />
+        </label>
+        <label class="field">
+          <span class="tech f-lbl">⚡ 2-MINUTE VERSION (scale-down)</span>
+          <input class="input" [ngModel]="form().twoMinuteVersion"
+                 (ngModelChange)="updateForm('twoMinuteVersion', $event)"
+                 placeholder="Never-miss-twice fallback" />
+        </label>
+      </fieldset>
+
+      <div class="row">
+        <label class="field half">
+          <span class="tech f-lbl">CUE TIME</span>
+          <input type="time" class="input" [ngModel]="form().cueTime"
+                 (ngModelChange)="updateForm('cueTime', $event)" />
+        </label>
+        <label class="field half">
+          <span class="tech f-lbl">DIFFICULTY (1-5)</span>
+          <input type="number" min="1" max="5" class="input" [ngModel]="form().difficulty"
+                 (ngModelChange)="updateForm('difficulty', +$event)" />
+        </label>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" [ngModel]="form().keystone"
+               (ngModelChange)="updateForm('keystone', $event)" />
+        <span class="tech">◆ KEYSTONE HABIT (2× XP, unlocks Keystone Bearer title)</span>
+      </label>
+
+      <!-- Weekday picker (activeDays bitmask) -->
+      <div class="field">
+        <span class="tech f-lbl">ACTIVE DAYS</span>
+        <div class="day-chips">
+          <button type="button" class="day-chip tech" *ngFor="let lbl of ['M','T','W','T','F','S','S']; let i = index"
+                  [class.on]="dayOn(i)" (click)="toggleDay(i)"
+                  [attr.aria-pressed]="dayOn(i)">{{ lbl }}</button>
+        </div>
+        <span class="tech f-hint">{{ activeDayLabels(form().activeDays ?? 127) }}</span>
+      </div>
+
+      <!-- Habit stacking dropdown -->
+      <label class="field" *ngIf="stackCandidates().length > 0">
+        <span class="tech f-lbl">HABIT STACK — "After [X], I will do this"</span>
+        <select class="input" [ngModel]="form().stackAfterHabitId"
+                (ngModelChange)="updateForm('stackAfterHabitId', $event ? +$event : null)">
+          <option [ngValue]="null">— No stack (standalone habit)</option>
+          <option *ngFor="let h of stackCandidates()" [ngValue]="h.id">
+            After: {{ h.name }}<span *ngIf="h.cueTime"> ({{ h.cueTime }})</span>
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn ghost tech" (click)="closeEditor()">CANCEL</button>
+      <button class="btn primary tech" (click)="saveHabit()">◈ COMMIT</button>
+    </div>
+  </div>
+
+  <!-- =============== COMPLETE (REFLECT) MODAL =============== -->
+  <div class="modal-backdrop" *ngIf="showComplete()" (click)="closeComplete()"></div>
+  <div class="modal system-card" *ngIf="showComplete() && completeTarget() as ct" role="dialog"
+       aria-modal="true" aria-labelledby="complete-title">
+    <header class="modal-head">
+      <h2 id="complete-title" class="mono">◈ COMPLETE — {{ ct.name }}</h2>
+      <button class="btn icon" (click)="closeComplete()" aria-label="Close">✕</button>
+    </header>
+    <div class="modal-body">
+      <p class="tech reflect-hint" *ngIf="ct.reward">🎁 REWARD: {{ ct.reward }}</p>
+
+      <div class="field">
+        <span class="tech f-lbl">QUALITY (1 = barely, 5 = crushed it)</span>
+        <div class="stars">
+          <button type="button" class="star" *ngFor="let n of [1,2,3,4,5]"
+                  [class.on]="completeQuality() >= n" (click)="completeQuality.set(n)"
+                  [attr.aria-label]="'Quality ' + n + ' of 5'">★</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="tech f-lbl">CUE LOG NOTE (optional)</span>
+        <textarea class="input" rows="3"
+                  [ngModel]="completeNote()" (ngModelChange)="completeNote.set($event)"
+                  placeholder="What triggered you? What resistance did you feel? Any insight?"></textarea>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" [ngModel]="completeTwoMin()"
+               (ngModelChange)="completeTwoMin.set($event)" />
+        <span class="tech">⚡ 2-Minute Rule — half XP, streak preserved (never miss twice)</span>
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost tech" (click)="closeComplete()">CANCEL</button>
+      <button class="btn primary tech" (click)="submitComplete()">◈ COMMIT</button>
+    </div>
+  </div>
+
+  <!-- =============== HISTORY (CUE LOG) MODAL =============== -->
+  <div class="modal-backdrop" *ngIf="showHistory()" (click)="closeHistory()"></div>
+  <div class="modal system-card" *ngIf="showHistory() && historyTarget() as ht" role="dialog"
+       aria-modal="true" aria-labelledby="history-title">
+    <header class="modal-head">
+      <h2 id="history-title" class="mono">📜 CUE LOG — {{ ht.name }}</h2>
+      <button class="btn icon" (click)="closeHistory()" aria-label="Close">✕</button>
+    </header>
+    <div class="modal-body">
+      <p class="tech" *ngIf="historyLoading()">Loading…</p>
+      <p class="tech empty-hist" *ngIf="!historyLoading() && historyEntries().length === 0">
+        No entries yet. Complete this habit to start writing your Cue Log.
+      </p>
+      <ul class="history-list" *ngIf="!historyLoading() && historyEntries().length > 0">
+        <li class="hist-item" *ngFor="let e of historyEntries()">
+          <div class="hist-head">
+            <span class="mono hist-date">{{ e.date | date:'MMM d, y' }}</span>
+            <span class="tech hist-meta">
+              <span *ngFor="let n of [1,2,3,4,5]" class="mini-star" [class.on]="e.quality >= n">★</span>
+              · +{{ e.xpGained }} XP
+              <span *ngIf="e.twoMinute" class="two-min-tag">2-MIN</span>
+            </span>
+          </div>
+          <p class="hist-note" *ngIf="e.note">{{ e.note }}</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- =============== TEMPLATES MODAL =============== -->
+  <div class="modal-backdrop" *ngIf="showTemplates()" (click)="closeTemplates()"></div>
+  <div class="modal wide system-card" *ngIf="showTemplates()" role="dialog"
+       aria-modal="true" aria-labelledby="tpl-title">
+    <header class="modal-head">
+      <h2 id="tpl-title" class="mono">◈ HABIT TEMPLATES</h2>
+      <button class="btn icon" (click)="closeTemplates()" aria-label="Close">✕</button>
+    </header>
+    <div class="modal-body">
+      <div class="tpl-loading" *ngIf="templatesLoading()">Loading…</div>
+      <div class="tpl-grid" *ngIf="!templatesLoading()">
+        <div class="tpl-card" *ngFor="let t of templates()"
+             [style.borderColor]="identityColor(t.identityTag)">
+          <div class="tpl-head">
+            <span class="mono tpl-name">{{ t.name }}</span>
+            <span class="tpl-tag tech" [style.color]="identityColor(t.identityTag)">
+              {{ t.identityTag }}<span *ngIf="t.keystone"> · ★KEY</span>
+            </span>
+          </div>
+          <p class="tech tpl-cue">🕒 {{ t.cueTime }} · {{ t.cue }}</p>
+          <p class="tech tpl-routine">→ {{ t.routine }}</p>
+          <button class="btn primary tech" (click)="adopt(t)">◈ ADOPT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+

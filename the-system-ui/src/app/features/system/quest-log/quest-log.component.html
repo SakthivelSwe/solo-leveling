@@ -1,0 +1,66 @@
+<div class="quest-log system-card">
+  <div class="header">
+    <div class="title-row">
+      <span class="mono diamond">◈</span>
+      <div>
+        <h2 class="mono title">DAILY QUEST LOG</h2>
+        <p class="tech subtitle">
+          {{ doneCount }}/{{ quests.length }} CLEARED ·
+          <span [class.warn]="pendingCount > 5" [class.crit]="pendingCount > 8">{{ pendingCount }} REMAINING</span>
+        </p>
+      </div>
+    </div>
+    <!-- XP progress of today -->
+    <div class="day-bar">
+      <div class="day-fill" [style.width.%]="(doneCount / quests.length) * 100"></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button *ngFor="let c of categories" class="filter-btn tech"
+            [class.active]="selectedCategory === c.key"
+            [style.--fc]="c.color"
+            (click)="selectedCategory = c.key">
+      {{ c.label }}
+    </button>
+  </div>
+
+  <!-- Skip warning -->
+  <div class="skip-warn tech" *ngIf="skipWarningKey" (click)="dismissWarning()">
+    <span class="mono">⚠</span> {{ skipMsg }}
+  </div>
+
+  <div class="quest-list" [@listStagger]="selectedCategory">
+    <div class="quest-item" *ngFor="let q of filtered; trackBy: trackByKey"
+         [class.done]="q.isCompleted"
+         [class.pending]="pendingKey === q.questKey"
+         [style.--cat]="categoryColor(q.category)"
+         (click)="onComplete(q)">
+      <div class="checkbox">
+        <span *ngIf="q.isCompleted" class="check">✓</span>
+        <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
+        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+      </div>
+      <div class="quest-body">
+        <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
+        <span class="label">{{ q.label }}</span>
+        <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
+          {{ formatBoosts(q.statBoosts) }}
+        </span>
+      </div>
+      <div class="right-col">
+        <div class="xp-badge mono">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
+      </div>
+    </div>
+
+    <div class="empty tech" *ngIf="filtered.length === 0">
+      NO QUESTS IN THIS GATE.
+    </div>
+  </div>
+
+  <!-- Bottom discipline message -->
+  <div class="bottom-msg tech" *ngIf="pendingCount > 0">
+    ◈ {{ pendingCount }} gate{{ pendingCount > 1 ? 's' : '' }} not cleared.
+    Each uncleared quest costs you stat growth. There are no shortcuts to S-Rank.
+  </div>
+</div>

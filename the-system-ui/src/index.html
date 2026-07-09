@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>THE SYSTEM ◈ Solo Leveling Life OS</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!--
+    Content-Security-Policy — defense in depth against XSS (mitigates the
+    known Angular 17 XSS CVE routes). Allows: our own bundle, Google Fonts,
+    HTTP(S) API + SSE calls. Forbids: inline JS, framing, plugins.
+    Angular runtime needs 'unsafe-inline' for styles.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' http: https: ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer">
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- PWA: installable app + Solo-Leveling theme colour -->
+  <link rel="manifest" href="assets/manifest.webmanifest">
+  <meta name="theme-color" content="#060610">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="THE SYSTEM">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

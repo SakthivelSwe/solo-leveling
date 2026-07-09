@@ -1,0 +1,83 @@
+<div class="status system-card">
+  <div class="header">
+    <div class="title-row">
+      <span class="mono diamond">◈</span>
+      <div>
+        <h2 class="mono title">STATUS</h2>
+        <p class="tech subtitle">PLAYER: {{ player.displayName || player.username }}</p>
+      </div>
+    </div>
+    <app-rank-badge [rank]="player.rankLevel"></app-rank-badge>
+  </div>
+
+  <div class="core">
+    <!-- XP Ring -->
+    <div class="ring-wrap">
+      <svg viewBox="0 0 180 180" class="ring">
+        <defs>
+          <linearGradient id="xpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4fc3f7" />
+            <stop offset="60%" stop-color="#534AB7" />
+            <stop offset="100%" stop-color="#1D9E75" />
+          </linearGradient>
+          <filter id="ringGlow">
+            <feGaussianBlur stdDeviation="3" result="b" />
+            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        <circle cx="90" cy="90" [attr.r]="radius" class="ring-track" />
+        <circle cx="90" cy="90" [attr.r]="radius" class="ring-progress"
+                filter="url(#ringGlow)"
+                [style.strokeDasharray]="circumference"
+                [style.strokeDashoffset]="dashOffset" />
+      </svg>
+      <div class="ring-center">
+        <div class="lvl-label tech">LEVEL</div>
+        <div class="lvl-num mono">{{ player.level }}</div>
+        <div class="xp-text tech">{{ player.currentXp }} / {{ player.xpToNextLevel }} XP</div>
+      </div>
+    </div>
+
+    <!-- Meta -->
+    <div class="meta">
+      <div class="meta-chip">
+        <span class="tech k">TOTAL XP</span>
+        <span class="mono v">{{ player.totalXp }}</span>
+      </div>
+      <div class="meta-chip">
+        <span class="tech k">STREAK</span>
+        <span class="mono v flame">{{ streak }}🔥</span>
+      </div>
+      <div class="meta-chip">
+        <span class="tech k">TODAY</span>
+        <span class="mono v">{{ completedToday }}/{{ totalQuests }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-row" *ngFor="let s of statsMeta; let i = index"
+         [style.animationDelay.ms]="i * 80">
+      <div class="stat-head">
+        <span class="stat-label mono" [style.color]="s.color">{{ s.label }}</span>
+        <span class="stat-full tech">{{ s.full }}</span>
+        <span class="stat-val mono" [style.color]="s.color">{{ statValue(s.key) }}</span>
+      </div>
+      <div class="stat-track">
+        <div class="stat-fill" [style.width.%]="statPct(s.key)"
+             [style.background]="'linear-gradient(90deg,' + s.color + '88,' + s.color + ')'"
+             [style.boxShadow]="'0 0 12px ' + s.color + '99'"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="motivation tech">
+    <span class="quote-mark">“</span>{{ motivation }}<span class="quote-mark">”</span>
+  </div>
+
+  <div class="system-quote tech" *ngIf="systemQuote">
+    <span class="mono sq-mark">◈ SYSTEM</span> {{ systemQuote }}
+  </div>
+</div>
+

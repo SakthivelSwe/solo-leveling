@@ -1,0 +1,111 @@
+<div class="system-shell">
+
+  <!-- HP DANGER BANNER — shows when HP < 40 -->
+  <div class="hp-danger-banner tech" *ngIf="status() && (status()!.player.hp < 40)"
+       role="alert" aria-live="assertive">
+    <span class="mono">⚠</span>
+    HP CRITICAL — {{ status()!.player.hp }}/{{ status()!.player.maxHp }} ·
+    COMPLETE {{ 10 - status()!.completedToday }} MORE QUESTS TODAY OR FACE RANK DEMOTION.
+    THE SYSTEM IS WATCHING.
+  </div>
+
+  <!-- Top Nav -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">THE SYSTEM</span>
+      <span class="tech rank-badge-mini" *ngIf="status() as s">
+        {{ s.player.rankLevel }}-RANK
+      </span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system" class="active">STATUS</a>
+      <a routerLink="/habits">HABITS</a>
+      <a routerLink="/life">LIFE OS</a>
+      <a routerLink="/ai">AI MENTOR</a>
+      <a routerLink="/insights">INSIGHTS</a>
+      <a routerLink="/achievements">RANKS</a>
+      <a routerLink="/notifications" class="bell"
+         [attr.aria-label]="'Notifications' + (notifications.unread() > 0 ? ', ' + notifications.unread() + ' unread' : '')">
+        🔔<span class="badge" *ngIf="notifications.unread() > 0">{{ notifications.unread() }}</span>
+      </a>
+      <span class="live-link tech" [class.on]="sse.connected()"
+            role="status" [attr.aria-label]="sse.connected() ? 'System link live' : 'Reconnecting'"
+            [title]="sse.connected() ? 'System link live' : 'Reconnecting…'">
+        <span class="dot"></span>{{ sse.connected() ? 'LIVE' : 'SYNC' }}
+      </span>
+      <button class="gear tech" (click)="settingsOpen.set(true)" title="Settings"
+              aria-label="Open settings">⚙</button>
+    </nav>
+    <div class="user" *ngIf="status() as s">
+      <div class="user-info">
+        <span class="tech hunter">{{ s.player.displayName || s.player.username }}</span>
+        <span class="tech title-tag" *ngIf="s.player.equippedTitle">{{ titleName(s.player.equippedTitle) }}</span>
+        <span class="tech lv">LV.{{ s.player.level }}</span>
+      </div>
+      <button class="logout tech" (click)="logout()">EXIT ⏻</button>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div class="loader" *ngIf="loading()">
+    <div class="loader-ring"></div>
+    <p class="mono">INITIALIZING THE SYSTEM<span class="dots"></span></p>
+    <p class="tech loader-sub">SCANNING HUNTER DATA...</p>
+  </div>
+
+  <!-- Dashboard -->
+  <main class="grid" *ngIf="status() as s">
+    <!-- LEFT: Status + Skill Tree -->
+    <div class="col-left">
+      <app-status-window
+        [player]="s.player"
+        [stats]="s.stats"
+        [streak]="s.streak"
+        [motivation]="s.motivation"
+        [systemQuote]="s.systemQuote"
+        [completedToday]="s.completedToday"
+        [totalQuests]="s.totalQuests">
+      </app-status-window>
+
+      <app-skill-tree [skills]="s.skills"></app-skill-tree>
+    </div>
+
+    <!-- CENTRE: Quest Log + Progress -->
+    <div class="col-centre">
+      <!-- Accountability strip -->
+      <div class="accountability tech" *ngIf="s.completedToday < s.totalQuests">
+        <span class="mono">◈</span>
+        {{ s.totalQuests - s.completedToday }} QUEST{{ s.totalQuests - s.completedToday > 1 ? 'S' : '' }} REMAINING ·
+        <span [style.color]="hpRiskColor(s.completedToday, s.totalQuests)">
+          {{ accountabilityMsg(s.completedToday, s.totalQuests) }}
+        </span>
+      </div>
+      <div class="all-clear tech" *ngIf="s.completedToday >= s.totalQuests">
+        ✓ ALL QUESTS CLEARED · PERFECT DAY · HP +5 AT MIDNIGHT
+      </div>
+
+      <app-quest-log
+        [quests]="s.todayQuests"
+        [pendingKey]="pendingKey()"
+        [pressureLevel]="pressureLevel()"
+        (complete)="onComplete($event)">
+      </app-quest-log>
+
+      <app-progress-chart [weekly]="s.weeklyProgress"></app-progress-chart>
+    </div>
+
+    <!-- RIGHT: Daily Schedule -->
+    <div class="col-right">
+      <app-dungeon-card></app-dungeon-card>
+      <app-daily-schedule></app-daily-schedule>
+    </div>
+  </main>
+
+  <footer class="footer tech" *ngIf="!loading()">
+    ◈ KEEP FORWARDING — E-RANK → S-RANK · SKIPPING IS CHOOSING TO STAY WEAK ◈
+  </footer>
+
+  <!-- Settings Panel -->
+  <app-settings-panel *ngIf="settingsOpen()" (close)="settingsOpen.set(false)"></app-settings-panel>
+</div>

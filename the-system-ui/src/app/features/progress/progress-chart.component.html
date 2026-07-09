@@ -1,0 +1,25 @@
+<div class="progress system-card">
+  <div class="header">
+    <div class="title-row">
+      <span class="mono diamond">◈</span>
+      <div>
+        <h2 class="mono title">WEEKLY PROGRESS</h2>
+        <p class="tech subtitle">LAST 7 DAYS · {{ totalWeekQuests }} QUESTS · {{ totalWeekXp }} XP</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-box">
+    <canvas baseChart
+            [type]="'bar'"
+            [data]="barData"
+            [options]="options"></canvas>
+  </div>
+
+  <div class="legend tech">
+    <span><i class="dot" style="background:#D85A30"></i>TODAY</span>
+    <span><i class="dot" style="background:#1D9E75"></i>STRONG (8+)</span>
+    <span><i class="dot" style="background:#85B7EB"></i>ACTIVE</span>
+  </div>
+</div>
+

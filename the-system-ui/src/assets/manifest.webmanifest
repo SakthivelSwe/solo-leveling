@@ -1,0 +1,21 @@
+{
+  "name": "THE SYSTEM — Solo Leveling Life OS",
+  "short_name": "THE SYSTEM",
+  "description": "Gamified life OS — complete daily quests, raise your stats, and climb the ranks from E to S.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#060610",
+  "theme_color": "#060610",
+  "categories": ["productivity", "lifestyle", "health"],
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}
+

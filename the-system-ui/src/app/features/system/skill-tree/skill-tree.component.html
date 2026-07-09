@@ -1,0 +1,30 @@
+<div class="skill-tree system-card">
+  <div class="header">
+    <div class="title-row">
+      <span class="mono diamond">◈</span>
+      <div>
+        <h2 class="mono title">SKILL TREE</h2>
+        <p class="tech subtitle">MASTERY GROWS WITH EVERY SKILL QUEST</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="skills">
+    <div class="skill" *ngFor="let s of skills; trackBy: trackBySkill; let i = index"
+         [style.animationDelay.ms]="i * 90">
+      <div class="skill-head">
+        <span class="name">{{ s.name }}</span>
+        <span class="lvl mono">LV.{{ s.level }}</span>
+      </div>
+      <div class="segments">
+        <span class="seg" *ngFor="let seg of segments; let j = index"
+              [class.filled]="j < s.level"></span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" [style.width.%]="s.pct"></div>
+        <span class="pct tech">{{ s.pct }}%</span>
+      </div>
+    </div>
+  </div>
+</div>
+

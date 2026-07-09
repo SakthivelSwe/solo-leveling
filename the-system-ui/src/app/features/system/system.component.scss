@@ -1,0 +1,143 @@
+:host { display: block; position: relative; z-index: 1; }
+
+/* HP Danger Banner */
+.hp-danger-banner {
+  position: sticky; top: 0; z-index: 30;
+  background: linear-gradient(90deg, rgba(226,75,74,0.18), rgba(226,75,74,0.08));
+  border-bottom: 1px solid rgba(226,75,74,0.35);
+  padding: 10px 24px; font-size: .72rem; letter-spacing: 2px;
+  color: #f09595; display: flex; align-items: center; gap: 10px;
+  animation: dangerPulse 2s ease-in-out infinite;
+}
+.hp-danger-banner .mono { font-size: 1.1rem; }
+
+.system-shell { max-width: 1440px; margin: 0 auto; padding: 0 20px 60px; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 20px; margin-bottom: 22px; flex-wrap: wrap;
+  border: 1px solid var(--border); border-radius: 0 0 16px 16px;
+  background: linear-gradient(160deg, rgba(16,16,30,0.96), rgba(10,10,26,0.96));
+  backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 20;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.diamond { font-size: 1.5rem; color: var(--system-blue); text-shadow: 0 0 20px var(--system-blue); animation: spin360 10s linear infinite; }
+@keyframes spin360 { to { transform: rotate(360deg); } }
+.name { font-weight: 900; letter-spacing: 5px; font-size: 1.05rem; }
+.rank-badge-mini {
+  font-size: .6rem; letter-spacing: 2px; padding: 3px 8px; border-radius: 6px;
+  border: 1px solid rgba(83,74,183,0.4); color: #b3aef0; background: rgba(83,74,183,0.12);
+}
+
+.nav { display: flex; gap: 18px; align-items: center; }
+.nav a {
+  color: var(--text-secondary); text-decoration: none; font-size: .72rem;
+  letter-spacing: 2px; font-weight: 600; padding: 4px 0; position: relative; transition: color .2s;
+}
+.nav a:hover, .nav a.active { color: var(--text-primary); }
+.nav a.active::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
+  background: linear-gradient(90deg, var(--system-blue), var(--accent-purple)); border-radius: 2px;
+}
+.nav a.bell { position: relative; font-size: 1rem; }
+.nav a.bell .badge {
+  position: absolute; top: -8px; right: -12px; min-width: 16px; height: 16px;
+  padding: 0 4px; border-radius: 9px; background: #E24B4A; color: #fff;
+  font-size: .56rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 12px rgba(226,75,74,0.8); animation: bellPulse 2s ease-in-out infinite;
+}
+@keyframes bellPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.22); } }
+.gear {
+  background: none; border: 1px solid var(--border); border-radius: 7px;
+  color: var(--text-secondary); cursor: pointer; padding: 4px 8px;
+  font-size: .9rem; transition: all .2s;
+}
+.gear:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
+
+/* Real-time link indicator */
+.live-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .54rem; letter-spacing: 2px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+  border: 1px solid rgba(226,75,74,0.35); color: #f09595;
+  background: rgba(226,75,74,0.06); transition: all .3s;
+}
+.live-link .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #E24B4A;
+  box-shadow: 0 0 6px rgba(226,75,74,0.8);
+}
+.live-link.on {
+  border-color: rgba(29,158,117,0.45); color: #5dcaa5; background: rgba(29,158,117,0.08);
+}
+.live-link.on .dot {
+  background: #1D9E75; box-shadow: 0 0 8px rgba(29,158,117,0.9);
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+@keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(1.3); } }
+
+.user { display: flex; align-items: center; gap: 12px; }
+.user-info { display: flex; flex-direction: column; gap: 1px; }
+.hunter { font-size: .76rem; letter-spacing: 1px; color: var(--accent-gold); }
+.title-tag { font-size: .54rem; letter-spacing: 1.5px; color: #ffe6b0; }
+.lv { font-size: .58rem; letter-spacing: 2px; color: var(--text-secondary); }
+.logout {
+  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-secondary); padding: 6px 12px; cursor: pointer;
+  font-size: .66rem; letter-spacing: 1px; transition: all .2s;
+}
+.logout:hover { border-color: #E24B4A; color: #F09595; }
+
+/* 3-column dashboard */
+.grid {
+  display: grid; grid-template-columns: 340px 1fr 300px; gap: 18px; align-items: start;
+}
+.col-left, .col-centre, .col-right { display: flex; flex-direction: column; gap: 18px; }
+
+/* Accountability strip */
+.accountability {
+  padding: 10px 14px; border-radius: 10px; font-size: .74rem; letter-spacing: 1.5px;
+  border: 1px solid rgba(226,75,74,0.25); background: rgba(226,75,74,0.06);
+  color: #f09595; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.all-clear {
+  padding: 10px 14px; border-radius: 10px; font-size: .72rem; letter-spacing: 1.5px;
+  border: 1px solid rgba(29,158,117,0.35); background: rgba(29,158,117,0.08); color: #5dcaa5;
+}
+
+.loader {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  padding: 100px 0; color: var(--text-secondary);
+}
+.loader-ring {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 3px solid rgba(83,74,183,0.2); border-top-color: var(--system-blue);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader p { letter-spacing: 3px; font-size: .78rem; margin: 0; }
+.loader-sub { font-size: .62rem; letter-spacing: 2px; color: var(--text-dim); }
+.dots::after { content: ''; animation: dots 1.2s steps(4) infinite; }
+@keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+.footer {
+  text-align: center; margin-top: 32px; padding-top: 18px;
+  color: var(--text-secondary); font-size: .66rem; letter-spacing: 4px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .col-right { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .grid { grid-template-columns: 1fr; }
+  .nav { gap: 12px; }
+  .name { font-size: .9rem; }
+}
+@media (max-width: 560px) {
+  .topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .nav { flex-wrap: wrap; gap: 10px 14px; }
+  .user { width: 100%; justify-content: space-between; }
+  .hp-danger-banner { font-size: .6rem; }
+}

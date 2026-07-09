@@ -1,0 +1,198 @@
+<div class="ai-shell">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">AI MENTOR</span>
+      <span class="tech tag">GROQ + GEMINI</span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system">STATUS</a>
+      <a routerLink="/life">LIFE OS</a>
+      <a routerLink="/ai" class="active">AI MENTOR</a>
+    </nav>
+  </header>
+
+  <!-- View tabs -->
+  <div class="view-tabs">
+    <button class="vt tech" [class.active]="view() === 'CHAT'"    (click)="setView('CHAT')">◈ CHAT WITH THE SYSTEM</button>
+    <button class="vt tech" [class.active]="view() === 'BOSS'"    (click)="setView('BOSS')">⚔ BOSS BATTLE</button>
+    <button class="vt tech" [class.active]="view() === 'HISTORY'" (click)="setView('HISTORY')">📜 BATTLE HISTORY</button>
+  </div>
+
+  <!-- ══════════════════════════ CHAT VIEW ══════════════════════════════════ -->
+  <div class="chat-view" *ngIf="view() === 'CHAT'" @fadeInUp>
+    <div class="chat-box">
+      <div class="messages" #chatEnd>
+        <div *ngFor="let m of chatMessages()" class="msg" [class.user]="m.role==='user'" [class.sys]="m.role==='system'">
+          <span class="who mono" *ngIf="m.role==='system'">◈ THE SYSTEM</span>
+          <span class="who mono user-who" *ngIf="m.role==='user'">▸ HUNTER</span>
+          <p class="text tech">{{ m.text }}</p>
+          <span class="ts tech">{{ m.ts | date:'HH:mm' }}</span>
+        </div>
+        <div class="typing tech" *ngIf="chatLoading()">
+          <span class="mono">◈</span> THE SYSTEM IS PROCESSING<span class="dots"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-btns">
+      <button class="qb tech" (click)="getSuggestion()" [disabled]="chatLoading()">🎯 SUGGEST MY NEXT TASK</button>
+    </div>
+
+    <div class="chat-input-row">
+      <textarea class="ci tech" [(ngModel)]="userInput" (keydown)="onInputKey($event)"
+                placeholder="Ask THE SYSTEM anything... (Enter to send, Shift+Enter for newline)"
+                rows="2"></textarea>
+      <button class="send mono" (click)="sendChat()" [disabled]="chatLoading() || !userInput.trim()">◈ SEND</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ BOSS BATTLE VIEW ══════════════════════════ -->
+  <div class="boss-view" *ngIf="view() === 'BOSS'" @fadeInUp>
+
+    <!-- Topic selector (only before battle starts) -->
+    <div class="setup" *ngIf="!battle()">
+      <div class="setup-head">
+        <h2 class="mono">⚔ SELECT YOUR GATE</h2>
+        <p class="tech sub">5 questions. Scored 0–10 each. XP awarded on completion.</p>
+      </div>
+
+      <div class="topic-grid">
+        <button *ngFor="let t of topics" class="topic-card tech"
+                [class.sel]="selectedTopic === t"
+                [attr.data-diff]="t.difficulty"
+                (click)="selectedTopic = t; selectedDifficulty = t.difficulty">
+          <span class="t-icon">{{ t.icon }}</span>
+          <span class="t-label">{{ t.label }}</span>
+          <span class="t-diff mono" [attr.data-diff]="t.difficulty">{{ t.difficulty }}</span>
+        </button>
+      </div>
+
+      <div class="diff-row">
+        <span class="tech">Difficulty:</span>
+        <button *ngFor="let d of ['EASY','MEDIUM','HARD']" class="diff-btn tech"
+                [class.active]="selectedDifficulty === d"
+                [attr.data-diff]="d"
+                (click)="selectedDifficulty = d">{{ d }}</button>
+      </div>
+
+      <button class="start-btn mono" (click)="startBattle()" [disabled]="battleLoading()">
+        <span *ngIf="!battleLoading()">⚔ ENTER THE GATE — {{ selectedTopic.label }}</span>
+        <span *ngIf="battleLoading()" class="tech">SUMMONING QUESTIONS<span class="dots"></span></span>
+      </button>
+
+      <div class="xp-info tech">
+        <span class="gold">300 XP</span> S-Rank (avg 8+) &nbsp;·&nbsp;
+        <span class="teal">150 XP</span> Satisfactory (avg 5–7) &nbsp;·&nbsp;
+        <span class="dim">50 XP</span> Attempted (&lt;5)
+      </div>
+    </div>
+
+    <!-- Active battle -->
+    <div class="battle-arena" *ngIf="battle() as b" @fadeInUp>
+
+      <!-- Battle header -->
+      <div class="arena-head">
+        <h2 class="mono">⚔ {{ b.topic }}</h2>
+        <div class="arena-meta tech">
+          <span class="diff-pill" [attr.data-diff]="b.difficulty">{{ b.difficulty }}</span>
+          <span>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
+          <span *ngIf="b.completedAt" class="done-label">GATE CLEARED</span>
+        </div>
+        <!-- Progress bar -->
+        <div class="q-progress">
+          <div *ngFor="let q of b.questions; let i = index" class="q-pip"
+               [class.done]="evaluations()[i]"
+               [class.active]="i === currentQ() && !b.completedAt"
+               [style.background]="evaluations()[i] ? scoreColor(evaluations()[i].score) : ''">
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed result -->
+      <div class="result-panel system-card" *ngIf="b.completedAt" @fadeInUp>
+        <div class="res-head mono">◈ BATTLE COMPLETE</div>
+        <div class="res-score">
+          <span class="score-num mono" [style.color]="scoreColor(b.score || 0)">{{ b.score }}</span>
+          <span class="score-max tech">/50</span>
+        </div>
+        <div class="xp-award mono">+{{ b.xpEarned }} XP — {{ xpLabel(b.xpEarned) }}</div>
+        <div class="eval-list">
+          <div *ngFor="let ev of evaluations()" class="eval-card system-card">
+            <div class="ev-q tech">Q{{ ev.questionIndex + 1 }}: {{ ev.question | slice:0:80 }}...</div>
+            <div class="ev-score mono" [style.color]="scoreColor(ev.score)">{{ ev.score }}/10</div>
+            <p class="ev-fb tech">{{ ev.feedback }}</p>
+            <div *ngIf="ev.missedPoints?.length" class="ev-missed">
+              <span class="tech label">MISSED:</span>
+              <span *ngFor="let m of ev.missedPoints" class="pip missed">{{ m }}</span>
+            </div>
+            <div *ngIf="ev.strongPoints?.length" class="ev-strong">
+              <span class="tech label">STRONG:</span>
+              <span *ngFor="let s of ev.strongPoints" class="pip strong">{{ s }}</span>
+            </div>
+          </div>
+        </div>
+        <button class="retry-btn mono" (click)="battle.set(null)">◈ ENTER ANOTHER GATE</button>
+      </div>
+
+      <!-- Current question -->
+      <div class="question-panel system-card" *ngIf="!b.completedAt && b.questions">
+        <div class="q-label tech">QUESTION {{ currentQ() + 1 }}</div>
+        <p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
+        <div class="hint-row tech" *ngIf="b.questions[currentQ()]?.hint">
+          <span class="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+        </div>
+
+        <!-- Previous evaluation (just answered) -->
+        <div class="prev-eval" *ngIf="evaluations()[currentQ() - 1] as ev" @fadeInUp>
+          <div class="ev-score-inline tech">
+            Last answer: <span class="mono" [style.color]="scoreColor(ev.score)">{{ ev.score }}/10</span>
+            — {{ ev.feedback | slice:0:100 }}
+          </div>
+        </div>
+
+        <textarea class="ans-input tech" [(ngModel)]="answer" rows="5"
+                  placeholder="Type your answer here. Be thorough. The System evaluates depth, not just keywords."></textarea>
+
+        <div class="btn-row">
+          <button class="submit-btn mono" (click)="submitAnswer()" [disabled]="battleLoading() || !answer.trim()">
+            <span *ngIf="!battleLoading()">◈ SUBMIT ANSWER</span>
+            <span *ngIf="battleLoading()" class="tech">EVALUATING<span class="dots"></span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ HISTORY VIEW ═══════════════════════════════ -->
+  <div class="history-view" *ngIf="view() === 'HISTORY'" @fadeInUp>
+    <h2 class="mono hist-head">◈ BATTLE HISTORY</h2>
+    <div class="hist-list" [@listStagger]="battleHistory().length">
+      <div *ngFor="let b of battleHistory()" class="hist-card system-card">
+        <div class="hc-left">
+          <span class="hc-topic tech">{{ b.topic }}</span>
+          <span class="hc-diff mono" [attr.data-diff]="b.difficulty">{{ b.difficulty }}</span>
+        </div>
+        <div class="hc-centre">
+          <span class="hc-score mono" [style.color]="b.score ? scoreColor(b.score) : '#6E7681'">
+            {{ b.score ?? '—' }}/50
+          </span>
+          <span class="hc-xp tech">+{{ b.xpEarned }} XP</span>
+        </div>
+        <div class="hc-right tech">
+          <span>{{ b.startedAt | date:'MMM d, HH:mm' }}</span>
+          <span class="status" [class.done]="b.completedAt" [class.pending]="!b.completedAt">
+            {{ b.completedAt ? 'CLEARED' : 'ONGOING' }}
+          </span>
+        </div>
+      </div>
+      <div *ngIf="!battleHistory().length" class="empty tech">
+        No battles yet. Enter a gate and prove your rank.
+      </div>
+    </div>
+  </div>
+
+</div>
+

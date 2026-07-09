@@ -1,0 +1,18 @@
+:host { display: block; }
+
+.progress { padding: 24px; }
+.header { margin-bottom: 18px; }
+.title-row { display: flex; align-items: center; gap: 12px; }
+.diamond { font-size: 1.6rem; color: var(--stat-str); text-shadow: 0 0 16px var(--stat-str); }
+.title { margin: 0; font-size: 1.3rem; letter-spacing: 4px; font-weight: 900; }
+.subtitle { margin: 2px 0 0; font-size: .68rem; letter-spacing: 2px; color: var(--text-secondary); }
+
+.chart-box { height: 240px; position: relative; }
+
+.legend {
+  display: flex; gap: 18px; justify-content: center; flex-wrap: wrap;
+  margin-top: 16px; font-size: .64rem; letter-spacing: 2px; color: var(--text-secondary);
+}
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+

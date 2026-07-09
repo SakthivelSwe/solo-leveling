@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: the-system-api
+  # Optional local overrides (real API keys / secrets) — git-ignored, loaded if present.
+  config:
+    import: "optional:file:./application-local.yml"
+  datasource:
+    # File-based H2 — data now PERSISTS across restarts (stored in ./data).
+    # For an in-memory reset-on-restart DB instead, use: jdbc:h2:mem:thesystem
+    url: ${DB_URL:jdbc:h2:file:./data/thesystem;DB_CLOSE_ON_EXIT=FALSE}
+    driver-class-name: org.h2.Driver
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  jackson:
+    default-property-inclusion: non_null
+
+# THE SYSTEM game config
+thesystem:
+  # Set to true ONLY in application-local.yml for local dev. Exposes H2 console
+  # + Swagger UI without auth. NEVER enable on a shipped/deployed build.
+  dev-tools-enabled: ${DEV_TOOLS_ENABLED:false}
+  jwt:
+    # REQUIRED. Boot fails fast if this is missing, too short (< 32 bytes),
+    # or left at the old public default. Generate with: openssl rand -base64 48
+    secret: "${JWT_SECRET:}"
+    access-expiration-ms: 86400000      # 24 hours
+    refresh-expiration-ms: 604800000    # 7 days
+  game:
+    xp-threshold: 100                    # XP required per level
+  scheduler:
+    timezone: Asia/Kolkata
+  ai:
+    # Secrets are read from environment variables (or application-local.yml). Never commit real keys.
+    groq-api-key: "${GROQ_API_KEY:}"
+    gemini-api-key: "${GEMINI_API_KEY:}"
+    groq-model: "${GROQ_MODEL:llama-3.3-70b-versatile}"
+    gemini-model: "${GEMINI_MODEL:gemini-2.0-flash}"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.thesystem: INFO
+

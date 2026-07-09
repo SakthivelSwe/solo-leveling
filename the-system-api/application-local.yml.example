@@ -1,0 +1,24 @@
+# ── THE SYSTEM · local secrets TEMPLATE ─────────────────────────────────────
+# Copy this file to "application-local.yml" (same folder) and fill in real keys.
+# application-local.yml is git-ignored so your secrets never get committed.
+#
+# Alternatively, set these as environment variables instead:
+#   $env:GROQ_API_KEY   = "your-groq-key"
+#   $env:GEMINI_API_KEY = "your-gemini-key"
+#   $env:JWT_SECRET     = "a-long-random-secret"   # REQUIRED, ≥ 32 chars
+thesystem:
+  # LOCAL DEV ONLY — exposes H2 console + Swagger. Leave `false` in production.
+  dev-tools-enabled: true
+  jwt:
+    # REQUIRED. Generate one with:  openssl rand -base64 48
+    secret: "PUT_A_RANDOM_MIN_32_CHAR_SECRET_HERE"
+  ai:
+    groq-api-key: "PUT_YOUR_GROQ_KEY_HERE"
+    gemini-api-key: "PUT_YOUR_GEMINI_KEY_HERE"
+
+# Enables the H2 web console (paired with dev-tools-enabled above).
+spring:
+  h2:
+    console:
+      enabled: true
+

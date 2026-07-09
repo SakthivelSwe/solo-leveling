@@ -1,0 +1,78 @@
+name: Android APK
+
+# Builds the Capacitor Android app whenever the UI changes on main, on tags, or
+# on manual dispatch. Produces a downloadable debug APK as a workflow artifact,
+# so you don't need a local Android SDK to get an installable build.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths:
+      - 'the-system-ui/**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'the-system-ui/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: the-system-ui
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: the-system-ui/package-lock.json
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Set up Android SDK (platforms 35 + 36, build-tools 36)
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 platforms;android-36 build-tools;36.0.0'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build Angular (Capacitor config)
+        run: npm run build:android
+
+      - name: Sync Capacitor → Android
+        run: npx cap sync android
+
+      - name: Grant gradlew execute permission
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: the-system-ui/android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: the-system-debug-apk
+          path: the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Attach APK to GitHub release (on tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
+

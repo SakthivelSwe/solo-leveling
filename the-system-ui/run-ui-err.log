@@ -1,0 +1,64 @@
+Node.js version v25.6.1 detected.
+Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/previous-releases/.
+- Building...
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:101:57:
+      101 │ ...an>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
+          ╵                                                ~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 │   templateUrl: './ai-mentor.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:143:59:
+      143 │ ...p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
+          ╵                                                      ~~~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 │   templateUrl: './ai-mentor.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:145:76:
+      145 │ ...ass="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+          ╵                                                              ~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 │   templateUrl: './ai-mentor.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] The same color styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 │ @import 'src/styles.scss';
+        ╵         ~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] The same density styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 │ @import 'src/styles.scss';
+        ╵         ~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] The same typography styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 │ @import 'src/styles.scss';
+        ╵         ~~~~~~~~~~~~~~~~~
+
+

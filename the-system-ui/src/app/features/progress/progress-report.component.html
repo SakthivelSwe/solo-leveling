@@ -1,0 +1,152 @@
+<div class="insights-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">SYSTEM INSIGHTS</span>
+      <span class="live-link tech" [class.on]="sse.connected()">
+        <span class="dot"></span>{{ sse.connected() ? 'LIVE' : 'SYNC' }}
+      </span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system">STATUS</a>
+      <a routerLink="/life">LIFE OS</a>
+      <a routerLink="/ai">AI MENTOR</a>
+      <a routerLink="/achievements">RANKS</a>
+    </nav>
+  </header>
+
+  <!-- Loading -->
+  <div class="loader" *ngIf="loading()">
+    <div class="loader-ring"></div>
+    <p class="mono">COMPILING SYSTEM REPORT<span class="dots"></span></p>
+  </div>
+
+  <main *ngIf="!loading()" class="content">
+
+    <!-- MONTHLY REPORT CARD -->
+    <section class="report-card system-card" *ngIf="report() as r" @fadeInUp>
+      <div class="report-head">
+        <div>
+          <h2 class="mono">◈ MONTHLY REPORT — {{ r.monthLabel }}</h2>
+          <p class="verdict tech">{{ r.systemVerdict }}</p>
+        </div>
+        <div class="rank-chip tech">{{ r.rankLevel }}-RANK · LV.{{ r.level }}</div>
+      </div>
+
+      <div class="stat-grid" @listStagger>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.perfectDays }}</span>
+          <span class="lbl tech">PERFECT DAYS</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.currentStreak }}</span>
+          <span class="lbl tech">CURRENT STREAK</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.longestStreak }}</span>
+          <span class="lbl tech">LONGEST STREAK</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.daysActive }}/{{ r.daysElapsed }}</span>
+          <span class="lbl tech">ACTIVE DAYS</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.totalQuestsMonth }}</span>
+          <span class="lbl tech">QUESTS CLEARED</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.totalXpMonth }}</span>
+          <span class="lbl tech">XP EARNED</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ r.avgQuestsPerActiveDay }}</span>
+          <span class="lbl tech">AVG / ACTIVE DAY</span>
+        </div>
+        <div class="stat-tile" @fadeInUp>
+          <span class="val mono">{{ activeRatioPct() }}%</span>
+          <span class="lbl tech">CONSISTENCY</span>
+        </div>
+      </div>
+
+      <div class="report-foot">
+        <div class="stat-line">
+          <span class="tech dim">STRONGEST</span>
+          <span class="tag strong">{{ r.bestStat }}</span>
+          <span class="tech dim">WEAKEST</span>
+          <span class="tag weak">{{ r.weakestStat }}</span>
+        </div>
+        <p class="target tech">🎯 {{ r.rankTarget }}</p>
+      </div>
+    </section>
+
+    <!-- AI WEEKLY REVIEW -->
+    <section class="ai-card system-card" @fadeInUp>
+      <div class="ai-head">
+        <h3 class="mono">◈ SYSTEM AI REVIEW</h3>
+        <button class="ai-btn tech" (click)="generateReview()" [disabled]="aiLoading()">
+          {{ aiLoading() ? 'ANALYSING…' : (aiReview() ? 'REGENERATE' : 'GENERATE REVIEW') }}
+        </button>
+      </div>
+      <div class="ai-body" *ngIf="aiLoading()">
+        <div class="ai-shimmer"></div>
+        <div class="ai-shimmer short"></div>
+        <div class="ai-shimmer"></div>
+      </div>
+      <p class="ai-text tech" *ngIf="!aiLoading() && aiReview()">{{ aiReview() }}</p>
+      <p class="ai-hint tech" *ngIf="!aiLoading() && !aiReview()">
+        Let THE SYSTEM analyse your month — one win, one weakness, two commands for next week.
+      </p>
+    </section>
+
+    <!-- TITLES -->
+    <section class="titles-card system-card" @fadeInUp>
+      <div class="hm-head">
+        <h3 class="mono">◈ TITLES</h3>
+        <span class="tech dim">Tap an unlocked title to equip it</span>
+      </div>
+      <div class="titles-grid" @listStagger>
+        <button *ngFor="let t of titles()" @fadeInUp
+                class="title-chip tech"
+                [class.locked]="!t.unlocked"
+                [class.equipped]="t.equipped"
+                [disabled]="!t.unlocked || equipping() === t.key"
+                (click)="equip(t)"
+                [title]="t.description">
+          <span class="t-name">{{ t.unlocked ? t.name : '🔒 ' + t.name }}</span>
+          <span class="t-desc">{{ t.description }}</span>
+          <span class="t-flag" *ngIf="t.equipped">EQUIPPED</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CONSISTENCY HEATMAP -->
+    <section class="heatmap-card system-card" @fadeInUp>
+      <div class="hm-head">
+        <h3 class="mono">◈ CONSISTENCY MAP</h3>
+        <span class="tech dim">{{ totalDays() }} active days · last 18 weeks</span>
+      </div>
+
+      <div class="heatmap" *ngIf="heatmap().length; else noData">
+        <div class="cell" *ngFor="let c of cells()"
+             [class.empty-slot]="!c"
+             [style.background]="c ? intensityColor(c.intensity) : 'transparent'"
+             [title]="tooltip(c)"></div>
+      </div>
+      <ng-template #noData>
+        <p class="empty tech">No quest history yet. Clear quests and the map will fill with light.</p>
+      </ng-template>
+
+      <div class="legend tech">
+        <span class="dim">LESS</span>
+        <span class="cell" [style.background]="intensityColor(0)"></span>
+        <span class="cell" [style.background]="intensityColor(1)"></span>
+        <span class="cell" [style.background]="intensityColor(2)"></span>
+        <span class="cell" [style.background]="intensityColor(3)"></span>
+        <span class="cell" [style.background]="intensityColor(4)"></span>
+        <span class="dim">MORE</span>
+      </div>
+    </section>
+  </main>
+</div>
+
+

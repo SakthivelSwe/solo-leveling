@@ -1,0 +1,363 @@
+/* ============================================================
+   THE SYSTEM — Solo Leveling Life OS · Global Theme v2
+   ============================================================ */
+@use '@angular/material' as mat;
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Backgrounds */
+  --bg-primary:   #060610;
+  --bg-secondary: #0a0a1a;
+  --card-bg:      #10101e;
+  --border:       #1a1a30;
+  --border-glow:  #252545;
+
+  /* Accents */
+  --accent-purple: #534AB7;
+  --accent-purple-dim: rgba(83,74,183,0.18);
+  --accent-teal:   #1D9E75;
+  --accent-gold:   #FAC775;
+  --accent-red:    #E24B4A;
+
+  /* Text */
+  --text-primary:   #E6EDF3;
+  --text-secondary: #5a6370;
+  --text-dim:       #3a4050;
+
+  /* Stat colors */
+  --stat-str: #D85A30;
+  --stat-int: #534AB7;
+  --stat-vit: #1D9E75;
+  --stat-agi: #BA7517;
+  --stat-per: #378ADD;
+  --stat-hor: #E24B4A;
+
+  --system-blue: #4fc3f7;
+  --system-glow: rgba(83,74,183,0.6);
+
+  /* HP colors */
+  --hp-high:   #1D9E75;
+  --hp-mid:    #FAC775;
+  --hp-low:    #E24B4A;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; padding: 0; }
+
+body {
+  background:
+    radial-gradient(ellipse 1400px 700px at 30% -5%,  rgba(83,74,183,0.20), transparent 60%),
+    radial-gradient(ellipse 1000px 600px at 80% 110%, rgba(29,158,117,0.12), transparent 55%),
+    radial-gradient(ellipse 600px 400px at 95% 5%,   rgba(79,195,247,0.08), transparent 50%),
+    var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Particle/star field ───────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 8%  15%, rgba(255,255,255,0.50), transparent),
+    radial-gradient(1px 1px at 22% 55%, rgba(79,195,247,0.45), transparent),
+    radial-gradient(1px 1px at 38% 28%, rgba(255,255,255,0.30), transparent),
+    radial-gradient(1px 1px at 55% 72%, rgba(83,74,183,0.50), transparent),
+    radial-gradient(1px 1px at 72% 42%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(2px 2px at 85% 18%, rgba(250,199,117,0.30), transparent),
+    radial-gradient(1px 1px at 93% 78%, rgba(29,158,117,0.40), transparent),
+    radial-gradient(1px 1px at 15% 88%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 64% 8%,  rgba(79,195,247,0.30), transparent),
+    radial-gradient(2px 2px at 48% 96%, rgba(83,74,183,0.25), transparent);
+  background-size: 600px 600px;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 80s linear infinite;
+}
+
+/* ── Scan-line overlay ─────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes drift {
+  from { background-position: 0 0; }
+  to   { background-position: 600px 600px; }
+}
+
+/* ── Typography ───────────────────────────────────────────── */
+.mono  { font-family: 'Orbitron', 'Courier New', monospace; }
+.tech  { font-family: 'Rajdhani', sans-serif; letter-spacing: .5px; }
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #534AB7, #2a2670);
+  border-radius: 6px;
+}
+
+/* ── System Card ───────────────────────────────────────────── */
+.system-card {
+  background: linear-gradient(160deg, rgba(16,16,30,0.97), rgba(10,10,26,0.97));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  position: relative;
+  backdrop-filter: blur(8px);
+  transition: border-color .3s;
+}
+.system-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(83,74,183,0.6), transparent 40%, rgba(79,195,247,0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.system-card:hover { border-color: rgba(83,74,183,0.4); }
+
+/* ── Utility ───────────────────────────────────────────────── */
+.glow-text { text-shadow: 0 0 18px var(--system-glow), 0 0 36px var(--system-glow); }
+.glow-teal  { text-shadow: 0 0 12px rgba(29,158,117,0.8); }
+.glow-gold  { text-shadow: 0 0 12px rgba(250,199,117,0.7); }
+
+/* XP/progress shimmer utility */
+@keyframes shimmer {
+  0%,60% { transform: translateX(-100%); }
+  100%   { transform: translateX(300%); }
+}
+
+/* ── Angular Material dark theme ──────────────────────────── */
+$sys-primary: mat.define-palette(mat.$indigo-palette, 400);
+$sys-accent:  mat.define-palette(mat.$teal-palette,   400);
+$sys-warn:    mat.define-palette(mat.$red-palette);
+$sys-theme: mat.define-dark-theme((
+  color: (primary: $sys-primary, accent: $sys-accent, warn: $sys-warn),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+@include mat.core();
+@include mat.all-component-themes($sys-theme);
+
+/* ── System Snackbar ──────────────────────────────────────── */
+.mat-mdc-snack-bar-container.system-snack {
+  --mdc-snackbar-container-color:       #10101e;
+  --mdc-snackbar-supporting-text-color: #E6EDF3;
+  --mat-snack-bar-button-color:         #FAC775;
+}
+.mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
+  border: 1px solid var(--accent-teal);
+  box-shadow: 0 0 28px rgba(29,158,117,0.45);
+}
+.mat-mdc-snack-bar-container.system-snack-warn .mdc-snackbar__surface {
+  border: 1px solid #E24B4A;
+  box-shadow: 0 0 28px rgba(226,75,74,0.45);
+}
+
+/* ── System Alert Modal ───────────────────────────────────── */
+.cdk-overlay-dark-backdrop {
+  background: rgba(3,3,10,0.88);
+  backdrop-filter: blur(6px);
+}
+
+/* ── Holographic flicker animation ──────────────────────────── */
+@keyframes holoBlink {
+  0%,100% { opacity: 1; }
+  92%     { opacity: 1; }
+  93%     { opacity: 0.7; }
+  94%     { opacity: 1; }
+  96%     { opacity: 0.85; }
+  97%     { opacity: 1; }
+}
+
+/* ── Stat increase pop ─────────────────────────────────────── */
+@keyframes statPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); filter: brightness(1.8); }
+  70%  { transform: scale(0.96); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.stat-pop { animation: statPop .55s cubic-bezier(.22,1,.36,1) both; }
+
+/* ── HP danger pulse ─────────────────────────────────────────── */
+@keyframes dangerPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(226,75,74,0.4); }
+  50%     { box-shadow: 0 0 28px rgba(226,75,74,0.9); }
+}
+.hp-danger { animation: dangerPulse 1.6s ease-in-out infinite; }
+
+/* ── Level-up panel ─────────────────────────────────────────── */
+.level-up-panel .mat-mdc-dialog-container {
+  background: transparent;
+  box-shadow: none;
+}
+
+
+:root {
+  /* Backgrounds */
+  --bg-primary:   #090912;
+  --bg-secondary: #0d0d1c;
+  --card-bg:      #13131f;
+  --border:       #1a1a2c;
+
+  /* Accents */
+  --accent-purple: #534AB7;
+  --accent-teal:   #1D9E75;
+  --accent-gold:   #FAC775;
+
+  /* Text */
+  --text-primary:   #E6EDF3;
+  --text-secondary: #6E7681;
+
+  /* Stat colors */
+  --stat-str: #D85A30;
+  --stat-int: #534AB7;
+  --stat-vit: #1D9E75;
+  --stat-agi: #BA7517;
+  --stat-per: #378ADD;
+  --stat-hor: #E24B4A;
+
+  --system-blue: #4fc3f7;
+  --system-glow: rgba(83, 74, 183, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(83, 74, 183, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(29, 158, 117, 0.10), transparent 55%),
+    var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated star / particle field */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 45% 80%, rgba(79,195,247,0.35), transparent),
+    radial-gradient(1px 1px at 65% 20%, rgba(255,255,255,0.20), transparent),
+    radial-gradient(2px 2px at 10% 70%, rgba(83,74,183,0.30), transparent);
+  background-size: 400px 400px;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 60s linear infinite;
+}
+
+@keyframes drift {
+  from { background-position: 0 0; }
+  to   { background-position: 400px 400px; }
+}
+
+.mono { font-family: 'Orbitron', 'Courier New', monospace; }
+.tech { font-family: 'Rajdhani', sans-serif; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--accent-purple), #2a2670);
+  border-radius: 6px;
+}
+
+/* Shared card */
+.system-card {
+  background: linear-gradient(160deg, rgba(19,19,31,0.95), rgba(13,13,28,0.95));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  position: relative;
+  backdrop-filter: blur(6px);
+}
+.system-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1px;
+  background: linear-gradient(140deg, rgba(83,74,183,0.5), transparent 40%, rgba(79,195,247,0.25));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glow-text { text-shadow: 0 0 12px var(--system-glow); }
+
+/* Angular Material dark theme */
+$sys-primary: mat.define-palette(mat.$indigo-palette, 400);
+$sys-accent:  mat.define-palette(mat.$teal-palette, 400);
+$sys-warn:    mat.define-palette(mat.$red-palette);
+$sys-theme: mat.define-dark-theme((
+  color: (primary: $sys-primary, accent: $sys-accent, warn: $sys-warn),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+@include mat.core();
+@include mat.all-component-themes($sys-theme);
+
+.mat-mdc-snack-bar-container.system-snack {
+  --mdc-snackbar-container-color: #13131f;
+  --mdc-snackbar-supporting-text-color: #E6EDF3;
+  --mat-snack-bar-button-color: #FAC775;
+}
+.mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
+  border: 1px solid var(--accent-teal);
+  box-shadow: 0 0 24px rgba(29,158,117,0.4);
+}
+
+.cdk-overlay-dark-backdrop {
+  background: rgba(4, 4, 12, 0.86);
+  backdrop-filter: blur(4px);
+}
+
+/* ── Android 15 edge-to-edge safe areas ─────────────────────────
+   Android 15 (API 35+) enforces edge-to-edge, so system bars can
+   overlap content. When running inside the Capacitor WebView
+   (body.native-platform, set by NativeService) we inset the app
+   shell by the safe-area values so the topbar and bottom controls
+   never hide behind the status / gesture-navigation bars. */
+body.native-platform .route-host {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Keep full-height pages filling the viewport after insets are applied. */
+body.native-platform .route-host { min-height: 100dvh; }
+

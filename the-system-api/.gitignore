@@ -1,0 +1,22 @@
+# ── THE SYSTEM API · git ignore ─────────────────────────────────────────────
+# Build output
+target/
+
+# Persistent H2 database (file-based) — local data, do not commit
+data/
+*.mv.db
+*.trace.db
+
+# Local secrets (real API keys / JWT secret) — never commit
+application-local.yml
+
+# Logs
+*.log
+boot.log
+run-api.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+

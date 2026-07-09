@@ -1,0 +1,73 @@
+<div class="auth-wrap">
+  <div class="grid-bg"></div>
+
+  <!-- Floating rank pillars in background -->
+  <div class="rank-pillars">
+    <span class="rp rp1 mono">E</span>
+    <span class="rp rp2 mono">D</span>
+    <span class="rp rp3 mono">C</span>
+    <span class="rp rp4 mono">B</span>
+    <span class="rp rp5 mono">A</span>
+    <span class="rp rp6 mono">S</span>
+  </div>
+
+  <div class="auth-card system-card">
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-diamond mono">◈</div>
+      <h1 class="mono brand-title glow-text">THE SYSTEM</h1>
+      <p class="tech brand-sub">SOLO LEVELING · LIFE OS · SAKTHIVEL</p>
+    </div>
+
+    <!-- Typewriter System notice -->
+    <div class="notice tech">
+      <span class="blink">▸</span>&nbsp;{{ typedText() }}<span class="cursor">|</span>
+    </div>
+
+    <!-- Rank indicators -->
+    <div class="rank-row">
+      <span *ngFor="let r of ['E','D','C','B','A','S']" class="rk mono" [attr.data-rank]="r">{{ r }}</span>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+      <label class="field" for="login-username">
+        <span class="tech">◈ HUNTER ID</span>
+        <input id="login-username" formControlName="username" autocomplete="username"
+               placeholder="your username"
+               [attr.aria-invalid]="invalid('username')"
+               [attr.aria-describedby]="invalid('username') ? 'err-username' : null" />
+        <span id="err-username" class="field-error tech" role="alert" *ngIf="invalid('username')">
+          Hunter ID is required.
+        </span>
+      </label>
+
+      <label class="field" for="login-password">
+        <span class="tech">◈ ACCESS KEY</span>
+        <input id="login-password" formControlName="password" type="password"
+               autocomplete="current-password" placeholder="••••••••"
+               [attr.aria-invalid]="invalid('password')"
+               [attr.aria-describedby]="invalid('password') ? 'err-password' : null" />
+        <span id="err-password" class="field-error tech" role="alert" *ngIf="invalid('password')">
+          {{ form.get('password')?.errors?.['required'] ? 'Access key is required.' : 'At least 6 characters.' }}
+        </span>
+      </label>
+
+      <div class="error tech" *ngIf="error()" role="alert" aria-live="assertive">⚠ {{ error() }}</div>
+
+      <button type="submit" class="submit mono" [disabled]="loading()"
+              [attr.aria-busy]="loading()">
+        <span *ngIf="!loading()">◈ ENTER THE SYSTEM</span>
+        <span *ngIf="loading()" class="loading">AUTHENTICATING<span class="dots"></span></span>
+      </button>
+    </form>
+
+    <p class="switch tech">
+      NO HUNTER LICENSE? <a routerLink="/register">AWAKEN NOW →</a>
+    </p>
+
+    <!-- Bottom discipline reminder -->
+    <div class="discipline tech">
+      E-RANK IS THE BEGINNING. NOT THE END. THE GRIND STARTS THE MOMENT YOU LOG IN.
+    </div>
+  </div>
+</div>

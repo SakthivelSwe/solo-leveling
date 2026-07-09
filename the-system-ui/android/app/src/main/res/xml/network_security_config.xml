@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  THE SYSTEM — network policy.
+
+  HARDENED: cleartext (HTTP) is BLOCKED by default. It is only permitted for
+  the specific private/loopback hosts used to reach the local Spring Boot dev
+  backend (emulator = 10.0.2.2, physical device on same Wi-Fi = 192.168.x.x /
+  10.x.x.x LAN). Public internet traffic MUST be HTTPS.
+
+  When you point the app at a real deployed backend, add its HTTPS host to
+  <base-config> above and remove the LAN entries below.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Local dev backend only. Extend or shrink to match your LAN. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>       <!-- Android emulator → host localhost -->
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <!-- Common home-router LAN ranges. Trim to just your PC's IP for tighter security. -->
+        <domain-suffix includeSubdomains="true">192.168.1.1</domain-suffix>
+        <domain-suffix includeSubdomains="true">192.168.0.1</domain-suffix>
+    </domain-config>
+</network-security-config>
+
+
+

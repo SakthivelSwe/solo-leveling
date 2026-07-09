@@ -1,0 +1,29 @@
+<div class="notif-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">SYSTEM ALERTS</span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system">STATUS</a>
+      <a routerLink="/life">LIFE OS</a>
+      <button class="clear tech" (click)="notifications.markAllRead()">MARK ALL READ</button>
+    </nav>
+  </header>
+
+  <ul class="feed" @listStagger>
+    <li *ngFor="let n of notifications.items()" class="note system-card" [class.unread]="!n.read"
+        (click)="notifications.markRead(n.id)" @fadeInUp>
+      <span class="ic">{{ icon(n.type) }}</span>
+      <div class="body">
+        <div class="row"><span class="mono title">{{ n.title }}</span><span class="tech time">{{ n.createdAt | date:'short' }}</span></div>
+        <p class="msg">{{ n.message }}</p>
+      </div>
+      <span class="dot" *ngIf="!n.read"></span>
+    </li>
+    <li *ngIf="!notifications.items().length" class="empty tech">
+      The System is silent for now. Scheduled alerts will appear here.
+    </li>
+  </ul>
+</div>
+

@@ -1,0 +1,45 @@
+name: Backend CI
+
+# Runs the Spring Boot unit tests on every push/PR that touches the API.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'the-system-api/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'the-system-api/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: mvn test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: the-system-api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Run tests
+        run: mvn -B --no-transfer-progress test
+
+      - name: Upload surefire reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: the-system-api/target/surefire-reports/
+

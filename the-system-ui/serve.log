@@ -1,0 +1,328 @@
+﻿
+> the-system-ui@0.0.0 start
+> ng serve
+
+safe-chain.exe : Node.js version v25.6.1 detected.
+At C:\Users\anbur\.safe-chain\scripts\init-pwsh.ps1:178 char:9
++         & safe-chain $OriginalCmd @Arguments
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Node.js version v25.6.1 detected.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/previous-releases/.
+- Building...
+
+Initial chunk files | Names                     |  Raw size
+styles.css          | styles                    | 195.18 kB | 
+polyfills.js        | polyfills                 |  88.09 kB | 
+main.js             | main                      |   6.68 kB | 
+chunk-KZXWW24N.js   | -                         |   3.01 kB | 
+chunk-NGY2MP6J.js   | -                         |   2.12 kB | 
+chunk-FSLHH37J.js   | -                         |   2.03 kB | 
+chunk-2MUQAC7U.js   | -                         |   1.96 kB | 
+chunk-MSKEIO3X.js   | -                         |   1.05 kB | 
+
+                    | Initial total             | 300.12 kB
+
+Lazy chunk files    | Names                     |  Raw size
+chunk-R5ALHL56.js   | system-component          | 128.64 kB | 
+chunk-OUEQMGUH.js   | life-os-component         |  74.81 kB | 
+chunk-UW3TJ3K3.js   | ai-mentor-component       |  54.58 kB | 
+chunk-BMDP564T.js   | progress-report-component |  30.75 kB | 
+chunk-LZU6EURV.js   | register-component        |  21.92 kB | 
+chunk-JR5NSFDV.js   | login-component           |  20.86 kB | 
+chunk-JR6A5NNA.js   | achievements-component    |  10.91 kB | 
+chunk-7PUOQ3FH.js   | notifications-component   |   8.82 kB | 
+chunk-ZENNGRX3.js   | -                         |   1.77 kB | 
+chunk-L54TRUST.js   | -                         |   1.63 kB | 
+
+Application bundle generation complete. [10.445 seconds]
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:101:57:
+      101 Γöé ...an>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
+          Γò╡                                                ~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:143:59:
+      143 Γöé ...p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
+          Γò╡                                                      ~~~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:145:76:
+      145 Γöé ...ass="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+          Γò╡                                                              ~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same color styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same density styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same typography styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Watch mode enabled. Watching for file changes...
+  Γ₧£  Local:   http://localhost:4200/
+  Γ₧£  press h + enter to show help
+- Changes detected. Rebuilding...
+
+
+No output file changes.
+
+Application bundle generation complete. [1.294 seconds]
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:101:57:
+      101 Γöé ...an>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
+          Γò╡                                                ~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:143:59:
+      143 Γöé ...p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
+          Γò╡                                                      ~~~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:145:76:
+      145 Γöé ...ass="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+          Γò╡                                                              ~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same color styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same density styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same typography styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+
+No output file changes.
+
+Application bundle generation complete. [0.108 seconds]
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:101:57:
+      101 Γöé ...an>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
+          Γò╡                                                ~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:143:59:
+      143 Γöé ...p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
+          Γò╡                                                      ~~~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:145:76:
+      145 Γöé ...ass="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+          Γò╡                                                              ~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same color styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same density styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same typography styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+
+No output file changes.
+
+Application bundle generation complete. [0.538 seconds]
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:101:57:
+      101 Γöé ...an>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
+          Γò╡                                                ~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:143:59:
+      143 Γöé ...p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
+          Γò╡                                                      ~~~~~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' 
+operator. [plugin angular-compiler]
+
+    src/app/features/ai-mentor/ai-mentor.component.html:145:76:
+      145 Γöé ...ass="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+          Γò╡                                                              ~~~~
+
+  Error occurs in the template of component AiMentorComponent.
+
+    src/app/features/ai-mentor/ai-mentor.component.ts:27:15:
+      27 Γöé   templateUrl: './ai-mentor.component.html',
+         Γò╡                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same color styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same density styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+
+Γû▓ [WARNING] The same typography styles are generated multiple times. Read more about how style duplication can be avoided in a dedicated guide. 
+https://github.com/angular/components/blob/main/guides/duplicate-theming-styles.md [plugin angular-sass]
+
+    angular:styles/global:styles:1:8:
+      1 Γöé @import 'src/styles.scss';
+        Γò╡         ~~~~~~~~~~~~~~~~~
+
+

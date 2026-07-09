@@ -1,0 +1,37 @@
+
+> the-system-ui@0.0.0 start
+> ng serve
+
+Initial chunk files | Names                     |  Raw size
+styles.css          | styles                    | 195.47 kB | 
+polyfills.js        | polyfills                 |  88.09 kB | 
+main.js             | main                      |   8.98 kB | 
+chunk-WBCZW5B4.js   | -                         |   5.43 kB | 
+chunk-UWU3HBEV.js   | -                         |   3.10 kB | 
+chunk-CIHTF2NI.js   | -                         |   2.12 kB | 
+chunk-J72S4XRL.js   | -                         |   2.03 kB | 
+chunk-2MUQAC7U.js   | -                         |   1.96 kB | 
+chunk-EXWSB2GG.js   | -                         |   1.77 kB | 
+chunk-GVTHFJJI.js   | -                         |   1.61 kB | 
+
+                    | Initial total             | 310.55 kB
+
+Lazy chunk files    | Names                     |  Raw size
+chunk-MIUYRDRG.js   | system-component          | 129.09 kB | 
+chunk-GP5MBMUO.js   | habits-component          |  88.07 kB | 
+chunk-F6EUNLTD.js   | life-os-component         |  74.81 kB | 
+chunk-BD4P4MUB.js   | ai-mentor-component       |  54.58 kB | 
+chunk-CPCZTSXM.js   | progress-report-component |  30.75 kB | 
+chunk-GNIZ5TFG.js   | register-component        |  21.92 kB | 
+chunk-PM73ZCDV.js   | login-component           |  20.86 kB | 
+chunk-FDBVVAEM.js   | achievements-component    |  11.06 kB | 
+chunk-HCN567K5.js   | notifications-component   |   8.82 kB | 
+chunk-YIOTCHQF.js   | -                         |   1.63 kB | 
+chunk-GE5KQSXL.js   | -                         |   1.60 kB | 
+
+Application bundle generation complete. [17.462 seconds]
+
+Watch mode enabled. Watching for file changes...
+Re-optimizing dependencies because lockfile has changed
+  ➜  Local:   http://localhost:4200/
+  ➜  press h + enter to show help

@@ -1,0 +1,38 @@
+<div class="ach-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="mono diamond">◈</span>
+      <span class="mono name">THE SYSTEM</span>
+    </div>
+    <nav class="nav tech">
+      <a routerLink="/system">STATUS</a>
+      <a routerLink="/habits">HABITS</a>
+      <a routerLink="/achievements" class="active">ACHIEVEMENTS</a>
+    </nav>
+  </header>
+
+  <div class="head">
+    <h1 class="mono title glow-text">ACHIEVEMENTS</h1>
+    <p class="tech sub">{{ unlockedCount }} / {{ catalogue.length }} UNLOCKED</p>
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="(unlockedCount / catalogue.length) * 100"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card system-card" *ngFor="let a of catalogue; let i = index"
+         [class.locked]="!isUnlocked(a.key)"
+         [style.animationDelay.ms]="i * 70">
+      <div class="icon">{{ isUnlocked(a.key) ? a.icon : '🔒' }}</div>
+      <div class="info">
+        <h3 class="a-title">{{ a.title }}</h3>
+        <p class="a-desc tech">{{ a.description }}</p>
+        <p class="a-date tech" *ngIf="isUnlocked(a.key) as u">
+          UNLOCKED · {{ u.unlockedAt | date:'MMM d, y' }}
+        </p>
+        <p class="a-date locked-tag tech" *ngIf="!isUnlocked(a.key)">LOCKED</p>
+      </div>
+    </div>
+  </div>
+</div>
+
