@@ -40,6 +40,7 @@ public class SecurityConfig {
         // when thesystem.dev-tools-enabled=true (dev-only) — never in a shipped build.
         List<String> publicPaths = new ArrayList<>();
         publicPaths.add("/api/auth/**");
+        publicPaths.add("/api/public/**");
         if (devToolsEnabled) {
             publicPaths.add("/swagger-ui/**");
             publicPaths.add("/swagger-ui.html");
