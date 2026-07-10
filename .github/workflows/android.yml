@@ -81,6 +81,7 @@ jobs:
           BUILD_TOOLS_VERSION: "36.0.0"
 
       - name: Rename signed APK
+        working-directory: ${{ github.workspace }}
         run: mv the-system-ui/android/app/build/outputs/apk/release/app-release-unsigned-signed.apk the-system-ui/android/app/build/outputs/apk/release/app-release.apk
 
       - name: Upload Debug APK artifact
