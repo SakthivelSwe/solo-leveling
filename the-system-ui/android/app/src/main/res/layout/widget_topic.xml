@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  widget_topic.xml — Layout for THE SYSTEM "Topic of the Day" widget.
+  Dark themed to match the app (#060610 background, purple accents).
+  Designed for 2×1 to 4×2 widget cells.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="@drawable/widget_bg">
+
+    <!-- Header row: logo glyph + app name -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="◈"
+            android:textColor="#4fc3f7"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="THE SYSTEM"
+            android:textColor="#6E7681"
+            android:textSize="9sp"
+            android:letterSpacing="0.18"
+            android:fontFamily="sans-serif-medium"/>
+
+    </LinearLayout>
+
+    <!-- Label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TODAY'S FOCUS"
+        android:textColor="#534AB7"
+        android:textSize="8sp"
+        android:letterSpacing="0.22"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Topic text — main content -->
+    <TextView
+        android:id="@+id/widget_topic_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DISCIPLINE OVER MOTIVATION"
+        android:textColor="#E6EDF3"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.06"
+        android:lineSpacingMultiplier="1.2"
+        android:maxLines="2"
+        android:ellipsize="end"/>
+
+    <!-- Bottom hint -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TAP TO TRACK HABITS"
+        android:textColor="#3a4050"
+        android:textSize="7sp"
+        android:letterSpacing="0.16"
+        android:layout_marginTop="6dp"/>
+
+</LinearLayout>

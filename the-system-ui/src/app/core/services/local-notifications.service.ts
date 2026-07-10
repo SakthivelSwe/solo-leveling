@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications, ScheduleOptions, PermissionStatus } from '@capacitor/local-notifications';
 import { Habit } from '../models/models';
@@ -10,9 +11,14 @@ import { Habit } from '../models/models';
  * Backend counterpart: NotificationScheduler in the API also broadcasts these
  * over SSE (for the in-app 🔔 feed) — this class ensures the phone still buzzes
  * when the app is killed / backgrounded.
+ *
+ * Notification Actions: habit-cue notifications now have an inline "Start Now ⚡"
+ * button that deep-links straight to /habits without extra taps.
  */
 @Injectable({ providedIn: 'root' })
 export class LocalNotificationsService {
+  private router = inject(Router);
+
   /** Static IDs — reusing them means re-scheduling REPLACES the previous alarm. */
   private static readonly IDS = {
     wake: 101,
@@ -23,6 +29,11 @@ export class LocalNotificationsService {
   };
   /** Habit reminder IDs live in a separate range so they don't collide. */
   private static readonly HABIT_ID_BASE = 2000;
+
+  /** Action type ID for habit-cue notifications */
+  private static readonly HABIT_ACTION_TYPE = 'HABIT_ACTION';
+  /** Action ID for the "Start Now" button */
+  private static readonly ACTION_START_NOW = 'start_now';
 
   /**
    * Requests permission (Android 13+ needs runtime consent) and schedules the
@@ -37,10 +48,49 @@ export class LocalNotificationsService {
         const req = await LocalNotifications.requestPermissions();
         if (req.display !== 'granted') return;
       }
+
+      // Register action types first so Android knows about them before scheduling.
+      await this.registerActionTypes();
       await this.scheduleDefaults();
+      this.listenForActions();
     } catch {
       /* plugin unavailable — silently ignore */
     }
+  }
+
+  /**
+   * Registers the notification action types with the OS.
+   * Must be called before scheduling notifications that use them.
+   */
+  private async registerActionTypes(): Promise<void> {
+    try {
+      await LocalNotifications.registerActionTypes({
+        types: [
+          {
+            id: LocalNotificationsService.HABIT_ACTION_TYPE,
+            actions: [
+              {
+                id: LocalNotificationsService.ACTION_START_NOW,
+                title: 'Start Now ⚡',
+                foreground: true,
+              },
+            ],
+          },
+        ],
+      });
+    } catch { /* ignore if unsupported */ }
+  }
+
+  /**
+   * Listens for notification action taps (e.g. "Start Now").
+   * When fired, routes the user directly to /habits.
+   */
+  private listenForActions(): void {
+    LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
+      if (action.actionId === LocalNotificationsService.ACTION_START_NOW) {
+        this.router.navigate(['/habits']);
+      }
+    });
   }
 
   /**
@@ -65,7 +115,6 @@ export class LocalNotificationsService {
         this.daily(LocalNotificationsService.IDS.sleep, 23, 0,
           '◈ SLEEP PROTOCOL',
           'Phone down. No reels. Testosterone builds in sleep. Put it down.'),
-        // Weekly review — Sunday 20:00. weekday in Capacitor: 1=Sun … 7=Sat.
         {
           id: LocalNotificationsService.IDS.weeklyReview,
           title: '◈ WEEKLY REVIEW',
@@ -77,7 +126,6 @@ export class LocalNotificationsService {
     };
 
     try {
-      // Cancel previous copies (idempotent re-schedule).
       await LocalNotifications.cancel({
         notifications: Object.values(LocalNotificationsService.IDS).map(id => ({ id })),
       });
@@ -104,7 +152,7 @@ export class LocalNotificationsService {
       body,
       schedule: {
         on: { hour, minute },
-        allowWhileIdle: true,      // fire even in Doze mode
+        allowWhileIdle: true,
         repeats: true,
       },
       smallIcon: 'ic_launcher',
@@ -115,12 +163,11 @@ export class LocalNotificationsService {
   /**
    * Schedule per-habit cue-time reminders on the device. Called from the
    * Habits view whenever the list changes. Each habit gets ID 2000+habitId.
-   * Only habits with a cueTime + not archived + not already done today are scheduled.
+   * Habit notifications include a "Start Now ⚡" action button that deep-links to /habits.
    */
   async scheduleHabits(habits: Habit[]): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
-      // Cancel prior habit reminders first (idempotent).
       const existing = await LocalNotifications.getPending();
       const toCancel = existing.notifications
         .filter(n => n.id >= LocalNotificationsService.HABIT_ID_BASE
@@ -130,7 +177,7 @@ export class LocalNotificationsService {
 
       const scheduled = habits
         .filter(h => !h.archived && h.cueTime && h.cueTime.match(/^\d{2}:\d{2}$/))
-        .slice(0, 5)  // cap noise: never more than 5 habit alerts per day
+        .slice(0, 5)
         .map(h => {
           const [hh, mm] = h.cueTime!.split(':').map(n => +n);
           return {
@@ -142,6 +189,7 @@ export class LocalNotificationsService {
             schedule: { on: { hour: hh, minute: mm }, allowWhileIdle: true, repeats: true },
             smallIcon: 'ic_launcher',
             channelId: 'thesystem_reminders',
+            actionTypeId: LocalNotificationsService.HABIT_ACTION_TYPE,
           };
         });
 

@@ -1,0 +1,49 @@
+<div class="lock-overlay">
+  <!-- Animated background grid -->
+  <div class="grid-bg"></div>
+
+  <!-- Floating rank letters -->
+  <div class="rank-pillars" aria-hidden="true">
+    <span class="rp rp1">S</span>
+    <span class="rp rp2">A</span>
+    <span class="rp rp3">◈</span>
+  </div>
+
+  <div class="lock-card system-card">
+    <!-- Logo -->
+    <div class="brand">
+      <div class="brand-icon">◈</div>
+      <p class="brand-title mono">THE SYSTEM</p>
+      <p class="brand-sub tech">IDENTITY VERIFICATION REQUIRED</p>
+    </div>
+
+    <!-- Lock icon -->
+    <div class="lock-icon" [class.unlocking]="authenticating()">
+      <span class="icon-glyph">{{ failed() ? '✗' : (authenticating() ? '◌' : '🔒') }}</span>
+    </div>
+
+    <!-- Status message -->
+    <p class="status-msg" [class.error]="failed()">
+      @if (authenticating()) {
+        <span class="dots">Verifying identity</span>
+      } @else if (failed()) {
+        Authentication failed. Try again.
+      } @else {
+        Authenticate to access THE SYSTEM
+      }
+    </p>
+
+    <!-- CTA button -->
+    <button class="verify-btn submit" (click)="authenticate()" [disabled]="authenticating()">
+      @if (authenticating()) {
+        <span class="dots">SCANNING</span>
+      } @else {
+        VERIFY IDENTITY
+      }
+    </button>
+
+    <p class="lock-hint tech">
+      Fingerprint · Face · PIN
+    </p>
+  </div>
+</div>

@@ -7,7 +7,8 @@ import { HabitService, HabitHistoryEntry } from '../../core/services/habit.servi
 import { HapticsService } from '../../core/services/haptics.service';
 import { LocalNotificationsService } from '../../core/services/local-notifications.service';
 import { SseService } from '../../core/services/sse.service';
-import { Habit, HabitTemplate } from '../../core/models/models';
+import { Habit, HabitTemplate, HabitCompletionResult } from '../../core/models/models';
+import { StreakCelebrationComponent } from '../../shared/streak-celebration/streak-celebration.component';
 
 /**
  * Habits Dashboard — the Atomic Habits & Power of Habit engine, rendered
@@ -17,7 +18,7 @@ import { Habit, HabitTemplate } from '../../core/models/models';
 @Component({
   selector: 'app-habits',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, StreakCelebrationComponent],
   templateUrl: './habits.component.html',
   styleUrls: ['./habits.component.scss'],
 })
@@ -43,6 +44,14 @@ export class HabitsComponent implements OnInit {
   completeQuality = signal(3);
   completeNote = signal('');
   completeTwoMin = signal(false);
+
+  // Streak celebration
+  showCelebration = signal(false);
+  celebrationStreak = signal(0);
+  celebrationHabitName = signal('');
+
+  /** Streak milestones that trigger the confetti celebration. */
+  private static readonly STREAK_MILESTONES = new Set([3, 7, 14, 21, 30, 50, 100]);
 
   // History (Cue Log) modal
   showHistory = signal(false);
@@ -107,6 +116,7 @@ export class HabitsComponent implements OnInit {
     this.habitService.complete(h.id, { twoMinute }).subscribe({
       next: (res) => {
         this.haptics[twoMinute ? 'light' : 'success']();
+        this.checkStreak(res);
         this.snack.open(
           `◈ +${res.xpGained} XP · streak ${res.newCurrentStreak} — ${res.systemMessage}`,
           '✕',
@@ -141,6 +151,7 @@ export class HabitsComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         this.haptics[this.completeTwoMin() ? 'light' : 'success']();
+        this.checkStreak(res);
         this.snack.open(
           `◈ +${res.xpGained} XP · streak ${res.newCurrentStreak} — ${res.systemMessage}`,
           '✕', { duration: 5000, panelClass: 'system-snack' },
@@ -156,6 +167,21 @@ export class HabitsComponent implements OnInit {
   }
 
   closeComplete(): void { this.showComplete.set(false); }
+
+  dismissCelebration(): void { this.showCelebration.set(false); }
+
+  /**
+   * Check if a completed habit hit a streak milestone.
+   * If so, fire confetti overlay + 3-beat haptic pattern.
+   */
+  private checkStreak(res: HabitCompletionResult): void {
+    if (HabitsComponent.STREAK_MILESTONES.has(res.newCurrentStreak)) {
+      this.celebrationStreak.set(res.newCurrentStreak);
+      this.celebrationHabitName.set(res.habitName);
+      this.showCelebration.set(true);
+      this.haptics.streak(); // 3-beat vibration
+    }
+  }
 
   // ============ History (Cue Log) ============
 

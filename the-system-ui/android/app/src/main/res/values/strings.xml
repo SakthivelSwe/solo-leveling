@@ -4,4 +4,5 @@
     <string name="title_activity_main">THE SYSTEM</string>
     <string name="package_name">com.thesystem.app</string>
     <string name="custom_url_scheme">com.thesystem.app</string>
+    <string name="widget_description">Shows your daily focus topic from THE SYSTEM. Tap to track habits.</string>
 </resources>

@@ -410,3 +410,11 @@
 
 </div>
 
+<!-- 🎊 Streak milestone celebration overlay -->
+@if (showCelebration()) {
+  <app-streak-celebration
+    [streak]="celebrationStreak()"
+    [habitName]="celebrationHabitName()"
+    (dismissed)="dismissCelebration()">
+  </app-streak-celebration>
+}

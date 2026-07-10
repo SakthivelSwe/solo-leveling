@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  widget_topic_info.xml — AppWidget metadata descriptor.
+  Tells Android the widget's minimum size, update period, and preview.
+
+  minWidth  180dp ≈ 2 grid cells on standard launcher
+  minHeight 110dp ≈ 1-2 grid cells
+  updatePeriodMillis = 3600000 (1 hour) — Android enforces ≥ 30 min.
+    Since the topic changes daily, hourly updates are sufficient.
+    The update is low-cost (just rotating a static array).
+-->
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="3600000"
+    android:initialLayout="@layout/widget_topic"
+    android:description="@string/widget_description"
+    android:widgetCategory="home_screen"
+    android:resizeMode="horizontal|vertical">
+</appwidget-provider>

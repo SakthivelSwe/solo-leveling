@@ -1,3 +1,8 @@
 <div class="route-host" [@routeFade]="routeState(outlet)">
   <router-outlet #outlet="outlet"></router-outlet>
 </div>
+
+<!-- Biometric lock overlay — shown when app resumes and re-auth is needed -->
+@if (isLocked()) {
+  <app-biometric-lock></app-biometric-lock>
+}

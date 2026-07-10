@@ -29,5 +29,20 @@ export class HapticsService {
     if (!this.native) return;
     try { await Haptics.notification({ type: NotificationType.Warning }); } catch { /* ignore */ }
   }
-}
 
+  /**
+   * 3-beat celebration pattern for streak milestones.
+   * Medium → pause → Medium → pause → Heavy.
+   * Creates a triumphant, distinct feel different from a normal success tap.
+   */
+  async streak(): Promise<void> {
+    if (!this.native) return;
+    try {
+      await Haptics.impact({ style: ImpactStyle.Medium });
+      await new Promise(r => setTimeout(r, 120));
+      await Haptics.impact({ style: ImpactStyle.Medium });
+      await new Promise(r => setTimeout(r, 120));
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+    } catch { /* ignore */ }
+  }
+}
