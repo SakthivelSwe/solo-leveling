@@ -81,6 +81,7 @@ public class SecurityConfig {
                 "https://localhost",
                 "capacitor://localhost",
                 "http://10.0.2.2:*",
+                "https://solo-leveling-1h5.pages.dev",
                 "https://*.pages.dev",
                 "https://*.onrender.com"
         ));

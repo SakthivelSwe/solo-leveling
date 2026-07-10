@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
   native: false,
-  apiUrl: 'https://the-system-api.onrender.com/api',
+  apiUrl: 'https://solo-leveling-0rpl.onrender.com/api',
 };
