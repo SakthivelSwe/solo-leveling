@@ -12,7 +12,7 @@ services:
     plan: free                  # Free tier — upgrade when needed
     dockerfilePath: ./the-system-api/Dockerfile
     dockerContext: ./the-system-api
-    healthCheckPath: /api/auth/login    # Any public endpoint for health check
+    healthCheckPath: /api/public/ping    # Lightweight public GET endpoint for Render health checks
     envVars:
       - key: DB_URL
         value: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres

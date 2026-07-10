@@ -18,7 +18,7 @@ public class KeepAliveScheduler {
     /**
      * Pings the empty API every 14 minutes (840000 ms) to keep the Render free tier alive.
      */
-    @Scheduled(fixedRate = 840000)
+    @Scheduled(initialDelay = 840000, fixedRate = 840000)
     public void pingSelf() {
         try {
             String targetUrl = appUrl + "/api/public/ping";
