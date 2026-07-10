@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+
+// Create a proxy to the native plugin without importing its JS implementation.
+// This prevents Angular's esbuild from bundling the ancient web implementation.
+const BiometricAuth = registerPlugin<any>('BiometricAuth');
 
 /**
  * Biometric authentication service using capacitor-biometric-auth.
@@ -32,12 +36,9 @@ export class BiometricService {
     if (!Capacitor.isNativePlatform()) return;
 
     try {
-      // Dynamically import so the web build never fails if plugin is absent
-      const { BiometricAuth } = await import('capacitor-biometric-auth');
       this._biometricPlugin = BiometricAuth;
-
-      const result = await BiometricAuth.checkBiometry();
-      this._isAvailable = result.isAvailable;
+      const result = await this._biometricPlugin.isAvailable();
+      this._isAvailable = result.has;
     } catch {
       this._isAvailable = false;
     }
@@ -62,15 +63,16 @@ export class BiometricService {
 
     this._isLocked = true;
     try {
-      await this._biometricPlugin.authenticate({
+      const res = await this._biometricPlugin.verify({
         reason: 'Verify your identity to access THE SYSTEM',
-        cancelTitle: 'Cancel',
-        allowDeviceCredential: true, // fallback to PIN/pattern if biometrics fail
-        iosFallbackTitle: 'Use Passcode',
       });
-      sessionStorage.setItem(BiometricService.LAST_AUTH_KEY, String(Date.now()));
-      this._isLocked = false;
-      return true;
+      if (res.verified) {
+        sessionStorage.setItem(BiometricService.LAST_AUTH_KEY, String(Date.now()));
+        this._isLocked = false;
+        return true;
+      } else {
+        return false;
+      }
     } catch {
       // Auth failed or cancelled — stay locked
       this._isLocked = true;

@@ -98,16 +98,11 @@
         <h2 class="mono">⚔ {{ b.topic }}</h2>
         <div class="arena-meta tech">
           <span class="diff-pill" [attr.data-diff]="b.difficulty">{{ b.difficulty }}</span>
-          <span>Q {{ currentQ() + 1 }} / {{ b.questions?.length || 5 }}</span>
-          <span *ngIf="b.completedAt" class="done-label">GATE CLEARED</span>
+          <div class="q-progress" *ngIf="b.questions">
+          <span>Q {{ currentQ() + 1 }} / {{ b.questions.length || 5 }}</span>
+          <div class="q-track"><div class="q-fill" [style.width.%]="(currentQ() + 1) / (b.questions.length || 5) * 100"></div></div>
         </div>
-        <!-- Progress bar -->
-        <div class="q-progress">
-          <div *ngFor="let q of b.questions; let i = index" class="q-pip"
-               [class.done]="evaluations()[i]"
-               [class.active]="i === currentQ() && !b.completedAt"
-               [style.background]="evaluations()[i] ? scoreColor(evaluations()[i].score) : ''">
-          </div>
+          <span *ngIf="b.completedAt" class="done-label">GATE CLEARED</span>
         </div>
       </div>
 
@@ -140,9 +135,9 @@
       <!-- Current question -->
       <div class="question-panel system-card" *ngIf="!b.completedAt && b.questions">
         <div class="q-label tech">QUESTION {{ currentQ() + 1 }}</div>
-        <p class="q-text mono">{{ b.questions[currentQ()]?.question }}</p>
-        <div class="hint-row tech" *ngIf="b.questions[currentQ()]?.hint">
-          <span class="hint-label">HINT:</span> {{ b.questions[currentQ()]?.hint }}
+        <p class="q-text mono">{{ b.questions[currentQ()].question }}</p>
+        <div class="q-hint tech" *ngIf="b.questions[currentQ()].hint">
+          <span class="hint-label">HINT:</span> {{ b.questions[currentQ()].hint }}
         </div>
 
         <!-- Previous evaluation (just answered) -->

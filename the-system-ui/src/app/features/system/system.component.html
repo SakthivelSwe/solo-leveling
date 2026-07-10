@@ -92,7 +92,11 @@
         (complete)="onComplete($event)">
       </app-quest-log>
 
-      <app-progress-chart [weekly]="s.weeklyProgress"></app-progress-chart>
+      @defer (on viewport) {
+        <app-progress-chart [weekly]="s.weeklyProgress"></app-progress-chart>
+      } @placeholder {
+        <div style="height: 150px; border-radius: 12px; background: #0d0d1c; border: 1px solid #1a1a2c;"></div>
+      }
     </div>
 
     <!-- RIGHT: Daily Schedule -->

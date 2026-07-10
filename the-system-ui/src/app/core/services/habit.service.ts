@@ -13,18 +13,32 @@ import {
 @Injectable({ providedIn: 'root' })
 export class HabitService {
   private readonly api = environment.apiUrl;
+  private readonly CACHE_KEY = 'system_cached_habits';
 
   /** Live overview cache; components can also subscribe to fresh HTTP for details. */
-  readonly overview = signal<HabitsOverview | null>(null);
+  readonly overview = signal<HabitsOverview | null>(this.getCachedOverview());
   readonly loading = signal(false);
 
   constructor(private http: HttpClient) {}
 
+  getCachedOverview(): HabitsOverview | null {
+    const raw = localStorage.getItem(this.CACHE_KEY);
+    return raw ? JSON.parse(raw) as HabitsOverview : null;
+  }
+
   fetchOverview(): Observable<HabitsOverview> {
-    this.loading.set(true);
+    // Only show loader if we have absolutely no cached data
+    if (!this.overview()) {
+      this.loading.set(true);
+    }
+    
     return this.http.get<HabitsOverview>(`${this.api}/habits`).pipe(
       tap({
-        next: (o) => { this.overview.set(o); this.loading.set(false); },
+        next: (o) => { 
+          localStorage.setItem(this.CACHE_KEY, JSON.stringify(o));
+          this.overview.set(o); 
+          this.loading.set(false); 
+        },
         error: () => this.loading.set(false),
       }),
     );

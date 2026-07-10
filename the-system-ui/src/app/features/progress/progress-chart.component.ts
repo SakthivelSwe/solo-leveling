@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgChartsModule } from 'ng2-charts';
-import { ChartConfiguration, ChartData } from 'chart.js';
+import { ChartConfiguration, ChartData, Chart, registerables } from 'chart.js';
 import { DayProgress } from '../../core/models/models';
 
 @Component({
@@ -13,6 +13,10 @@ import { DayProgress } from '../../core/models/models';
 })
 export class ProgressChartComponent implements OnChanges {
   @Input({ required: true }) weekly: DayProgress[] = [];
+
+  constructor() {
+    Chart.register(...registerables);
+  }
 
   barData: ChartData<'bar'> = { labels: [], datasets: [] };
 

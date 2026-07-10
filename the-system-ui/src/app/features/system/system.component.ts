@@ -32,8 +32,8 @@ import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
   styleUrls: ['./system.component.scss'],
 })
 export class SystemComponent implements OnInit {
-  status = signal<StatusWindow | null>(null);
-  loading = signal(true);
+  status = signal<StatusWindow | null>(this.playerService.getCachedStatus());
+  loading = signal(!this.status());
   pendingKey = signal<string | null>(null);
   settingsOpen = signal(false);
   pressureLevel = signal(localStorage.getItem('sys_pressure') ?? 'STANDARD');

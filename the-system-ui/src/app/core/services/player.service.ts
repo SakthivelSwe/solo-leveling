@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import {
   StatusWindow, Quest, QuestCompletionResult, PlayerSkill,
   Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon
@@ -11,10 +11,19 @@ import { environment } from '../../../environments/environment';
 export class PlayerService {
   private readonly api = environment.apiUrl;
 
+  private readonly CACHE_KEY = 'system_cached_status';
+
   constructor(private http: HttpClient) {}
 
+  getCachedStatus(): StatusWindow | null {
+    const raw = localStorage.getItem(this.CACHE_KEY);
+    return raw ? JSON.parse(raw) as StatusWindow : null;
+  }
+
   getStatus(): Observable<StatusWindow> {
-    return this.http.get<StatusWindow>(`${this.api}/player/status`);
+    return this.http.get<StatusWindow>(`${this.api}/player/status`).pipe(
+      tap(s => localStorage.setItem(this.CACHE_KEY, JSON.stringify(s)))
+    );
   }
 
   getProfile(): Observable<Player> {
