@@ -84,7 +84,7 @@
 .identity-hint { font-size: .62rem; letter-spacing: 1px; color: var(--text-secondary); text-transform: lowercase; }
 
 /* Habit cards */
-.habits-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+.habits-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: clamp(12px, 3vw, 18px); }
 .habit-card {
   --accent: #8892B0;
   padding: 16px; border-left: 3px solid var(--accent);
@@ -112,7 +112,7 @@
 .loop-lbl { color: var(--text-secondary); font-size: .58rem; letter-spacing: 2px; align-self: center; }
 .loop-val { color: var(--text-primary); font-size: .74rem; line-height: 1.35; }
 
-.h-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+.h-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 8px; text-align: center; }
 .metric { display: flex; flex-direction: column; gap: 2px; }
 .metric-val { font-size: .95rem; font-weight: 900; color: var(--accent-gold); }
 .metric-lbl { font-size: .58rem; letter-spacing: 1.5px; color: var(--text-secondary); }
@@ -197,6 +197,11 @@
   .habits-grid { grid-template-columns: 1fr; }
   .h-metrics { grid-template-columns: repeat(2, 1fr); }
   .row { flex-direction: column; }
+}
+@media (max-width: 380px) {
+  .habits-shell { padding-left: 12px; padding-right: 12px; }
+  .h-metrics { grid-template-columns: repeat(2, 1fr); }
+  .metric-val { font-size: .8rem; }
 }
 
 /* ===== Compounding chart ===== */

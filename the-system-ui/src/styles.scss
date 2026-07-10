@@ -46,6 +46,28 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
+/* ── Mobile-first responsive foundations ───────────────────────
+   Fluid font scaling so text looks right on every screen size.
+   clamp(min, preferred, max) smoothly scales between breakpoints. */
+html {
+  /* Fluid base font: 14px on 320px phone → 16px on 1440px desktop */
+  font-size: clamp(14px, 1.5vw + 10px, 16px);
+  -webkit-text-size-adjust: 100%; /* prevent iOS auto font-size boost */
+  text-size-adjust: 100%;
+}
+
+/* ── Touch targets ──────────────────────────────────────────────
+   Apple HIG / Material guidelines: interactive elements ≥ 44px.
+   This prevents mis-taps on small phones. */
+button, a, [role='button'] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation; /* disable double-tap-to-zoom for fast taps */
+}
+
+/* Slightly relax the 44px rule for purely decorative icon links */
+.nav a { min-width: unset; min-height: unset; padding: 8px 6px; }
+
 body {
   background:
     radial-gradient(ellipse 1400px 700px at 30% -5%,  rgba(83,74,183,0.20), transparent 60%),
@@ -345,19 +367,46 @@ $sys-theme: mat.define-dark-theme((
   backdrop-filter: blur(4px);
 }
 
-/* ── Android 15 edge-to-edge safe areas ─────────────────────────
-   Android 15 (API 35+) enforces edge-to-edge, so system bars can
-   overlap content. When running inside the Capacitor WebView
-   (body.native-platform, set by NativeService) we inset the app
-   shell by the safe-area values so the topbar and bottom controls
-   never hide behind the status / gesture-navigation bars. */
+/* ── Android 15 / iOS edge-to-edge safe areas ─────────────────────
+   Android 15 (API 35+) and iOS enforce edge-to-edge, so system bars
+   can overlap content. We inset the app shell by the safe-area values
+   so the topbar and bottom controls never hide behind status bars,
+   notches, punch-holes, or gesture-navigation bars on ANY device. */
 body.native-platform .route-host {
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  padding-top:    max(env(safe-area-inset-top,    0px), 0px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+  padding-left:   max(env(safe-area-inset-left,   0px), 0px);
+  padding-right:  max(env(safe-area-inset-right,  0px), 0px);
 }
 
-/* Keep full-height pages filling the viewport after insets are applied. */
+/* Keep full-height pages filling the viewport after insets are applied.
+   Use dvh (dynamic viewport height) which accounts for collapsible
+   browser chrome / keyboard / address bars on mobile. */
 body.native-platform .route-host { min-height: 100dvh; }
+
+/* ── Global responsive shell padding ─────────────────────────────
+   On narrow phones (< 400px, e.g. Galaxy A series) reduce all
+   horizontal gutters so content doesn't feel cramped. */
+@media (max-width: 400px) {
+  .system-shell,
+  .habits-shell,
+  .life-shell,
+  .ai-shell,
+  .ach-shell,
+  .notif-shell {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* ── Utility: prevent text overflow on all screens ────────────── */
+p, h1, h2, h3, h4, h5, h6, span, a, label {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ── Fluid card padding ───────────────────────────────────────── */
+.system-card {
+  padding: clamp(12px, 3vw, 20px);
+}
 

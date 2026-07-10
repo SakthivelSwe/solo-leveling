@@ -51,7 +51,7 @@
 }
 
 .stat-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; margin-bottom: 18px;
 }
 .stat-tile {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -120,7 +120,7 @@
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 
 /* Titles */
-.titles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.titles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 12px; }
 .title-chip {
   display: flex; flex-direction: column; gap: 4px; text-align: left;
   padding: 12px 14px; border-radius: 10px; cursor: pointer;
@@ -157,6 +157,11 @@
 @media (max-width: 640px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .titles-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-tile .val { font-size: 1.1rem; }
+  .heatmap .cell { width: 11px; height: 11px; }
 }
 
 
