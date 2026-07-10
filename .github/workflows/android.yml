@@ -68,18 +68,33 @@ jobs:
         working-directory: the-system-ui/android
         run: ./gradlew --no-daemon assembleRelease
 
+      - name: Sign Release APK
+        id: sign_apk
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: the-system-ui/android/app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY_BASE64 }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "36.0.0"
+
+      - name: Rename signed APK
+        run: mv "${{ steps.sign_apk.outputs.signedReleaseFile }}" the-system-ui/android/app/build/outputs/apk/release/app-release.apk
+
       - name: Upload Debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: the-system-debug-apk
           path: the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          
+
       - name: Upload Release APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: the-system-release-unsigned-apk
-          path: the-system-ui/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          name: the-system-release-apk
+          path: the-system-ui/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
 
       - name: Update Latest Release
@@ -91,4 +106,4 @@ jobs:
           make_latest: true
           files: |
             the-system-ui/android/app/build/outputs/apk/debug/app-debug.apk
-            the-system-ui/android/app/build/outputs/apk/release/app-release-unsigned.apk
+            the-system-ui/android/app/build/outputs/apk/release/app-release.apk

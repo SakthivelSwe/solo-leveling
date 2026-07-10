@@ -1,0 +1,4 @@
+
+# Keystore - NEVER commit this
+*.jks
+*.keystore
