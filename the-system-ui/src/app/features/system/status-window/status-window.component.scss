@@ -16,7 +16,7 @@
   justify-content: center; margin-bottom: 24px;
 }
 
-.ring-wrap { position: relative; width: 180px; height: 180px; }
+.ring-wrap { position: relative; width: 180px; height: 180px; filter: drop-shadow(0 0 18px rgba(79,195,247,0.35)); }
 .ring { width: 180px; height: 180px; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 10; }
 .ring-progress {
@@ -39,8 +39,15 @@
 .meta { display: flex; flex-direction: column; gap: 12px; }
 .meta-chip {
   display: flex; flex-direction: column; gap: 2px; min-width: 108px;
-  padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
-  background: rgba(9,9,18,0.5);
+  padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px;
+  background: linear-gradient(160deg, rgba(20,20,38,0.6), rgba(9,9,18,0.55));
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
+  transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s;
+}
+.meta-chip:hover {
+  transform: translateY(-3px);
+  border-color: rgba(108,99,255,0.4);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.5), 0 0 18px rgba(108,99,255,0.18);
 }
 .meta-chip .k { font-size: .6rem; letter-spacing: 2px; color: var(--text-secondary); }
 .meta-chip .v { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }

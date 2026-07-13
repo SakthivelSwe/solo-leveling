@@ -16,14 +16,27 @@
 .topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px); margin-bottom: 22px; flex-wrap: wrap;
-  border: 1px solid var(--border); border-radius: 0 0 16px 16px;
-  background: linear-gradient(160deg, rgba(16,16,30,0.96), rgba(10,10,26,0.96));
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--border); border-top: none; border-radius: 0 0 20px 20px;
+  background: linear-gradient(160deg, rgba(22,22,42,0.82), rgba(10,10,26,0.88));
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 24px rgba(108,99,255,0.10), 0 1px 0 rgba(255,255,255,0.05) inset;
   position: sticky; top: 0; z-index: 20;
 }
+/* Neon underline that anchors the floating topbar */
+.topbar::after {
+  content: ''; position: absolute; left: 8%; right: 8%; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(108,99,255,0.7), rgba(79,195,247,0.5), transparent);
+}
 .brand { display: flex; align-items: center; gap: 10px; }
-.brand-logo { width: 32px; height: 32px; filter: drop-shadow(0 0 10px var(--system-blue)); animation: floatLogo 5s ease-in-out infinite; }
-@keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.brand-logo {
+  width: 34px; height: 34px;
+  filter: drop-shadow(0 0 12px var(--system-blue)) drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  animation: floatLogo 5s ease-in-out infinite;
+}
+@keyframes floatLogo {
+  0%,100% { transform: translateY(0) rotateY(0deg); }
+  50%     { transform: translateY(-5px) rotateY(18deg); }
+}
 .name { font-weight: 900; letter-spacing: 5px; font-size: clamp(.8rem, 2.5vw, 1.05rem); }
 .rank-badge-mini {
   font-size: .6rem; letter-spacing: 2px; padding: 3px 8px; border-radius: 6px;
@@ -36,10 +49,11 @@
   letter-spacing: 2px; font-weight: 600; padding: 8px 6px; position: relative; transition: color .2s;
   min-height: unset;
 }
-.nav a:hover, .nav a.active { color: var(--text-primary); }
+.nav a:hover, .nav a.active { color: var(--text-primary); transform: translateY(-1px); }
 .nav a.active::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
   background: linear-gradient(90deg, var(--system-blue), var(--accent-purple)); border-radius: 2px;
+  box-shadow: 0 0 10px rgba(108,99,255,0.9), 0 0 4px var(--system-blue);
 }
 .nav a.bell { position: relative; font-size: 1rem; }
 .nav a.bell .badge {
@@ -50,11 +64,17 @@
 }
 @keyframes bellPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.22); } }
 .gear {
-  background: none; border: 1px solid var(--border); border-radius: 7px;
-  color: var(--text-secondary); cursor: pointer; padding: 4px 8px;
-  font-size: .9rem; transition: all .2s;
+  background: linear-gradient(180deg, rgba(30,30,54,0.9), rgba(16,16,30,0.9));
+  border: 1px solid var(--border); border-radius: 9px;
+  color: var(--text-secondary); cursor: pointer; padding: 5px 9px;
+  font-size: .9rem; transition: all .25s var(--ease-spring);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset;
 }
-.gear:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
+.gear:hover {
+  color: var(--accent-gold); border-color: var(--accent-gold);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 6px 16px rgba(250,199,117,0.3);
+}
 
 /* Real-time link indicator */
 .live-link {
@@ -83,11 +103,16 @@
 .title-tag { font-size: .54rem; letter-spacing: 1.5px; color: #ffe6b0; }
 .lv { font-size: .58rem; letter-spacing: 2px; color: var(--text-secondary); }
 .logout {
-  background: transparent; border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text-secondary); padding: 6px 12px; cursor: pointer;
-  font-size: .66rem; letter-spacing: 1px; transition: all .2s;
+  background: linear-gradient(180deg, rgba(30,30,54,0.85), rgba(16,16,30,0.85));
+  border: 1px solid var(--border); border-radius: 9px;
+  color: var(--text-secondary); padding: 7px 13px; cursor: pointer;
+  font-size: .66rem; letter-spacing: 1px; transition: all .25s var(--ease-spring);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset;
 }
-.logout:hover { border-color: #E24B4A; color: #F09595; }
+.logout:hover {
+  border-color: #E24B4A; color: #F09595; transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(226,75,74,0.3);
+}
 
 /* ── 3-column dashboard — fluid, not fixed ─────────────────────────
    Uses clamp() so columns shrink gracefully on medium screens

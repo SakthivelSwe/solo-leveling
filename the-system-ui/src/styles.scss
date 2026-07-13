@@ -1,78 +1,104 @@
 /* ============================================================
-   THE SYSTEM — Solo Leveling Life OS · Global Theme v2
+   THE SYSTEM — Solo Leveling Life OS · Premium 3D Theme v3
+   A depth-driven, glassmorphic, "holographic UI" design system.
    ============================================================ */
 @use '@angular/material' as mat;
 
 /* ── Google Fonts ─────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Backgrounds */
-  --bg-primary:   #060610;
-  --bg-secondary: #0a0a1a;
+  /* Backgrounds — deep space blacks with a faint violet cast */
+  --bg-primary:   #05050d;
+  --bg-secondary: #0a0a18;
   --card-bg:      #10101e;
-  --border:       #1a1a30;
-  --border-glow:  #252545;
+  --border:       #1c1c34;
+  --border-glow:  #2b2b52;
 
   /* Accents */
-  --accent-purple: #534AB7;
-  --accent-purple-dim: rgba(83,74,183,0.18);
-  --accent-teal:   #1D9E75;
+  --accent-purple:     #6C63FF;
+  --accent-purple-2:   #534AB7;
+  --accent-purple-dim: rgba(108,99,255,0.18);
+  --accent-teal:   #1FBE8E;
   --accent-gold:   #FAC775;
   --accent-red:    #E24B4A;
+  --accent-cyan:   #4fc3f7;
 
   /* Text */
-  --text-primary:   #E6EDF3;
-  --text-secondary: #5a6370;
+  --text-primary:   #EEF3FA;
+  --text-secondary: #7a8494;
   --text-dim:       #3a4050;
 
   /* Stat colors */
-  --stat-str: #D85A30;
-  --stat-int: #534AB7;
-  --stat-vit: #1D9E75;
-  --stat-agi: #BA7517;
-  --stat-per: #378ADD;
-  --stat-hor: #E24B4A;
+  --stat-str: #FF6B3D;
+  --stat-int: #6C63FF;
+  --stat-vit: #1FBE8E;
+  --stat-agi: #FFB020;
+  --stat-per: #3B9BFF;
+  --stat-hor: #FF5252;
 
   --system-blue: #4fc3f7;
-  --system-glow: rgba(83,74,183,0.6);
+  --system-glow: rgba(108,99,255,0.60);
 
   /* HP colors */
-  --hp-high:   #1D9E75;
-  --hp-mid:    #FAC775;
-  --hp-low:    #E24B4A;
+  --hp-high: #1FBE8E;
+  --hp-mid:  #FAC775;
+  --hp-low:  #E24B4A;
+
+  /* ── 3D depth / elevation tokens ─────────────────────────
+     Layered shadows create realistic, physically-plausible depth.
+     Each level combines: ambient + key light + rim highlight. */
+  --elev-1:
+    0 1px 2px rgba(0,0,0,0.40),
+    0 2px 8px rgba(0,0,0,0.35);
+  --elev-2:
+    0 2px 4px rgba(0,0,0,0.45),
+    0 8px 20px rgba(0,0,0,0.45),
+    0 0 0 1px rgba(255,255,255,0.02) inset;
+  --elev-3:
+    0 4px 8px rgba(0,0,0,0.50),
+    0 16px 40px rgba(0,0,0,0.55),
+    0 0 32px rgba(108,99,255,0.10),
+    0 1px 0 rgba(255,255,255,0.05) inset;
+  --elev-float:
+    0 24px 60px rgba(0,0,0,0.60),
+    0 8px 24px rgba(108,99,255,0.22),
+    0 1px 0 rgba(255,255,255,0.07) inset;
+
+  /* Glass surface fills */
+  --glass-fill: linear-gradient(160deg, rgba(24,24,44,0.72), rgba(12,12,26,0.78));
+  --glass-blur: 16px;
+
+  /* Motion */
+  --ease-spring: cubic-bezier(.22,1,.36,1);
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
-/* ── Mobile-first responsive foundations ───────────────────────
-   Fluid font scaling so text looks right on every screen size.
-   clamp(min, preferred, max) smoothly scales between breakpoints. */
+/* Enable GPU-accelerated 3D across the app */
+html { perspective: 1400px; }
+
+/* ── Mobile-first responsive foundations ─────────────────────── */
 html {
-  /* Fluid base font: 14px on 320px phone → 16px on 1440px desktop */
   font-size: clamp(14px, 1.5vw + 10px, 16px);
-  -webkit-text-size-adjust: 100%; /* prevent iOS auto font-size boost */
+  -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
-/* ── Touch targets ──────────────────────────────────────────────
-   Apple HIG / Material guidelines: interactive elements ≥ 44px.
-   This prevents mis-taps on small phones. */
+/* ── Touch targets ───────────────────────────────────────────── */
 button, a, [role='button'] {
   min-height: 44px;
   min-width: 44px;
-  touch-action: manipulation; /* disable double-tap-to-zoom for fast taps */
+  touch-action: manipulation;
 }
-
-/* Slightly relax the 44px rule for purely decorative icon links */
 .nav a { min-width: unset; min-height: unset; padding: 8px 6px; }
 
 body {
   background:
-    radial-gradient(ellipse 1400px 700px at 30% -5%,  rgba(83,74,183,0.20), transparent 60%),
-    radial-gradient(ellipse 1000px 600px at 80% 110%, rgba(29,158,117,0.12), transparent 55%),
-    radial-gradient(ellipse 600px 400px at 95% 5%,   rgba(79,195,247,0.08), transparent 50%),
+    radial-gradient(ellipse 1400px 720px at 28% -8%,  rgba(108,99,255,0.24), transparent 60%),
+    radial-gradient(ellipse 1100px 620px at 82% 112%, rgba(31,190,142,0.14), transparent 55%),
+    radial-gradient(ellipse 640px 440px at 96% 4%,    rgba(79,195,247,0.10), transparent 50%),
     var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
@@ -80,8 +106,29 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Particle/star field ───────────────────────────────────── */
+/* ── Animated aurora / nebula layer (adds living depth) ──────── */
 body::before {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  background:
+    radial-gradient(closest-side, rgba(108,99,255,0.16), transparent 70%) 20% 30% / 55% 55% no-repeat,
+    radial-gradient(closest-side, rgba(31,190,142,0.12), transparent 70%) 80% 70% / 50% 50% no-repeat,
+    radial-gradient(closest-side, rgba(79,195,247,0.10), transparent 70%) 60% 15% / 45% 45% no-repeat;
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: 0;
+  animation: aurora 26s ease-in-out infinite alternate;
+}
+
+@keyframes aurora {
+  0%   { transform: translate3d(0,0,0) scale(1);        opacity: .85; }
+  50%  { transform: translate3d(3%, -2%, 0) scale(1.08); opacity: 1; }
+  100% { transform: translate3d(-2%, 2%, 0) scale(1.04); opacity: .8; }
+}
+
+/* ── Star / particle field ───────────────────────────────────── */
+body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -89,34 +136,18 @@ body::before {
     radial-gradient(1px 1px at 8%  15%, rgba(255,255,255,0.50), transparent),
     radial-gradient(1px 1px at 22% 55%, rgba(79,195,247,0.45), transparent),
     radial-gradient(1px 1px at 38% 28%, rgba(255,255,255,0.30), transparent),
-    radial-gradient(1px 1px at 55% 72%, rgba(83,74,183,0.50), transparent),
+    radial-gradient(1px 1px at 55% 72%, rgba(108,99,255,0.50), transparent),
     radial-gradient(1px 1px at 72% 42%, rgba(255,255,255,0.35), transparent),
     radial-gradient(2px 2px at 85% 18%, rgba(250,199,117,0.30), transparent),
-    radial-gradient(1px 1px at 93% 78%, rgba(29,158,117,0.40), transparent),
+    radial-gradient(1px 1px at 93% 78%, rgba(31,190,142,0.40), transparent),
     radial-gradient(1px 1px at 15% 88%, rgba(255,255,255,0.25), transparent),
     radial-gradient(1px 1px at 64% 8%,  rgba(79,195,247,0.30), transparent),
-    radial-gradient(2px 2px at 48% 96%, rgba(83,74,183,0.25), transparent);
+    radial-gradient(2px 2px at 48% 96%, rgba(108,99,255,0.25), transparent);
   background-size: 600px 600px;
-  opacity: 0.6;
+  opacity: 0.55;
   pointer-events: none;
   z-index: 0;
   animation: drift 80s linear infinite;
-}
-
-/* ── Scan-line overlay ─────────────────────────────────────── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.08) 2px,
-    rgba(0,0,0,0.08) 4px
-  );
-  pointer-events: none;
-  z-index: 0;
 }
 
 @keyframes drift {
@@ -129,39 +160,104 @@ body::after {
 .tech  { font-family: 'Rajdhani', sans-serif; letter-spacing: .5px; }
 
 /* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #534AB7, #2a2670);
+  background: linear-gradient(180deg, #6C63FF, #2a2670);
   border-radius: 6px;
+  border: 2px solid var(--bg-secondary);
 }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #8b83ff, #3a34a0); }
 
-/* ── System Card ───────────────────────────────────────────── */
+/* ============================================================
+   3D SYSTEM CARD — glassmorphic surface with real depth
+   ============================================================ */
 .system-card {
-  background: linear-gradient(160deg, rgba(16,16,30,0.97), rgba(10,10,26,0.97));
+  background: var(--glass-fill);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 18px;
   position: relative;
-  backdrop-filter: blur(8px);
-  transition: border-color .3s;
+  padding: clamp(12px, 3vw, 20px);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--elev-2);
+  transform-style: preserve-3d;
+  transition:
+    transform .45s var(--ease-spring),
+    box-shadow .45s var(--ease-spring),
+    border-color .3s;
 }
+/* Gradient rim-light border */
 .system-card::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(83,74,183,0.6), transparent 40%, rgba(79,195,247,0.3));
+  background: linear-gradient(135deg, rgba(108,99,255,0.65), transparent 40%, rgba(79,195,247,0.35));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
 }
-.system-card:hover { border-color: rgba(83,74,183,0.4); }
+/* Top specular highlight for a "glassy" curved feel */
+.system-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 42%;
+  border-radius: 18px 18px 40% 40% / 18px 18px 100% 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+  pointer-events: none;
+}
+.system-card:hover {
+  border-color: rgba(108,99,255,0.45);
+  box-shadow: var(--elev-3);
+  transform: translateZ(0) translateY(-2px);
+}
 
-/* ── Utility ───────────────────────────────────────────────── */
-.glow-text { text-shadow: 0 0 18px var(--system-glow), 0 0 36px var(--system-glow); }
-.glow-teal  { text-shadow: 0 0 12px rgba(29,158,117,0.8); }
+/* Opt-in interactive 3D tilt/lift — add class="card-3d" to clickable cards */
+.card-3d {
+  transition: transform .35s var(--ease-spring), box-shadow .35s var(--ease-spring);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.card-3d:hover {
+  transform: perspective(900px) rotateX(4deg) rotateY(-4deg) translateY(-4px) scale(1.015);
+  box-shadow: var(--elev-float);
+}
+.card-3d:active { transform: perspective(900px) translateY(-1px) scale(.995); }
+
+/* ── Premium 3D buttons ──────────────────────────────────────
+   Use class="btn-3d" for primary actions. */
+.btn-3d {
+  position: relative;
+  border: 1px solid rgba(108,99,255,0.45);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #6C63FF, #4a42b0);
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #322b7a,
+    0 10px 22px rgba(108,99,255,0.40),
+    0 1px 0 rgba(255,255,255,0.30) inset;
+  transition: transform .12s ease, box-shadow .12s ease, filter .2s;
+}
+.btn-3d:hover { filter: brightness(1.08); }
+.btn-3d:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #322b7a,
+    0 4px 10px rgba(108,99,255,0.35),
+    0 1px 0 rgba(255,255,255,0.25) inset;
+}
+
+/* ── Glow utilities ───────────────────────────────────────── */
+.glow-text  { text-shadow: 0 0 18px var(--system-glow), 0 0 36px var(--system-glow); }
+.glow-teal  { text-shadow: 0 0 12px rgba(31,190,142,0.8); }
 .glow-gold  { text-shadow: 0 0 12px rgba(250,199,117,0.7); }
 
 /* XP/progress shimmer utility */
@@ -185,22 +281,23 @@ $sys-theme: mat.define-dark-theme((
 /* ── System Snackbar ──────────────────────────────────────── */
 .mat-mdc-snack-bar-container.system-snack {
   --mdc-snackbar-container-color:       #10101e;
-  --mdc-snackbar-supporting-text-color: #E6EDF3;
+  --mdc-snackbar-supporting-text-color: #EEF3FA;
   --mat-snack-bar-button-color:         #FAC775;
 }
 .mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
   border: 1px solid var(--accent-teal);
-  box-shadow: 0 0 28px rgba(29,158,117,0.45);
+  box-shadow: 0 0 28px rgba(31,190,142,0.45), var(--elev-3);
 }
 .mat-mdc-snack-bar-container.system-snack-warn .mdc-snackbar__surface {
   border: 1px solid #E24B4A;
-  box-shadow: 0 0 28px rgba(226,75,74,0.45);
+  box-shadow: 0 0 28px rgba(226,75,74,0.45), var(--elev-3);
 }
 
-/* ── System Alert Modal ───────────────────────────────────── */
+/* ── Overlay backdrop ─────────────────────────────────────── */
 .cdk-overlay-dark-backdrop {
-  background: rgba(3,3,10,0.88);
-  backdrop-filter: blur(6px);
+  background: rgba(3,3,10,0.90);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* ── Holographic flicker animation ──────────────────────────── */
@@ -220,7 +317,7 @@ $sys-theme: mat.define-dark-theme((
   70%  { transform: scale(0.96); }
   100% { transform: scale(1); filter: brightness(1); }
 }
-.stat-pop { animation: statPop .55s cubic-bezier(.22,1,.36,1) both; }
+.stat-pop { animation: statPop .55s var(--ease-spring) both; }
 
 /* ── HP danger pulse ─────────────────────────────────────────── */
 @keyframes dangerPulse {
@@ -235,158 +332,16 @@ $sys-theme: mat.define-dark-theme((
   box-shadow: none;
 }
 
-
-:root {
-  /* Backgrounds */
-  --bg-primary:   #090912;
-  --bg-secondary: #0d0d1c;
-  --card-bg:      #13131f;
-  --border:       #1a1a2c;
-
-  /* Accents */
-  --accent-purple: #534AB7;
-  --accent-teal:   #1D9E75;
-  --accent-gold:   #FAC775;
-
-  /* Text */
-  --text-primary:   #E6EDF3;
-  --text-secondary: #6E7681;
-
-  /* Stat colors */
-  --stat-str: #D85A30;
-  --stat-int: #534AB7;
-  --stat-vit: #1D9E75;
-  --stat-agi: #BA7517;
-  --stat-per: #378ADD;
-  --stat-hor: #E24B4A;
-
-  --system-blue: #4fc3f7;
-  --system-glow: rgba(83, 74, 183, 0.55);
-}
-
-* { box-sizing: border-box; }
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(83, 74, 183, 0.18), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(29, 158, 117, 0.10), transparent 55%),
-    var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Animated star / particle field */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.35), transparent),
-    radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.25), transparent),
-    radial-gradient(1px 1px at 45% 80%, rgba(79,195,247,0.35), transparent),
-    radial-gradient(1px 1px at 65% 20%, rgba(255,255,255,0.20), transparent),
-    radial-gradient(2px 2px at 10% 70%, rgba(83,74,183,0.30), transparent);
-  background-size: 400px 400px;
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: 0;
-  animation: drift 60s linear infinite;
-}
-
-@keyframes drift {
-  from { background-position: 0 0; }
-  to   { background-position: 400px 400px; }
-}
-
-.mono { font-family: 'Orbitron', 'Courier New', monospace; }
-.tech { font-family: 'Rajdhani', sans-serif; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--accent-purple), #2a2670);
-  border-radius: 6px;
-}
-
-/* Shared card */
-.system-card {
-  background: linear-gradient(160deg, rgba(19,19,31,0.95), rgba(13,13,28,0.95));
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  position: relative;
-  backdrop-filter: blur(6px);
-}
-.system-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  padding: 1px;
-  background: linear-gradient(140deg, rgba(83,74,183,0.5), transparent 40%, rgba(79,195,247,0.25));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.glow-text { text-shadow: 0 0 12px var(--system-glow); }
-
-/* Angular Material dark theme */
-$sys-primary: mat.define-palette(mat.$indigo-palette, 400);
-$sys-accent:  mat.define-palette(mat.$teal-palette, 400);
-$sys-warn:    mat.define-palette(mat.$red-palette);
-$sys-theme: mat.define-dark-theme((
-  color: (primary: $sys-primary, accent: $sys-accent, warn: $sys-warn),
-  typography: mat.define-typography-config(),
-  density: 0,
-));
-@include mat.core();
-@include mat.all-component-themes($sys-theme);
-
-.mat-mdc-snack-bar-container.system-snack {
-  --mdc-snackbar-container-color: #13131f;
-  --mdc-snackbar-supporting-text-color: #E6EDF3;
-  --mat-snack-bar-button-color: #FAC775;
-}
-.mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
-  border: 1px solid var(--accent-teal);
-  box-shadow: 0 0 24px rgba(29,158,117,0.4);
-}
-
-.cdk-overlay-dark-backdrop {
-  background: rgba(4, 4, 12, 0.86);
-  backdrop-filter: blur(4px);
-}
-
-/* ── Android 15 / iOS edge-to-edge safe areas ─────────────────────
-   Android 15 (API 35+) and iOS enforce edge-to-edge, so system bars
-   can overlap content. We inset the app shell by the safe-area values
-   so the topbar and bottom controls never hide behind status bars,
-   notches, punch-holes, or gesture-navigation bars on ANY device. */
+/* ── Android 15 / iOS edge-to-edge safe areas ───────────────── */
 body.native-platform .route-host {
   padding-top:    max(env(safe-area-inset-top,    0px), 0px);
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
   padding-left:   max(env(safe-area-inset-left,   0px), 0px);
   padding-right:  max(env(safe-area-inset-right,  0px), 0px);
+  min-height: 100dvh;
 }
 
-/* Keep full-height pages filling the viewport after insets are applied.
-   Use dvh (dynamic viewport height) which accounts for collapsible
-   browser chrome / keyboard / address bars on mobile. */
-body.native-platform .route-host { min-height: 100dvh; }
-
-/* ── Global responsive shell padding ─────────────────────────────
-   On narrow phones (< 400px, e.g. Galaxy A series) reduce all
-   horizontal gutters so content doesn't feel cramped. */
+/* ── Global responsive shell padding ────────────────────────── */
 @media (max-width: 400px) {
   .system-shell,
   .habits-shell,
@@ -399,14 +354,19 @@ body.native-platform .route-host { min-height: 100dvh; }
   }
 }
 
-/* ── Utility: prevent text overflow on all screens ────────────── */
+/* ── Utility: prevent text overflow on all screens ──────────── */
 p, h1, h2, h3, h4, h5, h6, span, a, label {
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
-/* ── Fluid card padding ───────────────────────────────────────── */
-.system-card {
-  padding: clamp(12px, 3vw, 20px);
+/* ── Reduced-motion: respect user preference ────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .card-3d:hover { transform: none; }
 }
 
