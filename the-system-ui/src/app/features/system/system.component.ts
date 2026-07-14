@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HapticsService } from '../../core/services/haptics.service';
@@ -27,7 +27,7 @@ import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
   selector: 'app-system',
   standalone: true,
   imports: [
-    CommonModule, RouterLink,
+    CommonModule, RouterLink, RouterLinkActive,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
     DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent,
   ],

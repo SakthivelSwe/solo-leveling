@@ -10,6 +10,15 @@
       </span>
     </div>
 
+    <nav class="desktop-nav tech" role="navigation" aria-label="System navigation">
+      <a routerLink="/system" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">STATUS</a>
+      <a routerLink="/habits" routerLinkActive="active">QUESTS</a>
+      <a routerLink="/life" routerLinkActive="active">LIFE OS</a>
+      <a routerLink="/ai" routerLinkActive="active">AI MENTOR</a>
+      <a routerLink="/insights" routerLinkActive="active">INSIGHTS</a>
+      <a routerLink="/achievements" routerLinkActive="active">RANKS</a>
+    </nav>
+
     <div class="topbar-right">
       <!-- Live sync indicator -->
       <span class="live-link tech" [class.on]="sse.connected()"
