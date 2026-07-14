@@ -104,6 +104,11 @@ export class SystemComponent implements OnInit {
               data: { newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged },
               panelClass: 'level-up-panel',
               backdropClass: 'cdk-overlay-dark-backdrop',
+              width: 'auto',
+              maxWidth: 'calc(100vw - 32px)',
+              maxHeight: 'calc(100dvh - 32px)',
+              autoFocus: false,
+              restoreFocus: false,
             });
           }, 400);
         }

@@ -361,6 +361,18 @@ $sys-theme: mat.define-dark-theme((
 }
 
 /* ── Overlay backdrop ─────────────────────────────────────── */
+.cdk-overlay-container {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+  pointer-events: none;
+}
+.cdk-overlay-container:empty { display: none; }
+.cdk-overlay-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: auto;
+}
 .cdk-overlay-dark-backdrop {
   background: rgba(3,3,10,0.90);
   backdrop-filter: blur(8px);
@@ -394,9 +406,20 @@ $sys-theme: mat.define-dark-theme((
 .hp-danger { animation: dangerPulse 1.6s ease-in-out infinite; }
 
 /* ── Level-up panel ─────────────────────────────────────────── */
+.cdk-overlay-pane.level-up-panel {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100dvh - 32px) !important;
+  pointer-events: auto;
+}
 .level-up-panel .mat-mdc-dialog-container {
   background: transparent;
   box-shadow: none;
+  width: auto;
+  height: auto;
 }
 .level-up-panel .mat-mdc-dialog-surface {
   background: transparent;
