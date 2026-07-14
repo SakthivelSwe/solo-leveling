@@ -45,7 +45,7 @@
                  [attr.aria-describedby]="invalid('password') ? 'err-reg-password' : null" />
           <button type="button" class="pw-eye tech" id="reg-toggle-password"
                   (click)="showPassword.set(!showPassword())"
-                  [attr.aria-label]="showPassword() ? 'Hide access key' : 'Show access key'">
+                  [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
             {{ showPassword() ? '🙈' : '👁' }}
           </button>
         </div>

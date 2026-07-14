@@ -79,7 +79,11 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "http://localhost",
+                "http://127.0.0.1:*",
+                "http://127.0.0.1",
                 "https://localhost",
+                "https://127.0.0.1:*",
+                "https://127.0.0.1",
                 "capacitor://localhost",
                 "http://10.0.2.2:*",
                 "https://solo-leveling-1h5.pages.dev",
