@@ -40,6 +40,8 @@ export class SystemComponent implements OnInit {
   pendingKey = signal<string | null>(null);
   settingsOpen = signal(false);
   pressureLevel = signal(localStorage.getItem('sys_pressure') ?? 'STANDARD');
+  /** Mobile section tabs: 'status' | 'quests' | 'schedule' */
+  mobileTab = signal<'status' | 'quests' | 'schedule'>('status');
 
   constructor(
     private playerService: PlayerService,

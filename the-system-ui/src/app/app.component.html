@@ -1,8 +1,46 @@
+<!-- Page content -->
 <div class="route-host" [@routeFade]="routeState(outlet)">
   <router-outlet #outlet="outlet"></router-outlet>
 </div>
 
-<!-- Biometric lock overlay — shown when app resumes and re-auth is needed -->
+<!-- ═══ BOTTOM NAVIGATION BAR (mobile) ════════════════════════ -->
+@if (showBottomNav()) {
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+
+    <a routerLink="/system" routerLinkActive="active" id="nav-status"
+       class="bnav-item" aria-label="Status">
+      <span class="bnav-icon">◈</span>
+      <span class="bnav-label">STATUS</span>
+    </a>
+
+    <a routerLink="/habits" routerLinkActive="active" id="nav-habits"
+       class="bnav-item" aria-label="Quests">
+      <span class="bnav-icon">⚔</span>
+      <span class="bnav-label">QUESTS</span>
+    </a>
+
+    <a routerLink="/life" routerLinkActive="active" id="nav-life"
+       class="bnav-item" aria-label="Life OS">
+      <span class="bnav-icon">🧬</span>
+      <span class="bnav-label">LIFE OS</span>
+    </a>
+
+    <a routerLink="/ai" routerLinkActive="active" id="nav-ai"
+       class="bnav-item" aria-label="AI Mentor">
+      <span class="bnav-icon">🤖</span>
+      <span class="bnav-label">AI</span>
+    </a>
+
+    <a routerLink="/achievements" routerLinkActive="active" id="nav-ranks"
+       class="bnav-item" aria-label="Ranks">
+      <span class="bnav-icon">🏆</span>
+      <span class="bnav-label">RANKS</span>
+    </a>
+
+  </nav>
+}
+
+<!-- Biometric lock overlay -->
 @if (isLocked()) {
   <app-biometric-lock></app-biometric-lock>
 }

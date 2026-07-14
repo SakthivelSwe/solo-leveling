@@ -1,19 +1,21 @@
 :host { display: block; }
 
-.life-shell { max-width: 1180px; margin: 0 auto; padding: 20px 18px 60px; }
+.life-shell {
+  max-width: 1180px; margin: 0 auto;
+  padding: 20px 18px clamp(24px, 4vw, 60px);
+}
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; margin-bottom: 18px;
-  border: 1px solid var(--border); border-radius: 14px;
-  background: rgba(13,13,28,0.6); backdrop-filter: blur(8px);
+  padding: max(env(safe-area-inset-top, 10px), 10px) 18px 10px;
+  margin-bottom: 18px;
+  border: 1px solid var(--border); border-top: none; border-radius: 0 0 16px 16px;
+  background: rgba(13,13,28,0.8); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 20;
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .diamond { color: var(--system-blue, #4fc3f7); text-shadow: 0 0 16px var(--system-blue, #4fc3f7); font-size: 1.3rem; }
 .name { letter-spacing: 5px; font-weight: 900; }
-.nav { display: flex; gap: 18px; }
-.nav a { color: var(--text-secondary); text-decoration: none; letter-spacing: 2px; font-size: .72rem; transition: color .2s; }
-.nav a:hover, .nav a.active { color: var(--text-primary); }
 
 .tabs {
   display: flex; gap: 8px; margin-bottom: 16px;
@@ -137,6 +139,12 @@ select.fin { cursor: pointer; }
 @media (max-width: 780px) {
   .cards { grid-template-columns: 1fr; }
   .pillars { grid-template-columns: 1fr; }
-  .nav { display: none; }
+}
+
+@media (max-width: 480px) {
+  .life-shell { padding: 0 10px 24px; }
+  .topbar { margin-bottom: 10px; }
+  .name { font-size: .85rem; letter-spacing: 3px; }
+  .tab { padding: 8px 12px; font-size: .66rem; }
 }
 

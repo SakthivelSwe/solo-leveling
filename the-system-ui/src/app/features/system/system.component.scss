@@ -1,119 +1,135 @@
 :host { display: block; position: relative; z-index: 1; }
 
+/* ── Shell ─────────────────────────────────────────────────── */
+.system-shell {
+  max-width: 1440px; margin: 0 auto;
+  padding: 0 clamp(12px, 4vw, 20px) clamp(24px, 4vw, 80px);
+}
 
-.system-shell { max-width: 1440px; margin: 0 auto; padding: 0 clamp(12px, 4vw, 20px) 80px; }
-
+/* ════════════════════════════════════════════════════════════
+   TOPBAR
+   Safe-area-inset-top keeps content below the phone status bar.
+   ════════════════════════════════════════════════════════════ */
 .topbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 14px;
-  padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px); margin-bottom: 22px; flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  /* Push content below device status bar */
+  padding-top: max(env(safe-area-inset-top, 12px), 12px);
+  padding-bottom: 10px;
+  padding-left:  clamp(12px, 3vw, 20px);
+  padding-right: clamp(12px, 3vw, 20px);
+  margin-bottom: 14px;
   border: 1px solid var(--border); border-top: none; border-radius: 0 0 20px 20px;
-  background: linear-gradient(160deg, rgba(22,22,42,0.82), rgba(10,10,26,0.88));
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 24px rgba(108,99,255,0.10), 0 1px 0 rgba(255,255,255,0.05) inset;
+  background: linear-gradient(160deg, rgba(22,22,42,0.92), rgba(10,10,26,0.95));
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.5),
+    0 0 24px rgba(108,99,255,0.12),
+    0 1px 0 rgba(255,255,255,0.05) inset;
   position: sticky; top: 0; z-index: 20;
 }
-/* Neon underline that anchors the floating topbar */
+/* Neon underline */
 .topbar::after {
   content: ''; position: absolute; left: 8%; right: 8%; bottom: -1px; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(108,99,255,0.7), rgba(79,195,247,0.5), transparent);
 }
-.brand { display: flex; align-items: center; gap: 10px; }
+
+/* Brand */
+.brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .brand-logo {
-  width: 34px; height: 34px;
-  filter: drop-shadow(0 0 12px var(--system-blue)) drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  width: 30px; height: 30px;
+  filter: drop-shadow(0 0 10px var(--system-blue)) drop-shadow(0 4px 6px rgba(0,0,0,0.5));
   animation: floatLogo 5s ease-in-out infinite;
 }
 @keyframes floatLogo {
   0%,100% { transform: translateY(0) rotateY(0deg); }
-  50%     { transform: translateY(-5px) rotateY(18deg); }
+  50%     { transform: translateY(-4px) rotateY(18deg); }
 }
-.name { font-weight: 900; letter-spacing: 5px; font-size: clamp(.8rem, 2.5vw, 1.05rem); }
+.name { font-weight: 900; letter-spacing: 4px; font-size: clamp(.72rem, 3vw, 1rem); white-space: nowrap; }
 .rank-badge-mini {
-  font-size: .6rem; letter-spacing: 2px; padding: 3px 8px; border-radius: 6px;
+  font-size: .58rem; letter-spacing: 2px; padding: 3px 7px; border-radius: 6px;
   border: 1px solid rgba(83,74,183,0.4); color: #b3aef0; background: rgba(83,74,183,0.12);
+  white-space: nowrap;
 }
 
-.nav {
-  display: flex; gap: 14px; align-items: center;
-  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+/* Right cluster */
+.topbar-right {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
-.nav::-webkit-scrollbar { display: none; }
-.nav a {
-  color: var(--text-secondary); text-decoration: none; font-size: clamp(.62rem, 1.8vw, .72rem);
-  letter-spacing: 2px; font-weight: 600; padding: 8px 6px; position: relative; transition: color .2s;
-  min-height: unset;
+.lv { font-size: .6rem; letter-spacing: 2px; color: var(--accent-gold); }
+
+/* Icon buttons (bell, gear) */
+.icon-btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
+  background: rgba(20,20,38,0.8); border: 1px solid var(--border);
+  color: var(--text-secondary); font-size: .95rem;
+  transition: all .22s var(--ease-spring);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset;
+  text-decoration: none;
+  /* Touch targets */
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
 }
-.nav a:hover, .nav a.active { color: var(--text-primary); transform: translateY(-1px); }
-.nav a.active::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
-  background: linear-gradient(90deg, var(--system-blue), var(--accent-purple)); border-radius: 2px;
-  box-shadow: 0 0 10px rgba(108,99,255,0.9), 0 0 4px var(--system-blue);
-}
-.nav a.bell { position: relative; font-size: 1rem; }
-.nav a.bell .badge {
-  position: absolute; top: -8px; right: -12px; min-width: 16px; height: 16px;
+.icon-btn:hover { color: var(--accent-gold); border-color: var(--accent-gold); transform: translateY(-2px); }
+.icon-btn.gear:hover { color: var(--accent-gold); transform: translateY(-2px) rotate(45deg); }
+
+.bell .badge {
+  position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px;
   padding: 0 4px; border-radius: 9px; background: #E24B4A; color: #fff;
-  font-size: .56rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 12px rgba(226,75,74,0.8); animation: bellPulse 2s ease-in-out infinite;
+  font-size: .52rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 10px rgba(226,75,74,0.8); animation: bellPulse 2s ease-in-out infinite;
 }
 @keyframes bellPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.22); } }
-.gear {
-  background: linear-gradient(180deg, rgba(30,30,54,0.9), rgba(16,16,30,0.9));
-  border: 1px solid var(--border); border-radius: 9px;
-  color: var(--text-secondary); cursor: pointer; padding: 5px 9px;
-  font-size: .9rem; transition: all .25s var(--ease-spring);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset;
-}
-.gear:hover {
-  color: var(--accent-gold); border-color: var(--accent-gold);
-  transform: translateY(-2px) rotate(45deg);
-  box-shadow: 0 6px 16px rgba(250,199,117,0.3);
-}
 
 /* Real-time link indicator */
 .live-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: .54rem; letter-spacing: 2px; font-weight: 700;
-  padding: 3px 8px; border-radius: 20px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .52rem; letter-spacing: 1.5px; font-weight: 700;
+  padding: 4px 8px; border-radius: 20px;
   border: 1px solid rgba(226,75,74,0.35); color: #f09595;
   background: rgba(226,75,74,0.06); transition: all .3s;
+  white-space: nowrap;
 }
 .live-link .dot {
-  width: 6px; height: 6px; border-radius: 50%; background: #E24B4A;
+  width: 6px; height: 6px; border-radius: 50%; background: #E24B4A; flex-shrink: 0;
   box-shadow: 0 0 6px rgba(226,75,74,0.8);
 }
-.live-link.on {
-  border-color: rgba(29,158,117,0.45); color: #5dcaa5; background: rgba(29,158,117,0.08);
-}
+.live-link.on { border-color: rgba(29,158,117,0.45); color: #5dcaa5; background: rgba(29,158,117,0.08); }
 .live-link.on .dot {
   background: #1D9E75; box-shadow: 0 0 8px rgba(29,158,117,0.9);
   animation: livePulse 1.8s ease-in-out infinite;
 }
 @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(1.3); } }
 
-.user { display: flex; align-items: center; gap: 12px; }
-.user-info { display: flex; flex-direction: column; gap: 1px; }
-.hunter { font-size: .76rem; letter-spacing: 1px; color: var(--accent-gold); }
-.title-tag { font-size: .54rem; letter-spacing: 1.5px; color: #ffe6b0; }
-.lv { font-size: .58rem; letter-spacing: 2px; color: var(--text-secondary); }
-.logout {
-  background: linear-gradient(180deg, rgba(30,30,54,0.85), rgba(16,16,30,0.85));
-  border: 1px solid var(--border); border-radius: 9px;
-  color: var(--text-secondary); padding: 7px 13px; cursor: pointer;
-  font-size: .66rem; letter-spacing: 1px; transition: all .25s var(--ease-spring);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset;
+/* ════════════════════════════════════════════════════════════
+   MOBILE SECTION TABS (visible < 760px)
+   Lets user switch between Status / Quests / Schedule panels.
+   ════════════════════════════════════════════════════════════ */
+.mobile-tabs {
+  display: none; /* hidden on desktop */
+  gap: 6px; margin-bottom: 14px;
+  background: rgba(10,10,22,0.7); border-radius: 14px; padding: 5px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
 }
-.logout:hover {
-  border-color: #E24B4A; color: #F09595; transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(226,75,74,0.3);
+.mtab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px; border-radius: 10px; cursor: pointer;
+  background: transparent; border: none; color: var(--text-secondary);
+  transition: all .22s var(--ease-spring); -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+.mtab-icon { font-size: 1.1rem; line-height: 1; }
+.mtab-label { font-size: .52rem; letter-spacing: 2px; font-weight: 700; font-family: 'Rajdhani', sans-serif; }
+.mtab.active {
+  background: linear-gradient(160deg, rgba(108,99,255,0.22), rgba(79,195,247,0.12));
+  border: 1px solid rgba(108,99,255,0.35); color: #fff;
+  box-shadow: 0 0 16px rgba(108,99,255,0.2);
+}
+.mtab.active .mtab-icon { text-shadow: 0 0 12px var(--accent-purple); }
 
-/* ── 3-column dashboard ─────────────────────────────────────────
-   clamp(min, preferred, max):
-     left  = status window + skill tree   (fits comfortably)
-     centre= quest log + chart            (takes remaining space)
-     right = dungeon + directive          (slightly wider for anchor strip)
-   ─────────────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   GRID — 3 columns on desktop, single column on mobile
+   ════════════════════════════════════════════════════════════ */
 .grid {
   display: grid;
   grid-template-columns:
@@ -125,7 +141,7 @@
 }
 .col-left, .col-centre, .col-right { display: flex; flex-direction: column; gap: var(--s-4); }
 
-/* Staggered entrance — each column enters 80ms after the previous */
+/* Staggered entrance */
 .col-left   { animation: colIn var(--duration-slow) var(--ease-spring) both; }
 .col-centre { animation: colIn var(--duration-slow) var(--ease-spring) 80ms both; }
 .col-right  { animation: colIn var(--duration-slow) var(--ease-spring) 160ms both; }
@@ -134,7 +150,7 @@
   to   { opacity: 1; transform: none; }
 }
 
-/* Unified day-status line — HP + quest progress + accountability in one bar */
+/* Day-status bar */
 .day-status {
   display: flex; align-items: center; gap: 12px;
   padding: 11px 14px; border-radius: 12px;
@@ -149,13 +165,9 @@
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-teal));
   transition: width .5s cubic-bezier(.22,1,.36,1);
 }
-
-/* All quests cleared → calm green */
 .day-status.clear { border-color: rgba(29,158,117,0.35); background: rgba(29,158,117,0.07); }
 .day-status.clear .ds-icon { color: #5dcaa5; }
 .day-status.clear .ds-fill { background: var(--accent-teal); }
-
-/* HP critical → urgent red, overrides clear */
 .day-status.critical {
   border-color: rgba(226,75,74,0.4); background: rgba(226,75,74,0.08);
   animation: dsPulse 2s ease-in-out infinite;
@@ -164,6 +176,7 @@
 .day-status.critical .ds-hp { color: #f09595; font-weight: 700; }
 @keyframes dsPulse { 0%,100% { box-shadow: 0 0 0 rgba(226,75,74,0); } 50% { box-shadow: 0 0 18px rgba(226,75,74,0.28); } }
 
+/* Loader */
 .loader {
   display: flex; flex-direction: column; align-items: center; gap: 16px;
   padding: 100px 0; color: var(--text-secondary);
@@ -185,34 +198,47 @@
   border-top: 1px solid var(--border);
 }
 
-/* ── Large tablet: collapse right col to full width ──────────── */
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════════════════════════ */
+
+/* Large tablet: collapse right col */
 @media (max-width: 1200px) {
   .grid { grid-template-columns: clamp(240px, 30vw, 320px) 1fr; }
   .col-right { grid-column: 1 / -1; }
 }
 
-/* ── Tablet portrait / large phone landscape ─────────────────── */
+/* Tablet portrait: 2-col -> 1-col transition */
 @media (max-width: 760px) {
-  .grid { grid-template-columns: 1fr; }
-  .nav { gap: 10px; }
-  .name { font-size: .9rem; letter-spacing: 3px; }
+  .grid { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Show mobile section tabs */
+  .mobile-tabs { display: flex; }
+
+  /* Hide non-active columns on mobile — driven by [class.mob-hidden] in template */
+  .mob-hidden { display: none !important; }
+
+  /* All columns full width when visible */
+  .col-left, .col-centre, .col-right { animation: none; }
+
+  .live-label { display: none; } /* hide text on small screens, keep dot */
+  .live-link { padding: 4px 6px; }
 }
 
-/* ── Small phone (< 560px) ───────────────────────────────────── */
-@media (max-width: 560px) {
-  .topbar { gap: 8px; padding: 8px 12px; flex-wrap: nowrap; }
-  .brand { flex-shrink: 0; }
-  .nav { flex: 1; min-width: 0; gap: 8px; }
-  .nav a { font-size: .6rem; letter-spacing: 1px; padding: 6px 4px; }
-  .user { flex-shrink: 0; }
-  .day-status .ds-line { font-size: .66rem; letter-spacing: 1px; }
+/* Small phone < 480px */
+@media (max-width: 480px) {
+  .system-shell { padding: 0 10px 24px; }
+  .topbar { margin-bottom: 10px; }
+  .name { font-size: .78rem; letter-spacing: 3px; }
+  .rank-badge-mini { display: none; }
+  .topbar-right { gap: 6px; }
+  .lv { display: none; } /* save space — LV shown in status panel */
 }
 
-/* ── Very small phone (< 380px, e.g. Galaxy A02s) ────────────── */
-@media (max-width: 380px) {
-  .brand-logo { width: 26px; height: 26px; }
-  .name { font-size: .75rem; letter-spacing: 2px; }
-  .nav a { font-size: .58rem; letter-spacing: 1px; }
-  .rank-badge-mini { display: none; } /* hide on tiny screens to save space */
-  .grid { gap: 10px; }
+/* Very small phone < 360px */
+@media (max-width: 360px) {
+  .brand-logo { width: 24px; height: 24px; }
+  .name { font-size: .68rem; letter-spacing: 2px; }
+  .icon-btn { width: 32px; height: 32px; font-size: .85rem; }
+  .mtab-label { font-size: .46rem; letter-spacing: 1px; }
 }

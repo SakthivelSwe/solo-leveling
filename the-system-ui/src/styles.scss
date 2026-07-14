@@ -55,6 +55,11 @@
   --s-8: 32px;
   --s-10: 40px;
 
+  /* ── Mobile navigation ──────────────────────────────────── */
+  /* Bottom nav bar height + safe-area-inset-bottom */
+  --bottom-nav-height: 70px;
+  --bottom-nav-total: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+
   /* ── Border radius scale ────────────────────────────────── */
   --r-sm:   6px;
   --r-md:  10px;
@@ -365,12 +370,16 @@ $sys-theme: mat.define-dark-theme((
 }
 
 /* ── Android 15 / iOS edge-to-edge safe areas ───────────────── */
-body.native-platform .route-host {
-  padding-top:    max(env(safe-area-inset-top,    0px), 0px);
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
-  padding-left:   max(env(safe-area-inset-left,   0px), 0px);
-  padding-right:  max(env(safe-area-inset-right,  0px), 0px);
+/* Applied universally — env() returns 0 on desktop so no visual change there */
+.route-host {
   min-height: 100dvh;
+  /* Reserve space at bottom for the fixed bottom nav + device home indicator */
+  padding-bottom: var(--bottom-nav-total);
+}
+/* Extra side/top safe areas only needed on real devices */
+body.native-platform .route-host {
+  padding-left:  max(env(safe-area-inset-left,  0px), 0px);
+  padding-right: max(env(safe-area-inset-right, 0px), 0px);
 }
 
 /* ── Global responsive shell padding ────────────────────────── */

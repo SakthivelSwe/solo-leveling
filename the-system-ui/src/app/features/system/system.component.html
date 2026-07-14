@@ -1,7 +1,6 @@
 <div class="system-shell">
 
-
-  <!-- Top Nav -->
+  <!-- ═══ TOPBAR ═══════════════════════════════════════════════ -->
   <header class="topbar">
     <div class="brand">
       <img src="assets/logo.png" alt="Logo" class="brand-logo" />
@@ -10,46 +9,62 @@
         {{ s.player.rankLevel }}-RANK
       </span>
     </div>
-    <nav class="nav tech">
-      <a routerLink="/system" class="active">STATUS</a>
-      <a routerLink="/habits">HABITS</a>
-      <a routerLink="/life">LIFE OS</a>
-      <a routerLink="/ai">AI MENTOR</a>
-      <a routerLink="/insights">INSIGHTS</a>
-      <a routerLink="/achievements">RANKS</a>
-      <a routerLink="/notifications" class="bell"
-         [attr.aria-label]="'Notifications' + (notifications.unread() > 0 ? ', ' + notifications.unread() + ' unread' : '')">
-        🔔<span class="badge" *ngIf="notifications.unread() > 0">{{ notifications.unread() }}</span>
-      </a>
+
+    <div class="topbar-right">
+      <!-- Live sync indicator -->
       <span class="live-link tech" [class.on]="sse.connected()"
             role="status" [attr.aria-label]="sse.connected() ? 'System link live' : 'Reconnecting'"
             [title]="sse.connected() ? 'System link live' : 'Reconnecting…'">
-        <span class="dot"></span>{{ sse.connected() ? 'LIVE' : 'SYNC' }}
+        <span class="dot"></span>
+        <span class="live-label">{{ sse.connected() ? 'LIVE' : 'SYNC' }}</span>
       </span>
-      <button class="gear tech" (click)="settingsOpen.set(true)" title="Settings"
-              aria-label="Open settings">⚙</button>
-    </nav>
-    <div class="user" *ngIf="status() as s">
-      <div class="user-info">
-        <span class="tech hunter">{{ s.player.displayName || s.player.username }}</span>
-        <span class="tech title-tag" *ngIf="s.player.equippedTitle">{{ titleName(s.player.equippedTitle) }}</span>
-        <span class="tech lv">LV.{{ s.player.level }}</span>
-      </div>
-      <button class="logout tech" (click)="logout()">EXIT ⏻</button>
+
+      <!-- Player LV -->
+      <span class="tech lv" *ngIf="status() as s">LV.{{ s.player.level }}</span>
+
+      <!-- Notifications -->
+      <a routerLink="/notifications" class="icon-btn bell" id="notif-btn"
+         [attr.aria-label]="'Notifications' + (notifications.unread() > 0 ? ', ' + notifications.unread() + ' unread' : '')">
+        🔔<span class="badge" *ngIf="notifications.unread() > 0">{{ notifications.unread() }}</span>
+      </a>
+
+      <!-- Settings -->
+      <button class="icon-btn gear tech" (click)="settingsOpen.set(true)" title="Settings"
+              aria-label="Open settings" id="settings-btn">⚙</button>
     </div>
   </header>
 
-  <!-- Loading -->
+  <!-- ═══ LOADING ══════════════════════════════════════════════ -->
   <div class="loader" *ngIf="loading()">
     <div class="loader-ring"></div>
     <p class="mono">INITIALIZING THE SYSTEM<span class="dots"></span></p>
     <p class="tech loader-sub">SCANNING HUNTER DATA...</p>
   </div>
 
-  <!-- Dashboard -->
+  <!-- ═══ MOBILE SECTION TABS ══════════════════════════════════ -->
+  <div class="mobile-tabs" *ngIf="status() && !loading()">
+    <button class="mtab" [class.active]="mobileTab() === 'status'"
+            (click)="mobileTab.set('status')" id="tab-status">
+      <span class="mtab-icon">◈</span>
+      <span class="mtab-label">STATUS</span>
+    </button>
+    <button class="mtab" [class.active]="mobileTab() === 'quests'"
+            (click)="mobileTab.set('quests')" id="tab-quests">
+      <span class="mtab-icon">⚔</span>
+      <span class="mtab-label">QUESTS</span>
+    </button>
+    <button class="mtab" [class.active]="mobileTab() === 'schedule'"
+            (click)="mobileTab.set('schedule')" id="tab-schedule">
+      <span class="mtab-icon">📅</span>
+      <span class="mtab-label">SCHEDULE</span>
+    </button>
+  </div>
+
+  <!-- ═══ DASHBOARD ════════════════════════════════════════════ -->
   <main class="grid" *ngIf="status() as s">
-    <!-- LEFT: Status + Skill Tree -->
-    <div class="col-left">
+
+    <!-- LEFT col: Status Window + Skill Tree -->
+    <div class="col-left" [class.mob-hidden]="mobileTab() !== 'status'">
       <app-status-window
         [player]="s.player"
         [stats]="s.stats"
@@ -63,9 +78,9 @@
       <app-skill-tree [skills]="s.skills"></app-skill-tree>
     </div>
 
-    <!-- CENTRE: Quest Log + Progress -->
-    <div class="col-centre">
-      <!-- Unified day status — one adaptive line for HP + quest progress + accountability -->
+    <!-- CENTRE col: Quest Log + Progress -->
+    <div class="col-centre" [class.mob-hidden]="mobileTab() !== 'quests'">
+      <!-- Day status bar -->
       <div class="day-status"
            [class.critical]="s.player.hp < 40"
            [class.clear]="s.completedToday >= s.totalQuests"
@@ -104,8 +119,8 @@
       }
     </div>
 
-    <!-- RIGHT: Daily Schedule -->
-    <div class="col-right">
+    <!-- RIGHT col: Dungeon + Schedule -->
+    <div class="col-right" [class.mob-hidden]="mobileTab() !== 'schedule'">
       <app-dungeon-card></app-dungeon-card>
       <app-daily-schedule></app-daily-schedule>
     </div>
