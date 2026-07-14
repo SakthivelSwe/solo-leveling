@@ -43,10 +43,18 @@
 
       <label class="field" for="login-password">
         <span class="tech">◈ ACCESS KEY</span>
-        <input id="login-password" formControlName="password" type="password"
-               autocomplete="current-password" placeholder="••••••••"
-               [attr.aria-invalid]="invalid('password')"
-               [attr.aria-describedby]="invalid('password') ? 'err-password' : null" />
+        <div class="pw-wrap">
+          <input id="login-password" formControlName="password"
+                 [type]="showPassword() ? 'text' : 'password'"
+                 autocomplete="current-password" placeholder="••••••••"
+                 [attr.aria-invalid]="invalid('password')"
+                 [attr.aria-describedby]="invalid('password') ? 'err-password' : null" />
+          <button type="button" class="pw-eye tech" id="toggle-password"
+                  (click)="showPassword.set(!showPassword())"
+                  [attr.aria-label]="showPassword() ? 'Hide access key' : 'Show access key'">
+            {{ showPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
         <span id="err-password" class="field-error tech" role="alert" *ngIf="invalid('password')">
           {{ form.get('password')?.errors?.['required'] ? 'Access key is required.' : 'At least 6 characters.' }}
         </span>

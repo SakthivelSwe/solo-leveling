@@ -32,6 +32,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   loading = signal(false);
   error = signal<string | null>(null);
   typedText = signal('');
+  /** Toggles password field between text and password type */
+  showPassword = signal(false);
   promptIdx = 0;
   charIdx = 0;
   private timer: any;
@@ -67,8 +69,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
     this.loading.set(true);
     this.error.set(null);
-    const { username, password } = this.form.getRawValue();
-    this.auth.login({ username: username!, password: password! }).subscribe({
+    const raw = this.form.getRawValue();
+    // Hunter ID is case-insensitive — normalize before sending
+    const username = raw.username!.trim().toLowerCase();
+    const password = raw.password!;
+    this.auth.login({ username, password }).subscribe({
       next: () => this.router.navigate(['/system']),
       error: (e) => {
         this.error.set(e?.error?.message ?? 'AUTHENTICATION FAILED. TRY AGAIN, HUNTER.');

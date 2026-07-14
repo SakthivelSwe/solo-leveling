@@ -22,7 +22,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Player player = playerRepository.findByUsername(username)
+        // Normalize to lowercase so login is case-insensitive
+        String normalised = username == null ? "" : username.trim().toLowerCase();
+        Player player = playerRepository.findByUsernameIgnoreCase(normalised)
                 .orElseThrow(() -> new UsernameNotFoundException("Player not found: " + username));
         return new User(player.getUsername(), player.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_PLAYER")));

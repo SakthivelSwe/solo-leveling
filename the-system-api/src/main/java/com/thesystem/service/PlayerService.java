@@ -54,7 +54,7 @@ public class PlayerService {
     }
 
     public Player getByUsername(String username) {
-        return playerRepository.findByUsername(username)
+        return playerRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
     }
 

@@ -37,10 +37,18 @@
       </label>
       <label class="field" for="reg-password">
         <span class="tech">ACCESS KEY</span>
-        <input id="reg-password" formControlName="password" type="password" autocomplete="new-password"
-               placeholder="••••••••"
-               [attr.aria-invalid]="invalid('password')"
-               [attr.aria-describedby]="invalid('password') ? 'err-reg-password' : null" />
+        <div class="pw-wrap">
+          <input id="reg-password" formControlName="password"
+                 [type]="showPassword() ? 'text' : 'password'"
+                 autocomplete="new-password" placeholder="••••••••"
+                 [attr.aria-invalid]="invalid('password')"
+                 [attr.aria-describedby]="invalid('password') ? 'err-reg-password' : null" />
+          <button type="button" class="pw-eye tech" id="reg-toggle-password"
+                  (click)="showPassword.set(!showPassword())"
+                  [attr.aria-label]="showPassword() ? 'Hide access key' : 'Show access key'">
+            {{ showPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
         <div class="pw-meter" [class]="'pw-meter lvl-' + passwordStrength().level"
              *ngIf="form.get('password')?.value" [attr.aria-hidden]="true">
           <span class="pw-seg" [class.on]="passwordStrength().level >= 0"></span>

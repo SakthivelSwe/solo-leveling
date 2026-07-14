@@ -25,6 +25,8 @@ export class RegisterComponent {
 
   loading = signal(false);
   error = signal<string | null>(null);
+  /** Toggles password field between text and password type */
+  showPassword = signal(false);
 
   invalid(name: 'username' | 'email' | 'password'): boolean {
     const c = this.form.get(name)!;
@@ -50,12 +52,14 @@ export class RegisterComponent {
     }
     this.loading.set(true);
     this.error.set(null);
-    const { username, displayName, email, password } = this.form.getRawValue();
+    const raw = this.form.getRawValue();
+    // Store username lowercase — case-insensitive Hunter ID
+    const username = raw.username!.trim().toLowerCase();
     this.auth.register({
-      username: username!,
-      email: email!,
-      password: password!,
-      displayName: displayName || username!,
+      username,
+      email: raw.email!,
+      password: raw.password!,
+      displayName: raw.displayName || username,
     }).subscribe({
       next: () => this.router.navigate(['/system']),
       error: (e) => {

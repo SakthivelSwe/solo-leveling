@@ -47,7 +47,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest req) {
-        if (playerRepository.existsByUsername(req.username())) {
+        // Store username in lowercase so lookups are always case-insensitive
+        String username = req.username().trim().toLowerCase();
+        if (playerRepository.existsByUsernameIgnoreCase(username)) {
             throw new ApiException("Username already taken", HttpStatus.CONFLICT);
         }
         if (playerRepository.existsByEmail(req.email())) {
@@ -55,11 +57,11 @@ public class AuthService {
         }
 
         Player player = new Player();
-        player.setUsername(req.username());
+        player.setUsername(username);
         player.setEmail(req.email());
         player.setPassword(passwordEncoder.encode(req.password()));
         player.setDisplayName((req.displayName() == null || req.displayName().isBlank())
-                ? req.username() : req.displayName());
+                ? username : req.displayName());
         player = playerRepository.save(player);
 
         // Default stats
@@ -80,9 +82,11 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest req) {
+        // Normalize username: trim whitespace + lowercase for case-insensitive login
+        String username = req.username().trim().toLowerCase();
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.username(), req.password()));
-        Player player = playerRepository.findByUsername(req.username())
+                new UsernamePasswordAuthenticationToken(username, req.password()));
+        Player player = playerRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
         return buildResponse(player);
     }
