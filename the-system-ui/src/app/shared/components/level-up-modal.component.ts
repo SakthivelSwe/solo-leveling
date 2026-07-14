@@ -15,6 +15,7 @@ export interface LevelUpData {
   imports: [CommonModule, RankBadgeComponent],
   template: `
     <div class="lvl-overlay">
+      <button type="button" class="close" aria-label="Close level up modal" (click)="close()">×</button>
       <div class="rays"></div>
       <div class="content">
         <div class="diamond-burst">◈</div>
@@ -42,6 +43,18 @@ export interface LevelUpData {
       border: 1px solid rgba(83,74,183,0.6);
       box-shadow: 0 0 60px rgba(83,74,183,0.5);
       animation: popIn .5s cubic-bezier(.16,1,.3,1);
+    }
+    .close {
+      position: absolute; top: 12px; right: 12px; z-index: 3;
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(9,9,18,0.72); color: var(--text-secondary);
+      font-size: 1.2rem; line-height: 1; cursor: pointer;
+      transition: color .2s, border-color .2s, transform .2s;
+    }
+    .close:hover {
+      color: var(--text-primary); border-color: rgba(79,195,247,0.45);
+      transform: translateY(-1px);
     }
     .rays {
       position: absolute; inset: -50%;
@@ -85,6 +98,10 @@ export class LevelUpModalComponent implements OnInit {
 
   ngOnInit(): void {
     setTimeout(() => this.dialogRef.close(), 4000);
+  }
+
+  close(): void {
+    this.dialogRef.close();
   }
 }
 

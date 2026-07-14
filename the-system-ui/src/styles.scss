@@ -3,6 +3,7 @@
    Foundation: design tokens + container queries + spacing scale.
    ============================================================ */
 @use '@angular/material' as mat;
+@import '@angular/cdk/overlay-prebuilt.css';
 
 /* ── Google Fonts ─────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -194,6 +195,35 @@ body::after {
 .mono  { font-family: 'Orbitron', 'Courier New', monospace; }
 .tech  { font-family: 'Rajdhani', sans-serif; letter-spacing: .5px; }
 
+/* Shared desktop top navigation. Several feature pages own their headers, so
+   keep the base nav behavior global and let pages only tune colors/spacing. */
+.topbar .nav,
+.topbar .desktop-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 1.4vw, 20px);
+  flex-wrap: wrap;
+}
+.topbar .nav a,
+.topbar .desktop-nav a,
+.bottom-nav a {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  text-decoration: none;
+}
+.topbar .nav a {
+  color: var(--text-secondary);
+  font-size: clamp(.62rem, .78vw, .76rem);
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.topbar .nav a:hover,
+.topbar .nav a.active {
+  color: var(--text-primary);
+}
+
 /* ── Scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
@@ -368,13 +398,22 @@ $sys-theme: mat.define-dark-theme((
   background: transparent;
   box-shadow: none;
 }
+.level-up-panel .mat-mdc-dialog-surface {
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
 
 /* ── Android 15 / iOS edge-to-edge safe areas ───────────────── */
 /* Applied universally — env() returns 0 on desktop so no visual change there */
 .route-host {
   min-height: 100dvh;
-  /* Reserve space at bottom for the fixed bottom nav + device home indicator */
-  padding-bottom: var(--bottom-nav-total);
+}
+@media (max-width: 760px) {
+  .route-host {
+    /* Reserve space at bottom for the fixed bottom nav + device home indicator */
+    padding-bottom: var(--bottom-nav-total);
+  }
 }
 /* Extra side/top safe areas only needed on real devices */
 body.native-platform .route-host {
