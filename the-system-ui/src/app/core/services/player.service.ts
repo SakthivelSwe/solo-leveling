@@ -34,6 +34,11 @@ export class PlayerService {
     return this.http.put<Player>(`${this.api}/player/profile`, body);
   }
 
+  /** Permanently deletes the account and all server-side data. */
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(`${this.api}/player/account`);
+  }
+
   getTodayQuests(): Observable<Quest[]> {
     return this.http.get<Quest[]>(`${this.api}/quests/today`);
   }

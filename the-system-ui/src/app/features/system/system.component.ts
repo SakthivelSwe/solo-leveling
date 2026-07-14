@@ -9,7 +9,10 @@ import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { SseService } from '../../core/services/sse.service';
-import { Quest, StatusWindow } from '../../core/models/models';
+import {
+  StatusWindow, Quest, QuestCompletionResult, PlayerSkill,
+  Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon
+} from '../../core/models/models';
 
 import { StatusWindowComponent } from './status-window/status-window.component';
 import { QuestLogComponent } from './quest-log/quest-log.component';
@@ -68,7 +71,7 @@ export class SystemComponent implements OnInit {
 
   load(): void {
     this.playerService.getStatus().subscribe({
-      next: (s) => { this.status.set(s); this.auth.updatePlayer(s.player); this.loading.set(false); },
+      next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
   }
@@ -76,7 +79,7 @@ export class SystemComponent implements OnInit {
   onComplete(quest: Quest): void {
     this.pendingKey.set(quest.questKey);
     this.playerService.completeQuest(quest.questKey).subscribe({
-      next: (res) => {
+      next: (res: QuestCompletionResult) => {
         this.pendingKey.set(null);
         // Native haptic — success buzz on level-up, light tap on plain XP.
         if (res.leveledUp) { this.haptics.success(); } else { this.haptics.light(); }
@@ -85,7 +88,7 @@ export class SystemComponent implements OnInit {
           duration: 3400, panelClass: 'system-snack',
           horizontalPosition: 'center', verticalPosition: 'top',
         });
-        res.newAchievements?.forEach((a, i) => {
+        res.newAchievements?.forEach((a: Achievement, i: number) => {
           setTimeout(() => {
             this.snack.open(`🏆 ACHIEVEMENT — ${a.title}`, '✕', {
               duration: 4200, panelClass: 'system-snack',
@@ -105,7 +108,7 @@ export class SystemComponent implements OnInit {
         this.load();
         this.notifications.refreshUnread();
       },
-      error: (e) => {
+      error: (e: { error?: { message?: string } }) => {
         this.pendingKey.set(null);
         this.haptics.warning();
         const msg = e?.error?.message ?? 'Quest failed';

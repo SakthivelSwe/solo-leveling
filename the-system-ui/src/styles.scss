@@ -1,6 +1,6 @@
 /* ============================================================
-   THE SYSTEM — Solo Leveling Life OS · Premium 3D Theme v3
-   A depth-driven, glassmorphic, "holographic UI" design system.
+   THE SYSTEM — Solo Leveling Life OS · Premium 3D Theme v4
+   Foundation: design tokens + container queries + spacing scale.
    ============================================================ */
 @use '@angular/material' as mat;
 
@@ -8,14 +8,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Backgrounds — deep space blacks with a faint violet cast */
+  /* ── Backgrounds ────────────────────────────────────────── */
   --bg-primary:   #05050d;
   --bg-secondary: #0a0a18;
   --card-bg:      #10101e;
   --border:       #1c1c34;
   --border-glow:  #2b2b52;
 
-  /* Accents */
+  /* ── Accents ────────────────────────────────────────────── */
   --accent-purple:     #6C63FF;
   --accent-purple-2:   #534AB7;
   --accent-purple-dim: rgba(108,99,255,0.18);
@@ -24,12 +24,12 @@
   --accent-red:    #E24B4A;
   --accent-cyan:   #4fc3f7;
 
-  /* Text */
+  /* ── Text ───────────────────────────────────────────────── */
   --text-primary:   #EEF3FA;
   --text-secondary: #7a8494;
   --text-dim:       #3a4050;
 
-  /* Stat colors */
+  /* ── Stat colors ────────────────────────────────────────── */
   --stat-str: #FF6B3D;
   --stat-int: #6C63FF;
   --stat-vit: #1FBE8E;
@@ -40,14 +40,37 @@
   --system-blue: #4fc3f7;
   --system-glow: rgba(108,99,255,0.60);
 
-  /* HP colors */
+  /* ── HP colors ──────────────────────────────────────────── */
   --hp-high: #1FBE8E;
   --hp-mid:  #FAC775;
   --hp-low:  #E24B4A;
 
-  /* ── 3D depth / elevation tokens ─────────────────────────
-     Layered shadows create realistic, physically-plausible depth.
-     Each level combines: ambient + key light + rim highlight. */
+  /* ── Spacing scale ──────────────────────────────────────── */
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+
+  /* ── Border radius scale ────────────────────────────────── */
+  --r-sm:   6px;
+  --r-md:  10px;
+  --r-lg:  16px;
+  --r-xl:  20px;
+  --r-pill: 999px;
+
+  /* ── Typography scale ───────────────────────────────────── */
+  --fs-2xs: 0.5rem;
+  --fs-xs:  0.62rem;
+  --fs-sm:  0.72rem;
+  --fs-md:  0.86rem;
+  --fs-lg:  1rem;
+  --fs-xl:  1.2rem;
+
+  /* ── 3D depth / elevation tokens ───────────────────────── */
   --elev-1:
     0 1px 2px rgba(0,0,0,0.40),
     0 2px 8px rgba(0,0,0,0.35);
@@ -65,19 +88,24 @@
     0 8px 24px rgba(108,99,255,0.22),
     0 1px 0 rgba(255,255,255,0.07) inset;
 
-  /* Glass surface fills */
+  /* ── Glass surface ──────────────────────────────────────── */
   --glass-fill: linear-gradient(160deg, rgba(24,24,44,0.72), rgba(12,12,26,0.78));
   --glass-blur: 16px;
 
-  /* Motion */
+  /* ── Motion ─────────────────────────────────────────────── */
   --ease-spring: cubic-bezier(.22,1,.36,1);
+  --duration-fast:   150ms;
+  --duration-normal: 280ms;
+  --duration-slow:   420ms;
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
-/* Enable GPU-accelerated 3D across the app */
-html { perspective: 1400px; }
+/* Enable GPU-accelerated 3D across the app — perspective on html causes
+   backdrop-filter blur artefacts on nested elements, so we apply it only
+   per-element where needed (see .card-3d hover in styles below). */
+/* html { perspective: 1400px; } ← intentionally removed */
 
 /* ── Mobile-first responsive foundations ─────────────────────── */
 html {
@@ -86,12 +114,14 @@ html {
   text-size-adjust: 100%;
 }
 
-/* ── Touch targets ───────────────────────────────────────────── */
-button, a, [role='button'] {
+/* ── Touch targets — only on primary interactive elements ──── */
+/* Avoids forcing 44px on tiny UI micro-buttons (handled per-component) */
+a[href], [role='button']:not([class*="mini"]):not([class*="tog"]):not([class*="gear"]):not([class*="cls"]) {
   min-height: 44px;
   min-width: 44px;
   touch-action: manipulation;
 }
+button { touch-action: manipulation; }
 .nav a { min-width: unset; min-height: unset; padding: 8px 6px; }
 
 body {
@@ -171,28 +201,32 @@ body::after {
 
 /* ============================================================
    3D SYSTEM CARD — glassmorphic surface with real depth
+   container-type: inline-size enables @container queries in
+   child components so they adapt to the card's own width, not
+   the viewport — this is the key to rock-solid responsive UX.
    ============================================================ */
 .system-card {
   background: var(--glass-fill);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--r-xl);
   position: relative;
-  padding: clamp(12px, 3vw, 20px);
+  padding: clamp(var(--s-3), 3vw, var(--s-5));
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   box-shadow: var(--elev-2);
-  transform-style: preserve-3d;
+  /* Container query foundation — child CSS can use @container */
+  container-type: inline-size;
+  container-name: card;
   transition:
-    transform .45s var(--ease-spring),
-    box-shadow .45s var(--ease-spring),
-    border-color .3s;
+    transform  var(--duration-normal) var(--ease-spring),
+    box-shadow var(--duration-normal) var(--ease-spring),
+    border-color var(--duration-fast);
 }
 /* Gradient rim-light border */
 .system-card::after {
   content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
+  position: absolute; inset: 0;
+  border-radius: var(--r-xl);
   padding: 1px;
   background: linear-gradient(135deg, rgba(108,99,255,0.65), transparent 40%, rgba(79,195,247,0.35));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -200,33 +234,31 @@ body::after {
   mask-composite: exclude;
   pointer-events: none;
 }
-/* Top specular highlight for a "glassy" curved feel */
+/* Top specular highlight */
 .system-card::before {
   content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
+  position: absolute; inset: 0 0 auto 0;
   height: 42%;
-  border-radius: 18px 18px 40% 40% / 18px 18px 100% 100%;
+  border-radius: var(--r-xl) var(--r-xl) 40% 40% / var(--r-xl) var(--r-xl) 100% 100%;
   background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
   pointer-events: none;
 }
 .system-card:hover {
   border-color: rgba(108,99,255,0.45);
   box-shadow: var(--elev-3);
-  transform: translateZ(0) translateY(-2px);
+  transform: translateY(-2px);
 }
 
-/* Opt-in interactive 3D tilt/lift — add class="card-3d" to clickable cards */
+/* Opt-in interactive 3D tilt/lift */
 .card-3d {
   transition: transform .35s var(--ease-spring), box-shadow .35s var(--ease-spring);
-  transform-style: preserve-3d;
   will-change: transform;
 }
 .card-3d:hover {
-  transform: perspective(900px) rotateX(4deg) rotateY(-4deg) translateY(-4px) scale(1.015);
+  transform: perspective(900px) rotateX(2deg) rotateY(-2deg) translateY(-3px) scale(1.01);
   box-shadow: var(--elev-float);
 }
-.card-3d:active { transform: perspective(900px) translateY(-1px) scale(.995); }
+.card-3d:active { transform: perspective(900px) translateY(-1px) scale(.997); }
 
 /* ── Premium 3D buttons ──────────────────────────────────────
    Use class="btn-3d" for primary actions. */
@@ -354,10 +386,15 @@ body.native-platform .route-host {
   }
 }
 
-/* ── Utility: prevent text overflow on all screens ──────────── */
-p, h1, h2, h3, h4, h5, h6, span, a, label {
+/* ── Utility: prevent long words overflowing containers ──────────── */
+/* Applied broadly, but overridden per-component for badge/tag elements */
+p, h1, h2, h3, h4, h5, h6, a, label {
   overflow-wrap: break-word;
   word-break: break-word;
+}
+/* Spans only break words when they're NOT tags/badges (component CSS overrides) */
+span {
+  overflow-wrap: break-word;
 }
 
 /* ── Reduced-motion: respect user preference ────────────────── */

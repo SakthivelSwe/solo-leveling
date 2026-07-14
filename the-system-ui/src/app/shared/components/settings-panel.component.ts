@@ -1,9 +1,11 @@
-import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { slideInRight } from '../../shared/animations';
+import { PlayerService } from '../../core/services/player.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface QuestItem {
   id?: number;
@@ -91,6 +93,29 @@ interface QuestItem {
         EVENING DIRECTIVE — Show "You haven't done X yet" reminder after 9 PM</label>
     </section>
 
+    <!-- Danger Zone -->
+    <section class="section danger-zone">
+      <h3 class="mono sh danger">◈ DANGER ZONE</h3>
+      <p class="tech hint">Deleting your profile is permanent. Every quest, habit, stat, streak and log is erased. There is no undo.</p>
+
+      <button class="btn-danger mono" *ngIf="!confirmingDelete()" (click)="confirmingDelete.set(true)">
+        ⚠ DELETE MY PROFILE
+      </button>
+
+      <div class="del-confirm" *ngIf="confirmingDelete()">
+        <p class="tech del-note">Type <b>DELETE</b> to confirm. This cannot be reversed.</p>
+        <input class="fin" placeholder="DELETE" [(ngModel)]="deleteConfirmText" aria-label="Type DELETE to confirm" />
+        <div class="del-actions">
+          <button class="btn-danger mono" [disabled]="deleteConfirmText.trim().toUpperCase() !== 'DELETE' || deleting()"
+                  (click)="deleteProfile()">
+            {{ deleting() ? 'DELETING…' : 'PERMANENTLY DELETE' }}
+          </button>
+          <button class="btn-ghost tech" [disabled]="deleting()" (click)="cancelDelete()">CANCEL</button>
+        </div>
+        <div class="err tech" *ngIf="deleteErr()">{{ deleteErr() }}</div>
+      </div>
+    </section>
+
     <button class="btn-close mono" (click)="close.emit()">◈ CLOSE SETTINGS</button>
   </div>
 </div>
@@ -151,6 +176,19 @@ interface QuestItem {
 
 .btn-close { width: 100%; margin-top: 12px; padding: 14px; border: 1px solid var(--accent-purple); border-radius: 10px; background: rgba(83,74,183,0.18); color: #b3aef0; font-size: .8rem; letter-spacing: 3px; cursor: pointer; }
 .btn-close:hover { background: rgba(83,74,183,0.30); }
+
+.danger-zone { border: 1px solid rgba(226,75,74,0.28); border-radius: 12px; padding: 18px 16px; background: rgba(226,75,74,0.04); }
+.sh.danger { color: #f09595; }
+.btn-danger { cursor: pointer; width: 100%; padding: 12px; border: 1px solid var(--accent-red); border-radius: 8px; background: rgba(226,75,74,0.12); color: #f09595; font-size: .74rem; letter-spacing: 2px; font-family: inherit; }
+.btn-danger:hover:not(:disabled) { background: rgba(226,75,74,0.24); }
+.btn-danger:disabled { opacity: .45; cursor: not-allowed; }
+.del-confirm { display: flex; flex-direction: column; gap: 10px; }
+.del-note { margin: 0; font-size: .74rem; color: var(--text-secondary); }
+.del-note b { color: #f09595; letter-spacing: 1px; }
+.del-actions { display: flex; gap: 8px; }
+.del-actions .btn-danger { flex: 1; }
+.btn-ghost { cursor: pointer; background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); padding: 12px 16px; font-size: .68rem; letter-spacing: 1.5px; }
+.btn-ghost:hover:not(:disabled) { color: var(--text-primary); border-color: var(--accent-purple); }
   `],
 })
 export class SettingsPanelComponent implements OnInit {
@@ -162,6 +200,15 @@ export class SettingsPanelComponent implements OnInit {
 
   newQuest: Partial<QuestItem> = { category: 'DAILY', xpReward: 60 };
   boostsRaw = '';
+
+  // Danger zone — account deletion state.
+  confirmingDelete = signal(false);
+  deleting = signal(false);
+  deleteErr = signal<string | null>(null);
+  deleteConfirmText = '';
+
+  private readonly players = inject(PlayerService);
+  private readonly auth = inject(AuthService);
 
   settings = {
     noSkipMode: localStorage.getItem('sys_noskip') === '1',
@@ -180,9 +227,9 @@ export class SettingsPanelComponent implements OnInit {
   ngOnInit(): void {
     const token = localStorage.getItem('system_access_token');
     if (!token) return;
-    this.http.get<any[]>(`${environment.apiUrl}/quests/today`, {
+    this.http.get<QuestItem[]>(`${environment.apiUrl}/quests/today`, {
       headers: { Authorization: `Bearer ${token}` }
-    }).subscribe(list => this.quests.set(list as QuestItem[]));
+    }).subscribe((list: QuestItem[]) => this.quests.set(list));
   }
 
   addQuest(): void {
@@ -193,7 +240,7 @@ export class SettingsPanelComponent implements OnInit {
     const boosts = this.boostsRaw.trim() ? this.parseBoosts(this.boostsRaw) : null;
     const body = { questKey: key, label: this.newQuest.label, category: this.newQuest.category, xpReward: this.newQuest.xpReward, statBoosts: boosts, active: true };
     this.http.post<QuestItem>(`${environment.apiUrl}/quests/custom`, body, { headers: { Authorization: `Bearer ${token}` }})
-      .subscribe({ next: q => { this.quests.update(list => [q, ...list]); this.newQuest = { category: 'DAILY', xpReward: 60 }; this.boostsRaw = ''; this.addErr.set(null); },
+      .subscribe({ next: (q: QuestItem) => { this.quests.update((list: QuestItem[]) => [q, ...list]); this.newQuest = { category: 'DAILY', xpReward: 60 }; this.boostsRaw = ''; this.addErr.set(null); },
         error: () => this.addErr.set('Failed to save quest.') });
   }
 
@@ -201,7 +248,7 @@ export class SettingsPanelComponent implements OnInit {
     const token = localStorage.getItem('system_access_token');
     if (!token || !q.id) return;
     this.http.patch<QuestItem>(`${environment.apiUrl}/quests/${q.id}/toggle`, {}, { headers: { Authorization: `Bearer ${token}` }})
-      .subscribe(updated => this.quests.update(list => list.map(x => x.id === updated.id ? updated : x)));
+      .subscribe((updated: QuestItem) => this.quests.update((list: QuestItem[]) => list.map((x: QuestItem) => x.id === updated.id ? updated : x)));
   }
 
   setPressure(key: string): void {
@@ -217,6 +264,28 @@ export class SettingsPanelComponent implements OnInit {
     localStorage.setItem('sys_noskip', this.settings.noSkipMode ? '1' : '0');
     localStorage.setItem('sys_hpwarn', this.settings.hpWarnings ? '1' : '0');
     localStorage.setItem('sys_reminder', this.settings.dailyReminder ? '1' : '0');
+  }
+
+  cancelDelete(): void {
+    this.confirmingDelete.set(false);
+    this.deleteConfirmText = '';
+    this.deleteErr.set(null);
+  }
+
+  deleteProfile(): void {
+    if (this.deleteConfirmText.trim().toUpperCase() !== 'DELETE' || this.deleting()) return;
+    this.deleting.set(true);
+    this.deleteErr.set(null);
+    this.players.deleteAccount().subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.auth.purgeLocalAndLogout();
+      },
+      error: () => {
+        this.deleting.set(false);
+        this.deleteErr.set('Deletion failed. Check your connection and try again.');
+      },
+    });
   }
 
   private parseBoosts(raw: string): string {

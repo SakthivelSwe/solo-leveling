@@ -56,6 +56,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- H2 in-memory DB — used for local dev (activated via application-local.yml) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

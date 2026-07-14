@@ -6,8 +6,11 @@ import com.thesystem.entity.PlayerStats;
 import com.thesystem.entity.QuestCompletion;
 import com.thesystem.exception.ApiException;
 import com.thesystem.repository.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -26,6 +29,9 @@ public class PlayerService {
     private final AchievementService achievementService;
     private final LevelService levelService;
     private final SystemQuoteService systemQuoteService;
+
+    @PersistenceContext
+    private EntityManager em;
 
     public PlayerService(PlayerRepository playerRepository,
                          PlayerStatsRepository statsRepository,
@@ -75,6 +81,41 @@ public class PlayerService {
             p.setUsername(req.username());
         }
         return toDto(playerRepository.save(p));
+    }
+
+    /**
+     * Permanently deletes the player and every record they own. All player-scoped
+     * entities reference the player through a plain {@code playerId} column, so a
+     * set of JPQL bulk deletes fully wipes the account. Shared catalogs (e.g. the
+     * global {@code quests} table) are intentionally left untouched.
+     */
+    @Transactional
+    public void deleteAccount(Long playerId) {
+        find(playerId); // 404 if the account no longer exists
+
+        // Detail rows that hang off a job application must go before the applications.
+        em.createQuery("DELETE FROM InterviewRound ir WHERE ir.applicationId IN " +
+                        "(SELECT j.id FROM JobApplication j WHERE j.playerId = :id)")
+                .setParameter("id", playerId).executeUpdate();
+
+        // All remaining player-scoped entities (completions/logs first, then parents).
+        String[] entities = {
+                "HabitCompletion", "Habit",
+                "QuestCompletion",
+                "BossBattle", "Dungeon",
+                "PlayerStats", "PlayerSkill", "Achievement", "Notification",
+                "JobApplication", "LeetcodeLog", "CourseProgress",
+                "HealthLog", "MindLog", "BodyLog", "EnglishLog", "ExerciseLog",
+                "VocabularyLog", "RelationshipLog", "SavingsGoal", "BudgetEntry",
+                "SelfDoubtEvidence"
+        };
+        for (String entity : entities) {
+            em.createQuery("DELETE FROM " + entity + " e WHERE e.playerId = :id")
+                    .setParameter("id", playerId).executeUpdate();
+        }
+
+        em.createQuery("DELETE FROM Player p WHERE p.id = :id")
+                .setParameter("id", playerId).executeUpdate();
     }
 
     public StatusWindowDTO getStatusWindow(Long playerId) {

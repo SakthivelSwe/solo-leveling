@@ -34,6 +34,12 @@ public class PlayerController {
         return playerService.updateProfile(playerId(principal), request);
     }
 
+    /** Permanently deletes the authenticated player's account and all their data. */
+    @DeleteMapping("/account")
+    public void deleteAccount(Principal principal) {
+        playerService.deleteAccount(playerId(principal));
+    }
+
     private Long playerId(Principal principal) {
         Player player = playerService.getByUsername(principal.getName());
         return player.getId();

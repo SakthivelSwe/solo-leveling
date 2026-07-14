@@ -1,15 +1,5 @@
 :host { display: block; position: relative; z-index: 1; }
 
-/* HP Danger Banner */
-.hp-danger-banner {
-  position: sticky; top: 0; z-index: 30;
-  background: linear-gradient(90deg, rgba(226,75,74,0.18), rgba(226,75,74,0.08));
-  border-bottom: 1px solid rgba(226,75,74,0.35);
-  padding: clamp(6px, 2vw, 10px) clamp(12px, 4vw, 24px); font-size: clamp(.6rem, 1.8vw, .72rem); letter-spacing: 2px;
-  color: #f09595; display: flex; align-items: center; gap: 10px;
-  animation: dangerPulse 2s ease-in-out infinite;
-}
-.hp-danger-banner .mono { font-size: 1.1rem; }
 
 .system-shell { max-width: 1440px; margin: 0 auto; padding: 0 clamp(12px, 4vw, 20px) 80px; }
 
@@ -43,7 +33,11 @@
   border: 1px solid rgba(83,74,183,0.4); color: #b3aef0; background: rgba(83,74,183,0.12);
 }
 
-.nav { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.nav {
+  display: flex; gap: 14px; align-items: center;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.nav::-webkit-scrollbar { display: none; }
 .nav a {
   color: var(--text-secondary); text-decoration: none; font-size: clamp(.62rem, 1.8vw, .72rem);
   letter-spacing: 2px; font-weight: 600; padding: 8px 6px; position: relative; transition: color .2s;
@@ -114,27 +108,61 @@
   box-shadow: 0 6px 16px rgba(226,75,74,0.3);
 }
 
-/* ── 3-column dashboard — fluid, not fixed ─────────────────────────
-   Uses clamp() so columns shrink gracefully on medium screens
-   without needing an explicit breakpoint. */
+/* ── 3-column dashboard ─────────────────────────────────────────
+   clamp(min, preferred, max):
+     left  = status window + skill tree   (fits comfortably)
+     centre= quest log + chart            (takes remaining space)
+     right = dungeon + directive          (slightly wider for anchor strip)
+   ─────────────────────────────────────────────────────────────── */
 .grid {
   display: grid;
-  grid-template-columns: clamp(260px, 25vw, 340px) 1fr clamp(240px, 22vw, 300px);
-  gap: clamp(12px, 2vw, 18px);
+  grid-template-columns:
+    clamp(260px, 25vw, 340px)
+    1fr
+    clamp(280px, 26vw, 360px);
+  gap: clamp(var(--s-3), 2vw, var(--s-4));
   align-items: start;
 }
-.col-left, .col-centre, .col-right { display: flex; flex-direction: column; gap: 18px; }
+.col-left, .col-centre, .col-right { display: flex; flex-direction: column; gap: var(--s-4); }
 
-/* Accountability strip */
-.accountability {
-  padding: 10px 14px; border-radius: 10px; font-size: .74rem; letter-spacing: 1.5px;
-  border: 1px solid rgba(226,75,74,0.25); background: rgba(226,75,74,0.06);
-  color: #f09595; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+/* Staggered entrance — each column enters 80ms after the previous */
+.col-left   { animation: colIn var(--duration-slow) var(--ease-spring) both; }
+.col-centre { animation: colIn var(--duration-slow) var(--ease-spring) 80ms both; }
+.col-right  { animation: colIn var(--duration-slow) var(--ease-spring) 160ms both; }
+@keyframes colIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
 }
-.all-clear {
-  padding: 10px 14px; border-radius: 10px; font-size: .72rem; letter-spacing: 1.5px;
-  border: 1px solid rgba(29,158,117,0.35); background: rgba(29,158,117,0.08); color: #5dcaa5;
+
+/* Unified day-status line — HP + quest progress + accountability in one bar */
+.day-status {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: rgba(19,19,31,0.55);
 }
+.day-status .ds-icon { font-size: 1.05rem; color: var(--accent-gold); line-height: 1; }
+.day-status .ds-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.day-status .ds-line { font-size: .72rem; letter-spacing: 1.4px; color: var(--text-secondary); line-height: 1.4; }
+.day-status .ds-bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.07); overflow: hidden; }
+.day-status .ds-fill {
+  display: block; height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-teal));
+  transition: width .5s cubic-bezier(.22,1,.36,1);
+}
+
+/* All quests cleared → calm green */
+.day-status.clear { border-color: rgba(29,158,117,0.35); background: rgba(29,158,117,0.07); }
+.day-status.clear .ds-icon { color: #5dcaa5; }
+.day-status.clear .ds-fill { background: var(--accent-teal); }
+
+/* HP critical → urgent red, overrides clear */
+.day-status.critical {
+  border-color: rgba(226,75,74,0.4); background: rgba(226,75,74,0.08);
+  animation: dsPulse 2s ease-in-out infinite;
+}
+.day-status.critical .ds-icon { color: #f09595; }
+.day-status.critical .ds-hp { color: #f09595; font-weight: 700; }
+@keyframes dsPulse { 0%,100% { box-shadow: 0 0 0 rgba(226,75,74,0); } 50% { box-shadow: 0 0 18px rgba(226,75,74,0.28); } }
 
 .loader {
   display: flex; flex-direction: column; align-items: center; gap: 16px;
@@ -166,16 +194,18 @@
 /* ── Tablet portrait / large phone landscape ─────────────────── */
 @media (max-width: 760px) {
   .grid { grid-template-columns: 1fr; }
-  .nav { gap: 8px 12px; }
+  .nav { gap: 10px; }
   .name { font-size: .9rem; letter-spacing: 3px; }
 }
 
 /* ── Small phone (< 560px) ───────────────────────────────────── */
 @media (max-width: 560px) {
-  .topbar { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 14px; }
-  .nav { flex-wrap: wrap; gap: 8px 12px; width: 100%; }
-  .user { width: 100%; justify-content: space-between; }
-  .hp-danger-banner { font-size: .6rem; letter-spacing: 1px; }
+  .topbar { gap: 8px; padding: 8px 12px; flex-wrap: nowrap; }
+  .brand { flex-shrink: 0; }
+  .nav { flex: 1; min-width: 0; gap: 8px; }
+  .nav a { font-size: .6rem; letter-spacing: 1px; padding: 6px 4px; }
+  .user { flex-shrink: 0; }
+  .day-status .ds-line { font-size: .66rem; letter-spacing: 1px; }
 }
 
 /* ── Very small phone (< 380px, e.g. Galaxy A02s) ────────────── */

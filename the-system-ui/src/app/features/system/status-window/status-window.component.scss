@@ -1,6 +1,10 @@
 :host { display: block; }
 
-.status { padding: 24px; }
+.status {
+  padding: clamp(var(--s-3), 3vw, var(--s-6));
+  container-type: inline-size;
+  container-name: status;
+}
 
 .header {
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -112,5 +116,19 @@
 @media (max-width: 480px) {
   .core { gap: 18px; }
   .meta { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+}
+
+/* ── Container queries ──────────────────────────────────────── */
+/* When status card is narrow, stack meta chips in a row */
+@container status (max-width: 280px) {
+  .ring-wrap { width: 150px; height: 150px; }
+  .ring      { width: 150px; height: 150px; }
+  .lvl-num   { font-size: 2.4rem; }
+  .meta      { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .meta-chip { min-width: 80px; padding: 8px 10px; }
+  .meta-chip .v { font-size: 1.1rem; }
+}
+@container status (min-width: 360px) {
+  .title { font-size: 1.6rem; }
 }
 

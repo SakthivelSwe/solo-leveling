@@ -39,6 +39,25 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  /**
+   * Wipes every locally-stored trace of the account (tokens, cached status,
+   * settings, custom directive) then routes back to login. Used after a
+   * full account deletion so no stale data survives on the device.
+   */
+  purgeLocalAndLogout(): void {
+    const keep = new Set<string>();
+    // Clear all System-owned keys.
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      if (key.startsWith('system_') || key.startsWith('sys_') || keep.has(key)) {
+        localStorage.removeItem(key);
+      }
+    }
+    this.player.set(null);
+    this.router.navigate(['/login']);
+  }
+
   get token(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }

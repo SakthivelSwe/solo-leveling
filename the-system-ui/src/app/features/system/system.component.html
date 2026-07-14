@@ -1,13 +1,5 @@
 <div class="system-shell">
 
-  <!-- HP DANGER BANNER — shows when HP < 40 -->
-  <div class="hp-danger-banner tech" *ngIf="status() && (status()!.player.hp < 40)"
-       role="alert" aria-live="assertive">
-    <span class="mono">⚠</span>
-    HP CRITICAL — {{ status()!.player.hp }}/{{ status()!.player.maxHp }} ·
-    COMPLETE {{ 10 - status()!.completedToday }} MORE QUESTS TODAY OR FACE RANK DEMOTION.
-    THE SYSTEM IS WATCHING.
-  </div>
 
   <!-- Top Nav -->
   <header class="topbar">
@@ -73,16 +65,29 @@
 
     <!-- CENTRE: Quest Log + Progress -->
     <div class="col-centre">
-      <!-- Accountability strip -->
-      <div class="accountability tech" *ngIf="s.completedToday < s.totalQuests">
-        <span class="mono">◈</span>
-        {{ s.totalQuests - s.completedToday }} QUEST{{ s.totalQuests - s.completedToday > 1 ? 'S' : '' }} REMAINING ·
-        <span [style.color]="hpRiskColor(s.completedToday, s.totalQuests)">
-          {{ accountabilityMsg(s.completedToday, s.totalQuests) }}
-        </span>
-      </div>
-      <div class="all-clear tech" *ngIf="s.completedToday >= s.totalQuests">
-        ✓ ALL QUESTS CLEARED · PERFECT DAY · HP +5 AT MIDNIGHT
+      <!-- Unified day status — one adaptive line for HP + quest progress + accountability -->
+      <div class="day-status"
+           [class.critical]="s.player.hp < 40"
+           [class.clear]="s.completedToday >= s.totalQuests"
+           role="status" [attr.aria-live]="s.player.hp < 40 ? 'assertive' : 'polite'">
+        <span class="ds-icon mono">{{ s.player.hp < 40 ? '⚠' : (s.completedToday >= s.totalQuests ? '✓' : '◈') }}</span>
+        <div class="ds-body">
+          <div class="ds-line tech">
+            <ng-container *ngIf="s.player.hp < 40">
+              <span class="ds-hp">HP {{ s.player.hp }}/{{ s.player.maxHp }} CRITICAL</span> ·
+            </ng-container>
+            <ng-container *ngIf="s.completedToday < s.totalQuests">
+              {{ s.completedToday }}/{{ s.totalQuests }} CLEARED ·
+              <span [style.color]="hpRiskColor(s.completedToday, s.totalQuests)">{{ accountabilityMsg(s.completedToday, s.totalQuests) }}</span>
+            </ng-container>
+            <ng-container *ngIf="s.completedToday >= s.totalQuests">
+              ALL {{ s.totalQuests }} QUESTS CLEARED · PERFECT DAY · HP +5 AT MIDNIGHT
+            </ng-container>
+          </div>
+          <div class="ds-bar" aria-hidden="true">
+            <span class="ds-fill" [style.width.%]="(s.completedToday / (s.totalQuests || 1)) * 100"></span>
+          </div>
+        </div>
       </div>
 
       <app-quest-log
@@ -107,7 +112,7 @@
   </main>
 
   <footer class="footer tech" *ngIf="!loading()">
-    ◈ KEEP FORWARDING — E-RANK → S-RANK · SKIPPING IS CHOOSING TO STAY WEAK ◈
+    ◈ E-RANK → S-RANK · KEEP FORWARDING ◈
   </footer>
 
   <!-- Settings Panel -->
