@@ -107,7 +107,9 @@ public class PlayerService {
                 "JobApplication", "LeetcodeLog", "CourseProgress",
                 "HealthLog", "MindLog", "BodyLog", "EnglishLog", "ExerciseLog",
                 "VocabularyLog", "RelationshipLog", "SavingsGoal", "BudgetEntry",
-                "SelfDoubtEvidence"
+                "SelfDoubtEvidence", "AiMemoryEntry", "DailyMission",
+                "DeepWorkSession", "DopamineLog", "InventoryItem",
+                "Shadow", "SkillTreeNode"
         };
         for (String entity : entities) {
             em.createQuery("DELETE FROM " + entity + " e WHERE e.playerId = :id")
