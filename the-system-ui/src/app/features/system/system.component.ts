@@ -15,12 +15,12 @@ import {
   DailyMissionDTO, DopamineSummary
 } from '../../core/models/models';
 import { LifeOsService } from '../../core/services/life-os.service';
+import { UiStateService } from '../../core/services/ui-state.service';
 
 import { StatusWindowComponent } from './status-window/status-window.component';
 import { QuestLogComponent } from './quest-log/quest-log.component';
 import { SkillTreeComponent } from './skill-tree/skill-tree.component';
 import { ProgressChartComponent } from '../progress/progress-chart.component';
-import { LevelUpModalComponent } from '../../shared/components/level-up-modal.component';
 import { DailyScheduleComponent } from '../../shared/components/daily-schedule.component';
 import { SettingsPanelComponent } from '../../shared/components/settings-panel.component';
 import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
@@ -31,7 +31,7 @@ import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
   imports: [
     CommonModule, RouterLink, RouterLinkActive,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
-    DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, LevelUpModalComponent,
+    DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent,
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
@@ -50,7 +50,6 @@ export class SystemComponent implements OnInit {
   skillTreeNodes = signal<import('../../core/models/models').SkillTreeNode[]>([]);
   shadows = signal<import('../../core/models/models').Shadow[]>([]);
   showAllQuests = signal<boolean>(false);
-  levelUpData = signal<import('../../shared/components/level-up-modal.component').LevelUpData | null>(null);
 
   constructor(
     private playerService: PlayerService,
@@ -60,7 +59,8 @@ export class SystemComponent implements OnInit {
     private snack: MatSnackBar,
     public notifications: NotificationService,
     public sse: SseService,
-    private haptics: HapticsService
+    private haptics: HapticsService,
+    private uiState: UiStateService
   ) {
     // Live sync: reload the dashboard whenever a real-time player-update arrives
     // (e.g. a quest completed in another tab, or midnight HP processing).
@@ -126,7 +126,7 @@ export class SystemComponent implements OnInit {
         });
         if (res.leveledUp) {
           setTimeout(() => {
-            this.levelUpData.set({ newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged });
+            this.uiState.triggerLevelUp({ newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged });
           }, 400);
         }
         this.load();

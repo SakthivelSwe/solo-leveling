@@ -40,7 +40,14 @@
   </nav>
 }
 
-<!-- Biometric lock overlay -->
+<!-- Fullscreen System Lock (Biometric) -->
 @if (isLocked()) {
   <app-biometric-lock></app-biometric-lock>
 }
+
+<!-- Level Up Modal (Global Overlay) -->
+<app-level-up-modal
+  *ngIf="uiState.levelUpData()"
+  [data]="uiState.levelUpData()!"
+  (closeModal)="uiState.clearLevelUp()">
+</app-level-up-modal>

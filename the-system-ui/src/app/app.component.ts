@@ -7,6 +7,8 @@ import { PwaUpdateService } from './core/services/pwa-update.service';
 import { NativeService } from './core/services/native.service';
 import { BiometricService } from './core/services/biometric.service';
 import { BiometricLockComponent } from './features/auth/biometric-lock.component';
+import { LevelUpModalComponent } from './shared/components/level-up-modal.component';
+import { UiStateService } from './core/services/ui-state.service';
 import { routeFade } from './shared/animations';
 
 /** Routes where the bottom nav should NOT be shown (auth screens). */
@@ -15,7 +17,7 @@ const AUTH_ROUTES = new Set(['/login', '/register', '/']);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent, LevelUpModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [routeFade],
@@ -25,6 +27,7 @@ export class AppComponent {
 
   private biometric = inject(BiometricService);
   private router    = inject(Router);
+  public uiState    = inject(UiStateService);
 
   /** Reactive signal: true when the biometric lock overlay should be shown. */
   isLocked = computed(() => this.biometric.isLocked);
