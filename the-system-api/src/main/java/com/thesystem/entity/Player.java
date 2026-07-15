@@ -47,14 +47,14 @@ public class Player {
      * When true, the end-of-day HP penalty threshold drops from 4 quests to 2.
      * Activated on days the player has work/PG schedule constraints (e.g. Saturdays).
      */
-    @Column(name = "rest_day_active", nullable = false)
+    @jakarta.persistence.Transient
     private boolean restDayActive = false;
 
     /**
      * Day-of-week (1=Mon … 7=Sun, ISO-8601) treated as rest day.
      * Default 6 = Saturday, matching the player's regular work schedule.
      */
-    @Column(name = "rest_day_day_of_week", nullable = false)
+    @jakarta.persistence.Transient
     private int restDayDayOfWeek = 6;
 
     /**
