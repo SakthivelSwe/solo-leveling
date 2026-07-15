@@ -61,7 +61,7 @@ public class Player {
      * Cached morning energy score (0–100) updated when today's health log is saved.
      * Drives the XP multiplier in QuestService: low energy reduces XP earned.
      */
-    @Column(name = "current_energy", nullable = false)
+    @jakarta.persistence.Transient
     private int currentEnergy = 70;
 
     @Column(name = "created_at")
