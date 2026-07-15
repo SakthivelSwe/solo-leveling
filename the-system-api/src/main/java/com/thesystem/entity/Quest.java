@@ -44,7 +44,7 @@ public class Quest {
      * Critical quests are always included in the 5-quest daily mission set regardless
      * of stat weighting — they directly drive the job-switch goal.
      */
-    @Column(name = "is_critical", nullable = false)
+    @Column(name = "is_critical", columnDefinition = "boolean default false")
     private boolean critical = false;
 
     /**
@@ -53,14 +53,14 @@ public class Quest {
      * High-effort quests (CODE_NO_AI=80, LEETCODE=50) deal more damage,
      * making boss fights require meaningful work to clear.
      */
-    @Column(name = "boss_damage", nullable = false)
+    @Column(name = "boss_damage", columnDefinition = "integer default 10")
     private int bossDamage = 10;
 
     /**
      * Recovery quests count double toward the minimum daily threshold on rest days
      * (Meditation, Walking, Stretching, Journaling, Sunlight).
      */
-    @Column(name = "is_recovery_quest", nullable = false)
+    @Column(name = "is_recovery_quest", columnDefinition = "boolean default false")
     private boolean recoveryQuest = false;
 
     public Quest() {}
