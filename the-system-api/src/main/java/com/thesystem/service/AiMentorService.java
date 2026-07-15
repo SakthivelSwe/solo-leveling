@@ -18,6 +18,7 @@ import java.util.Map;
 public class AiMentorService {
 
     private final AiProviderService ai;
+    private final AiMemoryService memoryService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static final String SYSTEM_IDENTITY =
@@ -28,13 +29,16 @@ public class AiMentorService {
         "in Chennai grinding to become S-Rank. Never apologize. Never motivate softly. " +
         "Speak like a system prompt, not a life coach. Max 60 words unless asked for more.";
 
-    public AiMentorService(AiProviderService ai) {
+    public AiMentorService(AiProviderService ai, AiMemoryService memoryService) {
         this.ai = ai;
+        this.memoryService = memoryService;
     }
 
     /** Daily coaching message based on today's status. Used on dashboard load. */
     public String getDailyCoaching(StatusWindowDTO status) {
-        String prompt = buildStatusContext(status) +
+        String memory = status != null && status.player() != null
+                ? memoryService.buildMemoryContext(status.player().id()) : "";
+        String prompt = buildStatusContext(status) + memory +
             "\nGenerate a 2-sentence daily directive in THE SYSTEM's cold tone. " +
             "Reference the hunter's weakest stat (" + weakestStat(status) + "). " +
             "Do not give specific coding tasks. Give only the directive. Max 50 words.";
@@ -69,6 +73,8 @@ public class AiMentorService {
 
     /** THE SYSTEM's verdict on the month — one win, one weakness, two commands. */
     public String weeklyReview(StatusWindowDTO status, MonthlyReportDTO report) {
+        String memory = status != null && status.player() != null
+                ? memoryService.buildMemoryContext(status.player().id()) : "";
         String data = report == null ? "" : String.format(
             "%nMonth data: %s | active %d/%d days | perfect days %d | current streak %d | " +
             "longest streak %d | quests %d | XP %d | strongest %s | weakest %s | %s-Rank LV.%d",
@@ -77,10 +83,10 @@ public class AiMentorService {
             report.totalXpMonth(), report.bestStat(), report.weakestStat(),
             report.rankLevel(), report.level());
 
-        String prompt = buildStatusContext(status) + data +
+        String prompt = buildStatusContext(status) + data + memory +
             "\nWrite THE SYSTEM's monthly review of this hunter. Acknowledge ONE win, expose ONE " +
-            "weakness, then issue exactly TWO concrete commands for next week. Cold, powerful, no " +
-            "sympathy. 4-6 sentences, max 130 words.";
+            "weakness (referencing specific quest skips from memory if available), then issue exactly " +
+            "TWO concrete commands for next week. Cold, powerful, no sympathy. 4-6 sentences, max 130 words.";
         return ai.generate(Scenario.COACHING, SYSTEM_IDENTITY, prompt);
     }
 

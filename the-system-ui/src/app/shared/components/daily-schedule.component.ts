@@ -13,6 +13,9 @@ interface DraftForm {
   tagsRaw: string;
 }
 
+import { LocalNotificationsService } from '../../core/services/local-notifications.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 @Component({
   selector: 'app-daily-schedule',
   standalone: true,
@@ -141,6 +144,18 @@ interface DraftForm {
 
   <div class="mandate tech" *ngIf="!editMode() && schedule().length > 0">
     ◈ Build the day you want — then execute it. Skipping costs HP.
+  </div>
+
+  <!-- ── Manual Native Alarm Timer ──────────────────────── -->
+  <div class="alarm-config" *ngIf="!editMode()">
+    <h4 class="mono ed-title" style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+      <span style="color: var(--accent-gold);">◈</span> MANUAL ALARM (NATIVE)
+    </h4>
+    <div style="display: flex; gap: 8px; margin-top: 12px;">
+      <button class="sys-btn" style="flex: 1; border-color: var(--accent-gold); color: var(--accent-gold);" (click)="setNativeTimer(25)">25M</button>
+      <button class="sys-btn" style="flex: 1; border-color: var(--accent-gold); color: var(--accent-gold);" (click)="setNativeTimer(45)">45M</button>
+      <button class="sys-btn" style="flex: 1; border-color: var(--accent-gold); color: var(--accent-gold);" (click)="setNativeTimer(90)">90M</button>
+    </div>
   </div>
 </div>
   `,
@@ -334,8 +349,15 @@ interface DraftForm {
 })
 export class DailyScheduleComponent implements OnInit, OnDestroy {
   private readonly svc = inject(DirectiveService);
+  private readonly notificationsSvc = inject(LocalNotificationsService);
+  private readonly snack = inject(MatSnackBar);
   readonly schedule   = this.svc.items;
   readonly config     = this.svc.config;
+
+  setNativeTimer(minutes: number) {
+    this.notificationsSvc.scheduleTimer(minutes);
+    this.snack.open(`◈ NATIVE TIMER SET: ${minutes} MINS`, '✕', { duration: 3000, panelClass: 'system-snack' });
+  }
 
   // ── Clock ────────────────────────────────────────────────────────────────
   readonly currentTime = signal('');

@@ -81,10 +81,27 @@
         [motivation]="s.motivation"
         [systemQuote]="s.systemQuote"
         [completedToday]="s.completedToday"
-        [totalQuests]="s.totalQuests">
+        [totalQuests]="s.totalQuests"
+        [dopamine]="dopamine()">
       </app-status-window>
 
-      <app-skill-tree [skills]="s.skills"></app-skill-tree>
+      <app-skill-tree [skills]="s.skills" [nodes]="skillTreeNodes()"></app-skill-tree>
+
+      <!-- Phase 5: Shadow Army -->
+      <div class="system-card block" style="margin-top: 16px;" *ngIf="shadows().length > 0">
+        <h3 class="mono head" style="color: #BA7517;">◈ SHADOW ARMY</h3>
+        <p class="tech subtitle" style="margin-bottom: 12px; font-size: 0.7rem;">MASTERED HABITS TRANSCEND INTO SHADOWS</p>
+        <div class="shadows-list" style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="shadow-item" *ngFor="let sh of shadows()" 
+               style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(186,117,23,0.1); border: 1px solid rgba(186,117,23,0.3); border-radius: 6px;">
+            <div>
+              <span class="mono" style="color: #BA7517; font-weight: bold; font-size: 0.9rem;">{{ sh.shadowName }}</span>
+              <div class="tech" style="font-size: 0.65rem; color: #8a8a9a;">Lv.{{ sh.shadowLevel }} (Power: {{ sh.powerLevel }}) · +{{ sh.powerLevel }}% {{ sh.shadowType }} XP</div>
+            </div>
+            <span class="tech" style="font-size: 0.7rem; color: #FAC775;">ARISE</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- CENTRE col: Quest Log + Progress -->
@@ -114,8 +131,18 @@
         </div>
       </div>
 
+      <!-- Daily Mission Controls -->
+      <div class="mission-controls tech" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <span *ngIf="dailyMission() as dm; else noMission">🎯 {{ showAllQuests() ? 'ALL QUESTS' : 'MISSIONS: ' + dm.focusArea + ' (' + dm.focusStat + ')' }}</span>
+        <ng-template #noMission><span>🎯 ALL QUESTS</span></ng-template>
+        
+        <button *ngIf="dailyMission()" class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem;" (click)="showAllQuests.set(!showAllQuests())">
+          {{ showAllQuests() ? 'SHOW MISSIONS' : 'SHOW ALL QUESTS' }}
+        </button>
+      </div>
+
       <app-quest-log
-        [quests]="s.todayQuests"
+        [quests]="getDisplayQuests(s.todayQuests)"
         [pendingKey]="pendingKey()"
         [pressureLevel]="pressureLevel()"
         (complete)="onComplete($event)">

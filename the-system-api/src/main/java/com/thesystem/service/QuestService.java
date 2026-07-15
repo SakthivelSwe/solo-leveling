@@ -26,6 +26,7 @@ public class QuestService {
     private final AchievementService achievementService;
     private final SelfDoubtEvidenceRepository evidenceRepository;
     private final SseService sseService;
+    private final DopamineService dopamineService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public QuestService(QuestRepository questRepository,
@@ -36,7 +37,8 @@ public class QuestService {
                         LevelService levelService,
                         AchievementService achievementService,
                         SelfDoubtEvidenceRepository evidenceRepository,
-                        SseService sseService) {
+                        SseService sseService,
+                        DopamineService dopamineService) {
         this.questRepository = questRepository;
         this.completionRepository = completionRepository;
         this.playerRepository = playerRepository;
@@ -46,6 +48,7 @@ public class QuestService {
         this.achievementService = achievementService;
         this.evidenceRepository = evidenceRepository;
         this.sseService = sseService;
+        this.dopamineService = dopamineService;
     }
 
     public List<QuestDTO> getTodayQuests(Long playerId) {
@@ -73,8 +76,16 @@ public class QuestService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
 
-        // Award XP
-        int xp = quest.getXpReward();
+        // Award XP — apply compound energy × dopamine/focus multipliers.
+        // Low energy (sleep-deprived) reduces XP. High dopamine (reels, porn) further reduces it.
+        // On a perfect day (high energy + clean dopamine): +10% bonus.
+        int baseXp = quest.getXpReward();
+        int energy = player.getCurrentEnergy();
+        double energyMultiplier = energy < 40 ? 0.80
+                : energy < 60 ? 0.90
+                : energy >= 80 ? 1.10 : 1.0;
+        double focusMultiplier = dopamineService.getTodayFocusMultiplier(playerId);
+        int xp = (int) Math.round(baseXp * energyMultiplier * focusMultiplier);
         player.setCurrentXp(player.getCurrentXp() + xp);
         player.setTotalXp(player.getTotalXp() + xp);
 
@@ -142,8 +153,14 @@ public class QuestService {
             PlayerSkill skill = skillRepository
                     .findByPlayerIdAndSkillName(playerId, skillName)
                     .orElseGet(() -> new PlayerSkill(playerId, skillName, 0));
+            // Increment mastery percentage (capped 100)
             int newPct = Math.min(100, skill.getSkillPct() + val);
             skill.setSkillPct(newPct);
+            // Accumulate skill-specific XP: each boost point = 10 skill XP
+            skill.setSkillXp(skill.getSkillXp() + (val * 10));
+            // Recompute RPG level and rank from accumulated XP
+            skill.recalculateLevelAndRank();
+            skill.setUpdatedAt(java.time.LocalDateTime.now());
             skillRepository.save(skill);
         });
     }
@@ -183,7 +200,8 @@ public class QuestService {
 
     public QuestDTO toDto(Quest q, boolean completed) {
         return new QuestDTO(q.getId(), q.getQuestKey(), q.getLabel(), q.getCategory().name(),
-                q.getXpReward(), q.getStatBoosts(), q.getSkillBoosts(), completed);
+                q.getXpReward(), q.getStatBoosts(), q.getSkillBoosts(), completed,
+                q.getPriority(), q.isCritical(), q.getBossDamage(), q.isRecoveryQuest());
     }
 }
 

@@ -8,6 +8,10 @@ public record QuestDTO(
         int xpReward,
         String statBoosts,
         String skillBoosts,
-        boolean isCompleted
+        boolean isCompleted,
+        int priority,
+        boolean isCritical,
+        int bossDamage,
+        boolean isRecoveryQuest
 ) {}
 

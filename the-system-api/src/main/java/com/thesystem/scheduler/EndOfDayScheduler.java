@@ -47,15 +47,34 @@ public class EndOfDayScheduler {
     @Transactional
     public void processEndOfDay() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
+        int yesterdayDow = yesterday.getDayOfWeek().getValue(); // 1=Mon … 7=Sun (ISO-8601)
         List<Player> players = playerRepository.findAll();
 
         for (Player player : players) {
-            int questsDone = (int) completionRepository
+            long rawQuestsDone = completionRepository
                     .countByPlayerIdAndCompletedAt(player.getId(), yesterday);
 
-            int hpChange = questsDone >= 10 ? 5
-                         : questsDone >= 7  ? 0
-                         : questsDone >= 4  ? -5
+            // Rest-day mode: if yesterday matched the player's configured rest day,
+            // recovery quests count double (they contribute 2 toward the threshold)
+            // and the HP penalty threshold drops from 4 → 2.
+            boolean wasRestDay = player.isRestDayActive()
+                    && player.getRestDayDayOfWeek() == yesterdayDow;
+
+            // Count recovery quests separately so they can count double
+            long recoveryQuestsDone = completionRepository
+                    .countRecoveryQuestsByPlayerIdAndCompletedAt(player.getId(), yesterday);
+            long normalQuestsDone = rawQuestsDone - recoveryQuestsDone;
+            // Effective count: recovery quests count 2×, normal count 1×
+            int effectiveDone = (int) (normalQuestsDone + (recoveryQuestsDone * 2));
+
+            // Thresholds shift on rest days
+            int thresholdPerfect  = wasRestDay ? 6 : 10;
+            int thresholdStrong   = wasRestDay ? 4 : 7;
+            int thresholdMinimum  = wasRestDay ? 2 : 4; // below this = HP penalty
+
+            int hpChange = effectiveDone >= thresholdPerfect ? 5
+                         : effectiveDone >= thresholdStrong  ? 0
+                         : effectiveDone >= thresholdMinimum ? -5
                          : -20;
 
             int newHp = Math.max(0, Math.min(player.getMaxHp(), player.getHp() + hpChange));
@@ -72,9 +91,10 @@ public class EndOfDayScheduler {
                             player.getUsername(), player.getRankLevel());
                 }
             } else if (hpChange < 0) {
+                String restNote = wasRestDay ? " (rest-day threshold applied)" : "";
                 notificationService.push(player.getId(), "◈ HP LOST",
-                        "Only " + questsDone + " quests cleared yesterday. HP " + hpChange
-                                + ". The weak fall behind. Push harder today.", "SYSTEM");
+                        "Only " + effectiveDone + " effective quests cleared yesterday. HP " + hpChange
+                                + ". Push harder today." + restNote, "SYSTEM");
             } else if (hpChange > 0) {
                 notificationService.push(player.getId(), "◈ HP RESTORED",
                         "Perfect clearance yesterday. +" + hpChange + " HP. The System acknowledges you.",

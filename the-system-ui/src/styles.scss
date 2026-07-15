@@ -346,18 +346,31 @@ $sys-theme: mat.define-dark-theme((
 @include mat.all-component-themes($sys-theme);
 
 /* ── System Snackbar ──────────────────────────────────────── */
+@keyframes systemSnackPulse {
+  0% { box-shadow: 0 0 15px rgba(31,190,142,0.6), inset 0 0 10px rgba(31,190,142,0.2); border-color: rgba(31,190,142, 0.8); }
+  50% { box-shadow: 0 0 35px rgba(31,190,142,0.9), inset 0 0 20px rgba(31,190,142,0.4); border-color: rgba(31,190,142, 1); }
+  100% { box-shadow: 0 0 15px rgba(31,190,142,0.6), inset 0 0 10px rgba(31,190,142,0.2); border-color: rgba(31,190,142, 0.8); }
+}
+
 .mat-mdc-snack-bar-container.system-snack {
-  --mdc-snackbar-container-color:       #10101e;
+  --mdc-snackbar-container-color:       rgba(10, 10, 24, 0.95);
   --mdc-snackbar-supporting-text-color: #EEF3FA;
   --mat-snack-bar-button-color:         #FAC775;
 }
 .mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
   border: 1px solid var(--accent-teal);
-  box-shadow: 0 0 28px rgba(31,190,142,0.45), var(--elev-3);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(10, 10, 24, 0.95), rgba(31, 190, 142, 0.15));
+  backdrop-filter: blur(10px);
+  animation: systemSnackPulse 2s infinite ease-in-out;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
 }
 .mat-mdc-snack-bar-container.system-snack-warn .mdc-snackbar__surface {
   border: 1px solid #E24B4A;
-  box-shadow: 0 0 28px rgba(226,75,74,0.45), var(--elev-3);
+  background: linear-gradient(135deg, rgba(10, 10, 24, 0.95), rgba(226, 75, 74, 0.15));
+  box-shadow: 0 0 28px rgba(226,75,74,0.65), inset 0 0 12px rgba(226,75,74,0.2);
+  font-family: 'Orbitron', sans-serif;
 }
 
 /* ── Overlay backdrop ─────────────────────────────────────── */

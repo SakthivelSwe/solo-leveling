@@ -1,5 +1,6 @@
 package com.thesystem.controller;
 
+import com.thesystem.dto.InterviewReadinessDTO;
 import com.thesystem.dto.LeetcodeStatsDTO;
 import com.thesystem.dto.SkillsGapDTO;
 import com.thesystem.entity.CourseProgress;
@@ -83,6 +84,12 @@ public class CareerController {
     @GetMapping("/skills-gap")
     public SkillsGapDTO skillsGap(Principal p) {
         return careerService.analyzeSkillsGap(currentPlayer.id(p));
+    }
+
+    // Interview Readiness
+    @GetMapping("/interview-readiness")
+    public InterviewReadinessDTO interviewReadiness(Principal p) {
+        return careerService.calculateInterviewReadiness(currentPlayer.id(p));
     }
 }
 

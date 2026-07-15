@@ -11,8 +11,10 @@ import { NotificationService } from '../../core/services/notification.service';
 import { SseService } from '../../core/services/sse.service';
 import {
   StatusWindow, Quest, QuestCompletionResult, PlayerSkill,
-  Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon
+  Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon,
+  DailyMissionDTO, DopamineSummary
 } from '../../core/models/models';
+import { LifeOsService } from '../../core/services/life-os.service';
 
 import { StatusWindowComponent } from './status-window/status-window.component';
 import { QuestLogComponent } from './quest-log/quest-log.component';
@@ -43,14 +45,21 @@ export class SystemComponent implements OnInit {
   /** Mobile section tabs: 'status' | 'quests' | 'schedule' */
   mobileTab = signal<'status' | 'quests' | 'schedule'>('status');
 
+  dailyMission = signal<DailyMissionDTO | null>(null);
+  dopamine = signal<DopamineSummary | null>(null);
+  skillTreeNodes = signal<import('../../core/models/models').SkillTreeNode[]>([]);
+  shadows = signal<import('../../core/models/models').Shadow[]>([]);
+  showAllQuests = signal<boolean>(false);
+
   constructor(
     private playerService: PlayerService,
+    private lifeOsService: LifeOsService,
     private auth: AuthService,
     private dialog: MatDialog,
     private snack: MatSnackBar,
     public notifications: NotificationService,
     public sse: SseService,
-    private haptics: HapticsService,
+    private haptics: HapticsService
   ) {
     // Live sync: reload the dashboard whenever a real-time player-update arrives
     // (e.g. a quest completed in another tab, or midnight HP processing).
@@ -75,6 +84,22 @@ export class SystemComponent implements OnInit {
     this.playerService.getStatus().subscribe({
       next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); this.loading.set(false); },
       error: () => this.loading.set(false),
+    });
+    this.lifeOsService.getDailyMissions().subscribe({
+      next: (dm) => this.dailyMission.set(dm),
+      error: () => this.dailyMission.set(null),
+    });
+    this.lifeOsService.getDopamineToday().subscribe({
+      next: (ds) => this.dopamine.set(ds),
+      error: () => this.dopamine.set(null),
+    });
+    this.lifeOsService.getSkillTreeNodes().subscribe({
+      next: (nodes) => this.skillTreeNodes.set(nodes),
+      error: () => this.skillTreeNodes.set([]),
+    });
+    this.lifeOsService.getShadows().subscribe({
+      next: (shadows) => this.shadows.set(shadows),
+      error: () => this.shadows.set([]),
     });
   }
 
@@ -128,6 +153,18 @@ export class SystemComponent implements OnInit {
   }
 
   logout(): void { this.auth.logout(); }
+
+  /** Returns quests to display based on Daily Mission logic. */
+  getDisplayQuests(quests: Quest[]): Quest[] {
+    const dm = this.dailyMission();
+    if (this.showAllQuests() || !dm) return quests;
+
+    const missionKeys = new Set([
+      ...dm.mainQuests.map(q => q.questKey),
+      ...dm.sideQuests.map(q => q.questKey)
+    ]);
+    return quests.filter(q => missionKeys.has(q.questKey));
+  }
 
   /** Maps an equipped title key to its display name for the topbar. */
   titleName(key: string): string {

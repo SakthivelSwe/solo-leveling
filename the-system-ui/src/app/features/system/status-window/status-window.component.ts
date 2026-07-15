@@ -21,6 +21,7 @@ export class StatusWindowComponent {
   @Input() systemQuote = '';
   @Input() completedToday = 0;
   @Input() totalQuests = 0;
+  @Input() dopamine?: import('../../../core/models/models').DopamineSummary | null;
 
   readonly statsMeta = STATS_META;
 

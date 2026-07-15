@@ -6,6 +6,8 @@ import {
   JobApplication, InterviewRound, LeetcodeLog, LeetcodeStats, CourseProgress, SkillsGap,
   SavingsGoal, BudgetEntry, HealthLog, MindLog, SelfDoubtEvidence,
   EnglishLog, VocabularyLog, BodyLog, RelationshipLog,
+  DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
+  SkillTreeNode, Shadow
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -30,6 +32,12 @@ export class LifeOsService {
   upsertCourse(b: CourseProgress): Observable<CourseProgress> { return this.http.post<CourseProgress>(`${this.api}/career/courses`, b); }
   getCourses(): Observable<CourseProgress[]> { return this.http.get<CourseProgress[]>(`${this.api}/career/courses`); }
   skillsGap(): Observable<SkillsGap> { return this.http.get<SkillsGap>(`${this.api}/career/skills-gap`); }
+  interviewReadiness(): Observable<InterviewReadinessDTO> { return this.http.get<InterviewReadinessDTO>(`${this.api}/career/interview-readiness`); }
+
+  /* ===== Deep Work OS ===== */
+  logDeepWork(b: DeepWorkSession): Observable<DeepWorkSession> { return this.http.post<DeepWorkSession>(`${this.api}/deep-work/log`, b); }
+  getDeepWorkWeekly(): Observable<DeepWorkSession[]> { return this.http.get<DeepWorkSession[]>(`${this.api}/deep-work/weekly`); }
+  getDeepWorkStats(): Observable<any> { return this.http.get<any>(`${this.api}/deep-work/stats`); }
 
   /* ===== Wealth OS ===== */
   getGoals(): Observable<SavingsGoal[]> { return this.http.get<SavingsGoal[]>(`${this.api}/wealth/goals`); }
@@ -68,5 +76,20 @@ export class LifeOsService {
   /* ===== Relationship OS ===== */
   getRelationshipToday(): Observable<RelationshipLog> { return this.http.get<RelationshipLog>(`${this.api}/relationship/today`); }
   upsertRelationship(b: RelationshipLog): Observable<RelationshipLog> { return this.http.post<RelationshipLog>(`${this.api}/relationship/log`, b); }
+
+  /* ===== Daily Mission Generator ===== */
+  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission`); }
+  regenerateDailyMissions(): Observable<DailyMissionDTO> { return this.http.post<DailyMissionDTO>(`${this.api}/daily-mission/regenerate`, {}); }
+
+  /* ===== Dopamine OS ===== */
+  logDopamine(b: DopamineLog): Observable<DopamineLog> { return this.http.post<DopamineLog>(`${this.api}/dopamine/log`, b); }
+  getDopamineToday(): Observable<DopamineSummary> { return this.http.get<DopamineSummary>(`${this.api}/dopamine/today`); }
+  getDopamineHistory(days = 30): Observable<DopamineLog[]> { return this.http.get<DopamineLog[]>(`${this.api}/dopamine/history?days=${days}`); }
+
+  /* ===== Skill Tree ===== */
+  getSkillTreeNodes(): Observable<SkillTreeNode[]> { return this.http.get<SkillTreeNode[]>(`${this.api}/skill-tree`); }
+
+  /* ===== Shadow Army ===== */
+  getShadows(): Observable<Shadow[]> { return this.http.get<Shadow[]>(`${this.api}/shadows`); }
 }
 

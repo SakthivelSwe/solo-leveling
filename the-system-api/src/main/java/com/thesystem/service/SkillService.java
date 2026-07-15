@@ -25,7 +25,7 @@ public class SkillService {
 
     public PlayerSkillDTO toDto(PlayerSkill s) {
         return new PlayerSkillDTO(s.getId(), s.getSkillName(), s.getSkillPct(),
-                s.getSkillPct() / 10);
+                s.getSkillPct() / 10, s.getSkillXp(), s.getSkillLevel(), s.getSkillRank());
     }
 }
 

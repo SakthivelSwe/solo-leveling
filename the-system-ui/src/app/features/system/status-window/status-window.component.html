@@ -53,6 +53,26 @@
         <span class="mono v">{{ completedToday }}/{{ totalQuests }}</span>
       </div>
     </div>
+    <!-- Phase 2/3 Gauges -->
+    <div class="gauges" style="display: flex; gap: 16px; margin-top: 16px;">
+      <div class="gauge" *ngIf="player.currentEnergy !== undefined" style="flex: 1;">
+        <span class="tech" style="color: #FAC775; font-size: 0.75rem;">⚡ MORNING ENERGY</span>
+        <div class="stat-track" style="height: 6px; margin-top: 6px; background: rgba(250,199,117,0.1);">
+          <div class="stat-fill" [style.width.%]="player.currentEnergy"
+               style="background: linear-gradient(90deg, rgba(250,199,117,0.4), #FAC775); box-shadow: 0 0 8px rgba(250,199,117,0.5);"></div>
+        </div>
+        <div class="tech" style="text-align: right; font-size: 0.7rem; color: #FAC775; margin-top: 4px;">{{ player.currentEnergy }}/100</div>
+      </div>
+
+      <div class="gauge" *ngIf="dopamine" style="flex: 1;">
+        <span class="tech" style="color: #E24B4A; font-size: 0.75rem;">🎯 FOCUS MULTIPLIER</span>
+        <div class="stat-track" style="height: 6px; margin-top: 6px; background: rgba(226,75,74,0.1);">
+          <div class="stat-fill" [style.width.%]="dopamine.focusPct"
+               style="background: linear-gradient(90deg, rgba(226,75,74,0.4), #E24B4A); box-shadow: 0 0 8px rgba(226,75,74,0.5);"></div>
+        </div>
+        <div class="tech" style="text-align: right; font-size: 0.7rem; color: #E24B4A; margin-top: 4px;">{{ dopamine.focusMultiplier }}x</div>
+      </div>
+    </div>
   </div>
 
   <!-- Stats -->

@@ -8,6 +8,7 @@ import { LifeOsService } from '../../core/services/life-os.service';
 import {
   JobApplication, LeetcodeLog, LeetcodeStats, SkillsGap, SavingsGoal,
   HealthLog, MindLog, SelfDoubtEvidence, EnglishLog, BodyLog, RelationshipLog,
+  InterviewReadinessDTO, DeepWorkSession
 } from '../../core/models/models';
 import { fadeInUp, listStagger } from '../../shared/animations';
 
@@ -40,6 +41,9 @@ export class LifeOsComponent implements OnInit {
   gap = signal<SkillsGap | null>(null);
   newJob: JobApplication = this.blankJob();
   newLeet: LeetcodeLog = this.blankLeet();
+  newDeepWork: DeepWorkSession = { codingMinutes: 0, interruptions: 0, mobilePickups: 0, focusSessions: 0 };
+  readiness = signal<InterviewReadinessDTO | null>(null);
+  deepWork = signal<DeepWorkSession[]>([]);
 
   // Wealth
   goals = signal<SavingsGoal[]>([]);
@@ -75,6 +79,8 @@ export class LifeOsComponent implements OnInit {
         this.life.leetcodeStats().subscribe(v => this.leetStats.set(v));
         this.life.leetcodeHistory().subscribe(v => this.leetHistory.set(v.slice(0, 8)));
         this.life.skillsGap().subscribe(v => this.gap.set(v));
+        this.life.interviewReadiness().subscribe(v => this.readiness.set(v));
+        this.life.getDeepWorkWeekly().subscribe(v => this.deepWork.set(v));
         break;
       case 'WEALTH':
         this.life.getGoals().subscribe(v => this.goals.set(v));
@@ -121,6 +127,15 @@ export class LifeOsComponent implements OnInit {
       this.newLeet = this.blankLeet();
       this.life.leetcodeStats().subscribe(v => this.leetStats.set(v));
       this.life.leetcodeHistory().subscribe(v => this.leetHistory.set(v.slice(0, 8)));
+    });
+  }
+
+  addDeepWork(): void {
+    if (this.newDeepWork.codingMinutes <= 0) { this.toast('⚠ Minutes must be greater than 0'); return; }
+    this.life.logDeepWork(this.newDeepWork).subscribe(() => {
+      this.toast('◈ Deep work logged');
+      this.newDeepWork = { codingMinutes: 0, interruptions: 0, mobilePickups: 0, focusSessions: 0 };
+      this.life.getDeepWorkWeekly().subscribe(v => this.deepWork.set(v));
     });
   }
 

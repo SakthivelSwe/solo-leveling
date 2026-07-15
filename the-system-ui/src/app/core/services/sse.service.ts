@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
 import { SystemNotification } from '../models/models';
+import { LocalNotificationsService } from './local-notifications.service';
 
 interface PlayerUpdate {
   currentXp?: number;
@@ -34,6 +35,7 @@ export class SseService {
     private notifications: NotificationService,
     private snack: MatSnackBar,
     private zone: NgZone,
+    private localNotifs: LocalNotificationsService,
   ) {
     // Open the link while authenticated; close it on logout.
     effect(
@@ -52,6 +54,11 @@ export class SseService {
     if (this.eventSource) return;
     const token = this.auth.token;
     if (!token) return;
+
+    // Request desktop notification permissions if supported
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
 
     const url = `${environment.apiUrl}/stream?token=${encodeURIComponent(token)}`;
     const es = new EventSource(url);
@@ -92,12 +99,22 @@ export class SseService {
       };
       this.notifications.ingest(payload.notification, payload.unreadCount);
       const n = payload.notification;
-      this.snack.open(`${n.title} — ${n.message}`, '✕', {
-        duration: 6000,
+      
+      // In-app snackbar
+      this.snack.open(`◈ ${n.title} — ${n.message}`, '✕', {
+        duration: 8000,
         panelClass: 'system-snack',
         horizontalPosition: 'end',
-        verticalPosition: 'top',
+        verticalPosition: 'bottom', // moved to bottom to be less intrusive to UI
       });
+
+      // Desktop Web Notification (if app is hidden)
+      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification(`◈ ${n.title}`, {
+          body: n.message,
+          icon: '/assets/icons/icon-192x192.png' // Default PWA icon
+        });
+      }
     } catch {
       /* ignore malformed frame */
     }
@@ -108,13 +125,20 @@ export class SseService {
       const data = JSON.parse(ev.data) as PlayerUpdate;
       const current = this.auth.player();
       if (current) {
+        const newHp = data.hp ?? current.hp;
+        
+        // Check for HP drop below 40% (maxHp is 100)
+        if (newHp < 40 && current.hp >= 40) {
+          this.localNotifs.triggerHpWarning(newHp);
+        }
+
         this.auth.updatePlayer({
           ...current,
           currentXp: data.currentXp ?? current.currentXp,
           totalXp: data.totalXp ?? current.totalXp,
           level: data.level ?? current.level,
           rankLevel: data.rankLevel ?? current.rankLevel,
-          hp: data.hp ?? current.hp,
+          hp: newHp,
           maxHp: data.maxHp ?? current.maxHp,
         });
       }

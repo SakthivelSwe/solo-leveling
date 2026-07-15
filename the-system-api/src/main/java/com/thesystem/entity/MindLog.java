@@ -41,5 +41,19 @@ public class MindLog {
     private String darkThought;
     @Column(name = "counter_evidence", length = 500)
     private String counterEvidence;
+
+    /**
+     * Work/office pressure level (1–10). Combined with anxietyLevel and sleepDebtDays
+     * to compute the Stress Meter score (0–100). Triggers Recovery Mode if score > 85.
+     */
+    @Column(name = "office_pressure")
+    private Integer officePressure; // 1-10
+
+    /**
+     * Accumulated sleep debt in days (0–7). Each night of less than 7h sleep
+     * adds to this counter; a full night of 8h+ reduces it by 1.
+     */
+    @Column(name = "sleep_debt_days")
+    private Integer sleepDebtDays; // 0-7
 }
 

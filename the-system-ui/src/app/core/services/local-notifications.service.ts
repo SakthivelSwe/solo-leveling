@@ -115,6 +115,9 @@ export class LocalNotificationsService {
         this.daily(LocalNotificationsService.IDS.sleep, 23, 0,
           '◈ SLEEP PROTOCOL',
           'Phone down. No reels. Testosterone builds in sleep. Put it down.'),
+        this.daily(997, 23, 50,
+          '◈ DAILY RESET IMMINENT',
+          '10 minutes until midnight. The System will deduct HP for uncompleted daily missions.'),
         {
           id: LocalNotificationsService.IDS.weeklyReview,
           title: '◈ WEEKLY REVIEW',
@@ -141,6 +144,45 @@ export class LocalNotificationsService {
     try {
       await LocalNotifications.cancel({
         notifications: Object.values(LocalNotificationsService.IDS).map(id => ({ id })),
+      });
+    } catch { /* ignore */ }
+  }
+
+  /** Schedules a manual native alarm (timer) for X minutes from now. */
+  async scheduleTimer(minutes: number): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      const fireDate = new Date(Date.now() + minutes * 60000);
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: 999, // Static ID for manual timer so it overwrites any existing one
+            title: '◈ SYSTEM OVERRIDE: TIMER COMPLETE',
+            body: `Your ${minutes} minute focus timer is up. Arise.`,
+            schedule: { at: fireDate, allowWhileIdle: true },
+            smallIcon: 'ic_launcher',
+            channelId: 'thesystem_reminders',
+          }
+        ]
+      });
+    } catch { /* ignore */ }
+  }
+
+  /** Immediately schedules a critical low HP warning native notification. */
+  async triggerHpWarning(currentHp: number): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: 998,
+            title: '◈ CRITICAL ALERT: LOW HP',
+            body: `Warning: HP is at ${currentHp}. You are in danger of a penalty. Rest or complete easy quests immediately.`,
+            schedule: { at: new Date(Date.now() + 1000) }, // Trigger almost immediately
+            smallIcon: 'ic_launcher',
+            channelId: 'thesystem_reminders',
+          }
+        ]
       });
     } catch { /* ignore */ }
   }

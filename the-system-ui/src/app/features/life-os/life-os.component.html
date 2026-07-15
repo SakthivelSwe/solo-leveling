@@ -75,6 +75,54 @@
         </div>
       </div>
 
+      <!-- Interview Readiness -->
+      <div class="system-card block" *ngIf="readiness() as ir">
+        <h3 class="mono head">◈ INTERVIEW READINESS</h3>
+        <div class="readiness-box" style="text-align: center; margin: 16px 0;">
+          <div class="readiness-pct mono" style="font-size: 2.5rem; color: #1D9E75;">{{ ir.overallPct }}%</div>
+          <div class="readiness-verdict tech" style="color: #FAC775; margin-top: 8px;">{{ ir.verdict }}</div>
+        </div>
+        <div class="gap-row" *ngFor="let skill of ir.perSkill | keyvalue">
+          <div class="gap-head">
+            <span class="sn">{{ skill.key }}</span>
+            <span class="tech gv">{{ skill.value }}%</span>
+          </div>
+          <div class="gap-track">
+            <div class="gap-fill" [style.width.%]="skill.value" style="background: #378ADD"></div>
+          </div>
+        </div>
+        <div class="tech" style="margin-top: 12px; font-size: 0.8rem; color: #8a8a9a;">
+          Strong: <span style="color: #1D9E75">{{ ir.strongAreas.join(', ') || 'None' }}</span><br/>
+          Weak: <span style="color: #E24B4A">{{ ir.weakAreas.join(', ') || 'None' }}</span>
+        </div>
+      </div>
+
+      <!-- Deep Work -->
+      <div class="system-card block">
+        <h3 class="mono head">◈ DEEP WORK LOG</h3>
+        <div class="tech" style="font-size: 0.8rem; color: #8a8a9a; margin-bottom: 12px;">Track raw coding hours without distractions. Minimum XP penalty applies for mobile pickups.</div>
+        <div class="form-row">
+          <input class="fin sm" type="number" placeholder="Mins" [(ngModel)]="newDeepWork.codingMinutes" />
+          <input class="fin sm" type="number" placeholder="Intrs" [(ngModel)]="newDeepWork.interruptions" title="Interruptions" />
+          <input class="fin sm" type="number" placeholder="Mobile" [(ngModel)]="newDeepWork.mobilePickups" title="Mobile Pickups" />
+          <button class="btn" (click)="addDeepWork()">+ LOG</button>
+        </div>
+        <ul class="mini-list" @listStagger>
+          <li *ngFor="let dw of deepWork()" class="dw-item">
+            <div class="jinfo">
+              <span class="pn mono">{{ dw.codingMinutes }}m</span>
+              <span class="tech role">Focus: {{ dw.focusScore }}%</span>
+            </div>
+            <span class="badge" [class.easy]="dw.focusScore && dw.focusScore >= 80" 
+                               [class.medium]="dw.focusScore && dw.focusScore >= 50 && dw.focusScore < 80"
+                               [class.hard]="dw.focusScore && dw.focusScore < 50">
+              +{{ dw.focusXpEarned }} XP
+            </span>
+          </li>
+          <li *ngIf="!deepWork().length" class="empty tech">No deep work logged this week.</li>
+        </ul>
+      </div>
+
       <!-- Job applications -->
       <div class="system-card block wide">
         <h3 class="mono head">◈ JOB APPLICATIONS</h3>

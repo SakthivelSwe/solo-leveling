@@ -2,6 +2,8 @@ package com.thesystem.repository;
 
 import com.thesystem.entity.QuestCompletion;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,5 +15,15 @@ public interface QuestCompletionRepository extends JpaRepository<QuestCompletion
     long countByPlayerIdAndQuestId(Long playerId, Long questId);
     long countByPlayerIdAndCompletedAt(Long playerId, LocalDate date);
     List<QuestCompletion> findByPlayerIdOrderByCompletedAtDesc(Long playerId);
+
+    /**
+     * Counts completions for quests flagged as recovery quests on a given date.
+     * Used by EndOfDayScheduler to double-count recovery quests toward the HP threshold.
+     */
+    @Query("SELECT COUNT(qc) FROM QuestCompletion qc " +
+           "JOIN Quest q ON q.id = qc.questId " +
+           "WHERE qc.playerId = :playerId AND qc.completedAt = :date AND q.recoveryQuest = true")
+    long countRecoveryQuestsByPlayerIdAndCompletedAt(
+            @Param("playerId") Long playerId, @Param("date") LocalDate date);
 }
 

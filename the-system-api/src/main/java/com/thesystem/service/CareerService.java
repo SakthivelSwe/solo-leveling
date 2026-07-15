@@ -1,5 +1,6 @@
 package com.thesystem.service;
 
+import com.thesystem.dto.InterviewReadinessDTO;
 import com.thesystem.dto.LeetcodeStatsDTO;
 import com.thesystem.dto.SkillsGapDTO;
 import com.thesystem.dto.SkillsGapDTO.SkillGapItem;
@@ -25,6 +26,7 @@ public class CareerService {
     private final LeetcodeLogRepository leetcodeRepo;
     private final CourseProgressRepository courseRepo;
     private final PlayerSkillRepository skillRepo;
+    private final DeepWorkSessionRepository deepWorkRepo;
 
     private static final Map<String, Integer> TARGETS = Map.of(
             "Java + Spring Boot", 80,
@@ -38,12 +40,14 @@ public class CareerService {
                          InterviewRoundRepository roundRepo,
                          LeetcodeLogRepository leetcodeRepo,
                          CourseProgressRepository courseRepo,
-                         PlayerSkillRepository skillRepo) {
+                         PlayerSkillRepository skillRepo,
+                         DeepWorkSessionRepository deepWorkRepo) {
         this.jobRepo = jobRepo;
         this.roundRepo = roundRepo;
         this.leetcodeRepo = leetcodeRepo;
         this.courseRepo = courseRepo;
         this.skillRepo = skillRepo;
+        this.deepWorkRepo = deepWorkRepo;
     }
 
     // ---- Job applications ----
@@ -147,6 +151,68 @@ public class CareerService {
             return new SkillGapItem(sk.getSkillName(), sk.getSkillPct(), target, gap, urgency);
         }).collect(Collectors.toList());
         return new SkillsGapDTO(items);
+    }
+
+    // ---- Interview Readiness ----
+
+    /**
+     * Computes an interview readiness score (0-100%) tailored to the ₹80k+ Java Full-Stack target.
+     *
+     * Weights:
+     *   Java + Spring Boot:  25%
+     *   Angular / JS:        15%
+     *   DSA / LeetCode:      20%  (problems solved / 100, capped 100)
+     *   English Speaking:    15%
+     *   System Design:       10%
+     *   Coding Evidence:     15%  (deep work hours / 200, capped 100)
+     */
+    public InterviewReadinessDTO calculateInterviewReadiness(Long playerId) {
+        List<PlayerSkill> skills = skillRepo.findByPlayerId(playerId);
+        Map<String, Integer> pctBySkill = new HashMap<>();
+        for (PlayerSkill s : skills) pctBySkill.put(s.getSkillName(), s.getSkillPct());
+
+        long leetcodeSolved = leetcodeRepo.countByPlayerId(playerId);
+        int leetcodePct = (int) Math.min(100, leetcodeSolved);
+
+        int codingMinutes = deepWorkRepo.sumCodingMinutesByPlayerId(playerId);
+        int codingPct = Math.min(100, codingMinutes / 120); // 200 hrs = 100%
+
+        int javaPct     = pctBySkill.getOrDefault("Java + Spring Boot", 0);
+        int angularPct  = pctBySkill.getOrDefault("Angular / JavaScript", 0);
+        int englishPct  = pctBySkill.getOrDefault("English Speaking", 0);
+        int sdPct       = pctBySkill.getOrDefault("System Design", 0);
+
+        Map<String, Integer> perSkill = new LinkedHashMap<>();
+        perSkill.put("Java + Spring Boot", javaPct);
+        perSkill.put("Angular / JavaScript", angularPct);
+        perSkill.put("DSA / LeetCode", leetcodePct);
+        perSkill.put("English Speaking", englishPct);
+        perSkill.put("System Design", sdPct);
+        perSkill.put("Coding Evidence", codingPct);
+
+        int overall = (int) Math.round(
+                javaPct    * 0.25 +
+                angularPct * 0.15 +
+                leetcodePct* 0.20 +
+                englishPct * 0.15 +
+                sdPct      * 0.10 +
+                codingPct  * 0.15
+        );
+
+        String verdict = overall >= 85 ? "Ready for senior roles. Negotiate confidently."
+                : overall >= 70 ? "Interview-ready for mid-level Java Full Stack (₹80k+ target)."
+                : overall >= 50 ? "Ready for junior Java roles. Keep pushing DSA and System Design."
+                : "Not yet interview-ready. Focus: LeetCode daily + Java Spring projects.";
+
+        List<String> weakAreas = perSkill.entrySet().stream()
+                .filter(e -> e.getValue() < 50).map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        List<String> strongAreas = perSkill.entrySet().stream()
+                .filter(e -> e.getValue() >= 70).map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return new InterviewReadinessDTO(perSkill, overall, verdict, weakAreas, strongAreas,
+                codingMinutes / 60);
     }
 }
 

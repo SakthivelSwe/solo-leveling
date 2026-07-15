@@ -4,6 +4,9 @@ public record PlayerSkillDTO(
         Long id,
         String name,
         int pct,
-        int level
+        int level,
+        int skillXp,
+        int skillLevel,
+        String skillRank
 ) {}
 

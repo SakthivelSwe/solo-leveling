@@ -20,11 +20,11 @@ public class NotificationScheduler {
         this.notificationService = notificationService;
     }
 
-    // 8:00 AM — Wake Protocol
-    @Scheduled(cron = "0 0 8 * * *", zone = "${thesystem.scheduler.timezone}")
+    // 6:30 AM — Wake Protocol (before office routine starts)
+    @Scheduled(cron = "0 30 6 * * *", zone = "${thesystem.scheduler.timezone}")
     public void morningProtocol() {
         notificationService.broadcast("◈ SYSTEM ALERT",
-                "Hunter, a new day begins. Exercise and breakfast before 9:30 AM.", "REMINDER");
+                "Hunter, a new day begins. Exercise and breakfast before 10:00 AM.", "REMINDER");
     }
 
     // 1:00 PM — Lunch Alert

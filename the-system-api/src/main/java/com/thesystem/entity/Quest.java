@@ -33,6 +33,36 @@ public class Quest {
     @Column(name = "is_active")
     private boolean active = true;
 
+    /**
+     * Priority tier for the Daily Mission Generator (1=lowest … 5=critical).
+     * Critical quests (CODE_NO_AI, LEETCODE, ENGLISH, EXERCISE, SLEEP) = 5.
+     */
+    @Column(nullable = false)
+    private int priority = 3;
+
+    /**
+     * Critical quests are always included in the 5-quest daily mission set regardless
+     * of stat weighting — they directly drive the job-switch goal.
+     */
+    @Column(name = "is_critical", nullable = false)
+    private boolean critical = false;
+
+    /**
+     * Damage this quest deals to the weekly dungeon boss.
+     * Replaces the old flat 10-damage-per-quest constant.
+     * High-effort quests (CODE_NO_AI=80, LEETCODE=50) deal more damage,
+     * making boss fights require meaningful work to clear.
+     */
+    @Column(name = "boss_damage", nullable = false)
+    private int bossDamage = 10;
+
+    /**
+     * Recovery quests count double toward the minimum daily threshold on rest days
+     * (Meditation, Walking, Stretching, Journaling, Sunlight).
+     */
+    @Column(name = "is_recovery_quest", nullable = false)
+    private boolean recoveryQuest = false;
+
     public Quest() {}
 
     public Quest(String questKey, String label, QuestCategory category, int xpReward,
@@ -61,5 +91,13 @@ public class Quest {
     public void setSkillBoosts(String skillBoosts) { this.skillBoosts = skillBoosts; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+    public int getPriority() { return priority; }
+    public void setPriority(int priority) { this.priority = priority; }
+    public boolean isCritical() { return critical; }
+    public void setCritical(boolean critical) { this.critical = critical; }
+    public int getBossDamage() { return bossDamage; }
+    public void setBossDamage(int bossDamage) { this.bossDamage = bossDamage; }
+    public boolean isRecoveryQuest() { return recoveryQuest; }
+    public void setRecoveryQuest(boolean recoveryQuest) { this.recoveryQuest = recoveryQuest; }
 }
 

@@ -43,6 +43,27 @@ public class Player {
     @Column(name = "equipped_title", length = 40)
     private String equippedTitle;
 
+    /**
+     * When true, the end-of-day HP penalty threshold drops from 4 quests to 2.
+     * Activated on days the player has work/PG schedule constraints (e.g. Saturdays).
+     */
+    @Column(name = "rest_day_active", nullable = false)
+    private boolean restDayActive = false;
+
+    /**
+     * Day-of-week (1=Mon … 7=Sun, ISO-8601) treated as rest day.
+     * Default 6 = Saturday, matching the player's regular work schedule.
+     */
+    @Column(name = "rest_day_day_of_week", nullable = false)
+    private int restDayDayOfWeek = 6;
+
+    /**
+     * Cached morning energy score (0–100) updated when today's health log is saved.
+     * Drives the XP multiplier in QuestService: low energy reduces XP earned.
+     */
+    @Column(name = "current_energy", nullable = false)
+    private int currentEnergy = 70;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -71,6 +92,12 @@ public class Player {
     public void setMaxHp(int maxHp) { this.maxHp = maxHp; }
     public String getEquippedTitle() { return equippedTitle; }
     public void setEquippedTitle(String equippedTitle) { this.equippedTitle = equippedTitle; }
+    public boolean isRestDayActive() { return restDayActive; }
+    public void setRestDayActive(boolean restDayActive) { this.restDayActive = restDayActive; }
+    public int getRestDayDayOfWeek() { return restDayDayOfWeek; }
+    public void setRestDayDayOfWeek(int restDayDayOfWeek) { this.restDayDayOfWeek = restDayDayOfWeek; }
+    public int getCurrentEnergy() { return currentEnergy; }
+    public void setCurrentEnergy(int currentEnergy) { this.currentEnergy = currentEnergy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

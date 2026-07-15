@@ -11,6 +11,7 @@ export interface Player {
   hp: number;
   maxHp: number;
   equippedTitle?: string | null;
+  currentEnergy?: number;
 }
 
 export interface AuthResponse {
@@ -33,17 +34,22 @@ export interface PlayerSkill {
   name: string;
   pct: number;
   level: number;
+  skillXp?: number;
+  skillRank?: string;
 }
 
 export interface Quest {
   id: number;
   questKey: string;
   label: string;
-  category: 'DAILY' | 'SKILL' | 'TESTOSTERONE';
+  category: 'DAILY' | 'SKILL' | 'TESTOSTERONE' | 'SIDE';
   xpReward: number;
   statBoosts: string | null;
   skillBoosts: string | null;
   isCompleted: boolean;
+  priority?: number;
+  critical?: boolean;
+  bossDamage?: number;
 }
 
 export interface DayProgress {
@@ -74,6 +80,85 @@ export interface StatusWindow {
   streak: number;
   motivation: string;
   systemQuote: string;
+  dailyMission?: DailyMissionDTO;
+  dopamine?: DopamineSummary;
+}
+
+/* ============ New Life OS Models ============ */
+
+export interface DailyMissionDTO {
+  mainQuests: Quest[];
+  sideQuests: Quest[];
+  focusStat: string;
+  focusArea: string;
+  missionDate: string;
+  directive: string;
+}
+
+export interface DopamineSummary {
+  dopamineScore: number;
+  focusPct: number;
+  focusMultiplier: number;
+  aiNote: string;
+}
+
+export interface DopamineLog {
+  id?: number;
+  logDate: string;
+  socialMediaMin: number;
+  reelsMin: number;
+  gamingMin: number;
+  junkFoodItems: number;
+  pornViewed: boolean;
+  exerciseDone: boolean;
+  coldShower: boolean;
+  dopamineScore: number;
+  focusPct: number;
+}
+
+export interface DeepWorkSession {
+  id?: number;
+  sessionDate?: string;
+  codingMinutes: number;
+  interruptions: number;
+  mobilePickups: number;
+  focusSessions: number;
+  focusXpEarned?: number;
+  focusScore?: number;
+  notes?: string;
+}
+
+export interface InterviewReadinessDTO {
+  perSkill: { [key: string]: number };
+  overallPct: number;
+  verdict: string;
+  weakAreas: string[];
+  strongAreas: string[];
+  codingHours: number;
+}
+
+export interface SkillTreeNode {
+  id?: number;
+  playerId: number;
+  parentSkillName: string;
+  nodeName: string;
+  nodeKey: string;
+  unlocked: boolean;
+  progressPct: number;
+  prerequisiteNodeKey?: string;
+  xpInvested: number;
+}
+
+export interface Shadow {
+  id?: number;
+  playerId: number;
+  habitId: number;
+  shadowName: string;
+  shadowType: string;
+  shadowLevel: number;
+  powerLevel: number;
+  streakAtActivation: number;
+  activeSince: string;
 }
 
 export interface QuestCompletionResult {

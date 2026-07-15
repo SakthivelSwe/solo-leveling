@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <div class="skills">
+  <div class="skills" *ngIf="trees.length === 0">
     <div class="skill" *ngFor="let s of skills; trackBy: trackBySkill; let i = index"
          [style.animationDelay.ms]="i * 90">
       <div class="skill-head">
@@ -23,6 +23,23 @@
       <div class="bar-track">
         <div class="bar-fill" [style.width.%]="s.pct"></div>
         <span class="pct tech">{{ s.pct }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-trees" *ngIf="trees.length > 0">
+    <div class="tree-group" *ngFor="let tree of trees">
+      <div class="tree-root node" [class.locked]="!tree.root.unlocked">
+        <div class="node-icon">{{ tree.root.unlocked ? '◈' : '🔒' }}</div>
+        <div class="node-name tech">{{ tree.root.nodeName }}</div>
+        <div class="node-lvl mono">{{ tree.root.progressPct }}%</div>
+      </div>
+      <div class="tree-branches" *ngIf="tree.children.length > 0">
+        <div class="node branch" *ngFor="let child of tree.children" [class.locked]="!child.unlocked">
+          <div class="node-icon">{{ child.unlocked ? '◈' : '🔒' }}</div>
+          <div class="node-name tech">{{ child.nodeName }}</div>
+          <div class="node-lvl mono">{{ child.progressPct }}%</div>
+        </div>
       </div>
     </div>
   </div>

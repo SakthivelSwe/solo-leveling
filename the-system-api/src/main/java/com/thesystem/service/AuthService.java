@@ -69,14 +69,27 @@ public class AuthService {
         stats.setPlayerId(player.getId());
         statsRepository.save(stats);
 
-        // Default skills
-        skillRepository.saveAll(List.of(
-                new PlayerSkill(player.getId(), "Java + Spring Boot", 45),
-                new PlayerSkill(player.getId(), "DSA / LeetCode", 5),
-                new PlayerSkill(player.getId(), "Angular / JavaScript", 30),
-                new PlayerSkill(player.getId(), "English Speaking", 10),
-                new PlayerSkill(player.getId(), "System Design", 3)
-        ));
+        // Default skills — seeded to reflect actual experience level.
+        // Java 62%: 2 yrs professional Spring Boot 3.x, Kafka, Redis, Flyway, AOP, Prometheus.
+        // English 27%: already communicates with US teammates daily in English.
+        // Starting too low makes progress feel fake and demotivating.
+        PlayerSkill javaSkill = new PlayerSkill(player.getId(), "Java + Spring Boot", 62);
+        javaSkill.setSkillXp(620);
+        javaSkill.recalculateLevelAndRank();
+
+        PlayerSkill dsaSkill = new PlayerSkill(player.getId(), "DSA / LeetCode", 5);
+
+        PlayerSkill angularSkill = new PlayerSkill(player.getId(), "Angular / JavaScript", 30);
+        angularSkill.setSkillXp(300);
+        angularSkill.recalculateLevelAndRank();
+
+        PlayerSkill englishSkill = new PlayerSkill(player.getId(), "English Speaking", 27);
+        englishSkill.setSkillXp(270);
+        englishSkill.recalculateLevelAndRank();
+
+        PlayerSkill sdSkill = new PlayerSkill(player.getId(), "System Design", 3);
+
+        skillRepository.saveAll(List.of(javaSkill, dsaSkill, angularSkill, englishSkill, sdSkill));
 
         return buildResponse(player);
     }
