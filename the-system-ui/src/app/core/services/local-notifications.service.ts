@@ -91,6 +91,8 @@ export class LocalNotificationsService {
             channelId: 'system-alarms',
             title: '⚡ SYSTEM ALERT: Midnight Reset',
             body: 'A new day begins. Quests reset. Arise, Hunter.',
+            largeBody: '◈ THE SYSTEM HAS RESET ◈\n\nA new day has dawned. All daily quests and routines have been reset.\n\n"The system is not your master, it is your tool. Use it to level up."\n\nPrepare your directives for today.',
+            largeIcon: 'ic_launcher',
             schedule: { on: { hour: 0, minute: 0 }, allowWhileIdle: true, repeats: true },
             smallIcon: 'ic_launcher'
           },
@@ -99,6 +101,8 @@ export class LocalNotificationsService {
             channelId: 'system-alarms',
             title: '⚡ WAKE PROTOCOL INITIATED',
             body: 'Cold shower. Sunlight. Eggs. Begin.',
+            largeBody: '◈ WAKE PROTOCOL ◈\n\n1. Get out of bed immediately.\n2. Expose your eyes to sunlight.\n3. Take a cold shower.\n4. Consume a high-protein breakfast.\n\nDo not let the system dictate your weakness. Level up today.',
+            largeIcon: 'ic_launcher',
             schedule: { on: { hour: 8, minute: 0 }, allowWhileIdle: true, repeats: true },
             smallIcon: 'ic_launcher'
           },
@@ -107,6 +111,8 @@ export class LocalNotificationsService {
             channelId: 'system-alarms',
             title: '⚡ SLEEP PROTOCOL',
             body: 'Phone down. Sleep before 11:30. System watching.',
+            largeBody: '◈ SLEEP PROTOCOL ◈\n\nYour body requires recovery to grow stronger.\n\n1. Put all screens away.\n2. Prepare for sleep.\n3. Sleep before 11:30 PM.\n\nFailure to recover is failure to level up.',
+            largeIcon: 'ic_launcher',
             schedule: { on: { hour: 23, minute: 0 }, allowWhileIdle: true, repeats: true },
             smallIcon: 'ic_launcher'
           }
@@ -128,6 +134,8 @@ export class LocalNotificationsService {
             channelId: 'reminders',
             title: 'FUEL REQUIRED',
             body: 'Proper lunch. No junk. Zinc included.',
+            largeBody: '◈ MIDDAY FUEL CHECK ◈\n\nYour body requires clean fuel to maintain peak performance.\n\n◈ No sugar. No processed junk.\n◈ Ensure adequate protein and zinc.\n◈ Hydrate immediately.\n\nDo not poison your avatar.',
+            largeIcon: 'ic_launcher',
             schedule: { on: { hour: 13, minute: 0 }, repeats: true },
             smallIcon: 'ic_launcher'
           },
@@ -136,6 +144,8 @@ export class LocalNotificationsService {
             channelId: 'reminders',
             title: 'QUESTS REMAINING',
             body: 'Check your incomplete quests. Evening window closing.',
+            largeBody: '◈ EVENING DIRECTIVE ◈\n\nThe day is ending, but your tasks are not finished.\n\nCheck the system for incomplete daily quests. Leaving them unfinished will result in penalties.\n\nPush through the fatigue. That is how you level up.',
+            largeIcon: 'ic_launcher',
             schedule: { on: { hour: 21, minute: 0 }, repeats: true },
             smallIcon: 'ic_launcher'
           },
@@ -144,6 +154,8 @@ export class LocalNotificationsService {
             channelId: 'reminders',
             title: '📊 WEEKLY REVIEW',
             body: 'Open the system. Review your week. Set next target.',
+            largeBody: '◈ SYSTEM WEEKLY REVIEW ◈\n\nIt is time to assess your growth.\n\n1. Review your completed quests.\n2. Analyze your failed habits.\n3. Adjust your stats allocation.\n4. Set a primary objective for the coming week.\n\nGrowth requires reflection. Open the app now.',
+            largeIcon: 'ic_launcher',
             schedule: { on: { weekday: 1, hour: 20, minute: 0 }, repeats: true },
             smallIcon: 'ic_launcher'
           }
@@ -176,8 +188,10 @@ export class LocalNotificationsService {
             channelId: 'system-alarms',
             title: '✅ FOCUS BLOCK COMPLETE',
             body: `${minutes}-minute session done. Take a break.`,
+            largeBody: `Hunter,\n\nYou have successfully completed a ${minutes}-minute focus block.\n\n◈ Consistency is the key to leveling up.\n◈ Your mental stamina has increased.\n\nTake a moment to recover before your next quest.`,
+            largeIcon: 'ic_launcher',
+            smallIcon: 'ic_launcher',
             schedule: { at: new Date(Date.now() + minutes * 60000), allowWhileIdle: true },
-            smallIcon: 'ic_launcher'
           }
         ]
       });
@@ -195,6 +209,8 @@ export class LocalNotificationsService {
           channelId: 'game-events',
           title: '⚠ CRITICAL: HP BELOW 40',
           body: `HP is at ${currentHp}. Complete quests now or face demotion.`,
+          largeBody: `◈ CRITICAL WARNING ◈\n\nYour HP has dropped to a dangerous level (${currentHp} HP).\n\nIf your HP reaches 0, you will face severe penalties and stat reduction.\n\nImmediate Action Required:\n1. Open the system.\n2. Complete pending daily quests.\n3. Restore your health before midnight.\n\nDo not fail.`,
+          largeIcon: 'ic_launcher',
           schedule: { at: new Date(Date.now() + 500) },
           smallIcon: 'ic_launcher'
         }]
