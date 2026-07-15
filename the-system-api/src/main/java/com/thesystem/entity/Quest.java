@@ -37,7 +37,7 @@ public class Quest {
      * Priority tier for the Daily Mission Generator (1=lowest … 5=critical).
      * Critical quests (CODE_NO_AI, LEETCODE, ENGLISH, EXERCISE, SLEEP) = 5.
      */
-    @Column(nullable = false)
+    @Column(columnDefinition = "integer default 3")
     private int priority = 3;
 
     /**
