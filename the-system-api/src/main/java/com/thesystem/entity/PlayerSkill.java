@@ -24,21 +24,21 @@ public class PlayerSkill {
      * Accumulated skill-specific XP. Each quest skill boost awards (boostValue × 10) XP.
      * Drives skillLevel and skillRank independently from skillPct.
      */
-    @Column(name = "skill_xp", nullable = false)
+    @Column(name = "skill_xp", columnDefinition = "integer default 0")
     private int skillXp = 0;
 
     /**
      * RPG level for this skill. Formula: floor(skillXp / 100).
      * Displayed as "Java — Lv 28" instead of a flat percentage.
      */
-    @Column(name = "skill_level", nullable = false)
+    @Column(name = "skill_level", columnDefinition = "integer default 1")
     private int skillLevel = 1;
 
     /**
      * Letter rank derived from skillLevel:
      * Lv 1–9 = E, Lv 10–19 = D, Lv 20–29 = C, Lv 30–39 = B, Lv 40+ = A.
      */
-    @Column(name = "skill_rank", length = 2, nullable = false)
+    @Column(name = "skill_rank", length = 2, columnDefinition = "varchar(2) default 'E'")
     private String skillRank = "E";
 
     @Column(name = "updated_at")
