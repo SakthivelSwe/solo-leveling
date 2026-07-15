@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Capacitor } from '@capacitor/core';
 import { environment } from '../../../environments/environment';
 import { slideInRight } from '../../shared/animations';
 import { PlayerService } from '../../core/services/player.service';
@@ -93,6 +94,51 @@ interface QuestItem {
         HP WARNINGS — Show brutal warning when HP drops below 40</label>
       <label class="chk tech"><input type="checkbox" [(ngModel)]="settings.dailyReminder" (change)="saveSettings()" />
         EVENING DIRECTIVE — Show "You haven't done X yet" reminder after 9 PM</label>
+    </section>
+
+    <!-- Alarm Clock -->
+    <section class="section">
+      <h3 class="mono sh">◈ ALARM CLOCK</h3>
+      <p class="tech hint">Set a real alarm that rings and vibrates — even when your phone screen is locked. Opens your phone's native Clock app so you can pick any ringtone from your music library.</p>
+
+      <div class="alarm-form">
+        <!-- Time picker -->
+        <div class="alarm-time-row">
+          <label class="alarm-label-text tech">WAKE TIME</label>
+          <input class="alarm-time-input mono" type="time" [(ngModel)]="alarmTime" id="alarm-time-input" />
+        </div>
+
+        <!-- Label -->
+        <input class="fin alarm-msg-input" type="text" placeholder="Alarm label (e.g. WAKE PROTOCOL)" [(ngModel)]="alarmLabel" maxlength="40" />
+
+        <!-- Days of week -->
+        <div class="alarm-days-row">
+          <button *ngFor="let d of weekDays; let i = index"
+                  class="day-chip tech"
+                  [class.active]="alarmDays[i]"
+                  (click)="toggleDay(i)"
+                  [attr.aria-pressed]="alarmDays[i]">{{ d }}</button>
+        </div>
+
+        <!-- Vibrate -->
+        <label class="chk tech">
+          <input type="checkbox" [(ngModel)]="alarmVibrate" />
+          VIBRATE when alarm rings
+        </label>
+
+        <!-- Set alarm button -->
+        <button class="alarm-set-btn mono" (click)="setAlarm()" id="set-alarm-btn">
+          ⚡ SET ALARM
+        </button>
+
+        <!-- Note for non-Android -->
+        <p class="alarm-note tech" *ngIf="!isAndroid">
+          ◈ On desktop, alarm will use in-app notification. Install the Android app for full native alarm with ringtone selection.
+        </p>
+        <p class="alarm-note alarm-note-android tech" *ngIf="isAndroid">
+          ◈ Tapping SET ALARM opens your Android Clock app — choose any ringtone or song there.
+        </p>
+      </div>
     </section>
 
     <!-- Focus Timer -->
@@ -211,6 +257,48 @@ interface QuestItem {
 }
 .timer-btn:hover { background: rgba(250,199,117,0.16); border-color: var(--accent-gold); box-shadow: 0 0 12px rgba(250,199,117,0.2); }
 
+/* ── Alarm Clock ─────────────────────────────────────────── */
+.alarm-form { display: flex; flex-direction: column; gap: 12px; }
+.alarm-time-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-radius: 10px;
+  border: 1px solid rgba(250,199,117,0.3); background: rgba(250,199,117,0.04);
+}
+.alarm-label-text { font-size: .7rem; letter-spacing: 2px; color: var(--accent-gold); }
+.alarm-time-input {
+  background: transparent; border: none; outline: none;
+  color: var(--accent-gold); font-size: 1.6rem; font-weight: 700;
+  font-family: 'Orbitron', monospace; letter-spacing: 2px;
+  text-align: right; cursor: pointer;
+  /* Style the time picker icon on mobile */
+  color-scheme: dark;
+}
+.alarm-msg-input { margin: 0; }
+.alarm-days-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.day-chip {
+  flex: 1; min-width: 34px; padding: 8px 4px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: none;
+  color: var(--text-secondary); font-size: .6rem; letter-spacing: 1px;
+  transition: all .2s;
+}
+.day-chip.active {
+  border-color: rgba(108,99,255,0.6); background: rgba(108,99,255,0.15);
+  color: #b3aef0;
+}
+.alarm-set-btn {
+  width: 100%; padding: 14px; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(250,199,117,0.6);
+  background: linear-gradient(135deg, rgba(250,199,117,0.12), rgba(250,199,117,0.04));
+  color: var(--accent-gold); font-size: .8rem; letter-spacing: 3px;
+  transition: all .2s;
+}
+.alarm-set-btn:hover { background: rgba(250,199,117,0.22); box-shadow: 0 0 16px rgba(250,199,117,0.25); }
+.alarm-note {
+  margin: 0; font-size: .64rem; letter-spacing: .5px;
+  color: var(--text-secondary); text-align: center; line-height: 1.5;
+}
+.alarm-note-android { color: rgba(108,99,255,0.8); }
+
   `],
 })
 export class SettingsPanelComponent implements OnInit {
@@ -245,6 +333,14 @@ export class SettingsPanelComponent implements OnInit {
     { key: 'STANDARD', label: 'STANDARD', desc: '"Hunter, your stats are weak in this area. Improve today." — Balanced.' },
     { key: 'BRUTAL', label: 'BRUTAL', desc: '"You skipped AGAIN. Sung Jin-Woo would have finished his dungeon by now. No excuses." — Merciless. For maximum accountability.' },
   ];
+
+  // Alarm clock state
+  alarmTime    = localStorage.getItem('sys_alarm_time') ?? '06:00';
+  alarmLabel   = localStorage.getItem('sys_alarm_label') ?? 'WAKE PROTOCOL — THE SYSTEM';
+  alarmVibrate = true;
+  alarmDays    = [false, true, true, true, true, true, false]; // Mon–Fri active by default
+  readonly weekDays  = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  readonly isAndroid = Capacitor.getPlatform() === 'android';
 
   constructor(private http: HttpClient) {}
 
@@ -282,6 +378,65 @@ export class SettingsPanelComponent implements OnInit {
 
   currentPressureDesc(): string {
     return this.pressures.find(p => p.key === this.pressureLevel())?.desc ?? '';
+  }
+
+  toggleDay(index: number): void {
+    this.alarmDays[index] = !this.alarmDays[index];
+  }
+
+  setAlarm(): void {
+    const time = this.alarmTime;
+    if (!time) { this.snack.open('Set a time first.', '✕', { duration: 2500, panelClass: 'system-snack' }); return; }
+
+    const [hourStr, minStr] = time.split(':');
+    const hour = parseInt(hourStr, 10);
+    const minute = parseInt(minStr, 10);
+    const label = this.alarmLabel.trim() || 'THE SYSTEM ALARM';
+
+    // Persist preference
+    localStorage.setItem('sys_alarm_time',  time);
+    localStorage.setItem('sys_alarm_label', label);
+
+    if (this.isAndroid) {
+      // --- Android: open native Clock app via ACTION_SET_ALARM intent ---
+      // This gives a REAL alarm — user picks their ringtone inside the Clock app.
+      // Construct the intent URL for Android's SET_ALARM action.
+      const intentUrl = [
+        'intent:#Intent',
+        'action=android.intent.action.SET_ALARM',
+        `i.android.intent.extra.alarm.HOUR=${hour}`,
+        `i.android.intent.extra.alarm.MINUTES=${minute}`,
+        `S.android.intent.extra.alarm.MESSAGE=${encodeURIComponent(label)}`,
+        `B.android.intent.extra.alarm.VIBRATE=${this.alarmVibrate}`,
+        'B.android.intent.extra.alarm.SKIP_UI=false', // false = open Clock UI so user can pick ringtone
+        'end',
+      ].join(';');
+
+      // Android WebView can handle android intent:// URLs
+      window.location.href = intentUrl;
+
+      this.snack.open(
+        `◈ OPENING CLOCK APP — Set your ringtone there`,
+        '✕',
+        { duration: 4000, panelClass: 'system-snack' }
+      );
+    } else {
+      // --- Web fallback: schedule a local notification for today ---
+      const now = new Date();
+      const fire = new Date();
+      fire.setHours(hour, minute, 0, 0);
+      if (fire <= now) fire.setDate(fire.getDate() + 1); // next occurrence
+
+      this.localNotifs.scheduleTimer(
+        Math.round((fire.getTime() - now.getTime()) / 60000)
+      );
+
+      this.snack.open(
+        `◈ ALARM SET FOR ${time} — ${label}`,
+        '✕',
+        { duration: 4000, panelClass: 'system-snack' }
+      );
+    }
   }
 
   setNativeTimer(minutes: number): void {
