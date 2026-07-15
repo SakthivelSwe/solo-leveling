@@ -130,10 +130,13 @@ export class SystemComponent implements OnInit {
               panelClass: 'level-up-panel',
               backdropClass: 'cdk-overlay-dark-backdrop',
               width: 'auto',
-              maxWidth: 'calc(100vw - 32px)',
-              maxHeight: 'calc(100dvh - 32px)',
+              maxWidth: 'min(92vw, 480px)',
+              maxHeight: '90dvh',
               autoFocus: false,
               restoreFocus: false,
+              // Explicit centering — critical for Android WebView where
+              // the CDK overlay pane may not auto-centre without this.
+              position: undefined,
             });
           }, 400);
         }

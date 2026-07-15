@@ -375,9 +375,13 @@ $sys-theme: mat.define-dark-theme((
 
 /* ── Overlay backdrop ─────────────────────────────────────── */
 .cdk-overlay-dark-backdrop {
-  background: rgba(3,3,10,0.90);
+  background: rgba(3,3,10,0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+/* Ensure the CDK overlay sits above the bottom navigation bar on mobile */
+.cdk-overlay-container {
+  z-index: 1000;
 }
 
 /* ── Holographic flicker animation ──────────────────────────── */
@@ -406,17 +410,32 @@ $sys-theme: mat.define-dark-theme((
 }
 .hp-danger { animation: dangerPulse 1.6s ease-in-out infinite; }
 
-/* ── Level-up panel ─────────────────────────────────────────── */
+/* ── Level-up dialog — full-screen centered overlay ─────────── */
+/* The CDK overlay container is already position:fixed full-screen.
+   We just need to ensure our custom panel class strips Material's
+   padding and that the surface is transparent so our card shows. */
+.level-up-panel {
+  /* Override Material's default max-width on mobile */
+  max-width: calc(100vw - 24px) !important;
+}
 .level-up-panel .mat-mdc-dialog-container {
   background: transparent;
   box-shadow: none;
-  width: auto;
-  height: auto;
+  /* Ensure container doesn't add its own padding that shifts alignment */
+  padding: 0;
 }
 .level-up-panel .mat-mdc-dialog-surface {
-  background: transparent;
-  box-shadow: none;
+  background: transparent !important;
+  box-shadow: none !important;
   overflow: visible;
+  padding: 0;
+}
+/* The CDK overlay pane that wraps the dialog — make sure it's centred */
+.cdk-overlay-pane:has(.level-up-panel),
+.cdk-global-overlay-wrapper:has(.level-up-panel) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Android 15 / iOS edge-to-edge safe areas ───────────────── */
