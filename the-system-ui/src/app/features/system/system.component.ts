@@ -31,7 +31,7 @@ import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
   imports: [
     CommonModule, RouterLink, RouterLinkActive,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
-    DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent,
+    DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, LevelUpModalComponent,
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
@@ -50,6 +50,7 @@ export class SystemComponent implements OnInit {
   skillTreeNodes = signal<import('../../core/models/models').SkillTreeNode[]>([]);
   shadows = signal<import('../../core/models/models').Shadow[]>([]);
   showAllQuests = signal<boolean>(false);
+  levelUpData = signal<import('../../shared/components/level-up-modal.component').LevelUpData | null>(null);
 
   constructor(
     private playerService: PlayerService,
@@ -125,19 +126,7 @@ export class SystemComponent implements OnInit {
         });
         if (res.leveledUp) {
           setTimeout(() => {
-            this.dialog.open(LevelUpModalComponent, {
-              data: { newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged },
-              panelClass: 'level-up-panel',
-              backdropClass: 'cdk-overlay-dark-backdrop',
-              width: 'auto',
-              maxWidth: 'min(92vw, 480px)',
-              maxHeight: '90dvh',
-              autoFocus: false,
-              restoreFocus: false,
-              // Explicit centering — critical for Android WebView where
-              // the CDK overlay pane may not auto-centre without this.
-              position: undefined,
-            });
+            this.levelUpData.set({ newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged });
           }, 400);
         }
         this.load();

@@ -1,6 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { RankBadgeComponent } from './rank-badge.component';
 
 export interface LevelUpData {
@@ -14,27 +13,42 @@ export interface LevelUpData {
   standalone: true,
   imports: [CommonModule, RankBadgeComponent],
   template: `
-    <div class="lvl-overlay">
-      <button type="button" class="close" aria-label="Close level up modal" (click)="close()">×</button>
-      <div class="rays"></div>
-      <div class="content">
-        <div class="diamond-burst">◈</div>
-        <h1 class="mono title glow">LEVEL UP!</h1>
-        <div class="level-num mono">LV. {{ data.newLevel }}</div>
+    <div class="lvl-backdrop">
+      <div class="lvl-overlay">
+        <button type="button" class="close" aria-label="Close level up modal" (click)="close()">×</button>
+        <div class="rays"></div>
+        <div class="content">
+          <div class="diamond-burst">◈</div>
+          <h1 class="mono title glow">LEVEL UP!</h1>
+          <div class="level-num mono">LV. {{ data.newLevel }}</div>
 
-        <div *ngIf="data.rankChanged" class="rank-up">
-          <div class="rank-up-label tech">RANK ASCENSION</div>
-          <app-rank-badge [rank]="data.newRank"></app-rank-badge>
+          <div *ngIf="data.rankChanged" class="rank-up">
+            <div class="rank-up-label tech">RANK ASCENSION</div>
+            <app-rank-badge [rank]="data.newRank"></app-rank-badge>
+          </div>
+
+          <p class="sub tech">THE SYSTEM ACKNOWLEDGES YOUR GROWTH, HUNTER.</p>
         </div>
-
-        <p class="sub tech">THE SYSTEM ACKNOWLEDGES YOUR GROWTH, HUNTER.</p>
       </div>
     </div>
   `,
   styles: [`
+    .lvl-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3,3,10,0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: fadeIn .3s ease-out;
+    }
     .lvl-overlay {
       position: relative;
-      width: min(90vw, 460px);
+      width: min(92vw, 480px);
+      max-height: 90dvh;
       padding: 48px 32px;
       text-align: center;
       overflow: hidden;
@@ -84,24 +98,30 @@ export interface LevelUpData {
     .rank-up { margin: 22px 0 6px; animation: fadeUp .6s .3s both; }
     .rank-up-label { font-size: .7rem; letter-spacing: 4px; color: var(--text-secondary); margin-bottom: 10px; }
     .sub { margin-top: 22px; font-size: .8rem; letter-spacing: 2px; color: var(--text-secondary); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes burst { 0% { transform: scale(0) rotate(-30deg); opacity: 0; } 60% { transform: scale(1.4); opacity: 1; } 100% { transform: scale(1); } }
     @keyframes fadeUp { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   `],
 })
-export class LevelUpModalComponent implements OnInit {
-  constructor(
-    public dialogRef: MatDialogRef<LevelUpModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: LevelUpData,
-  ) {}
+export class LevelUpModalComponent implements OnInit, OnDestroy {
+  @Input() data!: LevelUpData;
+  @Output() closeModal = new EventEmitter<void>();
+
+  private timeoutId: any;
 
   ngOnInit(): void {
-    setTimeout(() => this.dialogRef.close(), 4000);
+    this.timeoutId = setTimeout(() => this.close(), 4000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
   }
 
   close(): void {
-    this.dialogRef.close();
+    this.closeModal.emit();
   }
 }
-
