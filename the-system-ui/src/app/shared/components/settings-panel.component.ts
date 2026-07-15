@@ -2,10 +2,12 @@ import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../environments/environment';
 import { slideInRight } from '../../shared/animations';
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
+import { LocalNotificationsService } from '../../core/services/local-notifications.service';
 
 interface QuestItem {
   id?: number;
@@ -91,6 +93,17 @@ interface QuestItem {
         HP WARNINGS — Show brutal warning when HP drops below 40</label>
       <label class="chk tech"><input type="checkbox" [(ngModel)]="settings.dailyReminder" (change)="saveSettings()" />
         EVENING DIRECTIVE — Show "You haven't done X yet" reminder after 9 PM</label>
+    </section>
+
+    <!-- Focus Timer -->
+    <section class="section">
+      <h3 class="mono sh">◈ FOCUS TIMER</h3>
+      <p class="tech hint">Set a native Android alarm that fires even when the app is closed or your screen is locked. Starting a new timer cancels the previous one.</p>
+      <div class="timer-row">
+        <button class="timer-btn tech" (click)="setNativeTimer(25)" id="timer-25">25 MIN</button>
+        <button class="timer-btn tech" (click)="setNativeTimer(45)" id="timer-45">45 MIN</button>
+        <button class="timer-btn tech" (click)="setNativeTimer(90)" id="timer-90">90 MIN</button>
+      </div>
     </section>
 
     <!-- Danger Zone -->
@@ -189,6 +202,15 @@ interface QuestItem {
 .del-actions .btn-danger { flex: 1; }
 .btn-ghost { cursor: pointer; background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); padding: 12px 16px; font-size: .68rem; letter-spacing: 1.5px; }
 .btn-ghost:hover:not(:disabled) { color: var(--text-primary); border-color: var(--accent-purple); }
+.timer-row { display: flex; gap: 10px; }
+.timer-btn {
+  flex: 1; padding: 12px 8px; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(250,199,117,0.45); background: rgba(250,199,117,0.06);
+  color: var(--accent-gold); font-size: .74rem; letter-spacing: 2px;
+  transition: all .2s;
+}
+.timer-btn:hover { background: rgba(250,199,117,0.16); border-color: var(--accent-gold); box-shadow: 0 0 12px rgba(250,199,117,0.2); }
+
   `],
 })
 export class SettingsPanelComponent implements OnInit {
@@ -209,6 +231,8 @@ export class SettingsPanelComponent implements OnInit {
 
   private readonly players = inject(PlayerService);
   private readonly auth = inject(AuthService);
+  private readonly localNotifs = inject(LocalNotificationsService);
+  private readonly snack = inject(MatSnackBar);
 
   settings = {
     noSkipMode: localStorage.getItem('sys_noskip') === '1',
@@ -258,6 +282,11 @@ export class SettingsPanelComponent implements OnInit {
 
   currentPressureDesc(): string {
     return this.pressures.find(p => p.key === this.pressureLevel())?.desc ?? '';
+  }
+
+  setNativeTimer(minutes: number): void {
+    this.localNotifs.scheduleTimer(minutes);
+    this.snack.open(`◈ FOCUS TIMER SET: ${minutes} MIN`, '✕', { duration: 3000, panelClass: 'system-snack' });
   }
 
   saveSettings(): void {
