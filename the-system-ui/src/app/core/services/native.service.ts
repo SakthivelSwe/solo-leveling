@@ -76,9 +76,28 @@ export class NativeService {
       await this.biometric.authenticate();
     }
 
-    // Schedule the 5 System reminders on device (fire while app is closed).
-    // Requests POST_NOTIFICATIONS permission on Android 13+.
-    this.localNotifications.init();
+    // 1. Initialize action types and listeners
+    await this.localNotifications.init();
+    
+    // 2. Create notification channels
+    await this.localNotifications.createChannels();
+
+    // 3. Request POST_NOTIFICATIONS permissions (Android 13+)
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    try {
+      let perm = await LocalNotifications.checkPermissions();
+      if (perm.display !== 'granted') {
+        perm = await LocalNotifications.requestPermissions();
+      }
+      
+      if (perm.display === 'granted') {
+        // 4. Schedule exact alarms and soft reminders
+        await this.localNotifications.scheduleAlarms();
+        await this.localNotifications.scheduleReminders();
+      }
+    } catch {
+      /* ignore if permissions check fails or unsupported */
+    }
 
     try {
       await SplashScreen.hide();

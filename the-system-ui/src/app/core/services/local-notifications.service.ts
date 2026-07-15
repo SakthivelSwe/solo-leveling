@@ -1,90 +1,75 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { LocalNotifications, ScheduleOptions, PermissionStatus } from '@capacitor/local-notifications';
+import { LocalNotifications, ScheduleOptions, PermissionStatus, Channel } from '@capacitor/local-notifications';
 import { Habit } from '../models/models';
 
-/**
- * Native local notifications — schedules THE SYSTEM's daily/weekly reminders
- * directly on the device so they fire EVEN WHEN THE APP IS CLOSED.
- *
- * Backend counterpart: NotificationScheduler in the API also broadcasts these
- * over SSE (for the in-app 🔔 feed) — this class ensures the phone still buzzes
- * when the app is killed / backgrounded.
- *
- * Notification Actions: habit-cue notifications now have an inline "Start Now ⚡"
- * button that deep-links straight to /habits without extra taps.
- */
 @Injectable({ providedIn: 'root' })
 export class LocalNotificationsService {
   private router = inject(Router);
 
-  /** Static IDs — reusing them means re-scheduling REPLACES the previous alarm. */
+  /** Static IDs */
   private static readonly IDS = {
-    wake: 101,
-    lunch: 102,
-    evening: 103,
-    sleep: 104,
-    weeklyReview: 105,
+    midnight: 1,
+    wake: 10,
+    lunch: 11,
+    evening: 12,
+    sleep: 13,
+    weeklyReview: 14,
   };
-  /** Habit reminder IDs live in a separate range so they don't collide. */
   private static readonly HABIT_ID_BASE = 2000;
-
-  /** Action type ID for habit-cue notifications */
   private static readonly HABIT_ACTION_TYPE = 'HABIT_ACTION';
-  /** Action ID for the "Start Now" button */
   private static readonly ACTION_START_NOW = 'start_now';
 
-  /**
-   * Requests permission (Android 13+ needs runtime consent) and schedules the
-   * 5 default reminders. Safe to call on web — no-ops there.
-   */
+  private activeTimerId: number | null = null;
+  private hpWarningCooldown = false;
+
   async init(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
-
     try {
-      const perm: PermissionStatus = await LocalNotifications.checkPermissions();
-      if (perm.display !== 'granted') {
-        const req = await LocalNotifications.requestPermissions();
-        if (req.display !== 'granted') return;
-      }
-
-      // Register action types first so Android knows about them before scheduling.
       await this.registerActionTypes();
-      await this.scheduleDefaults();
       this.listenForActions();
-    } catch {
-      /* plugin unavailable — silently ignore */
-    }
+    } catch { /* ignore */ }
   }
 
-  /**
-   * Registers the notification action types with the OS.
-   * Must be called before scheduling notifications that use them.
-   */
+  async createChannels(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      await LocalNotifications.createChannel({
+        id: 'system-alarms',
+        name: 'System Alarms',
+        importance: 5,
+        sound: 'default',
+        vibration: true,
+        lights: true
+      });
+      await LocalNotifications.createChannel({
+        id: 'game-events',
+        name: 'Game Events',
+        importance: 4,
+        sound: 'default',
+        vibration: true
+      });
+      await LocalNotifications.createChannel({
+        id: 'reminders',
+        name: 'Daily Reminders',
+        importance: 3,
+        vibration: false
+      });
+    } catch { /* ignore */ }
+  }
+
   private async registerActionTypes(): Promise<void> {
     try {
       await LocalNotifications.registerActionTypes({
-        types: [
-          {
-            id: LocalNotificationsService.HABIT_ACTION_TYPE,
-            actions: [
-              {
-                id: LocalNotificationsService.ACTION_START_NOW,
-                title: 'Start Now ⚡',
-                foreground: true,
-              },
-            ],
-          },
-        ],
+        types: [{
+          id: LocalNotificationsService.HABIT_ACTION_TYPE,
+          actions: [{ id: LocalNotificationsService.ACTION_START_NOW, title: 'Start Now ⚡', foreground: true }]
+        }]
       });
-    } catch { /* ignore if unsupported */ }
+    } catch {}
   }
 
-  /**
-   * Listens for notification action taps (e.g. "Start Now").
-   * When fired, routes the user directly to /habits.
-   */
   private listenForActions(): void {
     LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
       if (action.actionId === LocalNotificationsService.ACTION_START_NOW) {
@@ -93,127 +78,153 @@ export class LocalNotificationsService {
     });
   }
 
-  /**
-   * (Re-)schedules the 5 System reminders. Every reminder repeats daily
-   * (weekly review repeats weekly on Sunday). Times mirror the backend
-   * NotificationScheduler.java so both channels agree.
-   */
-  async scheduleDefaults(): Promise<void> {
+  async scheduleAlarms(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
-
-    const options: ScheduleOptions = {
-      notifications: [
-        this.daily(LocalNotificationsService.IDS.wake, 8, 0,
-          '◈ SYSTEM ALERT',
-          'Hunter, a new day begins. Exercise and breakfast before 9:30 AM.'),
-        this.daily(LocalNotificationsService.IDS.lunch, 13, 0,
-          '◈ FUEL REQUIRED',
-          "Eat a proper meal. Zinc fuels testosterone. A hunter doesn't skip fuel."),
-        this.daily(LocalNotificationsService.IDS.evening, 21, 0,
-          '◈ QUESTS REMAINING',
-          'Code without AI. LeetCode. English. You have 2 hours. Move.'),
-        this.daily(LocalNotificationsService.IDS.sleep, 23, 0,
-          '◈ SLEEP PROTOCOL',
-          'Phone down. No reels. Testosterone builds in sleep. Put it down.'),
-        this.daily(997, 23, 50,
-          '◈ DAILY RESET IMMINENT',
-          '10 minutes until midnight. The System will deduct HP for uncompleted daily missions.'),
-        {
-          id: LocalNotificationsService.IDS.weeklyReview,
-          title: '◈ WEEKLY REVIEW',
-          body: '7 days complete. Check your stats. Plan next week.',
-          schedule: { on: { weekday: 1, hour: 20, minute: 0 }, allowWhileIdle: true },
-          smallIcon: 'ic_launcher',
-        },
-      ],
-    };
-
     try {
       await LocalNotifications.cancel({
-        notifications: Object.values(LocalNotificationsService.IDS).map(id => ({ id })),
+        notifications: [{ id: LocalNotificationsService.IDS.midnight }, { id: LocalNotificationsService.IDS.wake }, { id: LocalNotificationsService.IDS.sleep }]
       });
-      await LocalNotifications.schedule(options);
-    } catch {
-      /* ignore */
-    }
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: LocalNotificationsService.IDS.midnight,
+            channelId: 'system-alarms',
+            title: '⚡ SYSTEM ALERT: Midnight Reset',
+            body: 'A new day begins. Quests reset. Arise, Hunter.',
+            schedule: { on: { hour: 0, minute: 0 }, allowWhileIdle: true, repeats: true },
+            smallIcon: 'ic_launcher'
+          },
+          {
+            id: LocalNotificationsService.IDS.wake,
+            channelId: 'system-alarms',
+            title: '⚡ WAKE PROTOCOL INITIATED',
+            body: 'Cold shower. Sunlight. Eggs. Begin.',
+            schedule: { on: { hour: 8, minute: 0 }, allowWhileIdle: true, repeats: true },
+            smallIcon: 'ic_launcher'
+          },
+          {
+            id: LocalNotificationsService.IDS.sleep,
+            channelId: 'system-alarms',
+            title: '⚡ SLEEP PROTOCOL',
+            body: 'Phone down. Sleep before 11:30. System watching.',
+            schedule: { on: { hour: 23, minute: 0 }, allowWhileIdle: true, repeats: true },
+            smallIcon: 'ic_launcher'
+          }
+        ]
+      });
+    } catch {}
   }
 
-  /** Cancels every SYSTEM local reminder (e.g. on logout). */
+  async scheduleReminders(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      await LocalNotifications.cancel({
+        notifications: [{ id: LocalNotificationsService.IDS.lunch }, { id: LocalNotificationsService.IDS.evening }, { id: LocalNotificationsService.IDS.weeklyReview }]
+      });
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: LocalNotificationsService.IDS.lunch,
+            channelId: 'reminders',
+            title: 'FUEL REQUIRED',
+            body: 'Proper lunch. No junk. Zinc included.',
+            schedule: { on: { hour: 13, minute: 0 }, repeats: true },
+            smallIcon: 'ic_launcher'
+          },
+          {
+            id: LocalNotificationsService.IDS.evening,
+            channelId: 'reminders',
+            title: 'QUESTS REMAINING',
+            body: 'Check your incomplete quests. Evening window closing.',
+            schedule: { on: { hour: 21, minute: 0 }, repeats: true },
+            smallIcon: 'ic_launcher'
+          },
+          {
+            id: LocalNotificationsService.IDS.weeklyReview,
+            channelId: 'reminders',
+            title: '📊 WEEKLY REVIEW',
+            body: 'Open the system. Review your week. Set next target.',
+            schedule: { on: { weekday: 1, hour: 20, minute: 0 }, repeats: true },
+            smallIcon: 'ic_launcher'
+          }
+        ]
+      });
+    } catch {}
+  }
+
   async cancelAll(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
       await LocalNotifications.cancel({
-        notifications: Object.values(LocalNotificationsService.IDS).map(id => ({ id })),
+        notifications: Object.values(LocalNotificationsService.IDS).map(id => ({ id }))
       });
-    } catch { /* ignore */ }
+    } catch {}
   }
 
-  /** Schedules a manual native alarm (timer) for X minutes from now. */
   async scheduleTimer(minutes: number): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
-      const fireDate = new Date(Date.now() + minutes * 60000);
+      const id = 300 + minutes;
+      if (this.activeTimerId !== null) {
+        await LocalNotifications.cancel({ notifications: [{ id: this.activeTimerId }] });
+      }
+      this.activeTimerId = id;
       await LocalNotifications.schedule({
         notifications: [
           {
-            id: 999, // Static ID for manual timer so it overwrites any existing one
-            title: '◈ SYSTEM OVERRIDE: TIMER COMPLETE',
-            body: `Your ${minutes} minute focus timer is up. Arise.`,
-            schedule: { at: fireDate, allowWhileIdle: true },
-            smallIcon: 'ic_launcher',
-            channelId: 'thesystem_reminders',
+            id,
+            channelId: 'system-alarms',
+            title: '✅ FOCUS BLOCK COMPLETE',
+            body: `${minutes}-minute session done. Take a break.`,
+            schedule: { at: new Date(Date.now() + minutes * 60000), allowWhileIdle: true },
+            smallIcon: 'ic_launcher'
           }
         ]
       });
-    } catch { /* ignore */ }
+    } catch {}
   }
 
-  /** Immediately schedules a critical low HP warning native notification. */
   async triggerHpWarning(currentHp: number): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    if (this.hpWarningCooldown) return;
+    this.hpWarningCooldown = true;
+    try {
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: 2,
+          channelId: 'game-events',
+          title: '⚠ CRITICAL: HP BELOW 40',
+          body: `HP is at ${currentHp}. Complete quests now or face demotion.`,
+          schedule: { at: new Date(Date.now() + 500) },
+          smallIcon: 'ic_launcher'
+        }]
+      });
+      setTimeout(() => { this.hpWarningCooldown = false; }, 3600000);
+    } catch {}
+  }
+
+  async triggerGameEvent(title: string, body: string, id: number): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
       await LocalNotifications.schedule({
-        notifications: [
-          {
-            id: 998,
-            title: '◈ CRITICAL ALERT: LOW HP',
-            body: `Warning: HP is at ${currentHp}. You are in danger of a penalty. Rest or complete easy quests immediately.`,
-            schedule: { at: new Date(Date.now() + 1000) }, // Trigger almost immediately
-            smallIcon: 'ic_launcher',
-            channelId: 'thesystem_reminders',
-          }
-        ]
+        notifications: [{
+          id,
+          channelId: 'game-events',
+          title,
+          body,
+          schedule: { at: new Date(Date.now() + 500) },
+          smallIcon: 'ic_launcher'
+        }]
       });
-    } catch { /* ignore */ }
+    } catch {}
   }
 
-  private daily(id: number, hour: number, minute: number, title: string, body: string) {
-    return {
-      id,
-      title,
-      body,
-      schedule: {
-        on: { hour, minute },
-        allowWhileIdle: true,
-        repeats: true,
-      },
-      smallIcon: 'ic_launcher',
-      channelId: 'thesystem_reminders',
-    };
-  }
-
-  /**
-   * Schedule per-habit cue-time reminders on the device. Called from the
-   * Habits view whenever the list changes. Each habit gets ID 2000+habitId.
-   * Habit notifications include a "Start Now ⚡" action button that deep-links to /habits.
-   */
   async scheduleHabits(habits: Habit[]): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
       const existing = await LocalNotifications.getPending();
       const toCancel = existing.notifications
-        .filter(n => n.id >= LocalNotificationsService.HABIT_ID_BASE
-                 && n.id < LocalNotificationsService.HABIT_ID_BASE + 100000)
+        .filter(n => n.id >= LocalNotificationsService.HABIT_ID_BASE && n.id < LocalNotificationsService.HABIT_ID_BASE + 100000)
         .map(n => ({ id: n.id }));
       if (toCancel.length) await LocalNotifications.cancel({ notifications: toCancel });
 
@@ -225,21 +236,14 @@ export class LocalNotificationsService {
           return {
             id: LocalNotificationsService.HABIT_ID_BASE + h.id,
             title: `◈ HABIT CUE — ${h.name}`,
-            body: h.cue
-              ? `${h.cue} · Streak: ${h.currentStreak} 🔥`
-              : `Time for your habit. Streak: ${h.currentStreak} 🔥`,
+            body: h.cue ? `${h.cue} · Streak: ${h.currentStreak} 🔥` : `Time for your habit. Streak: ${h.currentStreak} 🔥`,
             schedule: { on: { hour: hh, minute: mm }, allowWhileIdle: true, repeats: true },
             smallIcon: 'ic_launcher',
-            channelId: 'thesystem_reminders',
+            channelId: 'reminders',
             actionTypeId: LocalNotificationsService.HABIT_ACTION_TYPE,
           };
         });
-
-      if (scheduled.length) {
-        await LocalNotifications.schedule({ notifications: scheduled });
-      }
-    } catch {
-      /* ignore */
-    }
+      if (scheduled.length) await LocalNotifications.schedule({ notifications: scheduled });
+    } catch {}
   }
 }
