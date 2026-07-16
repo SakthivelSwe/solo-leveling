@@ -76,8 +76,8 @@ export class RotatingQuoteComponent implements OnInit, OnDestroy {
   isAnimating = signal<boolean>(false);
   private intervalId: any;
 
-  // 5 minutes in milliseconds
-  private readonly ROTATION_INTERVAL = 300000;
+  // 2 minutes in milliseconds
+  private readonly ROTATION_INTERVAL = 120000;
 
   constructor(private http: HttpClient) {}
 
