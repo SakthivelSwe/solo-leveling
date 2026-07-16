@@ -39,7 +39,7 @@ public class AiProviderService {
 
     private final RestClient http = RestClient.create();
 
-    public enum Scenario { CHAT, COACHING, BOSS_BATTLE, EVALUATION, SUGGESTION }
+    public enum Scenario { CHAT, COACHING, BOSS_BATTLE, EVALUATION, SUGGESTION, NOTEBOOK }
 
     // ── Public API ────────────────────────────────────────────────────────────
 
@@ -47,7 +47,8 @@ public class AiProviderService {
      * Routes to the best provider for the scenario, with automatic fallback.
      */
     public String generate(Scenario scenario, String systemPrompt, String userPrompt) {
-        boolean geminiFirst = scenario == Scenario.BOSS_BATTLE || scenario == Scenario.EVALUATION;
+        boolean geminiFirst = scenario == Scenario.BOSS_BATTLE || scenario == Scenario.EVALUATION
+                || scenario == Scenario.NOTEBOOK;
         if (geminiFirst) {
             try { return callGemini(systemPrompt, userPrompt); }
             catch (Exception e) {

@@ -8,6 +8,9 @@ thesystem:
   ai:
     groq-api-key: "YOUR_GROQ_API_KEY_HERE"
     gemini-api-key: "YOUR_GEMINI_API_KEY_HERE"
+  devmastery:
+    webhook-secret: "CHANGE-ME-shared-secret-between-both-apps"
+    api-url: "https://devmastery-core.onrender.com"
 
 spring:
   datasource:

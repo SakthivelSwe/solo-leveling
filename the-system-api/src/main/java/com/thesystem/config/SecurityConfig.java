@@ -41,6 +41,7 @@ public class SecurityConfig {
         List<String> publicPaths = new ArrayList<>();
         publicPaths.add("/api/auth/**");
         publicPaths.add("/api/public/**");
+        publicPaths.add("/api/devmastery/webhook"); // uses X-Webhook-Secret, not JWT
         if (devToolsEnabled) {
             publicPaths.add("/swagger-ui/**");
             publicPaths.add("/swagger-ui.html");

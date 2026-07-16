@@ -62,6 +62,12 @@ export const routes: Routes = [
       import('./features/ai-mentor/ai-mentor.component').then(m => m.AiMentorComponent),
   },
   {
+    path: 'learning',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/learning/learning.component').then(m => m.LearningComponent),
+  },
+  {
     path: 'insights',
     canActivate: [authGuard],
     loadComponent: () =>
