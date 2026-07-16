@@ -58,7 +58,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   constructor(
     private playerService: PlayerService,
     private lifeOsService: LifeOsService,
-    private auth: AuthService,
+    public auth: AuthService,
     private dialog: MatDialog,
     private snack: MatSnackBar,
     public notifications: NotificationService,
@@ -113,6 +113,8 @@ export class SystemComponent implements OnInit, OnDestroy {
       error: () => this.shadows.set([]),
     });
   }
+
+
 
   onComplete(quest: Quest): void {
     this.pendingKey.set(quest.questKey);

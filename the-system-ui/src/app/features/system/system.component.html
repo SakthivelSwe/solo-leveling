@@ -42,6 +42,14 @@
          [attr.aria-label]="'Notifications' + (notifications.unread() > 0 ? ', ' + notifications.unread() + ' unread' : '')">
         🔔<span class="badge" *ngIf="notifications.unread() > 0">{{ notifications.unread() }}</span>
       </a>
+      
+      <!-- Profile & Exit -->
+      <span class="tech player-email" *ngIf="auth.player()?.email as email" style="font-size: 0.65rem; color: var(--text-dim); margin-left: 12px; margin-right: 8px;">
+        [{{ email }}]
+      </span>
+      <button class="icon-btn tech exit-btn" (click)="logout()" title="System Exit" aria-label="Sign out" style="color: var(--accent-red); font-size: 0.8rem;">
+        EXIT
+      </button>
 
       <!-- System Guide / Manual -->
       <a routerLink="/guide" class="icon-btn tech" title="System Manual" aria-label="System Manual">📖</a>
