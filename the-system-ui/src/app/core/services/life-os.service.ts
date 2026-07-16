@@ -7,7 +7,7 @@ import {
   SavingsGoal, BudgetEntry, HealthLog, MindLog, SelfDoubtEvidence,
   EnglishLog, VocabularyLog, BodyLog, RelationshipLog,
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
-  SkillTreeNode, Shadow
+  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -91,5 +91,28 @@ export class LifeOsService {
 
   /* ===== Shadow Army ===== */
   getShadows(): Observable<Shadow[]> { return this.http.get<Shadow[]>(`${this.api}/shadows`); }
+
+  /* ===== Phase 2 — Physical Tracking ===== */
+  // Body metrics (weight + body-fat)
+  bodyMetricToday(): Observable<BodyMetric> { return this.http.get<BodyMetric>(`${this.api}/body-metrics/today`); }
+  upsertBodyMetric(b: BodyMetric): Observable<BodyMetric> { return this.http.post<BodyMetric>(`${this.api}/body-metrics/log`, b); }
+  bodyMetricHistory(): Observable<BodyMetric[]> { return this.http.get<BodyMetric[]>(`${this.api}/body-metrics/history`); }
+
+  // Dedicated sleep tracker (exact bed/wake times + computed duration)
+  logSleep(b: { date?: string; bedtime: string; wakeTime: string; quality?: number | null }): Observable<HealthLog> {
+    return this.http.post<HealthLog>(`${this.api}/health/sleep`, b);
+  }
+  sleepHistory(): Observable<SleepEntry[]> { return this.http.get<SleepEntry[]>(`${this.api}/health/sleep`); }
+
+  // Mood trend line
+  moodTrend(days = 30): Observable<MoodPoint[]> { return this.http.get<MoodPoint[]>(`${this.api}/mind/mood-trend?days=${days}`); }
+
+  // Workout logger (Phase 4)
+  logWorkout(b: WorkoutEntry): Observable<WorkoutEntry> { return this.http.post<WorkoutEntry>(`${this.api}/workout/log`, b); }
+  workoutHistory(): Observable<WorkoutEntry[]> { return this.http.get<WorkoutEntry[]>(`${this.api}/workout/history`); }
+  deleteWorkout(id: number): Observable<void> { return this.http.delete<void>(`${this.api}/workout/${id}`); }
+
+  // Full data export (Phase 4)
+  exportData(): Observable<Record<string, unknown>> { return this.http.get<Record<string, unknown>>(`${this.api}/export`); }
 }
 

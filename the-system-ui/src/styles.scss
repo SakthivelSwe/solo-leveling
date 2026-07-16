@@ -489,3 +489,61 @@ span {
   .card-3d:hover { transform: none; }
 }
 
+/* ============================================================
+   NATIVE (Android WebView) PERFORMANCE MODE  ·  anti-overheat
+   ------------------------------------------------------------
+   The Capacitor WebView composites continuous `backdrop-filter`
+   blur and infinite full-screen animations far less efficiently
+   than a desktop browser. Those effects run on the GPU EVERY
+   frame even when the screen is idle, which pegs the GPU/CPU and
+   makes the phone hot + drains battery.
+
+   On native we therefore drop the most expensive effects and keep
+   cheap static equivalents. The desktop/PWA web build is untouched
+   and keeps the full premium look. `native-platform` is added to
+   <body> by NativeService on Android only.
+   ============================================================ */
+body.native-platform::before {
+  /* Kill the animated, blurred full-screen aurora — keep a cheap static tint. */
+  animation: none !important;
+  filter: none !important;
+  opacity: .45;
+}
+body.native-platform::after {
+  /* Stop the never-ending particle-drift repaint. */
+  animation: none !important;
+}
+body.native-platform .system-card {
+  /* backdrop-filter is the single most expensive WebView operation; having it
+     on every card forces a full-screen GPU composite constantly. Replace it
+     with an opaque gradient that looks nearly identical but costs nothing. */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: linear-gradient(160deg, rgba(22,22,42,0.98), rgba(12,12,26,0.99));
+}
+body.native-platform .mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
+  animation: none !important;                 /* stop the 2s infinite pulse + its big box-shadow */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body.native-platform .cdk-overlay-dark-backdrop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(3,3,10,0.96);
+}
+/* Safety net: on native, no decorative animation should loop forever while the
+   Hunter is just reading the screen. Cap infinite loops to a single play so the
+   GPU can go idle — the biggest sustained heat source after backdrop-filter. */
+body.native-platform *,
+body.native-platform *::before,
+body.native-platform *::after {
+  animation-iteration-count: 1 !important;
+}
+/* …but genuine loading indicators MUST keep spinning. Re-enable them. */
+body.native-platform .loader-ring,
+body.native-platform .dots::after,
+body.native-platform .sys-spin {
+  animation-iteration-count: infinite !important;
+}
+
+

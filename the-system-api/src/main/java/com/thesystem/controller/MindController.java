@@ -2,6 +2,7 @@ package com.thesystem.controller;
 
 import com.thesystem.entity.MindLog;
 import com.thesystem.entity.SelfDoubtEvidence;
+import com.thesystem.dto.MoodPointDTO;
 import com.thesystem.security.CurrentPlayer;
 import com.thesystem.service.MindService;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,13 @@ public class MindController {
     @GetMapping("/evidence")
     public List<SelfDoubtEvidence> evidence(Principal p) {
         return mindService.evidence(currentPlayer.id(p));
+    }
+
+    /* ===== Phase 2 — Mood Trend Graph ===== */
+
+    @GetMapping("/mood-trend")
+    public List<MoodPointDTO> moodTrend(Principal p, @RequestParam(defaultValue = "30") int days) {
+        return mindService.moodTrend(currentPlayer.id(p), days);
     }
 }
 

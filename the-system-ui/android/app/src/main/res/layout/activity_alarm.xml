@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#060610"
+    android:padding="28dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\u26A1 SYSTEM ALARM"
+            android:textColor="#6C63FF"
+            android:letterSpacing="0.25"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/alarm_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="00:00"
+            android:textColor="#FAC775"
+            android:textSize="76sp"
+            android:letterSpacing="0.05"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/alarm_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="\u25C8 WAKE PROTOCOL"
+            android:textColor="#E6E6F0"
+            android:letterSpacing="0.15"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Arise, Hunter."
+            android:textColor="#8A8AA0"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_dismiss"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="DISMISS"
+            android:textColor="#060610"
+            android:textStyle="bold"
+            android:letterSpacing="0.2"
+            android:background="#FAC775" />
+
+        <Button
+            android:id="@+id/btn_snooze"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="12dp"
+            android:text="SNOOZE"
+            android:textColor="#B3AEF0"
+            android:letterSpacing="0.2"
+            android:background="#141428" />
+    </LinearLayout>
+
+</RelativeLayout>
+

@@ -32,6 +32,18 @@ export const routes: Routes = [
       import('./features/life-os/life-os.component').then(m => m.LifeOsComponent),
   },
   {
+    path: 'physical',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/physical/physical-tracking.component').then(m => m.PhysicalTrackingComponent),
+  },
+  {
+    path: 'stats',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/stats/statistics.component').then(m => m.StatisticsComponent),
+  },
+  {
     path: 'habits',
     canActivate: [authGuard],
     loadComponent: () =>

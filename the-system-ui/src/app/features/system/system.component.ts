@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,6 +24,7 @@ import { ProgressChartComponent } from '../progress/progress-chart.component';
 import { DailyScheduleComponent } from '../../shared/components/daily-schedule.component';
 import { SettingsPanelComponent } from '../../shared/components/settings-panel.component';
 import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
+import { PomodoroComponent } from './pomodoro.component';
 
 @Component({
   selector: 'app-system',
@@ -31,12 +32,12 @@ import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
   imports: [
     CommonModule, RouterLink, RouterLinkActive,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
-    DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent,
+    DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, PomodoroComponent,
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
 })
-export class SystemComponent implements OnInit {
+export class SystemComponent implements OnInit, OnDestroy {
   status = signal<StatusWindow | null>(this.playerService.getCachedStatus());
   loading = signal(!this.status());
   pendingKey = signal<string | null>(null);
@@ -51,6 +52,9 @@ export class SystemComponent implements OnInit {
   shadows = signal<import('../../core/models/models').Shadow[]>([]);
   showAllQuests = signal<boolean>(false);
 
+  /** Debounce handle for coalescing bursts of live SSE events into one reload. */
+  private reloadTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(
     private playerService: PlayerService,
     private lifeOsService: LifeOsService,
@@ -64,14 +68,16 @@ export class SystemComponent implements OnInit {
   ) {
     // Live sync: reload the dashboard whenever a real-time player-update arrives
     // (e.g. a quest completed in another tab, or midnight HP processing).
-    let lastTick = 0;
+    // Debounced so a BURST of events fires a single reload instead of hammering
+    // the backend with several HTTP requests per event (saves battery + heat).
     effect(() => {
       const tick = this.sse.playerTick();
-      if (tick !== lastTick && tick > 0 && !this.loading()) {
-        lastTick = tick;
-        this.load();
-      } else {
-        lastTick = tick;
+      if (tick > 0 && !this.loading()) {
+        if (this.reloadTimer) clearTimeout(this.reloadTimer);
+        this.reloadTimer = setTimeout(() => {
+          this.reloadTimer = null;
+          this.load();
+        }, 700);
       }
     });
   }
@@ -79,6 +85,10 @@ export class SystemComponent implements OnInit {
   ngOnInit(): void {
     this.load();
     this.notifications.refreshUnread();
+  }
+
+  ngOnDestroy(): void {
+    if (this.reloadTimer) { clearTimeout(this.reloadTimer); this.reloadTimer = null; }
   }
 
   load(): void {

@@ -2,11 +2,13 @@ package com.thesystem.service;
 
 import com.thesystem.entity.MindLog;
 import com.thesystem.entity.SelfDoubtEvidence;
+import com.thesystem.dto.MoodPointDTO;
 import com.thesystem.repository.MindLogRepository;
 import com.thesystem.repository.SelfDoubtEvidenceRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,6 +61,31 @@ public class MindService {
 
     public List<SelfDoubtEvidence> evidence(Long playerId) {
         return evidenceRepo.findByPlayerIdOrderByEntryDateDesc(playerId);
+    }
+
+    /* ===== Phase 2 — Mood Trend Graph ===== */
+
+    /**
+     * Returns up to {days} recent mood points (oldest → newest) for the line
+     * chart. Each point's `mood` is the average of the available morning/evening
+     * scores; days with no mood recorded are skipped.
+     */
+    public List<MoodPointDTO> moodTrend(Long playerId, int days) {
+        LocalDate cutoff = LocalDate.now().minusDays(Math.max(1, days) - 1L);
+        List<MindLog> logs = mindRepo.findByPlayerIdOrderByLogDateDesc(playerId);
+        List<MoodPointDTO> out = new ArrayList<>();
+        for (MindLog m : logs) {
+            if (m.getLogDate() == null || m.getLogDate().isBefore(cutoff)) continue;
+            Integer morning = m.getMoodMorning();
+            Integer evening = m.getMoodEvening();
+            if (morning == null && evening == null) continue;
+            double avg;
+            if (morning != null && evening != null) avg = (morning + evening) / 2.0;
+            else avg = (morning != null) ? morning : evening;
+            out.add(new MoodPointDTO(m.getLogDate().toString(), avg, morning, evening));
+        }
+        java.util.Collections.reverse(out); // oldest → newest for the chart
+        return out;
     }
 }
 

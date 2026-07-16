@@ -25,6 +25,12 @@
       <span class="bnav-label">LIFE OS</span>
     </a>
 
+    <a routerLink="/physical" routerLinkActive="active" id="nav-physical"
+       class="bnav-item" aria-label="Physical Tracking">
+      <span class="bnav-icon">💪</span>
+      <span class="bnav-label">BODY</span>
+    </a>
+
     <a routerLink="/ai" routerLinkActive="active" id="nav-ai"
        class="bnav-item" aria-label="AI Mentor">
       <span class="bnav-icon">🤖</span>
@@ -51,3 +57,10 @@
   [data]="uiState.levelUpData()!"
   (closeModal)="uiState.clearLevelUp()">
 </app-level-up-modal>
+
+<!-- Evening Review (9 PM check-in, Global Overlay) -->
+<app-evening-review
+  *ngIf="uiState.eveningReviewOpen()"
+  (closed)="uiState.closeEveningReview()">
+</app-evening-review>
+

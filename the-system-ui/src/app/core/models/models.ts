@@ -470,3 +470,43 @@ export interface HabitTemplate {
   keystone: boolean;
   rankHint: string;
 }
+
+/* ============ Phase 2 — Physical Tracking ============ */
+
+/** One daily weigh-in. Weight is stored in kilograms; UI converts to lb. */
+export interface BodyMetric {
+  id?: number;
+  logDate?: string;
+  weightKg?: number | null;
+  bodyFatPct?: number | null;
+  note?: string;
+}
+
+/** One night of sleep, with server-computed duration (handles crossing midnight). */
+export interface SleepEntry {
+  date: string;
+  bedtime: string;   // "HH:mm"
+  wakeTime: string;  // "HH:mm"
+  durationMinutes: number;
+  quality?: number | null;
+}
+
+/** One point on the 30-day mood trend line. */
+export interface MoodPoint {
+  date: string;
+  mood: number;             // avg of morning/evening (1–10)
+  moodMorning?: number | null;
+  moodEvening?: number | null;
+}
+
+/** One detailed workout entry: an exercise with sets/reps/optional weight. */
+export interface WorkoutEntry {
+  id?: number;
+  workoutDate?: string;
+  exerciseName: string;
+  sets: number;
+  reps: number;
+  weightKg?: number | null;
+  notes?: string;
+}
+

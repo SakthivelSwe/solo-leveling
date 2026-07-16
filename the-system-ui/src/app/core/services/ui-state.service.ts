@@ -12,4 +12,17 @@ export class UiStateService {
   clearLevelUp(): void {
     this.levelUpData.set(null);
   }
+
+  /** Evening Review (9 PM check-in) overlay visibility. */
+  eveningReviewOpen = signal(false);
+
+  openEveningReview(): void {
+    this.eveningReviewOpen.set(true);
+  }
+
+  closeEveningReview(): void {
+    this.eveningReviewOpen.set(false);
+    // Don't auto-prompt again today.
+    localStorage.setItem('sys_evening_review_date', new Date().toISOString().slice(0, 10));
+  }
 }

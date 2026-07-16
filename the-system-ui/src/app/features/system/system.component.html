@@ -14,7 +14,9 @@
       <a routerLink="/system" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">STATUS</a>
       <a routerLink="/habits" routerLinkActive="active">QUESTS</a>
       <a routerLink="/life" routerLinkActive="active">LIFE OS</a>
+      <a routerLink="/physical" routerLinkActive="active">BODY</a>
       <a routerLink="/ai" routerLinkActive="active">AI MENTOR</a>
+      <a routerLink="/stats" routerLinkActive="active">STATS</a>
       <a routerLink="/insights" routerLinkActive="active">INSIGHTS</a>
       <a routerLink="/achievements" routerLinkActive="active">RANKS</a>
     </nav>
@@ -30,6 +32,9 @@
 
       <!-- Player LV -->
       <span class="tech lv" *ngIf="status() as s">LV.{{ s.player.level }}</span>
+
+      <!-- Statistics deep-dive (visible on all screen sizes) -->
+      <a routerLink="/stats" class="icon-btn tech" title="Statistics" aria-label="Statistics deep-dive" id="stats-btn">📊</a>
 
       <!-- Notifications -->
       <a routerLink="/notifications" class="icon-btn bell" id="notif-btn"
@@ -92,7 +97,7 @@
         <h3 class="mono head" style="color: #BA7517;">◈ SHADOW ARMY</h3>
         <p class="tech subtitle" style="margin-bottom: 12px; font-size: 0.7rem;">MASTERED HABITS TRANSCEND INTO SHADOWS</p>
         <div class="shadows-list" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="shadow-item" *ngFor="let sh of shadows()" 
+          <div class="shadow-item" *ngFor="let sh of shadows()"
                style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(186,117,23,0.1); border: 1px solid rgba(186,117,23,0.3); border-radius: 6px;">
             <div>
               <span class="mono" style="color: #BA7517; font-weight: bold; font-size: 0.9rem;">{{ sh.shadowName }}</span>
@@ -135,7 +140,7 @@
       <div class="mission-controls tech" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
         <span *ngIf="dailyMission() as dm; else noMission">🎯 {{ showAllQuests() ? 'ALL QUESTS' : 'MISSIONS: ' + dm.focusArea + ' (' + dm.focusStat + ')' }}</span>
         <ng-template #noMission><span>🎯 ALL QUESTS</span></ng-template>
-        
+
         <button *ngIf="dailyMission()" class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem;" (click)="showAllQuests.set(!showAllQuests())">
           {{ showAllQuests() ? 'SHOW MISSIONS' : 'SHOW ALL QUESTS' }}
         </button>
@@ -158,6 +163,7 @@
     <!-- RIGHT col: Dungeon + Schedule -->
     <div class="col-right" [class.mob-hidden]="mobileTab() !== 'schedule'">
       <app-dungeon-card></app-dungeon-card>
+      <app-pomodoro></app-pomodoro>
       <app-daily-schedule></app-daily-schedule>
     </div>
   </main>

@@ -2,6 +2,7 @@ package com.thesystem.controller;
 
 import com.thesystem.entity.ExerciseLog;
 import com.thesystem.entity.HealthLog;
+import com.thesystem.dto.SleepEntryDTO;
 import com.thesystem.security.CurrentPlayer;
 import com.thesystem.service.HealthService;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,25 @@ public class HealthController {
     @GetMapping("/exercise")
     public List<ExerciseLog> exercise(Principal p) {
         return healthService.exerciseHistory(currentPlayer.id(p));
+    }
+
+    /* ===== Phase 2 — Dedicated Sleep Tracker ===== */
+
+    @PostMapping("/sleep")
+    public HealthLog logSleep(Principal p, @RequestBody Map<String, String> body) {
+        Integer quality = body.get("quality") != null && !body.get("quality").isBlank()
+                ? Integer.valueOf(body.get("quality")) : null;
+        return healthService.upsertSleep(
+                currentPlayer.id(p),
+                body.get("date"),
+                body.get("bedtime"),
+                body.get("wakeTime"),
+                quality);
+    }
+
+    @GetMapping("/sleep")
+    public List<SleepEntryDTO> sleepHistory(Principal p) {
+        return healthService.sleepHistory(currentPlayer.id(p));
     }
 }
 

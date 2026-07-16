@@ -48,6 +48,20 @@ export class SseService {
       },
       { allowSignalWrites: true },
     );
+
+    // Battery/heat saver: an EventSource left open in the background keeps the
+    // radio + CPU busy (and auto-reconnects on every drop). While the app/tab is
+    // hidden we close the link entirely, then re-open it the moment the Hunter
+    // returns. Missed background alerts are still delivered via local notifications.
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.disconnect();
+        } else if (this.auth.isAuthenticated()) {
+          this.connect();
+        }
+      });
+    }
   }
 
   private connect(): void {
@@ -99,7 +113,7 @@ export class SseService {
       };
       this.notifications.ingest(payload.notification, payload.unreadCount);
       const n = payload.notification;
-      
+
       // In-app snackbar
       this.snack.open(`◈ ${n.title} — ${n.message}`, '✕', {
         duration: 8000,
@@ -126,7 +140,7 @@ export class SseService {
       const current = this.auth.player();
       if (current) {
         const newHp = data.hp ?? current.hp;
-        
+
         // Check for HP drop below 40% (maxHp is 100)
         if (newHp < 40 && current.hp >= 40) {
           this.localNotifs.triggerHpWarning(newHp);

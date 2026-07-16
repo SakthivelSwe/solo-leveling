@@ -8,7 +8,9 @@ import { NativeService } from './core/services/native.service';
 import { BiometricService } from './core/services/biometric.service';
 import { BiometricLockComponent } from './features/auth/biometric-lock.component';
 import { LevelUpModalComponent } from './shared/components/level-up-modal.component';
+import { EveningReviewComponent } from './shared/components/evening-review.component';
 import { UiStateService } from './core/services/ui-state.service';
+import { AuthService } from './core/services/auth.service';
 import { routeFade } from './shared/animations';
 
 /** Routes where the bottom nav should NOT be shown (auth screens). */
@@ -17,7 +19,7 @@ const AUTH_ROUTES = new Set(['/login', '/register', '/']);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent, LevelUpModalComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent, LevelUpModalComponent, EveningReviewComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [routeFade],
@@ -28,6 +30,7 @@ export class AppComponent {
   private biometric = inject(BiometricService);
   private router    = inject(Router);
   public uiState    = inject(UiStateService);
+  private auth      = inject(AuthService);
 
   /** Reactive signal: true when the biometric lock overlay should be shown. */
   isLocked = computed(() => this.biometric.isLocked);
@@ -55,6 +58,22 @@ export class AppComponent {
     this.pwaUpdate.init();
     // Native glue (status bar, hardware back button, splash hide, biometric init). No-ops on web.
     this.native.init();
+    this.maybePromptEveningReview();
+  }
+
+  /**
+   * Auto-opens the Evening Review after 9 PM, once per day, for a logged-in
+   * Hunter. Dismissing or saving marks it done for the day (see UiStateService).
+   */
+  private maybePromptEveningReview(): void {
+    if (!this.auth.isAuthenticated()) return;
+    const hour = new Date().getHours();
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const lastDone = localStorage.getItem('sys_evening_review_date');
+    if (hour >= 21 && lastDone !== todayKey) {
+      // Small delay so it appears after the first paint, not mid-boot.
+      setTimeout(() => this.uiState.openEveningReview(), 1400);
+    }
   }
 
   /** Drives the @routeFade page-transition animation on navigation. */

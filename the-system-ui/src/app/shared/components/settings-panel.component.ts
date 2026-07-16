@@ -9,6 +9,8 @@ import { slideInRight } from '../../shared/animations';
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
 import { LocalNotificationsService } from '../../core/services/local-notifications.service';
+import { SystemAlarm } from '../../core/native/system-alarm.plugin';
+import { LifeOsService } from '../../core/services/life-os.service';
 
 interface QuestItem {
   id?: number;
@@ -99,7 +101,19 @@ interface QuestItem {
     <!-- Alarm Clock -->
     <section class="section">
       <h3 class="mono sh">◈ ALARM CLOCK</h3>
-      <p class="tech hint">Set a real alarm that rings and vibrates — even when your phone screen is locked. Opens your phone's native Clock app so you can pick any ringtone from your music library.</p>
+      <p class="tech hint">Set a repeating alarm that rings and vibrates with your phone's default notification sound — even when the screen is locked.</p>
+
+      <!-- Xiaomi / POCO / Redmi (HyperOS / MIUI) reliability notice -->
+      <details class="alarm-help">
+        <summary class="tech">⚠ POCO / Xiaomi / Redmi phone? Tap here if the alarm is silent</summary>
+        <p class="tech hint">HyperOS/MIUI blocks background alarms by default. The app cannot override this — you must allow it once:</p>
+        <ol class="tech hint alarm-help-list">
+          <li>Settings → Apps → <b>THE SYSTEM</b> → <b>Autostart</b> → turn ON.</li>
+          <li>Settings → Apps → THE SYSTEM → <b>Battery saver</b> → set to <b>No restrictions</b>.</li>
+          <li>Settings → Apps → THE SYSTEM → Notifications → <b>⚡ Alarms</b> category → enable <b>Sound</b> + <b>Floating / heads-up</b>.</li>
+          <li>Lock the app in <b>Recents</b> (swipe down on the app card → lock icon).</li>
+        </ol>
+      </details>
 
       <div class="alarm-form">
         <!-- Time picker -->
@@ -110,6 +124,16 @@ interface QuestItem {
 
         <!-- Label -->
         <input class="fin alarm-msg-input" type="text" placeholder="Alarm label (e.g. WAKE PROTOCOL)" [(ngModel)]="alarmLabel" maxlength="40" />
+
+        <!-- Ringtone (native full-screen alarm) -->
+        <div class="alarm-sound-row" *ngIf="isAndroid">
+          <button class="alarm-sound-btn tech" (click)="chooseSound()">🎵 CHOOSE RINGTONE (MP3)</button>
+          <div class="alarm-sound-picked" *ngIf="alarmSoundName">
+            <span class="tech">◈ {{ alarmSoundName }}</span>
+            <button class="alarm-sound-clear tech" (click)="clearSound()" aria-label="Clear ringtone">✕</button>
+          </div>
+          <p class="tech hint" *ngIf="!alarmSoundName">No file chosen — the default alarm sound will play.</p>
+        </div>
 
         <!-- Days of week -->
         <div class="alarm-days-row">
@@ -138,7 +162,7 @@ interface QuestItem {
 
         <!-- Status -->
         <p class="alarm-note tech" *ngIf="alarmActive">
-          ◈ ALARM ACTIVE — {{ alarmTime }} — rings via THE SYSTEM notification (vibrates + sound)
+          ◈ ALARM ACTIVE — {{ alarmTime }} — rings + vibrates via THE SYSTEM notification
         </p>
         <p class="alarm-note tech" *ngIf="!isAndroid && !alarmActive">
           ◈ On desktop, set alarm will use browser notifications. Install the Android app for full reliability.
@@ -155,6 +179,21 @@ interface QuestItem {
         <button class="timer-btn tech" (click)="setNativeTimer(45)" id="timer-45">45 MIN</button>
         <button class="timer-btn tech" (click)="setNativeTimer(90)" id="timer-90">90 MIN</button>
       </div>
+    </section>
+
+    <!-- Data Export -->
+    <section class="section">
+      <h3 class="mono sh">◈ DATA EXPORT</h3>
+      <p class="tech hint">Download a full personal backup of every quest, habit, stat and log. Your data, in your hands.</p>
+      <div class="export-row">
+        <button class="export-btn tech" (click)="exportJson()" [disabled]="exporting()">
+          {{ exporting() ? 'EXPORTING…' : '⬇ EXPORT JSON' }}
+        </button>
+        <button class="export-btn tech" (click)="exportCsv()" [disabled]="exporting()">
+          {{ exporting() ? 'EXPORTING…' : '⬇ EXPORT CSV' }}
+        </button>
+      </div>
+      <p class="tech hint" style="margin-top:8px;">JSON is the complete backup. CSV is spreadsheet-friendly (one section per dataset).</p>
     </section>
 
     <!-- Danger Zone -->
@@ -262,8 +301,23 @@ interface QuestItem {
 }
 .timer-btn:hover { background: rgba(250,199,117,0.16); border-color: var(--accent-gold); box-shadow: 0 0 12px rgba(250,199,117,0.2); }
 
+/* ── Data Export ─────────────────────────────────────────── */
+.export-row { display: flex; gap: 10px; }
+.export-btn {
+  flex: 1; cursor: pointer; padding: 12px 8px; border-radius: 10px;
+  border: 1px solid rgba(31,190,142,0.45); background: rgba(31,190,142,0.06);
+  color: #5dcaa5; font-size: .72rem; letter-spacing: 2px; transition: all .2s;
+}
+.export-btn:hover:not(:disabled) { background: rgba(31,190,142,0.16); border-color: var(--accent-teal); }
+.export-btn:disabled { opacity: .5; cursor: not-allowed; }
+
 /* ── Alarm Clock ─────────────────────────────────────────── */
 .alarm-form { display: flex; flex-direction: column; gap: 12px; }
+.alarm-help { margin: 6px 0 12px; border: 1px solid rgba(250,199,117,0.22); border-radius: 10px; background: rgba(250,199,117,0.04); padding: 8px 12px; }
+.alarm-help > summary { cursor: pointer; font-size: .72rem; letter-spacing: 1px; color: var(--accent-gold); list-style: none; }
+.alarm-help > summary::-webkit-details-marker { display: none; }
+.alarm-help-list { margin: 8px 0 2px; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.alarm-help-list li { line-height: 1.4; }
 .alarm-time-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px; border-radius: 10px;
@@ -279,6 +333,24 @@ interface QuestItem {
   color-scheme: dark;
 }
 .alarm-msg-input { margin: 0; }
+.alarm-sound-row { display: flex; flex-direction: column; gap: 8px; }
+.alarm-sound-btn {
+  width: 100%; padding: 11px; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(108,99,255,0.5); background: rgba(108,99,255,0.08);
+  color: #b3aef0; font-size: .72rem; letter-spacing: 2px; transition: all .2s;
+}
+.alarm-sound-btn:hover { background: rgba(108,99,255,0.18); }
+.alarm-sound-picked {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 12px; border-radius: 8px;
+  border: 1px solid rgba(250,199,117,0.3); background: rgba(250,199,117,0.05);
+}
+.alarm-sound-picked span { font-size: .7rem; color: var(--accent-gold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alarm-sound-clear {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-secondary); cursor: pointer; padding: 2px 8px; font-size: .7rem; flex: 0 0 auto;
+}
+.alarm-sound-clear:hover { color: var(--accent-red); border-color: var(--accent-red); }
 .alarm-days-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .day-chip {
   flex: 1; min-width: 34px; padding: 8px 4px; border-radius: 8px; cursor: pointer;
@@ -332,6 +404,8 @@ export class SettingsPanelComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly localNotifs = inject(LocalNotificationsService);
   private readonly snack = inject(MatSnackBar);
+  private readonly lifeOs = inject(LifeOsService);
+  exporting = signal(false);
 
   settings = {
     noSkipMode: localStorage.getItem('sys_noskip') === '1',
@@ -348,9 +422,12 @@ export class SettingsPanelComponent implements OnInit {
   // Alarm clock state
   alarmTime    = localStorage.getItem('sys_alarm_time') ?? '06:00';
   alarmLabel   = localStorage.getItem('sys_alarm_label') ?? 'WAKE PROTOCOL — THE SYSTEM';
-  alarmVibrate = true;
+  alarmVibrate = localStorage.getItem('sys_alarm_vibrate') !== '0';
   alarmDays    = JSON.parse(localStorage.getItem('sys_alarm_days') ?? '[false,true,true,true,true,true,false]') as boolean[];
   alarmActive  = localStorage.getItem('sys_alarm_active') === '1';
+  // Chosen local ringtone (native full-screen alarm only)
+  alarmSoundUri  = localStorage.getItem('sys_alarm_sound_uri') ?? '';
+  alarmSoundName = localStorage.getItem('sys_alarm_sound_name') ?? '';
   readonly weekDays  = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   readonly isAndroid = Capacitor.getPlatform() === 'android';
 
@@ -409,14 +486,31 @@ export class SettingsPanelComponent implements OnInit {
     localStorage.setItem('sys_alarm_time',  time);
     localStorage.setItem('sys_alarm_label', label);
     localStorage.setItem('sys_alarm_days',  JSON.stringify(this.alarmDays));
+    localStorage.setItem('sys_alarm_vibrate', this.alarmVibrate ? '1' : '0');
+    localStorage.setItem('sys_alarm_sound_uri', this.alarmSoundUri);
+    localStorage.setItem('sys_alarm_sound_name', this.alarmSoundName);
     localStorage.setItem('sys_alarm_active', '1');
     this.alarmActive = true;
 
     if (this.isAndroid) {
-      // Schedule via Capacitor LocalNotifications (real OS alarm with sound + vibration)
-      this.localNotifs.scheduleAlarm(hour, minute, label, this.alarmDays);
+      // Native full-screen alarm: plays the chosen local MP3 at alarm volume,
+      // vibrates and rings over the lock screen even when the app is closed.
+      SystemAlarm.setAlarm({
+        hour, minute,
+        days: this.alarmDays,
+        label,
+        soundUri: this.alarmSoundUri,
+        soundName: this.alarmSoundName,
+        vibrate: this.alarmVibrate,
+        snoozeMinutes: 9,
+      }).then(() => this.checkFullScreenPermission())
+        .catch(() => {
+          // Fallback to the notification-based alarm if the native plugin is missing.
+          this.localNotifs.scheduleAlarm(hour, minute, label, this.alarmDays);
+        });
+      const soundMsg = this.alarmSoundName ? ` — ${this.alarmSoundName}` : '';
       this.snack.open(
-        `◈ ALARM SET — ${time} — THE SYSTEM will ring and vibrate`,
+        `◈ ALARM SET — ${time}${soundMsg} — rings + vibrates full-screen`,
         '✕',
         { duration: 4000, panelClass: 'system-snack' }
       );
@@ -431,7 +525,48 @@ export class SettingsPanelComponent implements OnInit {
     }
   }
 
+  /** Let the Hunter pick any local audio file as the alarm ringtone. */
+  chooseSound(): void {
+    if (!this.isAndroid) {
+      this.snack.open('Custom ringtones need the Android app.', '✕', { duration: 3000, panelClass: 'system-snack' });
+      return;
+    }
+    SystemAlarm.pickSound().then(res => {
+      this.alarmSoundUri  = res.uri;
+      this.alarmSoundName = res.name;
+      localStorage.setItem('sys_alarm_sound_uri', res.uri);
+      localStorage.setItem('sys_alarm_sound_name', res.name);
+      this.snack.open(`◈ RINGTONE SET — ${res.name}`, '✕', { duration: 3000, panelClass: 'system-snack' });
+      // If an alarm is already active, re-schedule so the new sound takes effect.
+      if (this.alarmActive) this.setAlarm();
+    }).catch(() => { /* user cancelled the picker — ignore */ });
+  }
+
+  /** Clear the custom ringtone → fall back to the default alarm sound. */
+  clearSound(): void {
+    this.alarmSoundUri = '';
+    this.alarmSoundName = '';
+    localStorage.removeItem('sys_alarm_sound_uri');
+    localStorage.removeItem('sys_alarm_sound_name');
+    if (this.alarmActive && this.isAndroid) this.setAlarm();
+  }
+
+  /** Android 14+ may block the full-screen ringing screen until allowed once. */
+  private checkFullScreenPermission(): void {
+    if (!this.isAndroid) return;
+    SystemAlarm.canUseFullScreenIntent().then(({ allowed }) => {
+      if (!allowed) {
+        this.snack.open('Allow "full-screen alarms" so it rings over the lock screen.', 'ALLOW', {
+          duration: 8000, panelClass: 'system-snack'
+        }).onAction().subscribe(() => SystemAlarm.openFullScreenIntentSettings());
+      }
+    }).catch(() => {});
+  }
+
   cancelAlarm(): void {
+    if (this.isAndroid) {
+      SystemAlarm.cancelAlarm().catch(() => {});
+    }
     this.localNotifs.cancelAlarm();
     localStorage.removeItem('sys_alarm_active');
     this.alarmActive = false;
@@ -469,6 +604,67 @@ export class SettingsPanelComponent implements OnInit {
         this.deleteErr.set('Deletion failed. Check your connection and try again.');
       },
     });
+  }
+
+  /* ===== Phase 4 — Data Export ===== */
+  exportJson(): void {
+    this.exporting.set(true);
+    this.lifeOs.exportData().subscribe({
+      next: (data) => {
+        this.exporting.set(false);
+        this.download(JSON.stringify(data, null, 2), 'the-system-backup.json', 'application/json');
+      },
+      error: () => { this.exporting.set(false); this.snack.open('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
+    });
+  }
+
+  exportCsv(): void {
+    this.exporting.set(true);
+    this.lifeOs.exportData().subscribe({
+      next: (data) => {
+        this.exporting.set(false);
+        const parts: string[] = [];
+        for (const [key, val] of Object.entries(data)) {
+          if (Array.isArray(val) && val.length) {
+            parts.push(`## ${key}`);
+            parts.push(this.arrayToCsv(val as Record<string, unknown>[]));
+            parts.push('');
+          }
+        }
+        this.download(parts.join('\n'), 'the-system-backup.csv', 'text/csv');
+      },
+      error: () => { this.exporting.set(false); this.snack.open('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
+    });
+  }
+
+  private arrayToCsv(rows: Record<string, unknown>[]): string {
+    const cols = Array.from(rows.reduce((set: Set<string>, r) => {
+      Object.keys(r).forEach(k => set.add(k)); return set;
+    }, new Set<string>()));
+    const esc = (v: unknown): string => {
+      if (v === null || v === undefined) return '';
+      const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const lines = rows.map(r => cols.map(c => esc(r[c])).join(','));
+    return [cols.join(','), ...lines].join('\n');
+  }
+
+  private download(content: string, filename: string, mime: string): void {
+    try {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      this.snack.open(`◈ EXPORTED — ${filename}`, '✕', { duration: 3000, panelClass: 'system-snack' });
+    } catch {
+      this.snack.open('⚠ Could not save. Try the web/PWA version.', '✕', { duration: 4000, panelClass: 'system-snack-warn' });
+    }
   }
 
   private parseBoosts(raw: string): string {

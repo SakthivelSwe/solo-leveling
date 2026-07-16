@@ -46,26 +46,55 @@ have been fixed. Details below.
 
 ---
 
-## 🔍 Dependency CVE review
+## 🔍 Dependency CVE review — July 2026
 
-**Backend** — `mvn` deps checked; the only reported CVEs are for `spring-security-web@6.2.4`:
-- **CVE-2024-38821** — *does not apply* (WebFlux-only; we use servlet Spring MVC).
-- **CVE-2026-22732** — no patched version yet; low practical impact for a personal LAN backend (affects custom header-writer edge case).
-- **CVE-2026-47838** — *does not apply* (X.509 client certs; we use JWT).
+**Bottom line:** these are *library* CVEs, **not malware**. None of them let the app
+harm your phone, spy on you, or attack other devices — they are theoretical bugs
+that require attacker preconditions this app doesn't create. Details below, with the
+clean-up upgrade path.
 
-None are exploitable in this app's configuration.
+### Backend (Maven / Spring Boot 3.2.12)
 
-**Frontend** — Angular 17 has 6 CVEs, all **XSS routes** requiring:
-- user-controlled Angular templates (we don't compile any at runtime), **or**
-- unsanitized SVG `<script>` bindings (we have none), **or**
-- untrusted i18n translations (we don't ship i18n), **or**
-- SSR client-hydration (we don't use SSR).
+> **Applied:** the Spring Boot parent was bumped **3.2.5 → 3.2.12** (same minor line,
+> a guaranteed drop-in per Spring's semver). This **cleared** CVE-2024-38809,
+> CVE-2024-38820 and CVE-2024-38827 by pulling in `spring-framework` 6.1.14 +
+> `spring-security` 6.2.8. Run `mvn test` after pulling to confirm the build.
 
-None are exploitable in this app. The **CSP added in step 3** blocks them even if some future template change accidentally created a vulnerable pattern.
+| Dependency | CVE(s) still reported | Applies here? |
+|---|---|---|
+| `spring-security-web@6.2.8` | CVE-2026-22732 (headers sometimes not written) | Low — degrades a hardening header in an edge case; no data exposure. **No patched version exists in any 6.x/7.x line yet.** |
+| `spring-security-web@6.2.8` | CVE-2026-47838 (X.509 impersonation) | **No** — we authenticate with JWT, not X.509 client certs. |
+| `spring-web@6.1.14` | CVE-2025-41234 (reflected file download) | **No** — needs a user-controlled `Content-Disposition` filename; we don't set one. |
+| `spring-core@6.1.14` | CVE-2025-41249 (annotation auth) | **No** — only affects `@EnableMethodSecurity` on generic superclasses. |
+| `spring-boot@3.2.12` | CVE-2025-22235 (`EndpointRequest.to()`) | **No** — not used; no `/null` route handling. |
+| `postgresql@42.7.x` | CVE-2026-42198 (SCRAM PBKDF2 DoS) | **No** — only a *malicious* Postgres server can trigger it; we connect to trusted Supabase over TLS. |
 
-**Capacitor 8.4.1** — clean; no known CVEs.
+**Optional further step:** a jump to Spring Boot **3.4.x** would clear CVE-2025-41234
+(N/A here anyway). Deferred — it's a minor-version bump that should be verified against
+the running backend; nothing above is exploitable in the current configuration.
 
-> To fully clear the Angular CVEs, upgrade to **Angular ≥ 19** (larger migration). Deferred — the app is safe today thanks to the CSP + safe template patterns.
+
+### Frontend (npm / Angular 17)
+
+Angular 17 reports several XSS + DoS CVEs (`@angular/core`, `@angular/common`). **Every
+one requires a precondition this app does not meet:**
+
+- Runtime-compiled user templates, SVG `<script>` bindings, or dynamic `createComponent`
+  on script hosts — **we compile no user templates**.
+- Angular **i18n** with untrusted translations — **we ship no i18n**.
+- **SSR / client hydration** transfer-cache poisoning — **we don't use SSR**.
+- `DecimalPipe` / `DatePipe` with attacker-controlled `digitsInfo` / format strings —
+  **our formats are hard-coded**.
+- XSRF token leak via protocol-relative URLs — **our API base URL is a fixed HTTPS host**.
+
+On top of that, the strict **Content-Security-Policy** in `index.html` blocks inline/external
+script execution, so even an accidental future vulnerable pattern is contained.
+
+**Recommended (larger) fix:** migrate to **Angular ≥ 19** to formally clear these. Deferred —
+it's a bigger migration and the app is safe today thanks to CSP + safe template patterns.
+
+**Capacitor 8.4.1** and the native alarm code — clean; no known CVEs, no network access.
+
 
 ---
 
@@ -96,14 +125,35 @@ None are exploitable in this app. The **CSP added in step 3** blocks them even i
 
 ## 📱 Permissions requested by the app
 
-Total: **4** (all standard, all necessary, none dangerous):
+All permissions are standard and necessary; **none are "dangerous"** in Android's
+classification (no camera, microphone, contacts, SMS, calendar, location, phone,
+or broad storage access). Only two show a runtime prompt.
 
 | Permission | Why | Runtime prompt? |
 |---|---|---|
 | `INTERNET` | Talk to your backend | no (install-time) |
-| `POST_NOTIFICATIONS` | Fire the 5 daily/weekly System reminders (wake, lunch, evening, sleep, weekly review) even when the app is closed | **yes** (Android 13+) — you can deny it and the app still works |
-| `SCHEDULE_EXACT_ALARM` + `USE_EXACT_ALARM` | Reminders fire at the exact scheduled minute (otherwise Doze mode delays them) | no |
-| `VIBRATE` | Haptic buzz on quest-complete / level-up | no |
+| `POST_NOTIFICATIONS` | Fire System reminders + the wake alarm even when the app is closed | **yes** (Android 13+) — deny it and the app still works |
+| `SCHEDULE_EXACT_ALARM` + `USE_EXACT_ALARM` | Reminders/alarm fire at the exact minute (otherwise Doze delays them) | no |
+| `RECEIVE_BOOT_COMPLETED` | Re-arm your wake alarm after a phone restart | no |
+| `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Keep the alarm sound playing reliably while it rings | no |
+| `USE_FULL_SCREEN_INTENT` | Show the full-screen "alarm ringing" screen over the lock screen | no |
+| `WAKE_LOCK` | Keep the CPU awake for the few minutes the alarm is ringing | no |
+| `VIBRATE` | Haptic buzz on quest-complete / level-up and alarm vibration | no |
+| `USE_BIOMETRIC` + `USE_FINGERPRINT` | Optional biometric app-lock (fingerprint / face / device PIN) | **yes** (only if you enable the lock) |
 
-**No** access to: camera, microphone, contacts, SMS, calendar, storage, location, phone, background location, install packages. The app can't read anything on your phone or send anything except HTTP to your backend.
+### 🎵 Custom alarm ringtone — scoped, not broad
+
+The "choose a local MP3" feature uses the Android **Storage Access Framework**
+(`ACTION_OPEN_DOCUMENT`). This means:
+
+- The app gets read access to **only the one file you pick** — never your whole
+  music library. There is **no `READ_MEDIA_AUDIO` / storage permission**.
+- The chosen file is only ever read locally to play the alarm. It is **never
+  uploaded** anywhere.
+- The alarm foreground service has **no network access code** and only plays audio.
+
+**No** access to: camera, microphone, contacts, SMS, calendar, storage library,
+location, phone, background location, or package installation. The app cannot read
+anything on your phone or send anything except HTTPS to your own backend.
+
 
