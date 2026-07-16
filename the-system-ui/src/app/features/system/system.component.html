@@ -42,6 +42,9 @@
         🔔<span class="badge" *ngIf="notifications.unread() > 0">{{ notifications.unread() }}</span>
       </a>
 
+      <!-- System Guide / Manual -->
+      <a routerLink="/guide" class="icon-btn tech" title="System Manual" aria-label="System Manual">📖</a>
+
       <!-- Settings -->
       <button class="icon-btn gear tech" (click)="settingsOpen.set(true)" title="Settings"
               aria-label="Open settings" id="settings-btn">⚙</button>

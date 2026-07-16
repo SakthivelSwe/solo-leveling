@@ -67,5 +67,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/progress/progress-report.component').then(m => m.ProgressReportComponent),
   },
+  {
+    path: 'guide',
+    loadComponent: () =>
+      import('./features/guide/system-guide.component').then(m => m.SystemGuideComponent),
+  },
   { path: '**', redirectTo: 'system' },
 ];
