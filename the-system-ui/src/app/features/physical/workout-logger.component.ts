@@ -39,7 +39,7 @@ interface DayGroup { date: string; entries: WorkoutEntry[]; volume: number; }
         <div class="wo-entry" *ngFor="let e of g.entries">
           <div class="wo-e-main">
             <span class="ex mono">{{ e.exerciseName }}</span>
-            <span class="sr tech">{{ e.sets }} × {{ e.reps }}<span *ngIf="e.weightKg"> @ {{ e.weightKg }}kg</span></span>
+            <span class="sr tech">{{ e.sets }} × {{ e.reps }}<span *ngIf="e.weightKg"> &#64; {{ e.weightKg }}kg</span></span>
           </div>
           <button class="wo-del" (click)="remove(e)" aria-label="Delete entry">✕</button>
         </div>
