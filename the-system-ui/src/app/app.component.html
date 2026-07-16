@@ -66,6 +66,6 @@
 
 <!-- Penalty Zone Overlay (Blocks everything) -->
 <app-penalty-zone
-  *ngIf="uiState.player()?.inPenaltyZone"
-  [endTime]="uiState.player()?.penaltyZoneEndTime || ''">
+  *ngIf="auth.player()?.inPenaltyZone"
+  [endTime]="auth.player()?.penaltyZoneEndTime || ''">
 </app-penalty-zone>

@@ -31,7 +31,7 @@ export class AppComponent {
   private biometric = inject(BiometricService);
   private router    = inject(Router);
   public uiState    = inject(UiStateService);
-  private auth      = inject(AuthService);
+  public auth       = inject(AuthService);
 
   /** Reactive signal: true when the biometric lock overlay should be shown. */
   isLocked = computed(() => this.biometric.isLocked);
