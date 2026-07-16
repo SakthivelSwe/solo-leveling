@@ -56,8 +56,24 @@ public class SmartNotebookService {
         }
     }
 
+    private String fetchYoutubeMetadata(String url) {
+        try {
+            org.springframework.web.client.RestClient http = org.springframework.web.client.RestClient.create();
+            java.util.Map<?, ?> resp = http.get()
+                .uri("https://www.youtube.com/oembed?url=" + url + "&format=json")
+                .retrieve()
+                .body(java.util.Map.class);
+            return resp != null ? resp.get("title") + " (Channel: " + resp.get("author_name") + ")" : "Unknown";
+        } catch (Exception e) {
+            log.warn("Failed to fetch YouTube oEmbed data for {}: {}", url, e.getMessage());
+            return "Unknown Video metadata";
+        }
+    }
+
     private String buildNotebookPrompt(String url) {
-        return "Analyze this YouTube educational video: " + url + "\n\n" +
+        String metadata = fetchYoutubeMetadata(url);
+        return "Analyze this YouTube educational video: " + url + "\n" +
+            "Video Title & Author Context: " + metadata + "\n\n" +
             "Extract and return STRICT JSON only (no markdown fences, no extra text):\n" +
             "{\n" +
             "  \"videoTitle\": \"exact video title\",\n" +

@@ -105,6 +105,9 @@ public class AiProviderService {
             "contents", List.of(
                 Map.of("parts", List.of(Map.of("text", combined)))
             ),
+            "tools", List.of(
+                Map.of("googleSearch", Map.of())
+            ),
             "generationConfig", Map.of(
                 "temperature", 0.7,
                 "maxOutputTokens", 1024
