@@ -1153,7 +1153,9 @@ export class LearningComponent implements OnInit {
 
   manualSync() {
     this.syncing.set(true);
-    const email = localStorage.getItem('system_user_email');
+    const playerRaw = localStorage.getItem('system_player');
+    const email = playerRaw ? JSON.parse(playerRaw).email : null;
+    
     if (!email) {
       alert('Error: User email not found in local storage.');
       this.syncing.set(false);
