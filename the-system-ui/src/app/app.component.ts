@@ -9,6 +9,7 @@ import { BiometricService } from './core/services/biometric.service';
 import { BiometricLockComponent } from './features/auth/biometric-lock.component';
 import { LevelUpModalComponent } from './shared/components/level-up-modal.component';
 import { EveningReviewComponent } from './shared/components/evening-review.component';
+import { PenaltyZoneComponent } from './shared/components/penalty-zone.component';
 import { UiStateService } from './core/services/ui-state.service';
 import { AuthService } from './core/services/auth.service';
 import { routeFade } from './shared/animations';
@@ -19,7 +20,7 @@ const AUTH_ROUTES = new Set(['/login', '/register', '/']);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent, LevelUpModalComponent, EveningReviewComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent, LevelUpModalComponent, EveningReviewComponent, PenaltyZoneComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [routeFade],

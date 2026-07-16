@@ -25,7 +25,10 @@ public class DataSeeder implements CommandLineRunner {
         if (questRepository.count() > 0) return;
 
         List<Quest> quests = List.of(
-            // DAILY
+            // DAILY - LORE ACCURATE (Dynamically Scaled)
+            build("COURAGE_OF_THE_WEAK", "[DAILY] Secret Quest: Courage of the Weak (10 Push-ups, 10 Sit-ups, 10 Squats, 1km Walk)", QuestCategory.DAILY, 50, "{\"STR\":3,\"VIT\":3,\"AGI\":2}", null, 10, true, 50, false),
+
+            // DAILY Foundational Habits
             build("BREAKFAST", "[DAILY] Eat breakfast before 10:00 AM", QuestCategory.DAILY, 40, "{\"VIT\":2}", null, 2, false, 5, false),
             build("WATER", "[DAILY] Drink 2 bottles of water", QuestCategory.DAILY, 30, "{\"VIT\":2}", null, 2, false, 5, false),
             build("EXERCISE", "[DAILY] 20-min exercise or walk outside", QuestCategory.DAILY, 80, "{\"STR\":4,\"HOR\":5}", null, 5, true, 30, false),

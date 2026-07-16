@@ -12,6 +12,8 @@ export interface Player {
   maxHp: number;
   equippedTitle?: string | null;
   currentEnergy?: number;
+  inPenaltyZone?: boolean;
+  penaltyZoneEndTime?: string;
 }
 
 export interface AuthResponse {

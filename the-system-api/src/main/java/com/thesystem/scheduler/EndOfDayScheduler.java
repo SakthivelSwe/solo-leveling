@@ -51,6 +51,19 @@ public class EndOfDayScheduler {
         List<Player> players = playerRepository.findAll();
 
         for (Player player : players) {
+            boolean courageDone = completionRepository
+                    .existsByPlayerIdAndQuestKeyAndCompletedAt(player.getId(), "COURAGE_OF_THE_WEAK", yesterday);
+
+            if (!courageDone) {
+                player.setInPenaltyZone(true);
+                player.setPenaltyZoneEndTime(null);
+                notificationService.push(player.getId(), "◈ PENALTY ZONE",
+                        "You failed the Daily Quest. A Penalty Survival Quest has been assigned.", "SYSTEM_PENALTY");
+                log.warn("◈ Player {} sent to PENALTY ZONE.", player.getUsername());
+            } else {
+                player.setInPenaltyZone(false);
+            }
+
             long rawQuestsDone = completionRepository
                     .countByPlayerIdAndCompletedAt(player.getId(), yesterday);
 
@@ -108,7 +121,9 @@ public class EndOfDayScheduler {
                     "hp", player.getHp(),
                     "maxHp", player.getMaxHp(),
                     "level", player.getLevel(),
-                    "rankLevel", player.getRankLevel()));
+                    "rankLevel", player.getRankLevel(),
+                    "inPenaltyZone", player.isInPenaltyZone(),
+                    "penaltyZoneEndTime", player.getPenaltyZoneEndTime() != null ? player.getPenaltyZoneEndTime().toString() : ""));
         }
         log.info("◈ THE SYSTEM — End-of-day HP processing complete for {} players.", players.size());
     }

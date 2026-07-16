@@ -14,6 +14,8 @@ interface PlayerUpdate {
   hp?: number;
   maxHp?: number;
   leveledUp?: boolean;
+  inPenaltyZone?: boolean;
+  penaltyZoneEndTime?: string;
 }
 
 /**
@@ -154,6 +156,8 @@ export class SseService {
           rankLevel: data.rankLevel ?? current.rankLevel,
           hp: newHp,
           maxHp: data.maxHp ?? current.maxHp,
+          inPenaltyZone: data.inPenaltyZone ?? current.inPenaltyZone,
+          penaltyZoneEndTime: data.penaltyZoneEndTime ?? current.penaltyZoneEndTime,
         });
       }
       this.playerTick.update(v => v + 1);

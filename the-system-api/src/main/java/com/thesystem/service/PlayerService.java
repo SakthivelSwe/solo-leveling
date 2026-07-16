@@ -61,7 +61,8 @@ public class PlayerService {
     public PlayerDTO toDto(Player p) {
         return new PlayerDTO(p.getId(), p.getUsername(), p.getDisplayName(), p.getEmail(),
                 p.getRankLevel(), p.getLevel(), p.getCurrentXp(), p.getTotalXp(),
-                levelService.xpToNextLevel(), p.getHp(), p.getMaxHp(), p.getEquippedTitle());
+                levelService.xpToNextLevel(), p.getHp(), p.getMaxHp(), p.getEquippedTitle(),
+                p.isInPenaltyZone(), p.getPenaltyZoneEndTime() != null ? p.getPenaltyZoneEndTime().toString() : "");
     }
 
     public PlayerDTO getProfile(Long playerId) {

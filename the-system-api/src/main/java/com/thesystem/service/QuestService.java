@@ -52,19 +52,48 @@ public class QuestService {
     }
 
     public List<QuestDTO> getTodayQuests(Long playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
         LocalDate today = LocalDate.now();
         Set<Long> completedIds = completionRepository
                 .findByPlayerIdAndCompletedAt(playerId, today).stream()
                 .map(QuestCompletion::getQuestId)
                 .collect(Collectors.toSet());
 
-        return questRepository.findByActiveTrueOrderByCategoryAscXpRewardDesc().stream()
-                .map(q -> toDto(q, completedIds.contains(q.getId())))
+        List<QuestDTO> dtos = questRepository.findByActiveTrueOrderByCategoryAscXpRewardDesc().stream()
+                .map(q -> toDto(q, completedIds.contains(q.getId()), player))
                 .collect(Collectors.toList());
+
+        if (player.isInPenaltyZone()) {
+            // Dynamic Penalty Quest injected at the top
+            dtos.add(0, new QuestDTO(-1L, "PENALTY_SURVIVAL", "[PENALTY] Survival: 20 Burpees or No Screen Time for 1 Hour", 
+                     "DAILY", 0, null, null, false, 999, true, 0, false));
+        }
+
+        return dtos;
     }
 
     @Transactional
     public QuestCompletionResult completeQuest(Long playerId, String questKey) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
+
+        if ("PENALTY_SURVIVAL".equals(questKey)) {
+            if (!player.isInPenaltyZone()) {
+                throw new ApiException("Not in penalty zone", HttpStatus.BAD_REQUEST);
+            }
+            player.setInPenaltyZone(false);
+            playerRepository.save(player);
+            sseService.send(player.getId(), "player-update", java.util.Map.of("inPenaltyZone", false));
+            
+            PlayerStats stats = statsRepository.findByPlayerId(playerId)
+                .orElseThrow(() -> new ApiException("Stats not found", HttpStatus.NOT_FOUND));
+            StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
+                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getHor());
+            
+            return new QuestCompletionResult(questKey, "Penalty Survival", 0, false, player.getLevel(), player.getRankLevel(), false, statsDto, List.of(), List.of());
+        }
+
         Quest quest = questRepository.findByQuestKey(questKey)
                 .orElseThrow(() -> new ApiException("Quest not found: " + questKey, HttpStatus.NOT_FOUND));
 
@@ -73,13 +102,10 @@ public class QuestService {
             throw new ApiException("Quest already completed today", HttpStatus.CONFLICT);
         }
 
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
-
         // Award XP — apply compound energy × dopamine/focus multipliers.
         // Low energy (sleep-deprived) reduces XP. High dopamine (reels, porn) further reduces it.
         // On a perfect day (high energy + clean dopamine): +10% bonus.
-        int baseXp = quest.getXpReward();
+        int baseXp = getDynamicXp(quest, player);
         int energy = player.getCurrentEnergy();
         double energyMultiplier = energy < 40 ? 0.80
                 : energy < 60 ? 0.90
@@ -199,9 +225,40 @@ public class QuestService {
     }
 
     public QuestDTO toDto(Quest q, boolean completed) {
-        return new QuestDTO(q.getId(), q.getQuestKey(), q.getLabel(), q.getCategory().name(),
-                q.getXpReward(), q.getStatBoosts(), q.getSkillBoosts(), completed,
+        return toDto(q, completed, null);
+    }
+
+    public QuestDTO toDto(Quest q, boolean completed, Player player) {
+        String label = q.getLabel();
+        int xpReward = getDynamicXp(q, player);
+        
+        if ("COURAGE_OF_THE_WEAK".equals(q.getQuestKey()) && player != null) {
+            int level = player.getLevel();
+            if (level <= 5) {
+                label = "[DAILY] Secret Quest: Courage of the Weak (10 Push-ups, 10 Sit-ups, 10 Squats, 1km Walk)";
+            } else if (level <= 10) {
+                label = "[DAILY] Secret Quest: Courage of the Weak (25 Push-ups, 25 Sit-ups, 25 Squats, 2.5km Jog)";
+            } else if (level <= 20) {
+                label = "[DAILY] Secret Quest: Courage of the Weak (50 Push-ups, 50 Sit-ups, 50 Squats, 5km Run)";
+            } else {
+                label = "[DAILY] Secret Quest: Courage of the Weak (100 Push-ups, 100 Sit-ups, 100 Squats, 10km Run)";
+            }
+        }
+
+        return new QuestDTO(q.getId(), q.getQuestKey(), label, q.getCategory().name(),
+                xpReward, q.getStatBoosts(), q.getSkillBoosts(), completed,
                 q.getPriority(), q.isCritical(), q.getBossDamage(), q.isRecoveryQuest());
+    }
+
+    private int getDynamicXp(Quest q, Player p) {
+        if ("COURAGE_OF_THE_WEAK".equals(q.getQuestKey()) && p != null) {
+            int level = p.getLevel();
+            if (level <= 5) return 50;
+            if (level <= 10) return 100;
+            if (level <= 20) return 150;
+            return 200;
+        }
+        return q.getXpReward();
     }
 }
 

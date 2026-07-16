@@ -25,5 +25,11 @@ public interface QuestCompletionRepository extends JpaRepository<QuestCompletion
            "WHERE qc.playerId = :playerId AND qc.completedAt = :date AND q.recoveryQuest = true")
     long countRecoveryQuestsByPlayerIdAndCompletedAt(
             @Param("playerId") Long playerId, @Param("date") LocalDate date);
+
+    @Query("SELECT CASE WHEN COUNT(qc) > 0 THEN true ELSE false END FROM QuestCompletion qc " +
+           "JOIN Quest q ON q.id = qc.questId " +
+           "WHERE qc.playerId = :playerId AND qc.completedAt = :date AND q.questKey = :questKey")
+    boolean existsByPlayerIdAndQuestKeyAndCompletedAt(
+            @Param("playerId") Long playerId, @Param("questKey") String questKey, @Param("date") LocalDate date);
 }
 

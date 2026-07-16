@@ -12,6 +12,8 @@ public record PlayerDTO(
         int xpToNextLevel,
         int hp,
         int maxHp,
-        String equippedTitle
+        String equippedTitle,
+        boolean inPenaltyZone,
+        String penaltyZoneEndTime
 ) {}
 

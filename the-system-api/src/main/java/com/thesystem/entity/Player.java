@@ -64,6 +64,12 @@ public class Player {
     @jakarta.persistence.Transient
     private int currentEnergy = 70;
 
+    @Column(name = "in_penalty_zone")
+    private boolean inPenaltyZone = false;
+
+    @Column(name = "penalty_zone_end_time")
+    private LocalDateTime penaltyZoneEndTime;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -100,5 +106,8 @@ public class Player {
     public void setCurrentEnergy(int currentEnergy) { this.currentEnergy = currentEnergy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public boolean isInPenaltyZone() { return inPenaltyZone; }
+    public void setInPenaltyZone(boolean inPenaltyZone) { this.inPenaltyZone = inPenaltyZone; }
+    public LocalDateTime getPenaltyZoneEndTime() { return penaltyZoneEndTime; }
+    public void setPenaltyZoneEndTime(LocalDateTime penaltyZoneEndTime) { this.penaltyZoneEndTime = penaltyZoneEndTime; }
 }
-
