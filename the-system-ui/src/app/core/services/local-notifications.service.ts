@@ -42,27 +42,47 @@ export class LocalNotificationsService {
   async createChannels(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
+      // ─── CRITICAL: Android notification channel settings are IMMUTABLE once
+      // created (sound, importance, vibration cannot be changed programmatically).
+      // Delete old channels first, then recreate with new IDs so Android treats
+      // them as fresh channels with correct sound settings.
+      // Stale channel IDs are left deleted; new ones are versioned (v2).
+      await LocalNotifications.deleteChannel({ id: 'system-alarms' }).catch(() => {});
+      await LocalNotifications.deleteChannel({ id: 'game-events' }).catch(() => {});
+      await LocalNotifications.deleteChannel({ id: 'reminders' }).catch(() => {});
+
+      // system-alarms-v2: URGENT priority — sound + vibration for alarms
       await LocalNotifications.createChannel({
-        id: 'system-alarms',
-        name: 'System Alarms',
-        importance: 5,
+        id: 'system-alarms-v2',
+        name: '⚡ THE SYSTEM — Alarms',
+        description: 'Wake alarm, sleep reminder and midnight reset notifications',
+        importance: 5,       // IMPORTANCE_HIGH → heads-up + sound
         sound: 'default',
         vibration: true,
         lights: true,
         lightColor: '#6C63FF',
       });
+
+      // game-events-v2: HIGH priority — sound + vibration for HP warnings / level ups
       await LocalNotifications.createChannel({
-        id: 'game-events',
-        name: 'Game Events',
+        id: 'game-events-v2',
+        name: '◈ THE SYSTEM — Game Events',
+        description: 'HP warnings, level ups, dungeon alerts',
         importance: 4,
         sound: 'default',
-        vibration: true
+        vibration: true,
+        lights: true,
+        lightColor: '#FAC775',
       });
+
+      // reminders-v2: DEFAULT priority — silent daily nudges
       await LocalNotifications.createChannel({
-        id: 'reminders',
-        name: 'Daily Reminders',
+        id: 'reminders-v2',
+        name: '◈ THE SYSTEM — Reminders',
+        description: 'Lunch, evening and weekly review reminders',
         importance: 3,
-        vibration: false
+        sound: 'default',
+        vibration: true,
       });
     } catch { /* ignore */ }
   }
@@ -100,7 +120,7 @@ export class LocalNotificationsService {
         notifications: [
           {
             id: LocalNotificationsService.IDS.midnight,
-            channelId: 'system-alarms',
+            channelId: 'system-alarms-v2',
             title: '⚡ SYSTEM ALERT: Midnight Reset',
             body: 'A new day begins. Quests reset. Arise, Hunter.',
             largeBody: '◈ THE SYSTEM HAS RESET ◈\n\nA new day has dawned. All daily quests and routines have been reset.\n\n"The system is not your master, it is your tool. Use it to level up."\n\nPrepare your directives for today.',
@@ -110,7 +130,7 @@ export class LocalNotificationsService {
           },
           {
             id: LocalNotificationsService.IDS.wake,
-            channelId: 'system-alarms',
+            channelId: 'system-alarms-v2',
             title: '⚡ WAKE PROTOCOL INITIATED',
             body: 'Cold shower. Sunlight. Eggs. Begin.',
             largeBody: '◈ WAKE PROTOCOL ◈\n\n1. Get out of bed immediately.\n2. Expose your eyes to sunlight.\n3. Take a cold shower.\n4. Consume a high-protein breakfast.\n\nDo not let the system dictate your weakness. Level up today.',
@@ -120,7 +140,7 @@ export class LocalNotificationsService {
           },
           {
             id: LocalNotificationsService.IDS.sleep,
-            channelId: 'system-alarms',
+            channelId: 'system-alarms-v2',
             title: '⚡ SLEEP PROTOCOL',
             body: 'Phone down. Sleep before 11:30. System watching.',
             largeBody: '◈ SLEEP PROTOCOL ◈\n\nYour body requires recovery to grow stronger.\n\n1. Put all screens away.\n2. Prepare for sleep.\n3. Sleep before 11:30 PM.\n\nFailure to recover is failure to level up.',
@@ -143,7 +163,7 @@ export class LocalNotificationsService {
         notifications: [
           {
             id: LocalNotificationsService.IDS.lunch,
-            channelId: 'reminders',
+            channelId: 'reminders-v2',
             title: 'FUEL REQUIRED',
             body: 'Proper lunch. No junk. Zinc included.',
             largeBody: '◈ MIDDAY FUEL CHECK ◈\n\nYour body requires clean fuel to maintain peak performance.\n\n◈ No sugar. No processed junk.\n◈ Ensure adequate protein and zinc.\n◈ Hydrate immediately.\n\nDo not poison your avatar.',
@@ -153,7 +173,7 @@ export class LocalNotificationsService {
           },
           {
             id: LocalNotificationsService.IDS.evening,
-            channelId: 'reminders',
+            channelId: 'reminders-v2',
             title: 'QUESTS REMAINING',
             body: 'Check your incomplete quests. Evening window closing.',
             largeBody: '◈ EVENING DIRECTIVE ◈\n\nThe day is ending, but your tasks are not finished.\n\nCheck the system for incomplete daily quests. Leaving them unfinished will result in penalties.\n\nPush through the fatigue. That is how you level up.',
@@ -163,7 +183,7 @@ export class LocalNotificationsService {
           },
           {
             id: LocalNotificationsService.IDS.weeklyReview,
-            channelId: 'reminders',
+            channelId: 'reminders-v2',
             title: '📊 WEEKLY REVIEW',
             body: 'Open the system. Review your week. Set next target.',
             largeBody: '◈ SYSTEM WEEKLY REVIEW ◈\n\nIt is time to assess your growth.\n\n1. Review your completed quests.\n2. Analyze your failed habits.\n3. Adjust your stats allocation.\n4. Set a primary objective for the coming week.\n\nGrowth requires reflection. Open the app now.',
@@ -201,7 +221,7 @@ export class LocalNotificationsService {
         await LocalNotifications.schedule({
           notifications: [{
             id,
-            channelId: 'system-alarms',
+            channelId: 'system-alarms-v2',
             title: `⚡ ${label}`,
             body: 'Hunter, your wake alarm is ringing. Arise.',
             largeBody: `◈ ALARM — ${label} ◈\n\nIt is time. The system is watching.\n\n1. Get out of bed immediately.\n2. Execute your morning protocol.\n3. Do not waste this moment.`,
@@ -240,7 +260,7 @@ export class LocalNotificationsService {
         notifications: [
           {
             id,
-            channelId: 'system-alarms',
+            channelId: 'system-alarms-v2',
             title: '✅ FOCUS BLOCK COMPLETE',
             body: `${minutes}-minute session done. Take a break.`,
             largeBody: `Hunter,\n\nYou have successfully completed a ${minutes}-minute focus block.\n\n◈ Consistency is the key to leveling up.\n◈ Your mental stamina has increased.\n\nTake a moment to recover before your next quest.`,
@@ -261,7 +281,7 @@ export class LocalNotificationsService {
       await LocalNotifications.schedule({
         notifications: [{
           id: 2,
-          channelId: 'game-events',
+          channelId: 'game-events-v2',
           title: '⚠ CRITICAL: HP BELOW 40',
           body: `HP is at ${currentHp}. Complete quests now or face demotion.`,
           largeBody: `◈ CRITICAL WARNING ◈\n\nYour HP has dropped to a dangerous level (${currentHp} HP).\n\nIf your HP reaches 0, you will face severe penalties and stat reduction.\n\nImmediate Action Required:\n1. Open the system.\n2. Complete pending daily quests.\n3. Restore your health before midnight.\n\nDo not fail.`,
@@ -280,7 +300,7 @@ export class LocalNotificationsService {
       await LocalNotifications.schedule({
         notifications: [{
           id,
-          channelId: 'game-events',
+          channelId: 'game-events-v2',
           title,
           body,
           schedule: { at: new Date(Date.now() + 500) },
@@ -311,7 +331,7 @@ export class LocalNotificationsService {
             schedule: { on: { hour: hh, minute: mm }, allowWhileIdle: true, repeats: true },
             smallIcon: SMALL_ICON,
             largeIcon: LARGE_ICON,
-            channelId: 'reminders',
+            channelId: 'reminders-v2',
             actionTypeId: LocalNotificationsService.HABIT_ACTION_TYPE,
           };
         });
