@@ -19,77 +19,134 @@ import { RouterLink } from '@angular/router';
 
       <div class="content-wrapper">
         <section class="panel">
-          <h2 class="tech">I. AWAKENING</h2>
+          <h2 class="tech">I. THE SYSTEM: AN OVERVIEW</h2>
           <p>
             Welcome, Player. You have been selected by <strong>THE SYSTEM</strong>.
-            This application is not just a habit tracker; it is an RPG engine for your real life.
-            Every action you take in reality earns XP, levels you up, and increases your stats.
-          </p>
-          <p>
-            If you stay consistent, you will grow stronger. If you fail to meet the System's requirements, you will be penalized.
+            This application is not just a habit tracker; it is a full RPG engine for your real life.
+            Your ultimate goal is to grow stronger, level up, and become an S-Rank Hunter by mastering your daily routines, physical health, and professional skills.
           </p>
         </section>
 
         <section class="panel">
-          <h2 class="tech">II. DAILY QUESTS & PROGRESSIVE OVERLOAD</h2>
-          <p>
-            Quests reset every night at midnight. You must complete your core Daily Quests to survive.
-          </p>
+          <h2 class="tech">II. DAILY WORKFLOW (HOW TO PLAY)</h2>
+          <p>Every day in THE SYSTEM follows a strict cycle. To survive and level up, you must follow this daily flow:</p>
+          
           <div class="highlight-box">
-            <h3 class="tech">[DAILY] Secret Quest: Courage of the Weak</h3>
-            <p>
-              Your physical requirement scales with your Player Level. You are not expected to do 100 reps on Day 1.
-            </p>
+            <h3 class="tech">Morning: The Awakening</h3>
             <ul>
-              <li><strong>Level 1-5:</strong> 10 Push-ups, 10 Sit-ups, 10 Squats, 1km Walk</li>
-              <li><strong>Level 6-10:</strong> 25 Push-ups, 25 Sit-ups, 25 Squats, 2.5km Jog</li>
-              <li><strong>Level 11-20:</strong> 50 Push-ups, 50 Sit-ups, 50 Squats, 5km Run</li>
-              <li><strong>Level 21+:</strong> 100 Push-ups, 100 Sit-ups, 100 Squats, 10km Run</li>
+              <li><strong>Open the App:</strong> Check your <em>Status</em> page to see your current HP, Level, and Rank.</li>
+              <li><strong>Review Quests:</strong> Navigate to the <em>Quests</em> tab to see your assigned tasks for the day.</li>
             </ul>
           </div>
-          <p>
-            In addition to physical training, foundational habits (Sleep, Water, Breakfast, No Screens before bed) are marked as <strong>[DAILY]</strong>. The System recognizes that recovery is just as important as training.
-          </p>
-        </section>
 
-        <section class="panel">
-          <h2 class="tech">III. HP & THE PENALTY ZONE</h2>
-          <p>
-            You start with 100 HP. Completing your Daily Quests perfectly recovers HP. Failing them results in HP loss.
-          </p>
-          <ul>
-            <li><strong>Penalty Zone:</strong> If you fail the "Courage of the Weak" physical quest, the System will throw you into the Penalty Zone the next day. A red banner will lock the top of your screen, and you must complete a <em>Survival Penalty Quest</em> (e.g. Burpees or Screen-Time bans) to restore normal functionality.</li>
-            <li><strong>Rank Drop:</strong> If you consistently fail your quests and your HP reaches 0, you will be demoted to a lower Rank (e.g. from C-Rank down to D-Rank), losing your prestige.</li>
-          </ul>
-        </section>
+          <div class="highlight-box">
+            <h3 class="tech">Daytime: The Grind</h3>
+            <ul>
+              <li><strong>Log Your Habits:</strong> As you complete tasks (e.g., Eating Breakfast, Drinking Water, Coding), check them off in the Quests tab.</li>
+              <li><strong>Physical Training:</strong> You must complete the <em>Courage of the Weak</em> quest every single day. (See section on Physical Quests).</li>
+              <li><strong>Life OS:</strong> Use the <em>Life OS</em> tab to log deep work sessions, track learning hours, or record dopamine detox streaks.</li>
+            </ul>
+          </div>
 
-        <section class="panel">
-          <h2 class="tech">IV. STATUS & STATS</h2>
-          <p>
-            Completing specific quests (like Coding, Reading, or Exercising) grants points toward your core stats:
-          </p>
-          <div class="stats-grid">
-            <div class="stat-item"><span class="tech stat-name str">STR</span> (Strength): Physical power and muscle endurance.</div>
-            <div class="stat-item"><span class="tech stat-name agi">AGI</span> (Agility): Speed, cardio, and quick task execution.</div>
-            <div class="stat-item"><span class="tech stat-name vit">VIT</span> (Vitality): Health, sleep quality, and diet.</div>
-            <div class="stat-item"><span class="tech stat-name int">INT</span> (Intelligence): Technical knowledge, coding, and learning.</div>
-            <div class="stat-item"><span class="tech stat-name per">PER</span> (Perception): Awareness, debugging, and focus.</div>
-            <div class="stat-item"><span class="tech stat-name hor">HOR</span> (Hormones): Testosterone, drive, and dopamine detox (No-fap, Cold Showers).</div>
+          <div class="highlight-box">
+            <h3 class="tech">Evening: The Review (9 PM)</h3>
+            <ul>
+              <li><strong>Evening Check-in:</strong> At 9 PM, the System will prompt an Evening Review. You must log your daily reflections.</li>
+              <li><strong>Midnight Reset:</strong> At exactly 12:00 AM, the System evaluates your day. If you missed core quests, you will lose HP and face penalties.</li>
+            </ul>
           </div>
         </section>
 
         <section class="panel">
-          <h2 class="tech">V. THE SYSTEM OS MODULES</h2>
+          <h2 class="tech">III. QUESTS & PROGRESSIVE OVERLOAD</h2>
+          <p>Your tasks are divided into routines and the core Physical Quest.</p>
+          
+          <h3 class="tech">The Physical Quest: Courage of the Weak</h3>
+          <p>
+            You must complete this quest daily. The System uses <strong>Progressive Overload</strong>, meaning the difficulty scales with your current Player Level:
+          </p>
           <ul>
-            <li><strong>Life OS:</strong> Track your career, coding hours, deep work, and dopamine detox.</li>
-            <li><strong>Body OS:</strong> Track your body weight, sleep duration, and detailed workouts.</li>
-            <li><strong>AI Mentor:</strong> Seek guidance from the System Architect when you are stuck.</li>
-            <li><strong>Ranks & Achievements:</strong> Unlock titles and view your overall Hunter Rank.</li>
+            <li><strong>Level 1-5 (E-Rank):</strong> 10 Push-ups, 10 Sit-ups, 10 Squats, 1km Walk</li>
+            <li><strong>Level 6-10 (D-Rank):</strong> 25 Push-ups, 25 Sit-ups, 25 Squats, 2.5km Jog</li>
+            <li><strong>Level 11-20 (C-Rank):</strong> 50 Push-ups, 50 Sit-ups, 50 Squats, 5km Run</li>
+            <li><strong>Level 21+ (B-Rank to S-Rank):</strong> 100 Push-ups, 100 Sit-ups, 100 Squats, 10km Run</li>
           </ul>
+
+          <h3 class="tech">Foundational Habits</h3>
+          <p>You are required to track basic life habits to ensure recovery. Eating, sleeping 8 hours, and avoiding late-night screens are critical for maintaining high HP.</p>
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">IV. HP, SURVIVAL & THE PENALTY ZONE</h2>
+          <p>You start with 100 HP. Your HP determines your survival.</p>
+          
+          <ul>
+            <li><strong>Gaining HP:</strong> Completing all your Daily Quests perfectly restores lost HP.</li>
+            <li><strong>Losing HP:</strong> Failing to complete enough quests causes your HP to drop during the Midnight Reset.</li>
+            <li><strong>The Penalty Zone:</strong> If you fail the "Courage of the Weak" physical quest, the System will throw you into the Penalty Zone. A red banner will lock the top of your screen. To escape, you must complete the <em>Survival Penalty Quest</em> (e.g., 20 Burpees or a 1-hour screen ban) listed in your Quests tab.</li>
+            <li><strong>Rank Drop:</strong> If you are lazy, your HP will eventually hit 0. When this happens, the System will instantly demote your Hunter Rank (e.g., from C-Rank back down to D-Rank).</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">V. STATS & ATTRIBUTES</h2>
+          <p>Every quest you complete grants Experience Points (XP) towards specific stats. Leveling up these stats reflects your real-life growth:</p>
+          <div class="stats-grid">
+            <div class="stat-item"><span class="tech stat-name str">STR (Strength)</span><br>Increased by physical workouts, lifting, and the daily physical quest.</div>
+            <div class="stat-item"><span class="tech stat-name agi">AGI (Agility)</span><br>Increased by cardio, running, speed reading, and fast task execution.</div>
+            <div class="stat-item"><span class="tech stat-name vit">VIT (Vitality)</span><br>Increased by sleep, eating healthy meals, drinking water, and recovery.</div>
+            <div class="stat-item"><span class="tech stat-name int">INT (Intelligence)</span><br>Increased by deep work, coding sessions, reading, and learning.</div>
+            <div class="stat-item"><span class="tech stat-name per">PER (Perception)</span><br>Increased by meditation, debugging code, and avoiding distractions.</div>
+            <div class="stat-item"><span class="tech stat-name hor">HOR (Hormones)</span><br>Increased by dopamine detox (No-fap, cold showers) and discipline.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">VI. SYSTEM COMPONENTS EXPLAINED</h2>
+          
+          <div class="highlight-box">
+            <h3 class="tech">1. Status (Dashboard)</h3>
+            <p>Your main hub. Here you can see your beautiful Hunter Badge, your current Level, XP progress bar, and your HP. Use this to quickly check your standing.</p>
+          </div>
+
+          <div class="highlight-box">
+            <h3 class="tech">2. Quests (Habits)</h3>
+            <p>This is where you check off your tasks. Simply tap a quest to mark it as complete. You will immediately see XP and stat boosts floating on the screen.</p>
+          </div>
+
+          <div class="highlight-box">
+            <h3 class="tech">3. Life OS</h3>
+            <p>Your professional and mental tracking tool. Use this tab to:</p>
+            <ul>
+              <li>Log hours spent coding or working.</li>
+              <li>Track your dopamine detox streaks (e.g., days without social media).</li>
+              <li>Input journal entries for mental clarity.</li>
+            </ul>
+          </div>
+
+          <div class="highlight-box">
+            <h3 class="tech">4. Body OS (Physical)</h3>
+            <p>Your health tracker. Use this tab to:</p>
+            <ul>
+              <li>Log your daily body weight.</li>
+              <li>Track your sleep duration and quality.</li>
+              <li>Record specific gym workouts (sets, reps, weights) beyond the basic daily quest.</li>
+            </ul>
+          </div>
+
+          <div class="highlight-box">
+            <h3 class="tech">5. AI Mentor</h3>
+            <p>If you feel lost, unmotivated, or need coding/life advice, talk to the AI Mentor. It acts as the "System Architect" and will give you ruthless, discipline-focused advice to keep you on track.</p>
+          </div>
+
+          <div class="highlight-box">
+            <h3 class="tech">6. Ranks & Achievements</h3>
+            <p>As you level up, you unlock Titles (like "Shadow Monarch" or "Novice Hunter"). This page shows your overall Rank (E -> S) and the achievements you have permanently unlocked.</p>
+          </div>
         </section>
 
         <div class="footer tech">
-          <p>ARISE, HUNTER.</p>
+          <p>ARISE, HUNTER. THE SYSTEM IS WATCHING.</p>
         </div>
       </div>
     </div>
