@@ -43,13 +43,20 @@
         🔔<span class="badge" *ngIf="notifications.unread() > 0">{{ notifications.unread() }}</span>
       </a>
       
-      <!-- Profile & Exit -->
-      <span class="tech player-email" *ngIf="auth.player()?.email as email" style="font-size: 0.65rem; color: var(--text-dim); margin-left: 12px; margin-right: 8px;">
-        [{{ email }}]
-      </span>
-      <button class="icon-btn tech exit-btn" (click)="logout()" title="System Exit" aria-label="Sign out" style="color: var(--accent-red); font-size: 0.8rem;">
-        EXIT
-      </button>
+      <!-- Profile Dropdown -->
+      <div class="profile-dropdown-container" (click)="$event.stopPropagation()">
+        <button class="icon-btn tech profile-btn" (click)="profileMenuOpen.set(!profileMenuOpen())" title="Profile" aria-label="Profile Menu">
+          👤
+        </button>
+        <div class="profile-menu" *ngIf="profileMenuOpen()">
+          <div class="profile-header tech">
+            {{ auth.player()?.email }}
+          </div>
+          <button class="menu-item exit-btn tech" (click)="logout()">
+            <span class="icon">⏻</span> EXIT SYSTEM
+          </button>
+        </div>
+      </div>
 
       <!-- System Guide / Manual -->
       <a routerLink="/guide" class="icon-btn tech" title="System Manual" aria-label="System Manual">📖</a>

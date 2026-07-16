@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -42,6 +42,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   loading = signal(!this.status());
   pendingKey = signal<string | null>(null);
   settingsOpen = signal(false);
+  profileMenuOpen = signal(false);
   pressureLevel = signal(localStorage.getItem('sys_pressure') ?? 'STANDARD');
   /** Mobile section tabs: 'status' | 'quests' | 'schedule' */
   mobileTab = signal<'status' | 'quests' | 'schedule'>('status');
@@ -114,7 +115,12 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
   }
 
-
+  @HostListener('document:click')
+  onDocumentClick() {
+    if (this.profileMenuOpen()) {
+      this.profileMenuOpen.set(false);
+    }
+  }
 
   onComplete(quest: Quest): void {
     this.pendingKey.set(quest.questKey);
