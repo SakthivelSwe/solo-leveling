@@ -131,12 +131,17 @@ interface QuestItem {
           ⚡ SET ALARM
         </button>
 
-        <!-- Note for non-Android -->
-        <p class="alarm-note tech" *ngIf="!isAndroid">
-          ◈ On desktop, alarm will use in-app notification. Install the Android app for full native alarm with ringtone selection.
+        <!-- Cancel alarm button -->
+        <button class="alarm-cancel-btn tech" *ngIf="alarmActive" (click)="cancelAlarm()" id="cancel-alarm-btn">
+          ✖ CANCEL ALARM
+        </button>
+
+        <!-- Status -->
+        <p class="alarm-note tech" *ngIf="alarmActive">
+          ◈ ALARM ACTIVE — {{ alarmTime }} — rings via THE SYSTEM notification (vibrates + sound)
         </p>
-        <p class="alarm-note alarm-note-android tech" *ngIf="isAndroid">
-          ◈ Tapping SET ALARM opens your Android Clock app — choose any ringtone or song there.
+        <p class="alarm-note tech" *ngIf="!isAndroid && !alarmActive">
+          ◈ On desktop, set alarm will use browser notifications. Install the Android app for full reliability.
         </p>
       </div>
     </section>
@@ -293,11 +298,17 @@ interface QuestItem {
   transition: all .2s;
 }
 .alarm-set-btn:hover { background: rgba(250,199,117,0.22); box-shadow: 0 0 16px rgba(250,199,117,0.25); }
-.alarm-note {
-  margin: 0; font-size: .64rem; letter-spacing: .5px;
-  color: var(--text-secondary); text-align: center; line-height: 1.5;
+.alarm-cancel-btn {
+  width: 100%; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 8px;
+  border: 1px solid rgba(226,75,74,0.5);
+  background: rgba(226,75,74,0.08);
+  color: #f09595; font-size: .74rem; letter-spacing: 2px; transition: all .2s;
 }
-.alarm-note-android { color: rgba(108,99,255,0.8); }
+.alarm-cancel-btn:hover { background: rgba(226,75,74,0.18); }
+.alarm-note {
+  margin: 8px 0 0; font-size: .64rem; letter-spacing: .5px;
+  color: rgba(108,99,255,0.8); text-align: center; line-height: 1.5;
+}
 
   `],
 })
@@ -338,7 +349,8 @@ export class SettingsPanelComponent implements OnInit {
   alarmTime    = localStorage.getItem('sys_alarm_time') ?? '06:00';
   alarmLabel   = localStorage.getItem('sys_alarm_label') ?? 'WAKE PROTOCOL — THE SYSTEM';
   alarmVibrate = true;
-  alarmDays    = [false, true, true, true, true, true, false]; // Mon–Fri active by default
+  alarmDays    = JSON.parse(localStorage.getItem('sys_alarm_days') ?? '[false,true,true,true,true,true,false]') as boolean[];
+  alarmActive  = localStorage.getItem('sys_alarm_active') === '1';
   readonly weekDays  = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   readonly isAndroid = Capacitor.getPlatform() === 'android';
 
@@ -396,47 +408,34 @@ export class SettingsPanelComponent implements OnInit {
     // Persist preference
     localStorage.setItem('sys_alarm_time',  time);
     localStorage.setItem('sys_alarm_label', label);
+    localStorage.setItem('sys_alarm_days',  JSON.stringify(this.alarmDays));
+    localStorage.setItem('sys_alarm_active', '1');
+    this.alarmActive = true;
 
     if (this.isAndroid) {
-      // --- Android: open native Clock app via ACTION_SET_ALARM intent ---
-      // This gives a REAL alarm — user picks their ringtone inside the Clock app.
-      // Construct the intent URL for Android's SET_ALARM action.
-      const intentUrl = [
-        'intent:#Intent',
-        'action=android.intent.action.SET_ALARM',
-        `i.android.intent.extra.alarm.HOUR=${hour}`,
-        `i.android.intent.extra.alarm.MINUTES=${minute}`,
-        `S.android.intent.extra.alarm.MESSAGE=${encodeURIComponent(label)}`,
-        `B.android.intent.extra.alarm.VIBRATE=${this.alarmVibrate}`,
-        'B.android.intent.extra.alarm.SKIP_UI=false', // false = open Clock UI so user can pick ringtone
-        'end',
-      ].join(';');
-
-      // Android WebView can handle android intent:// URLs
-      window.location.href = intentUrl;
-
+      // Schedule via Capacitor LocalNotifications (real OS alarm with sound + vibration)
+      this.localNotifs.scheduleAlarm(hour, minute, label, this.alarmDays);
       this.snack.open(
-        `◈ OPENING CLOCK APP — Set your ringtone there`,
+        `◈ ALARM SET — ${time} — THE SYSTEM will ring and vibrate`,
         '✕',
         { duration: 4000, panelClass: 'system-snack' }
       );
     } else {
-      // --- Web fallback: schedule a local notification for today ---
+      // Web fallback: one-time notification via LocalNotifications
       const now = new Date();
       const fire = new Date();
       fire.setHours(hour, minute, 0, 0);
-      if (fire <= now) fire.setDate(fire.getDate() + 1); // next occurrence
-
-      this.localNotifs.scheduleTimer(
-        Math.round((fire.getTime() - now.getTime()) / 60000)
-      );
-
-      this.snack.open(
-        `◈ ALARM SET FOR ${time} — ${label}`,
-        '✕',
-        { duration: 4000, panelClass: 'system-snack' }
-      );
+      if (fire <= now) fire.setDate(fire.getDate() + 1);
+      this.localNotifs.scheduleTimer(Math.round((fire.getTime() - now.getTime()) / 60000));
+      this.snack.open(`◈ ALARM SET FOR ${time} — ${label}`, '✕', { duration: 4000, panelClass: 'system-snack' });
     }
+  }
+
+  cancelAlarm(): void {
+    this.localNotifs.cancelAlarm();
+    localStorage.removeItem('sys_alarm_active');
+    this.alarmActive = false;
+    this.snack.open('◈ ALARM CANCELLED', '✕', { duration: 2500, panelClass: 'system-snack' });
   }
 
   setNativeTimer(minutes: number): void {

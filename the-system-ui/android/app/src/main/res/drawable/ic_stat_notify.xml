@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ic_stat_notify.xml
+  Small notification icon for THE SYSTEM app.
+  Android requires:
+    - Monochrome (white on transparent)
+    - Simple / legible at 24dp
+  This is the diamond "◈" mark used throughout the app UI.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer diamond outline -->
+    <path
+        android:pathData="M12,2 L22,12 L12,22 L2,12 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineJoin="round" />
+
+    <!-- Inner up-arrow / chevron (level-up symbol) -->
+    <path
+        android:pathData="M8,13.5 L12,9.5 L16,13.5"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Second chevron below -->
+    <path
+        android:pathData="M8,16.5 L12,12.5 L16,16.5"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+</vector>

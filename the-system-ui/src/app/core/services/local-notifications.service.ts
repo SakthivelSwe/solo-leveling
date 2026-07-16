@@ -4,6 +4,12 @@ import { Capacitor } from '@capacitor/core';
 import { LocalNotifications, ScheduleOptions, PermissionStatus, Channel } from '@capacitor/local-notifications';
 import { Habit } from '../models/models';
 
+/** The monochrome notification icon used in the Android status bar.
+ *  Must match the filename in android/app/src/main/res/drawable/ */
+const SMALL_ICON = 'ic_stat_notify';
+/** The full-colour app icon shown in the notification drawer (large icon). */
+const LARGE_ICON = 'ic_launcher';
+
 @Injectable({ providedIn: 'root' })
 export class LocalNotificationsService {
   private router = inject(Router);
@@ -16,6 +22,7 @@ export class LocalNotificationsService {
     evening: 12,
     sleep: 13,
     weeklyReview: 14,
+    alarm: 500,  // User-set wake alarm (cancelable)
   };
   private static readonly HABIT_ID_BASE = 2000;
   private static readonly HABIT_ACTION_TYPE = 'HABIT_ACTION';
@@ -41,7 +48,8 @@ export class LocalNotificationsService {
         importance: 5,
         sound: 'default',
         vibration: true,
-        lights: true
+        lights: true,
+        lightColor: '#6C63FF',
       });
       await LocalNotifications.createChannel({
         id: 'game-events',
@@ -82,7 +90,11 @@ export class LocalNotificationsService {
     if (!Capacitor.isNativePlatform()) return;
     try {
       await LocalNotifications.cancel({
-        notifications: [{ id: LocalNotificationsService.IDS.midnight }, { id: LocalNotificationsService.IDS.wake }, { id: LocalNotificationsService.IDS.sleep }]
+        notifications: [
+          { id: LocalNotificationsService.IDS.midnight },
+          { id: LocalNotificationsService.IDS.wake },
+          { id: LocalNotificationsService.IDS.sleep }
+        ]
       });
       await LocalNotifications.schedule({
         notifications: [
@@ -92,9 +104,9 @@ export class LocalNotificationsService {
             title: '⚡ SYSTEM ALERT: Midnight Reset',
             body: 'A new day begins. Quests reset. Arise, Hunter.',
             largeBody: '◈ THE SYSTEM HAS RESET ◈\n\nA new day has dawned. All daily quests and routines have been reset.\n\n"The system is not your master, it is your tool. Use it to level up."\n\nPrepare your directives for today.',
-            largeIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
             schedule: { on: { hour: 0, minute: 0 }, allowWhileIdle: true, repeats: true },
-            smallIcon: 'ic_launcher'
+            smallIcon: SMALL_ICON
           },
           {
             id: LocalNotificationsService.IDS.wake,
@@ -102,9 +114,9 @@ export class LocalNotificationsService {
             title: '⚡ WAKE PROTOCOL INITIATED',
             body: 'Cold shower. Sunlight. Eggs. Begin.',
             largeBody: '◈ WAKE PROTOCOL ◈\n\n1. Get out of bed immediately.\n2. Expose your eyes to sunlight.\n3. Take a cold shower.\n4. Consume a high-protein breakfast.\n\nDo not let the system dictate your weakness. Level up today.',
-            largeIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
             schedule: { on: { hour: 8, minute: 0 }, allowWhileIdle: true, repeats: true },
-            smallIcon: 'ic_launcher'
+            smallIcon: SMALL_ICON
           },
           {
             id: LocalNotificationsService.IDS.sleep,
@@ -112,9 +124,9 @@ export class LocalNotificationsService {
             title: '⚡ SLEEP PROTOCOL',
             body: 'Phone down. Sleep before 11:30. System watching.',
             largeBody: '◈ SLEEP PROTOCOL ◈\n\nYour body requires recovery to grow stronger.\n\n1. Put all screens away.\n2. Prepare for sleep.\n3. Sleep before 11:30 PM.\n\nFailure to recover is failure to level up.',
-            largeIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
             schedule: { on: { hour: 23, minute: 0 }, allowWhileIdle: true, repeats: true },
-            smallIcon: 'ic_launcher'
+            smallIcon: SMALL_ICON
           }
         ]
       });
@@ -135,9 +147,9 @@ export class LocalNotificationsService {
             title: 'FUEL REQUIRED',
             body: 'Proper lunch. No junk. Zinc included.',
             largeBody: '◈ MIDDAY FUEL CHECK ◈\n\nYour body requires clean fuel to maintain peak performance.\n\n◈ No sugar. No processed junk.\n◈ Ensure adequate protein and zinc.\n◈ Hydrate immediately.\n\nDo not poison your avatar.',
-            largeIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
             schedule: { on: { hour: 13, minute: 0 }, repeats: true },
-            smallIcon: 'ic_launcher'
+            smallIcon: SMALL_ICON
           },
           {
             id: LocalNotificationsService.IDS.evening,
@@ -145,9 +157,9 @@ export class LocalNotificationsService {
             title: 'QUESTS REMAINING',
             body: 'Check your incomplete quests. Evening window closing.',
             largeBody: '◈ EVENING DIRECTIVE ◈\n\nThe day is ending, but your tasks are not finished.\n\nCheck the system for incomplete daily quests. Leaving them unfinished will result in penalties.\n\nPush through the fatigue. That is how you level up.',
-            largeIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
             schedule: { on: { hour: 21, minute: 0 }, repeats: true },
-            smallIcon: 'ic_launcher'
+            smallIcon: SMALL_ICON
           },
           {
             id: LocalNotificationsService.IDS.weeklyReview,
@@ -155,9 +167,9 @@ export class LocalNotificationsService {
             title: '📊 WEEKLY REVIEW',
             body: 'Open the system. Review your week. Set next target.',
             largeBody: '◈ SYSTEM WEEKLY REVIEW ◈\n\nIt is time to assess your growth.\n\n1. Review your completed quests.\n2. Analyze your failed habits.\n3. Adjust your stats allocation.\n4. Set a primary objective for the coming week.\n\nGrowth requires reflection. Open the app now.',
-            largeIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
             schedule: { on: { weekday: 1, hour: 20, minute: 0 }, repeats: true },
-            smallIcon: 'ic_launcher'
+            smallIcon: SMALL_ICON
           }
         ]
       });
@@ -170,6 +182,49 @@ export class LocalNotificationsService {
       await LocalNotifications.cancel({
         notifications: Object.values(LocalNotificationsService.IDS).map(id => ({ id }))
       });
+    } catch {}
+  }
+
+  async scheduleAlarm(hour: number, minute: number, label: string, days: boolean[]): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      // Cancel any existing user alarm first
+      await LocalNotifications.cancel({ notifications: [{ id: LocalNotificationsService.IDS.alarm }] });
+
+      // We schedule 7 separate daily notifications, one per active day of the week.
+      // Weekday: 1=Sunday, 2=Monday, ..., 7=Saturday (Capacitor convention)
+      const activeIds: { id: number }[] = [];
+      for (let i = 0; i < 7; i++) {
+        if (!days[i]) continue;
+        const id = LocalNotificationsService.IDS.alarm + i;
+        activeIds.push({ id });
+        await LocalNotifications.schedule({
+          notifications: [{
+            id,
+            channelId: 'system-alarms',
+            title: `⚡ ${label}`,
+            body: 'Hunter, your wake alarm is ringing. Arise.',
+            largeBody: `◈ ALARM — ${label} ◈\n\nIt is time. The system is watching.\n\n1. Get out of bed immediately.\n2. Execute your morning protocol.\n3. Do not waste this moment.`,
+            largeIcon: LARGE_ICON,
+            smallIcon: SMALL_ICON,
+            schedule: {
+              on: { weekday: i + 1, hour, minute },
+              allowWhileIdle: true,
+              repeats: true,
+            },
+          }],
+        });
+      }
+    } catch (e) {
+      console.error('scheduleAlarm error', e);
+    }
+  }
+
+  async cancelAlarm(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      const ids = Array.from({ length: 7 }, (_, i) => ({ id: LocalNotificationsService.IDS.alarm + i }));
+      await LocalNotifications.cancel({ notifications: ids });
     } catch {}
   }
 
@@ -189,8 +244,8 @@ export class LocalNotificationsService {
             title: '✅ FOCUS BLOCK COMPLETE',
             body: `${minutes}-minute session done. Take a break.`,
             largeBody: `Hunter,\n\nYou have successfully completed a ${minutes}-minute focus block.\n\n◈ Consistency is the key to leveling up.\n◈ Your mental stamina has increased.\n\nTake a moment to recover before your next quest.`,
-            largeIcon: 'ic_launcher',
-            smallIcon: 'ic_launcher',
+            largeIcon: LARGE_ICON,
+            smallIcon: SMALL_ICON,
             schedule: { at: new Date(Date.now() + minutes * 60000), allowWhileIdle: true },
           }
         ]
@@ -210,9 +265,9 @@ export class LocalNotificationsService {
           title: '⚠ CRITICAL: HP BELOW 40',
           body: `HP is at ${currentHp}. Complete quests now or face demotion.`,
           largeBody: `◈ CRITICAL WARNING ◈\n\nYour HP has dropped to a dangerous level (${currentHp} HP).\n\nIf your HP reaches 0, you will face severe penalties and stat reduction.\n\nImmediate Action Required:\n1. Open the system.\n2. Complete pending daily quests.\n3. Restore your health before midnight.\n\nDo not fail.`,
-          largeIcon: 'ic_launcher',
+          largeIcon: LARGE_ICON,
           schedule: { at: new Date(Date.now() + 500) },
-          smallIcon: 'ic_launcher'
+          smallIcon: SMALL_ICON
         }]
       });
       setTimeout(() => { this.hpWarningCooldown = false; }, 3600000);
@@ -229,7 +284,7 @@ export class LocalNotificationsService {
           title,
           body,
           schedule: { at: new Date(Date.now() + 500) },
-          smallIcon: 'ic_launcher'
+          smallIcon: SMALL_ICON
         }]
       });
     } catch {}
@@ -254,7 +309,8 @@ export class LocalNotificationsService {
             title: `◈ HABIT CUE — ${h.name}`,
             body: h.cue ? `${h.cue} · Streak: ${h.currentStreak} 🔥` : `Time for your habit. Streak: ${h.currentStreak} 🔥`,
             schedule: { on: { hour: hh, minute: mm }, allowWhileIdle: true, repeats: true },
-            smallIcon: 'ic_launcher',
+            smallIcon: SMALL_ICON,
+            largeIcon: LARGE_ICON,
             channelId: 'reminders',
             actionTypeId: LocalNotificationsService.HABIT_ACTION_TYPE,
           };
