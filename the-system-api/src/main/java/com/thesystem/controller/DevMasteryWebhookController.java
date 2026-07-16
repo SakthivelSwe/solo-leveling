@@ -113,10 +113,7 @@ public class DevMasteryWebhookController {
      * Called by the "🔄 Sync DevMastery" button in the UI.
      */
     @PostMapping("/sync")
-    public Map<String, Object> manualSync(
-            @RequestHeader(value = "X-Webhook-Secret", required = false) String secret,
-            @RequestBody Map<String, Object> payload) {
-        validateSecret(secret);
+    public Map<String, Object> manualSync(@RequestBody Map<String, Object> payload) {
 
         String email = getString(payload, "email");
         if (email == null) throw new ApiException("email is required", HttpStatus.BAD_REQUEST);
