@@ -65,7 +65,7 @@ public class Player {
     private int currentEnergy = 70;
 
     @Column(name = "in_penalty_zone")
-    private boolean inPenaltyZone = false;
+    private Boolean inPenaltyZone = false;
 
     @Column(name = "penalty_zone_end_time")
     private LocalDateTime penaltyZoneEndTime;
@@ -106,8 +106,8 @@ public class Player {
     public void setCurrentEnergy(int currentEnergy) { this.currentEnergy = currentEnergy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public boolean isInPenaltyZone() { return inPenaltyZone; }
-    public void setInPenaltyZone(boolean inPenaltyZone) { this.inPenaltyZone = inPenaltyZone; }
+    public boolean isInPenaltyZone() { return Boolean.TRUE.equals(inPenaltyZone); }
+    public void setInPenaltyZone(Boolean inPenaltyZone) { this.inPenaltyZone = inPenaltyZone != null ? inPenaltyZone : false; }
     public LocalDateTime getPenaltyZoneEndTime() { return penaltyZoneEndTime; }
     public void setPenaltyZoneEndTime(LocalDateTime penaltyZoneEndTime) { this.penaltyZoneEndTime = penaltyZoneEndTime; }
 }
