@@ -2,13 +2,14 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Player, Stats } from '../../../core/models/models';
 import { RankBadgeComponent } from '../../../shared/components/rank-badge.component';
+import { RotatingQuoteComponent } from './rotating-quote.component';
 import { STATS_META } from '../../../shared/system.constants';
 import { fadeInUp } from '../../../shared/animations';
 
 @Component({
   selector: 'app-status-window',
   standalone: true,
-  imports: [CommonModule, RankBadgeComponent],
+  imports: [CommonModule, RankBadgeComponent, RotatingQuoteComponent],
   templateUrl: './status-window.component.html',
   styleUrls: ['./status-window.component.scss'],
   animations: [fadeInUp],
