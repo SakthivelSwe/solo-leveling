@@ -351,18 +351,7 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
           </div>
         </div>
       </div>
-      <div class="dm-setup">
-        <h4>Setup Webhook</h4>
-        <p>Add these environment variables to DevMastery on Render:</p>
-        <div class="code-block">
-          SOLO_LEVELING_WEBHOOK_URL={{ webhookUrl }}<br/>
-          SOLO_LEVELING_WEBHOOK_SECRET=&lt;your-shared-secret&gt;
-        </div>
-        <p>And in THE SYSTEM backend on Render:</p>
-        <div class="code-block">
-          THESYSTEM_DEVMASTERY_WEBHOOK_SECRET=&lt;same-shared-secret&gt;
-        </div>
-      </div>
+
       <div class="dm-sync">
         <button class="sync-btn" (click)="manualSync()" [disabled]="syncing()">
           {{ syncing() ? '⏳ SYNCING...' : '🔄 MANUAL SYNC' }}
