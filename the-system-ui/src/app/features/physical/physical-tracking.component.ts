@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { WorkoutEntry } from '../../core/models/models';
@@ -8,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-physical-tracking',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
   <div class="pt-shell">
     <header class="pt-topbar">
@@ -22,87 +23,48 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       <p class="tech">The System demands daily physical conditioning. Failure to complete this quest will result in penalties. No gym required—only your resolve.</p>
     </div>
 
-    <!-- Daily Progress Grid -->
+    <!-- Dynamic Progress Grid -->
     <div class="training-grid">
       
-      <!-- PUSH-UPS -->
-      <div class="training-card" [class.completed]="pushupsToday() >= 100">
+      <div class="training-card" *ngFor="let ex of trackedExercises()" [class.completed]="getTodayProgress(ex) >= getGoal(ex)">
         <div class="t-head">
-          <span class="t-icon">💪</span>
-          <span class="t-title mono">PUSH-UPS</span>
+          <span class="t-icon">{{ getIcon(ex) }}</span>
+          <span class="t-title mono">{{ ex | uppercase }}</span>
+          <button class="t-remove" (click)="removeExercise(ex)" aria-label="Remove exercise">✕</button>
         </div>
         <div class="t-progress">
           <div class="ring-bg"></div>
-          <div class="ring-fill" [style.width]="(pushupsToday() / 100 * 100 | number:'1.0-0') + '%'"></div>
-          <span class="t-count mono">{{ pushupsToday() }} <span class="t-max">/ 100</span></span>
+          <div class="ring-fill" [class.run-fill]="isCardio(ex)" [style.width]="Math.min(100, (getTodayProgress(ex) / getGoal(ex) * 100)) + '%'"></div>
+          <span class="t-count mono">{{ getTodayProgress(ex) | number: (isCardio(ex) ? '1.0-1' : '1.0-0') }} <span class="t-max">/ {{ getGoal(ex) }}{{ isCardio(ex) ? ' KM' : '' }}</span></span>
         </div>
         <div class="t-actions">
-          <button class="t-btn" (click)="logReps('Push-ups', 10)" [disabled]="saving()">+10</button>
-          <button class="t-btn" (click)="logReps('Push-ups', 25)" [disabled]="saving()">+25</button>
+          <button class="t-btn" (click)="logCustom(ex, getInc1(ex))" [disabled]="saving()">+{{ getInc1(ex) }}{{ isCardio(ex) ? ' KM' : '' }}</button>
+          <button class="t-btn" (click)="logCustom(ex, getInc2(ex))" [disabled]="saving()">+{{ getInc2(ex) }}{{ isCardio(ex) ? ' KM' : '' }}</button>
         </div>
       </div>
 
-      <!-- SIT-UPS -->
-      <div class="training-card" [class.completed]="situpsToday() >= 100">
-        <div class="t-head">
-          <span class="t-icon">🪨</span>
-          <span class="t-title mono">SIT-UPS</span>
-        </div>
-        <div class="t-progress">
-          <div class="ring-bg"></div>
-          <div class="ring-fill" [style.width]="(situpsToday() / 100 * 100 | number:'1.0-0') + '%'"></div>
-          <span class="t-count mono">{{ situpsToday() }} <span class="t-max">/ 100</span></span>
-        </div>
-        <div class="t-actions">
-          <button class="t-btn" (click)="logReps('Sit-ups', 10)" [disabled]="saving()">+10</button>
-          <button class="t-btn" (click)="logReps('Sit-ups', 25)" [disabled]="saving()">+25</button>
-        </div>
-      </div>
+    </div>
 
-      <!-- SQUATS -->
-      <div class="training-card" [class.completed]="squatsToday() >= 100">
-        <div class="t-head">
-          <span class="t-icon">🦵</span>
-          <span class="t-title mono">SQUATS</span>
-        </div>
-        <div class="t-progress">
-          <div class="ring-bg"></div>
-          <div class="ring-fill" [style.width]="(squatsToday() / 100 * 100 | number:'1.0-0') + '%'"></div>
-          <span class="t-count mono">{{ squatsToday() }} <span class="t-max">/ 100</span></span>
-        </div>
-        <div class="t-actions">
-          <button class="t-btn" (click)="logReps('Squats', 10)" [disabled]="saving()">+10</button>
-          <button class="t-btn" (click)="logReps('Squats', 25)" [disabled]="saving()">+25</button>
-        </div>
+    <!-- Add New Custom Exercise -->
+    <div class="add-workout-box system-card">
+      <h3 class="mono">◈ ADD CUSTOM WORKOUT</h3>
+      <div class="add-row">
+        <input type="text" class="fin" placeholder="E.g. Pull-ups, Planks, Swimming" [(ngModel)]="newWorkoutName" (keyup.enter)="addWorkout()" />
+        <label class="chk tech">
+          <input type="checkbox" [(ngModel)]="isNewCardio" /> Cardio (KM)
+        </label>
+        <button class="btn add-btn" (click)="addWorkout()">ADD</button>
       </div>
-
-      <!-- RUNNING -->
-      <div class="training-card" [class.completed]="runKmToday() >= 10">
-        <div class="t-head">
-          <span class="t-icon">🏃</span>
-          <span class="t-title mono">RUNNING</span>
-        </div>
-        <div class="t-progress">
-          <div class="ring-bg"></div>
-          <div class="ring-fill run-fill" [style.width]="(runKmToday() / 10 * 100 | number:'1.0-0') + '%'"></div>
-          <span class="t-count mono">{{ runKmToday() | number:'1.0-1' }} <span class="t-max">/ 10 KM</span></span>
-        </div>
-        <div class="t-actions">
-          <button class="t-btn" (click)="logRun(1)" [disabled]="saving()">+1 KM</button>
-          <button class="t-btn" (click)="logRun(2.5)" [disabled]="saving()">+2.5 KM</button>
-        </div>
-      </div>
-
     </div>
 
     <!-- Lifetime Stats -->
     <div class="lifetime-stats system-card">
       <h3 class="mono">◈ LIFETIME RECORDS</h3>
       <div class="stat-row tech">
-        <div><span class="slbl">TOTAL PUSH-UPS</span><span class="sval">{{ totalPushups() | number }}</span></div>
-        <div><span class="slbl">TOTAL SIT-UPS</span><span class="sval">{{ totalSitups() | number }}</span></div>
-        <div><span class="slbl">TOTAL SQUATS</span><span class="sval">{{ totalSquats() | number }}</span></div>
-        <div><span class="slbl">TOTAL DISTANCE</span><span class="sval">{{ totalRun() | number:'1.0-1' }} KM</span></div>
+        <div *ngFor="let ex of trackedExercises()">
+          <span class="slbl">TOTAL {{ ex | uppercase }}</span>
+          <span class="sval">{{ getTotalProgress(ex) | number: (isCardio(ex) ? '1.0-1' : '1.0-0') }}{{ isCardio(ex) ? ' KM' : '' }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -139,7 +101,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
   .t-head { display: flex; align-items: center; gap: 8px; }
   .t-icon { font-size: 1.4rem; }
-  .t-title { font-size: .85rem; letter-spacing: 2px; color: var(--text-primary); font-weight: 700; }
+  .t-title { font-size: .85rem; letter-spacing: 2px; color: var(--text-primary); font-weight: 700; flex: 1; }
+  .t-remove { background: none; border: none; color: var(--text-secondary); font-size: 1rem; cursor: pointer; padding: 0 4px; margin-right: -4px; transition: color 0.2s; }
+  .t-remove:hover { color: #E24B4A; }
 
   .t-progress { position: relative; height: 36px; border-radius: 8px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
   .ring-fill { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(226,75,74,0.6), #E24B4A); transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -159,38 +123,67 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   .t-btn:active:not([disabled]) { transform: translateY(1px); }
   .t-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
 
+  .add-workout-box { margin-bottom: 24px; padding: 20px; }
+  .add-workout-box h3 { margin: 0 0 16px; color: var(--accent-purple); font-size: .8rem; letter-spacing: 3px; }
+  .add-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .add-row .fin { flex: 1; min-width: 150px; background: rgba(0,0,0,0.3); }
+  .add-row .chk { white-space: nowrap; margin-right: 8px; }
+  .add-btn { white-space: nowrap; padding: 10px 24px; }
+
   .lifetime-stats { padding: 20px; }
   .lifetime-stats h3 { margin: 0 0 16px; color: var(--accent-gold); font-size: .8rem; letter-spacing: 3px; }
   .stat-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .stat-row > div { display: flex; flex-direction: column; gap: 4px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); }
-  .slbl { font-size: .55rem; color: var(--text-secondary); letter-spacing: 1.5px; font-weight: 600; }
+  .slbl { font-size: .55rem; color: var(--text-secondary); letter-spacing: 1.5px; font-weight: 600; text-transform: uppercase; }
   .sval { font-size: 1.1rem; color: var(--text-primary); font-weight: 800; font-family: 'Orbitron', monospace; }
 
   @media (max-width: 600px) {
-    .training-grid { grid-template-columns: 1fr; }
+    .training-grid, .stat-row { grid-template-columns: 1fr; }
   }
   `]
 })
 export class PhysicalTrackingComponent implements OnInit {
   saving = signal(false);
   history = signal<WorkoutEntry[]>([]);
+  Math = Math;
 
-  // Derived signals for today's progress
-  pushupsToday = computed(() => this.getTodayReps('Push-ups'));
-  situpsToday = computed(() => this.getTodayReps('Sit-ups'));
-  squatsToday = computed(() => this.getTodayReps('Squats'));
-  runKmToday = computed(() => this.getTodayRun());
+  // List of exercises the user has added to their dashboard
+  trackedExercises = signal<string[]>([]);
+  
+  // A map to remember if a custom exercise is cardio-based
+  cardioMap = signal<{ [key: string]: boolean }>({});
 
-  // Derived signals for lifetime stats
-  totalPushups = computed(() => this.getTotalReps('Push-ups'));
-  totalSitups = computed(() => this.getTotalReps('Sit-ups'));
-  totalSquats = computed(() => this.getTotalReps('Squats'));
-  totalRun = computed(() => this.getTotalRun());
+  newWorkoutName = '';
+  isNewCardio = false;
 
   constructor(private lifeOs: LifeOsService, private snack: MatSnackBar) {}
 
   ngOnInit() {
+    this.loadPreferences();
     this.loadHistory();
+  }
+
+  loadPreferences() {
+    const saved = localStorage.getItem('lifeos.trackedWorkouts');
+    const savedCardio = localStorage.getItem('lifeos.cardioMap');
+
+    if (saved) {
+      this.trackedExercises.set(JSON.parse(saved));
+    } else {
+      // Default Courage of the Weak setup
+      this.trackedExercises.set(['Push-ups', 'Sit-ups', 'Squats', 'Running']);
+    }
+
+    if (savedCardio) {
+      this.cardioMap.set(JSON.parse(savedCardio));
+    } else {
+      this.cardioMap.set({ 'Running': true, 'Swimming': true, 'Cycling': true });
+    }
+  }
+
+  savePreferences() {
+    localStorage.setItem('lifeos.trackedWorkouts', JSON.stringify(this.trackedExercises()));
+    localStorage.setItem('lifeos.cardioMap', JSON.stringify(this.cardioMap()));
   }
 
   loadHistory() {
@@ -200,16 +193,50 @@ export class PhysicalTrackingComponent implements OnInit {
     });
   }
 
-  logReps(exercise: string, reps: number) {
+  addWorkout() {
+    const name = this.newWorkoutName.trim();
+    if (!name) return;
+    
+    // Capitalize first letter
+    const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+
+    if (this.trackedExercises().includes(formattedName)) {
+      this.snack.open('Exercise already exists.', 'OK', { duration: 2000 });
+      return;
+    }
+
+    this.trackedExercises.update(list => [...list, formattedName]);
+    this.cardioMap.update(map => ({ ...map, [formattedName]: this.isNewCardio }));
+    this.savePreferences();
+
+    this.newWorkoutName = '';
+    this.isNewCardio = false;
+    this.snack.open(`${formattedName} added to dashboard.`, 'OK', { duration: 2000 });
+  }
+
+  removeExercise(name: string) {
+    if (confirm(`Remove ${name} from your dashboard? Your logged history will NOT be deleted.`)) {
+      this.trackedExercises.update(list => list.filter(ex => ex !== name));
+      this.savePreferences();
+    }
+  }
+
+  logCustom(exercise: string, value: number) {
     this.saving.set(true);
-    // We repurpose the gym WorkoutEntry to save Calisthenics reps!
-    const entry: WorkoutEntry = { exerciseName: exercise, sets: 1, reps: reps, weightKg: 0 };
+    const cardio = this.isCardio(exercise);
+
+    const entry: WorkoutEntry = { 
+      exerciseName: exercise, 
+      sets: 1, 
+      reps: cardio ? 1 : value, 
+      weightKg: cardio ? value : 0 
+    };
     
     this.lifeOs.logWorkout(entry).subscribe({
       next: (saved) => {
         this.history.update(h => [saved, ...h]);
         this.saving.set(false);
-        this.snack.open(`+${reps} ${exercise} logged. Keep pushing.`, 'OK', { duration: 2000 });
+        this.snack.open(`+${value} ${cardio ? 'KM' : 'reps'} of ${exercise} logged.`, 'OK', { duration: 2000 });
       },
       error: (err) => {
         console.error(err);
@@ -219,49 +246,52 @@ export class PhysicalTrackingComponent implements OnInit {
     });
   }
 
-  logRun(km: number) {
-    this.saving.set(true);
-    // For running, we save distance (km) in the weightKg field for simplicity
-    const entry: WorkoutEntry = { exerciseName: 'Running', sets: 1, reps: 1, weightKg: km };
-    
-    this.lifeOs.logWorkout(entry).subscribe({
-      next: (saved) => {
-        this.history.update(h => [saved, ...h]);
-        this.saving.set(false);
-        this.snack.open(`+${km} KM run logged.`, 'OK', { duration: 2000 });
-      },
-      error: (err) => {
-        console.error(err);
-        this.saving.set(false);
-        this.snack.open('Failed to log run.', 'OK', { duration: 3000 });
-      }
-    });
+  // --- Dynamic Configuration Helpers ---
+
+  getIcon(ex: string): string {
+    const l = ex.toLowerCase();
+    if (l.includes('push')) return '💪';
+    if (l.includes('sit')) return '🪨';
+    if (l.includes('squat')) return '🦵';
+    if (l.includes('run') || l.includes('jog')) return '🏃';
+    if (l.includes('swim')) return '🏊';
+    if (l.includes('cycle') || l.includes('bike')) return '🚴';
+    if (l.includes('pull')) return '🧗';
+    return '⚡';
   }
 
-  // --- Helper Methods ---
-  private getTodayReps(exercise: string): number {
+  isCardio(ex: string): boolean {
+    return !!this.cardioMap()[ex];
+  }
+
+  getGoal(ex: string): number {
+    return this.isCardio(ex) ? 10 : 100;
+  }
+
+  getInc1(ex: string): number {
+    return this.isCardio(ex) ? 1 : 10;
+  }
+
+  getInc2(ex: string): number {
+    return this.isCardio(ex) ? 2.5 : 25;
+  }
+
+  // --- Data Access Helpers ---
+
+  getTodayProgress(exercise: string): number {
     const todayStr = new Date().toISOString().split('T')[0];
+    const isCardio = this.isCardio(exercise);
+
     return this.history()
       .filter(e => e.exerciseName === exercise && e.workoutDate === todayStr)
-      .reduce((sum, e) => sum + (e.reps || 0), 0);
+      .reduce((sum, e) => sum + (isCardio ? (e.weightKg || 0) : (e.reps || 0)), 0);
   }
 
-  private getTodayRun(): number {
-    const todayStr = new Date().toISOString().split('T')[0];
-    return this.history()
-      .filter(e => e.exerciseName === 'Running' && e.workoutDate === todayStr)
-      .reduce((sum, e) => sum + (e.weightKg || 0), 0);
-  }
+  getTotalProgress(exercise: string): number {
+    const isCardio = this.isCardio(exercise);
 
-  private getTotalReps(exercise: string): number {
     return this.history()
       .filter(e => e.exerciseName === exercise)
-      .reduce((sum, e) => sum + (e.reps || 0), 0);
-  }
-
-  private getTotalRun(): number {
-    return this.history()
-      .filter(e => e.exerciseName === 'Running')
-      .reduce((sum, e) => sum + (e.weightKg || 0), 0);
+      .reduce((sum, e) => sum + (isCardio ? (e.weightKg || 0) : (e.reps || 0)), 0);
   }
 }
