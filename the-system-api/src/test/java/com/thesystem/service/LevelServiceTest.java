@@ -19,8 +19,6 @@ class LevelServiceTest {
     @BeforeEach
     void setUp() {
         levelService = new LevelService();
-        // @Value field isn't injected in a plain unit test — set it manually.
-        ReflectionTestUtils.setField(levelService, "xpThreshold", 100);
     }
 
     @Test
@@ -41,12 +39,12 @@ class LevelServiceTest {
 
     @Test
     void checkLevelUp_consumesXpAndRaisesMultipleLevels() {
-        Player p = newPlayer(1, "E", 250);
+        Player p = newPlayer(1, "E", 1050);
 
         LevelUpDTO result = levelService.checkLevelUp(p);
 
         assertTrue(result.leveledUp());
-        assertEquals(3, p.getLevel());          // 250 XP → +2 levels
+        assertEquals(3, p.getLevel());          // 500 (1->2) + 500 (2->3) = 1000 XP consumed
         assertEquals(50, p.getCurrentXp());      // 50 XP left over
         assertEquals("E", p.getRankLevel());
         assertFalse(result.rankChanged());
@@ -54,7 +52,7 @@ class LevelServiceTest {
 
     @Test
     void checkLevelUp_flagsRankChangeAtTierBoundary() {
-        Player p = newPlayer(5, "E", 100);        // level 5 + 100 XP → level 6 (D-Rank)
+        Player p = newPlayer(5, "E", 500);        // level 5 + 500 XP → level 6 (D-Rank)
 
         LevelUpDTO result = levelService.checkLevelUp(p);
 
