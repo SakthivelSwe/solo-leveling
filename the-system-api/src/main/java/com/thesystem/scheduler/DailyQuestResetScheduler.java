@@ -1,24 +1,45 @@
 package com.thesystem.scheduler;
 
+import com.thesystem.entity.Player;
+import com.thesystem.repository.PlayerRepository;
+import com.thesystem.service.AiQuestGeneratorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class DailyQuestResetScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(DailyQuestResetScheduler.class);
 
+    private final PlayerRepository playerRepository;
+    private final AiQuestGeneratorService aiQuestGeneratorService;
+
+    public DailyQuestResetScheduler(PlayerRepository playerRepository, AiQuestGeneratorService aiQuestGeneratorService) {
+        this.playerRepository = playerRepository;
+        this.aiQuestGeneratorService = aiQuestGeneratorService;
+    }
+
     /**
-     * Runs at midnight IST. Quest completions are date-based, so no deletion is needed —
-     * a new day simply presents fresh, uncompleted quests.
+     * Runs at midnight IST. 
+     * Triggers dynamic AI quest generation for all players based on their current stats and skills.
      */
     @Scheduled(cron = "0 0 0 * * *", zone = "${thesystem.scheduler.timezone}")
     public void dailyReset() {
         log.info("◈ THE SYSTEM — Daily quest reset triggered for {}. New gates await.", LocalDate.now());
+        
+        List<Player> players = playerRepository.findAll();
+        for (Player p : players) {
+            try {
+                aiQuestGeneratorService.generateDailyQuests(p.getId());
+            } catch (Exception e) {
+                log.error("Failed to generate AI quests for player {}", p.getId(), e);
+            }
+        }
     }
 }
 

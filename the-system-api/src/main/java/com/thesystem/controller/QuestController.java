@@ -24,12 +24,22 @@ public class QuestController {
     private final QuestService questService;
     private final PlayerService playerService;
     private final QuestRepository questRepository;
+    private final com.thesystem.service.AiQuestGeneratorService aiQuestGeneratorService;
 
     public QuestController(QuestService questService, PlayerService playerService,
-                           QuestRepository questRepository) {
+                           QuestRepository questRepository,
+                           com.thesystem.service.AiQuestGeneratorService aiQuestGeneratorService) {
         this.questService = questService;
         this.playerService = playerService;
         this.questRepository = questRepository;
+        this.aiQuestGeneratorService = aiQuestGeneratorService;
+    }
+
+    /** Manually triggers AI generation for new dynamic daily quests. */
+    @PostMapping("/generate-ai")
+    public Map<String, String> generateAiQuests(Principal principal) {
+        aiQuestGeneratorService.generateDailyQuests(playerId(principal));
+        return Map.of("status", "success", "message", "AI quests generated");
     }
 
     /** Today's DAILY quests (excludes MILESTONE/SIDE — those are on /milestones). */
