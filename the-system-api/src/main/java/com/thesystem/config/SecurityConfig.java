@@ -39,6 +39,8 @@ public class SecurityConfig {
         // Only /api/auth/** is public by default. H2 console + Swagger are ONLY exposed
         // when thesystem.dev-tools-enabled=true (dev-only) — never in a shipped build.
         List<String> publicPaths = new ArrayList<>();
+        publicPaths.add("/"); // For Render health checks
+        publicPaths.add("/error"); // For Spring Boot error dispatch
         publicPaths.add("/api/auth/**");
         publicPaths.add("/api/public/**");
         publicPaths.add("/api/devmastery/webhook"); // uses X-Webhook-Secret, not JWT
