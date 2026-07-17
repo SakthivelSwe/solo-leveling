@@ -20,6 +20,14 @@ const BOSS_TOPICS = [
 
 type View = 'CHAT' | 'BOSS' | 'HISTORY';
 
+const CHAT_CONTEXTS = [
+  { label: 'General System', value: 'general', icon: '◈' },
+  { label: 'Code Reviewer', value: 'code review', icon: '💻' },
+  { label: 'System Architect', value: 'system design', icon: '🏗️' },
+  { label: 'Career Strategist', value: 'career advice', icon: '📈' },
+  { label: 'HR Recruiter', value: 'hr interview', icon: '👔' }
+];
+
 @Component({
   selector: 'app-ai-mentor',
   standalone: true,
@@ -37,9 +45,14 @@ export class AiMentorComponent implements OnInit {
   chatLoading = signal(false);
   coachingMsg = signal('');
 
+  // Chat contexts
+  readonly contexts = CHAT_CONTEXTS;
+  selectedContext = signal(CHAT_CONTEXTS[0]);
+
   // Boss Battle
   readonly topics = BOSS_TOPICS;
   selectedTopic = BOSS_TOPICS[1];
+  customTopic = '';
   selectedDifficulty = 'MEDIUM';
   battle = signal<BossBattle | null>(null);
   currentQ = signal(0);
@@ -73,7 +86,7 @@ export class AiMentorComponent implements OnInit {
     this.userInput = '';
     this.chatMessages.update(list => [...list, { role: 'user', text: msg, ts: new Date() }]);
     this.chatLoading.set(true);
-    this.ai.chat(msg, 'general').subscribe({
+    this.ai.chat(msg, this.selectedContext().value).subscribe({
       next: r => { this.pushSystem(r.reply); this.chatLoading.set(false); this.scrollChat(); },
       error: () => { this.pushSystem('◈ CONNECTION FAILED. Try again.'); this.chatLoading.set(false); }
     });
@@ -102,7 +115,10 @@ export class AiMentorComponent implements OnInit {
     this.evaluations.set([]);
     this.currentQ.set(0);
     this.answer = '';
-    this.ai.startBattle(this.selectedTopic.label, this.selectedDifficulty).subscribe({
+    
+    const topicToUse = this.customTopic.trim() || this.selectedTopic.label;
+    
+    this.ai.startBattle(topicToUse, this.selectedDifficulty).subscribe({
       next: b => { this.battle.set(b); this.battleLoading.set(false); },
       error: () => { this.battleLoading.set(false); alert('Failed to start battle. AI may be loading.'); }
     });

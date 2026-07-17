@@ -23,29 +23,44 @@
 
   <!-- ══════════════════════════ CHAT VIEW ══════════════════════════════════ -->
   <div class="chat-view" *ngIf="view() === 'CHAT'" @fadeInUp>
-    <div class="chat-box">
-      <div class="messages" #chatEnd>
-        <div *ngFor="let m of chatMessages()" class="msg" [class.user]="m.role==='user'" [class.sys]="m.role==='system'">
-          <span class="who mono" *ngIf="m.role==='system'">◈ THE SYSTEM</span>
-          <span class="who mono user-who" *ngIf="m.role==='user'">▸ HUNTER</span>
-          <p class="text tech">{{ m.text }}</p>
-          <span class="ts tech">{{ m.ts | date:'HH:mm' }}</span>
-        </div>
-        <div class="typing tech" *ngIf="chatLoading()">
-          <span class="mono">◈</span> THE SYSTEM IS PROCESSING<span class="dots"></span>
+    <!-- Context Sidebar -->
+    <div class="chat-sidebar">
+      <div class="cs-head tech">SELECT PERSONA</div>
+      <button *ngFor="let ctx of contexts" class="ctx-btn tech" 
+              [class.active]="selectedContext().value === ctx.value"
+              (click)="selectedContext.set(ctx)">
+        <span class="ctx-icon">{{ ctx.icon }}</span>
+        <span class="ctx-label">{{ ctx.label }}</span>
+      </button>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-main">
+      <div class="chat-box">
+        <div class="messages" #chatEnd>
+          <div *ngFor="let m of chatMessages()" class="msg" [class.user]="m.role==='user'" [class.sys]="m.role==='system'">
+            <span class="who mono" *ngIf="m.role==='system'">◈ THE SYSTEM ({{ selectedContext().label | uppercase }})</span>
+            <span class="who mono user-who" *ngIf="m.role==='user'">▸ HUNTER</span>
+            <p class="text tech">{{ m.text }}</p>
+            <span class="ts tech">{{ m.ts | date:'HH:mm' }}</span>
+          </div>
+          <div class="typing tech" *ngIf="chatLoading()">
+            <span class="mono">◈</span> THE SYSTEM IS PROCESSING<span class="dots"></span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="quick-btns">
-      <button class="qb tech" (click)="getSuggestion()" [disabled]="chatLoading()">🎯 SUGGEST MY NEXT TASK</button>
-    </div>
-
-    <div class="chat-input-row">
-      <textarea class="ci tech" [(ngModel)]="userInput" (keydown)="onInputKey($event)"
-                placeholder="Ask THE SYSTEM anything... (Enter to send, Shift+Enter for newline)"
-                rows="2"></textarea>
-      <button class="send mono" (click)="sendChat()" [disabled]="chatLoading() || !userInput.trim()">◈ SEND</button>
+      <div class="chat-input-area">
+        <div class="quick-btns">
+          <button class="qb tech" (click)="getSuggestion()" [disabled]="chatLoading()">🎯 SUGGEST MY NEXT TASK</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="ci tech" [(ngModel)]="userInput" (keydown)="onInputKey($event)"
+                    placeholder="Ask THE SYSTEM anything... (Enter to send, Shift+Enter for newline)"
+                    rows="2"></textarea>
+          <button class="send mono" (click)="sendChat()" [disabled]="chatLoading() || !userInput.trim()">◈ SEND</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -70,7 +85,12 @@
         </button>
       </div>
 
-      <div class="diff-row">
+      <div class="custom-topic">
+        <div class="tech sub mb-2">OR CREATE A CUSTOM GATE</div>
+        <input type="text" class="custom-input tech" [(ngModel)]="customTopic" placeholder="e.g. Kubernetes, React Hooks, AWS Architecture..." />
+      </div>
+
+      <div class="diff-row mt-3">
         <span class="tech">Difficulty:</span>
         <button *ngFor="let d of ['EASY','MEDIUM','HARD']" class="diff-btn tech"
                 [class.active]="selectedDifficulty === d"
@@ -78,8 +98,8 @@
                 (click)="selectedDifficulty = d">{{ d }}</button>
       </div>
 
-      <button class="start-btn mono" (click)="startBattle()" [disabled]="battleLoading()">
-        <span *ngIf="!battleLoading()">⚔ ENTER THE GATE — {{ selectedTopic.label }}</span>
+      <button class="start-btn mono mt-3" (click)="startBattle()" [disabled]="battleLoading()">
+        <span *ngIf="!battleLoading()">⚔ ENTER THE GATE — {{ customTopic.trim() || selectedTopic.label | uppercase }}</span>
         <span *ngIf="battleLoading()" class="tech">SUMMONING QUESTIONS<span class="dots"></span></span>
       </button>
 
@@ -163,7 +183,12 @@
 
   <!-- ══════════════════════════ HISTORY VIEW ═══════════════════════════════ -->
   <div class="history-view" *ngIf="view() === 'HISTORY'" @fadeInUp>
-    <h2 class="mono hist-head">◈ BATTLE HISTORY</h2>
+  <div class="history-view" *ngIf="view() === 'HISTORY'" @fadeInUp>
+    <div class="hist-header">
+      <h2 class="mono hist-head">◈ DUNGEON CLEAR LOG</h2>
+      <p class="tech sub">A record of your past battles against The System.</p>
+    </div>
+    
     <div class="hist-list" [@listStagger]="battleHistory().length">
       <div *ngFor="let b of battleHistory()" class="hist-card system-card">
         <div class="hc-left">
