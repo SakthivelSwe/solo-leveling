@@ -113,12 +113,17 @@ public class PlayerService {
                 "VocabularyLog", "RelationshipLog", "SavingsGoal", "BudgetEntry",
                 "SelfDoubtEvidence", "AiMemoryEntry", "DailyMission",
                 "DeepWorkSession", "DopamineLog", "InventoryItem",
-                "Shadow", "SkillTreeNode", "LearningLog", "WorkoutEntry", "BodyMetric"
+                "Shadow", "SkillTreeNode", "LearningLog", "WorkoutEntry", "BodyMetric",
+                "DevMasteryProgress", "DietEntry"
         };
         for (String entity : entities) {
             em.createQuery("DELETE FROM " + entity + " e WHERE e.playerId = :id")
                     .setParameter("id", playerId).executeUpdate();
         }
+
+        // Delete custom quests owned by the player
+        em.createQuery("DELETE FROM Quest q WHERE q.ownerId = :id")
+                .setParameter("id", playerId).executeUpdate();
 
         em.createQuery("DELETE FROM Player p WHERE p.id = :id")
                 .setParameter("id", playerId).executeUpdate();

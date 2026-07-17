@@ -529,3 +529,35 @@ export interface WorkoutEntry {
   notes?: string;
 }
 
+
+export interface DevMasteryProgress {
+  id?: number;
+  playerId?: number;
+  topicId: string;
+  topicTitle: string;
+  pathSlug: string;
+  xpEarned: number;
+  completedAt: string;
+}
+
+export interface DietEntry {
+  id?: number;
+  playerId?: number;
+  foodName: string;
+  category: string;
+  quantityGrams: number;
+  calories: number;
+  proteinGrams: number;
+  vitamins?: string;
+  consumedDate?: string;
+}
+
+export interface FoodItem {
+  name: string;
+  category: string;
+  baseGrams: number;
+  calories: number;
+  protein: number;
+  vitamins: string;
+  icon: string;
+}

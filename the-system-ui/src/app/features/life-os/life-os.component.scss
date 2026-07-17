@@ -52,7 +52,11 @@
   box-shadow: 0 0 18px color-mix(in srgb, var(--tc) 45%, transparent);
 }
 
-.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 768px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .mobile-stack { grid-template-columns: repeat(2, 1fr) !important; }
+}
 .block { padding: 20px; }
 .block.wide { grid-column: 1 / -1; }
 .head { margin: 0 0 16px; font-size: .9rem; letter-spacing: 3px; color: var(--text-primary); }

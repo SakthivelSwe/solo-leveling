@@ -56,6 +56,10 @@ export class SystemComponent implements OnInit, OnDestroy {
   weeklyQuests = signal<Quest[]>([]);
   monthlyQuests = signal<Quest[]>([]);
   milestoneQuests = signal<Quest[]>([]);
+  
+  todayDateStr = signal<string>('');
+  tomorrowDateStr = signal<string>('');
+  private timeInterval: any;
 
   /** Debounce handle for coalescing bursts of live SSE events into one reload. */
   private reloadTimer: ReturnType<typeof setTimeout> | null = null;
@@ -88,11 +92,17 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.updateDates();
+    this.timeInterval = setInterval(() => this.updateDates(), 60000); // update every minute
+
     this.load();
     this.notifications.refreshUnread();
   }
 
   ngOnDestroy(): void {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
     if (this.reloadTimer) { clearTimeout(this.reloadTimer); this.reloadTimer = null; }
   }
 
@@ -195,6 +205,16 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   logout(): void { this.auth.logout(); }
+
+  private updateDates(): void {
+    const now = new Date();
+    const tmrw = new Date(now);
+    tmrw.setDate(tmrw.getDate() + 1);
+
+    const opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+    this.todayDateStr.set(now.toLocaleDateString('en-GB', opts).toUpperCase());
+    this.tomorrowDateStr.set(tmrw.toLocaleDateString('en-GB', opts).toUpperCase());
+  }
 
   /** Returns quests to display based on Daily Mission logic. */
   getDisplayQuests(quests: Quest[]): Quest[] {

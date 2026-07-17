@@ -30,6 +30,25 @@
   <section class="panel" *ngIf="active() === 'CAREER'" @fadeInUp
            role="tabpanel" id="panel-CAREER" aria-labelledby="tab-CAREER">
     <div class="cards">
+      <!-- Dev Mastery Integration -->
+      <div class="system-card block" style="grid-column: 1 / -1;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="mono head" style="color: #BA7517;">◈ DEV-MASTERY LEARNING PATHS</h3>
+          <button class="btn sm" (click)="syncDevMastery()">SYNC PROGRESS</button>
+        </div>
+        <ul class="mini-list" @listStagger style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px;">
+          <li *ngFor="let dm of devMastery()" style="background: rgba(186, 117, 23, 0.1); border: 1px solid rgba(186, 117, 23, 0.3); border-radius: 4px; padding: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span class="badge" style="background: #BA7517;">{{ dm.pathSlug | uppercase }}</span>
+              <span class="tech dt" style="color: #FAC775;">+{{ dm.xpEarned }} XP</span>
+            </div>
+            <div class="pn" style="font-size: 0.9rem; line-height: 1.3;">{{ dm.topicTitle }}</div>
+            <div class="tech dt" style="margin-top: 8px;">{{ dm.completedAt | date:'mediumDate' }}</div>
+          </li>
+          <li *ngIf="!devMastery().length" class="empty tech">No learning progress synced yet.</li>
+        </ul>
+      </div>
+
       <!-- LeetCode stats -->
       <div class="system-card block">
         <h3 class="mono head">◈ DSA GRIND</h3>
@@ -149,6 +168,48 @@
   <section class="panel" *ngIf="active() === 'HEALTH'" @fadeInUp
            role="tabpanel" id="panel-HEALTH" aria-labelledby="tab-HEALTH">
     <div class="cards">
+      
+      <!-- AI Nutrition Tracker -->
+      <div class="system-card block" style="grid-column: 1 / -1; border-color: #1D9E75;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 class="mono head" style="color: #1D9E75;">◈ AI NUTRITION TRACKER</h3>
+          <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="generateAiHealthReport()" [disabled]="isGeneratingReport()">
+            <span *ngIf="!isGeneratingReport()">GENERATE AI REPORT</span>
+            <span *ngIf="isGeneratingReport()">ANALYZING...</span>
+          </button>
+        </div>
+
+        <!-- AI Report Output -->
+        <div *ngIf="aiReport()" style="background: rgba(29, 158, 117, 0.1); border-left: 3px solid #1D9E75; padding: 16px; margin-bottom: 24px;">
+          <h4 class="mono tech" style="color: #1D9E75; margin-bottom: 8px;">AI NUTRITIONIST ANALYSIS:</h4>
+          <div class="tech" style="line-height: 1.6; font-size: 0.9rem;">{{ aiReport() }}</div>
+        </div>
+
+        <!-- Food Catalog (Logging) -->
+        <div style="margin-bottom: 12px;"><span class="tech" style="color: #8a8a9a;">QUICK LOG:</span></div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+          <button class="btn sm" *ngFor="let food of foodCatalog" (click)="logFood(food)" style="background: rgba(255,255,255,0.05); display: flex; align-items: center; gap: 8px; border-radius: 20px; padding: 6px 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 1.2rem;">{{ food.icon }}</span>
+            <span>{{ food.name }}</span>
+            <span style="color: #1D9E75; font-size: 0.7rem;">+{{ food.protein }}g P</span>
+          </button>
+        </div>
+
+        <!-- Recent Diet History -->
+        <div style="margin-bottom: 12px;"><span class="tech" style="color: #8a8a9a;">RECENT LOGS:</span></div>
+        <ul class="mini-list" @listStagger style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+          <li *ngFor="let d of dietHistory()" style="background: rgba(0,0,0,0.3); border-radius: 4px; padding: 12px; border-left: 2px solid #1D9E75;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span class="pn" style="font-weight: bold;">{{ d.foodName }}</span>
+              <span class="tech dt" style="color: #8a8a9a;">{{ d.consumedDate | date:'shortDate' }}</span>
+            </div>
+            <div class="tech" style="font-size: 0.8rem; color: #1D9E75; margin-bottom: 4px;">{{ d.calories }} kcal | {{ d.proteinGrams }}g protein</div>
+            <div class="tech" style="font-size: 0.7rem; color: #8a8a9a;">{{ d.quantityGrams }}g • {{ d.vitamins }}</div>
+          </li>
+          <li *ngIf="!dietHistory().length" class="empty tech">No foods logged recently.</li>
+        </ul>
+      </div>
+
       <div class="system-card block" *ngIf="health() as h">
         <h3 class="mono head">◈ WATER INTAKE</h3>
         <div class="water">
@@ -180,8 +241,21 @@
   <section class="panel" *ngIf="active() === 'MIND'" @fadeInUp
            role="tabpanel" id="panel-MIND" aria-labelledby="tab-MIND">
     <div class="cards">
+      
+      <!-- Stoic Wisdom Carousel -->
+      <div class="system-card block" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: #378ADD; background: linear-gradient(90deg, rgba(55, 138, 221, 0.05), transparent);">
+        <div style="text-align: center; max-width: 800px; padding: 24px;">
+          <h3 class="mono tech" style="color: #378ADD; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.8rem;">◈ PSYCHOLOGICAL PILLAR</h3>
+          <p style="font-size: 1.2rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 8px;">
+            "{{ stoicQuotes[stoicQuoteIndex()].quote }}"
+          </p>
+          <span class="tech" style="color: #8a8a9a;">— {{ stoicQuotes[stoicQuoteIndex()].author }}</span>
+        </div>
+      </div>
+
+      <!-- Daily Reflection -->
       <div class="system-card block wide">
-        <h3 class="mono head">◈ DAILY REFLECTION</h3>
+        <h3 class="mono head" style="color: #378ADD;">◈ DAILY REFLECTION</h3>
         <div class="slider-row"><span class="tech">Mood</span>
           <input type="range" min="1" max="10" [(ngModel)]="mind.moodEvening" /><span class="mono">{{ mind.moodEvening || 5 }}</span></div>
         <div class="slider-row"><span class="tech">Anxiety</span>
@@ -189,11 +263,12 @@
         <textarea class="fin ta" placeholder="Today's win — one good thing that happened" [(ngModel)]="mind.todayWin"></textarea>
         <textarea class="fin ta" placeholder="Grateful for..." [(ngModel)]="mind.gratitude"></textarea>
         <textarea class="fin ta" placeholder="Evening reflection" [(ngModel)]="mind.eveningReflection"></textarea>
-        <button class="btn full" (click)="saveMind()">SAVE REFLECTION</button>
+        <button class="btn full" style="border-color: #378ADD; color: #378ADD;" (click)="saveMind()">SAVE REFLECTION</button>
       </div>
 
+      <!-- Evidence vs Doubt -->
       <div class="system-card block">
-        <h3 class="mono head">◈ EVIDENCE vs SELF-DOUBT</h3>
+        <h3 class="mono head" style="color: #378ADD;">◈ EVIDENCE vs SELF-DOUBT</h3>
         <p class="tech hint">When the mind says "you can't" — the record says otherwise.</p>
         <ul class="mini-list" @listStagger>
           <li *ngFor="let e of evidence()" class="ev">
@@ -210,22 +285,67 @@
   <section class="panel" *ngIf="active() === 'WEALTH'" @fadeInUp
            role="tabpanel" id="panel-WEALTH" aria-labelledby="tab-WEALTH">
     <div class="cards">
-      <div class="system-card block wide">
-        <h3 class="mono head">◈ SAVINGS GOALS</h3>
-        <div class="goal" *ngFor="let g of goals()">
-          <div class="goal-head">
-            <span class="pn">{{ g.goalName }}</span>
-            <span class="mono gv">₹{{ g.current }} / ₹{{ g.target }}</span>
+      
+      <!-- Wisdom Engine Carousel -->
+      <div class="system-card block" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: #FAC775; background: linear-gradient(90deg, rgba(250, 199, 117, 0.05), transparent);">
+        <div style="text-align: center; max-width: 800px; padding: 24px;">
+          <h3 class="mono tech" style="color: #FAC775; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.8rem;">◈ WISDOM ENGINE</h3>
+          <p style="font-size: 1.2rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 8px;">
+            "{{ wisdomTips[wisdomIndex()].text }}"
+          </p>
+          <span class="tech" style="color: #8a8a9a;">— {{ wisdomTips[wisdomIndex()].author }}</span>
+        </div>
+      </div>
+
+      <!-- Cash Flow Ledger & Chart -->
+      <div class="system-card block" style="display: flex; flex-direction: column; align-items: center;">
+        <h3 class="mono head" style="width: 100%; color: #FAC775;">◈ CASH FLOW (LATEST)</h3>
+        <div *ngIf="budgets().length === 0" class="tech empty" style="margin-top: 24px;">No budget data found for this month.</div>
+        <div *ngIf="budgets().length > 0" style="width: 100%; max-width: 300px; margin-top: 24px; position: relative;">
+          <canvas baseChart
+            [data]="doughnutChartData"
+            [options]="doughnutChartOptions"
+            [type]="doughnutChartType">
+          </canvas>
+          <!-- Central Overlay Data -->
+          <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+            <div class="tech" style="font-size: 0.8rem; color: #8a8a9a;">SALARY</div>
+            <div class="mono" style="font-size: 1.5rem; color: #FAC775;">₹{{ budgets()[0].salary }}</div>
           </div>
-          <div class="gap-track">
-            <div class="gap-fill gold" [style.width.%]="goalPct(g)"></div>
+        </div>
+        
+        <div *ngIf="budgets().length > 0" class="mobile-stack" style="width: 100%; margin-top: 32px; display: grid; grid-template-columns: 1fr; gap: 16px;">
+           <div style="background: rgba(226, 75, 74, 0.1); border-left: 3px solid #E24B4A; padding: 12px;">
+             <div class="tech" style="font-size: 0.7rem; color: #8a8a9a; margin-bottom: 4px;">FIXED + VARIABLE EXPENSES</div>
+             <div class="mono" style="color: #E24B4A; font-size: 1.2rem;">₹{{ budgets()[0].pgRent + budgets()[0].foodSpend + budgets()[0].transport + budgets()[0].onlineOrders + budgets()[0].misc }}</div>
+           </div>
+           <div style="background: rgba(29, 158, 117, 0.1); border-left: 3px solid #1D9E75; padding: 12px;">
+             <div class="tech" style="font-size: 0.7rem; color: #8a8a9a; margin-bottom: 4px;">SAVINGS + SIP</div>
+             <div class="mono" style="color: #1D9E75; font-size: 1.2rem;">₹{{ budgets()[0].saved + budgets()[0].sipAmount }}</div>
+           </div>
+        </div>
+      </div>
+
+      <!-- Savings Goals -->
+      <div class="system-card block">
+        <h3 class="mono head" style="color: #FAC775;">◈ SAVINGS GOALS</h3>
+        <div class="goal" *ngFor="let g of goals()" style="margin-bottom: 24px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px;">
+          <div class="goal-head" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span class="pn" style="font-size: 1.1rem;">{{ g.goalName }}</span>
+            <span class="mono gv" style="color: #FAC775;">₹{{ g.current }} / ₹{{ g.target }}</span>
           </div>
-          <div class="goal-actions">
-            <span class="tech dl" *ngIf="g.deadline">due {{ g.deadline }}</span>
-            <span class="done tech" *ngIf="g.achieved">✓ ACHIEVED</span>
-            <span class="spacer"></span>
-            <button class="btn sm" (click)="bumpGoal(g, 500)">+₹500</button>
-            <button class="btn sm" (click)="bumpGoal(g, 100)">+₹100</button>
+          <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+            <div class="gap-fill" [style.width.%]="goalPct(g)" style="background: linear-gradient(90deg, #BA7517, #FAC775); height: 100%;"></div>
+          </div>
+          <div class="goal-actions" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <span class="tech dl" *ngIf="g.deadline" style="color: #8a8a9a; font-size: 0.8rem; margin-right: 12px;">due {{ g.deadline }}</span>
+              <span class="done tech" *ngIf="g.achieved" style="color: #1D9E75; font-size: 0.8rem; letter-spacing: 1px;">✓ ACHIEVED</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn sm" style="border-color: #FAC775; color: #FAC775;" (click)="bumpGoal(g, 500)">+₹500</button>
+              <button class="btn sm" style="border-color: #FAC775; color: #FAC775;" (click)="bumpGoal(g, 100)">+₹100</button>
+            </div>
           </div>
         </div>
       </div>
@@ -236,18 +356,41 @@
   <section class="panel" *ngIf="active() === 'ENGLISH'" @fadeInUp
            role="tabpanel" id="panel-ENGLISH" aria-labelledby="tab-ENGLISH">
     <div class="cards">
-      <div class="system-card block wide">
-        <h3 class="mono head">◈ ENGLISH SESSION</h3>
-        <div class="slider-row"><span class="tech">Speaking minutes</span>
-          <input type="range" min="0" max="60" step="5" [(ngModel)]="english.speakingMin" /><span class="mono">{{ english.speakingMin }}m</span></div>
+      
+      <!-- Speaking Session -->
+      <div class="system-card block" style="border-color: #BA7517;">
+        <h3 class="mono head" style="color: #BA7517;">◈ SPEAKING SESSION</h3>
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 16px; background: rgba(186, 117, 23, 0.1); border-radius: 8px;">
+          <div>
+            <div class="tech" style="color: #8a8a9a; font-size: 0.8rem; margin-bottom: 4px;">TODAY'S SPEAKING TIME</div>
+            <div class="mono" style="font-size: 2rem; color: #BA7517;">{{ english.speakingMin }} <span style="font-size: 1rem;">mins</span></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn sm" style="border-color: #BA7517; color: #BA7517;" (click)="addSpeakingTime(15)">+15 MIN</button>
+            <button class="btn sm" style="border-color: #BA7517; color: #BA7517;" (click)="addSpeakingTime(30)">+30 MIN</button>
+          </div>
+        </div>
+
         <input class="fin" placeholder="Resource (Vanessa YouTube, BBC...)" [(ngModel)]="english.resourceUsed" />
         <input class="fin" placeholder="Topic practiced" [(ngModel)]="english.topicPracticed" />
-        <div class="slider-row"><span class="tech">New words</span>
-          <input type="number" class="fin sm" [(ngModel)]="english.newWords" /></div>
+        
         <div class="slider-row"><span class="tech">Confidence</span>
           <input type="range" min="1" max="10" [(ngModel)]="english.selfRating" /><span class="mono">{{ english.selfRating || 5 }}</span></div>
         <label class="chk tech"><input type="checkbox" [(ngModel)]="english.mockInterview" /> Mock interview done</label>
-        <button class="btn full" (click)="saveEnglish()">LOG ENGLISH SESSION</button>
+        
+        <button class="btn full" style="border-color: #BA7517; color: #BA7517; margin-top: 16px;" (click)="saveEnglish()">LOG ENGLISH SESSION</button>
+      </div>
+
+      <!-- Vocabulary Log -->
+      <div class="system-card block" style="border-color: #BA7517;">
+        <h3 class="mono head" style="color: #BA7517;">◈ NEW VOCABULARY</h3>
+        <p class="tech hint" style="margin-bottom: 16px;">Total new words logged today: <span class="mono" style="color: #BA7517;">{{ english.newWords }}</span></p>
+        
+        <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+          <input class="fin" placeholder="New word or phrase..." [(ngModel)]="newWordInput" (keyup.enter)="addNewWord()" />
+          <button class="btn" style="border-color: #BA7517; color: #BA7517; padding: 0 16px;" (click)="addNewWord()">ADD</button>
+        </div>
       </div>
     </div>
   </section>
@@ -256,20 +399,29 @@
   <section class="panel" *ngIf="active() === 'BODY'" @fadeInUp
            role="tabpanel" id="panel-BODY" aria-labelledby="tab-BODY">
     <div class="cards">
-      <div class="system-card block wide" *ngIf="body() as b">
-        <h3 class="mono head">◈ TESTOSTERONE — 7 PILLARS</h3>
-        <div class="pillars">
-          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.coldShower" /> ❄️ Cold shower</label>
-          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.exerciseDone" /> 🏋️ Exercise</label>
-          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.zincMeal" /> 🥚 Zinc meal</label>
-          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.noSoda" /> 🚫 No soda</label>
-          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.noPorn" /> 🧠 No porn</label>
-          <label class="pillar tech"><input type="checkbox" [(ngModel)]="b.sleptBefore1130" /> 😴 Slept &lt; 11:30</label>
+      
+      <!-- 7 Pillars of Testosterone -->
+      <div class="system-card block" *ngIf="body() as b" style="border-color: #E24B4A;">
+        <h3 class="mono head" style="color: #E24B4A; margin-bottom: 24px;">◈ 7 PILLARS OF TESTOSTERONE</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;" class="mobile-stack">
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.coldShower" /> ❄️ Cold shower</label>
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.exerciseDone" /> 🏋️ Exercise</label>
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.zincMeal" /> 🥚 Zinc meal</label>
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.noSoda" /> 🚫 No soda</label>
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.noPorn" /> 🧠 No porn</label>
+          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.sleptBefore1130" /> 😴 Slept &lt; 11:30</label>
         </div>
-        <div class="slider-row"><span class="tech">Morning sun (min)</span>
-          <input type="range" min="0" max="40" step="5" [(ngModel)]="b.morningSunMin" /><span class="mono">{{ b.morningSunMin }}m</span></div>
-        <button class="btn full" (click)="saveBody()">LOCK IN PILLARS</button>
+
+        <div class="slider-row" style="background: rgba(226, 75, 74, 0.1); padding: 12px; border-radius: 8px;">
+          <span class="tech" style="color: #E24B4A;">Morning sun exposure (min)</span>
+          <input type="range" min="0" max="60" step="5" [(ngModel)]="b.morningSunMin" />
+          <span class="mono" style="color: #E24B4A; font-size: 1.2rem;">{{ b.morningSunMin }}m</span>
+        </div>
+
+        <button class="btn full" style="border-color: #E24B4A; color: #E24B4A; margin-top: 24px; font-weight: bold; letter-spacing: 1px;" (click)="saveBody()">LOCK IN PILLARS</button>
       </div>
+
     </div>
   </section>
 
@@ -277,15 +429,31 @@
   <section class="panel" *ngIf="active() === 'RELATIONSHIP'" @fadeInUp
            role="tabpanel" id="panel-RELATIONSHIP" aria-labelledby="tab-RELATIONSHIP">
     <div class="cards">
-      <div class="system-card block wide" *ngIf="relationship() as r">
-        <h3 class="mono head">◈ BONDS</h3>
-        <label class="chk tech"><input type="checkbox" [(ngModel)]="r.gfCalled" /> Called / messaged girlfriend</label>
-        <div class="slider-row"><span class="tech">Call minutes</span>
-          <input type="number" class="fin sm" [(ngModel)]="r.callDurationMin" /></div>
-        <label class="chk tech"><input type="checkbox" [(ngModel)]="r.familyContact" /> Contacted family</label>
-        <label class="chk tech"><input type="checkbox" [(ngModel)]="r.friendMessage" /> Messaged a friend</label>
-        <input class="fin" placeholder="Friend name" [(ngModel)]="r.friendName" />
-        <button class="btn full" (click)="saveRel()">SAVE BONDS</button>
+      <div class="system-card block" *ngIf="relationship() as r" style="border-color: #D36B9B;">
+        <h3 class="mono head" style="color: #D36B9B;">◈ BONDS & CONNECTIONS</h3>
+        
+        <div style="margin-bottom: 24px;">
+          <h4 class="tech" style="color: #8a8a9a; margin-bottom: 12px;">DAILY NON-NEGOTIABLES</h4>
+          <label class="chk tech" style="margin-bottom: 12px; display: block;"><input type="checkbox" [(ngModel)]="r.familyContact" /> Contacted Family</label>
+          <div style="background: rgba(211, 107, 155, 0.1); padding: 16px; border-radius: 8px; border-left: 3px solid #D36B9B;">
+            <label class="chk tech" style="margin-bottom: 12px;"><input type="checkbox" [(ngModel)]="r.gfCalled" /> Talked with Partner</label>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div><span class="mono" style="color: #D36B9B; font-size: 1.5rem;">{{ r.callDurationMin || 0 }}</span> <span class="tech">mins</span></div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn sm" style="border-color: #D36B9B; color: #D36B9B;" (click)="addCallTime(15)">+15</button>
+                <button class="btn sm" style="border-color: #D36B9B; color: #D36B9B;" (click)="addCallTime(30)">+30</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="tech" style="color: #8a8a9a; margin-bottom: 12px;">FRIEND OUTREACH</h4>
+          <label class="chk tech" style="margin-bottom: 8px; display: block;"><input type="checkbox" [(ngModel)]="r.friendMessage" /> Messaged a Friend</label>
+          <input class="fin" style="width: 100%;" placeholder="Who did you talk to today?" [(ngModel)]="r.friendName" />
+        </div>
+
+        <button class="btn full" style="border-color: #D36B9B; color: #D36B9B; margin-top: 24px; font-weight: bold; letter-spacing: 1px;" (click)="saveRelationship()">SAVE BONDS</button>
       </div>
     </div>
   </section>

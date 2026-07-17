@@ -33,6 +33,7 @@ export class LifeOsService {
   getCourses(): Observable<CourseProgress[]> { return this.http.get<CourseProgress[]>(`${this.api}/career/courses`); }
   skillsGap(): Observable<SkillsGap> { return this.http.get<SkillsGap>(`${this.api}/career/skills-gap`); }
   interviewReadiness(): Observable<InterviewReadinessDTO> { return this.http.get<InterviewReadinessDTO>(`${this.api}/career/interview-readiness`); }
+  syncDevMastery(): Observable<any[]> { return this.http.post<any[]>(`${this.api}/career/sync-dev-mastery`, {}); }
 
   /* ===== Deep Work OS ===== */
   logDeepWork(b: DeepWorkSession): Observable<DeepWorkSession> { return this.http.post<DeepWorkSession>(`${this.api}/deep-work/log`, b); }
@@ -53,6 +54,9 @@ export class LifeOsService {
   upsertHealth(b: HealthLog): Observable<HealthLog> { return this.http.post<HealthLog>(`${this.api}/health/log`, b); }
   logWater(glasses: number): Observable<HealthLog> { return this.http.post<HealthLog>(`${this.api}/health/water`, { glasses }); }
   healthHistory(): Observable<HealthLog[]> { return this.http.get<HealthLog[]>(`${this.api}/health/history`); }
+  logDiet(b: any): Observable<any> { return this.http.post<any>(`${this.api}/health/diet`, b); }
+  getDietHistory(): Observable<any[]> { return this.http.get<any[]>(`${this.api}/health/diet/history`); }
+  generateHealthReport(): Observable<string> { return this.http.get(`${this.api}/health/diet/ai-report`, { responseType: 'text' }); }
 
   /* ===== Mind OS ===== */
   getMindToday(): Observable<MindLog> { return this.http.get<MindLog>(`${this.api}/mind/today`); }

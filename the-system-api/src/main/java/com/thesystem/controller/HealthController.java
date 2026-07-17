@@ -1,5 +1,6 @@
 package com.thesystem.controller;
 
+import com.thesystem.entity.DietEntry;
 import com.thesystem.entity.ExerciseLog;
 import com.thesystem.entity.HealthLog;
 import com.thesystem.dto.SleepEntryDTO;
@@ -67,9 +68,24 @@ public class HealthController {
                 quality);
     }
 
-    @GetMapping("/sleep")
+    @GetMapping("/sleep/history")
     public List<SleepEntryDTO> sleepHistory(Principal p) {
         return healthService.sleepHistory(currentPlayer.id(p));
     }
-}
 
+    // Diet / Nutrition
+    @PostMapping("/diet")
+    public DietEntry logDiet(Principal p, @RequestBody DietEntry body) {
+        return healthService.logDiet(currentPlayer.id(p), body);
+    }
+
+    @GetMapping("/diet/history")
+    public List<DietEntry> dietHistory(Principal p) {
+        return healthService.dietHistory(currentPlayer.id(p));
+    }
+
+    @GetMapping("/diet/ai-report")
+    public String generateWeeklyHealthReport(Principal p) {
+        return healthService.generateWeeklyHealthReport(currentPlayer.id(p));
+    }
+}

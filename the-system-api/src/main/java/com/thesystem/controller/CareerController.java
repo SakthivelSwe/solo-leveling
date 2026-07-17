@@ -9,6 +9,7 @@ import com.thesystem.entity.JobApplication;
 import com.thesystem.entity.LeetcodeLog;
 import com.thesystem.security.CurrentPlayer;
 import com.thesystem.service.CareerService;
+import com.thesystem.service.DevMasterySyncService;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -20,10 +21,14 @@ import java.util.Map;
 public class CareerController {
 
     private final CareerService careerService;
+    private final DevMasterySyncService devMasterySyncService;
     private final CurrentPlayer currentPlayer;
 
-    public CareerController(CareerService careerService, CurrentPlayer currentPlayer) {
+    public CareerController(CareerService careerService,
+                            DevMasterySyncService devMasterySyncService,
+                            CurrentPlayer currentPlayer) {
         this.careerService = careerService;
+        this.devMasterySyncService = devMasterySyncService;
         this.currentPlayer = currentPlayer;
     }
 
@@ -88,8 +93,12 @@ public class CareerController {
 
     // Interview Readiness
     @GetMapping("/interview-readiness")
-    public InterviewReadinessDTO interviewReadiness(Principal p) {
+    public InterviewReadinessDTO calculateInterviewReadiness(Principal p) {
         return careerService.calculateInterviewReadiness(currentPlayer.id(p));
     }
-}
 
+    @PostMapping("/sync-dev-mastery")
+    public List<com.thesystem.entity.DevMasteryProgress> syncDevMastery(Principal p) {
+        return devMasterySyncService.syncProgress(currentPlayer.id(p));
+    }
+}

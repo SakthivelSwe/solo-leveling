@@ -3,12 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 import { LifeOsService } from '../../core/services/life-os.service';
 import {
   JobApplication, LeetcodeLog, LeetcodeStats, SkillsGap, SavingsGoal,
   HealthLog, MindLog, SelfDoubtEvidence, EnglishLog, BodyLog, RelationshipLog,
-  InterviewReadinessDTO, DeepWorkSession
+  InterviewReadinessDTO, DeepWorkSession, DevMasteryProgress, BudgetEntry,
+  DietEntry, FoodItem
 } from '../../core/models/models';
 import { fadeInUp, listStagger } from '../../shared/animations';
 
@@ -17,7 +20,7 @@ type Tab = 'CAREER' | 'HEALTH' | 'MIND' | 'WEALTH' | 'ENGLISH' | 'BODY' | 'RELAT
 @Component({
   selector: 'app-life-os',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NgChartsModule],
   templateUrl: './life-os.component.html',
   styleUrls: ['./life-os.component.scss'],
   animations: [fadeInUp, listStagger],
@@ -44,19 +47,63 @@ export class LifeOsComponent implements OnInit {
   newDeepWork: DeepWorkSession = { codingMinutes: 0, interruptions: 0, mobilePickups: 0, focusSessions: 0 };
   readiness = signal<InterviewReadinessDTO | null>(null);
   deepWork = signal<DeepWorkSession[]>([]);
+  devMastery = signal<DevMasteryProgress[]>([]);
 
   // Wealth
   goals = signal<SavingsGoal[]>([]);
+  budgets = signal<BudgetEntry[]>([]);
+
+  // Wisdom Engine Carousel
+  wisdomIndex = signal<number>(0);
+  wisdomTips = [
+    { text: "Wealth is what you don't see. The cars not purchased, the diamonds not bought, the watches not worn.", author: "Psychology of Money" },
+    { text: "Rich people acquire assets. The poor and middle class acquire liabilities that they think are assets.", author: "Rich Dad Poor Dad" },
+    { text: "Getting money requires taking risks, being optimistic, and putting yourself out there. Keeping money requires the opposite of taking risk.", author: "Psychology of Money" },
+    { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" }
+  ];
+
+  // Doughnut Chart Data
+  public doughnutChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { color: '#8a8a9a' } },
+    }
+  };
+  public doughnutChartData: ChartData<'doughnut'> = {
+    labels: [ 'Expenses', 'Savings', 'Investments (SIP)' ],
+    datasets: [ { data: [50, 25, 25], backgroundColor: ['#E24B4A', '#1D9E75', '#378ADD'], borderWidth: 0 } ]
+  };
+  public doughnutChartType: ChartType = 'doughnut';
 
   // Health
   health = signal<HealthLog | null>(null);
+  dietHistory = signal<DietEntry[]>([]);
+  aiReport = signal<string | null>(null);
+  isGeneratingReport = signal<boolean>(false);
+
+  foodCatalog: FoodItem[] = [
+    { name: 'Almonds', category: 'Nut', baseGrams: 30, calories: 173, protein: 6, vitamins: 'Vitamin E, Magnesium', icon: '🥜' },
+    { name: 'Apple', category: 'Fruit', baseGrams: 100, calories: 52, protein: 0, vitamins: 'Vitamin C', icon: '🍎' },
+    { name: 'Chicken Breast', category: 'Meat', baseGrams: 150, calories: 165, protein: 31, vitamins: 'B6, Niacin', icon: '🍗' },
+    { name: 'Eggs (2)', category: 'Protein', baseGrams: 100, calories: 155, protein: 13, vitamins: 'B12, Vitamin D', icon: '🥚' },
+    { name: 'Spinach', category: 'Veg', baseGrams: 100, calories: 23, protein: 3, vitamins: 'Iron, Vitamin A, Vitamin K', icon: '🥬' },
+    { name: 'Oats', category: 'Carb', baseGrams: 50, calories: 194, protein: 7, vitamins: 'Iron, Magnesium', icon: '🥣' }
+  ];
 
   // Mind
   mind: MindLog = {};
   evidence = signal<SelfDoubtEvidence[]>([]);
+  stoicQuoteIndex = signal<number>(0);
+  stoicQuotes = [
+    { quote: "You have power over your mind - not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },
+    { quote: "We suffer more often in imagination than in reality.", author: "Seneca" },
+    { quote: "First say to yourself what you would be; and then do what you have to do.", author: "Epictetus" },
+    { quote: "The obstacle in the path becomes the path. Never forget, within every obstacle is an opportunity to improve our condition.", author: "Ryan Holiday" }
+  ];
 
   // English
-  english: EnglishLog = { speakingMin: 20, newWords: 0, mockInterview: false };
+  english: EnglishLog = { speakingMin: 0, newWords: 0, mockInterview: false };
+  newWordInput: string = '';
 
   // Body
   body = signal<BodyLog | null>(null);
@@ -84,13 +131,20 @@ export class LifeOsComponent implements OnInit {
         break;
       case 'WEALTH':
         this.life.getGoals().subscribe(v => this.goals.set(v));
+        this.life.getBudgets().subscribe(v => {
+          this.budgets.set(v);
+          this.updateWealthChart(v);
+        });
+        this.startWisdomEngine();
         break;
       case 'HEALTH':
         this.life.getHealthToday().subscribe(v => this.health.set(v ?? { waterGlasses: 0, breakfastEaten: false, lunchEaten: false, dinnerEaten: false }));
+        this.life.getDietHistory().subscribe(v => this.dietHistory.set(v));
         break;
       case 'MIND':
         this.life.getMindToday().subscribe(v => this.mind = v ?? {});
         this.life.getEvidence().subscribe(v => this.evidence.set(v));
+        this.startStoicEngine();
         break;
       case 'BODY':
         this.life.getBodyToday().subscribe(v => this.body.set(v ?? this.blankBody()));
@@ -108,12 +162,20 @@ export class LifeOsComponent implements OnInit {
   /* ===== Career actions ===== */
   addJob(): void {
     if (!this.newJob.company || !this.newJob.role) { this.toast('⚠ Company and role required'); return; }
-    this.life.createJob(this.newJob).subscribe(() => {
-      this.toast('◈ Application logged');
+    this.life.createJob(this.newJob).subscribe(v => {
+      this.jobs.update(j => [v, ...j]);
       this.newJob = this.blankJob();
-      this.life.getJobs().subscribe(v => this.jobs.set(v));
+      this.toast('◈ Job application logged');
     });
   }
+
+  syncDevMastery(): void {
+    this.life.syncDevMastery().subscribe(v => {
+      this.devMastery.set(v);
+      this.toast('◈ Dev-Mastery Progress Synced!');
+    });
+  }
+
   changeStatus(job: JobApplication, status: string): void {
     if (!job.id) return;
     this.life.updateJobStatus(job.id, status).subscribe(() => {
@@ -139,7 +201,33 @@ export class LifeOsComponent implements OnInit {
     });
   }
 
+  addGoal(): void {
+    // Add logic later if needed
+  }
+
   /* ===== Wealth actions ===== */
+  updateWealthChart(budgets: BudgetEntry[]): void {
+    if (budgets.length > 0) {
+      const b = budgets[0]; // latest budget
+      const totalExpenses = b.pgRent + b.foodSpend + b.transport + b.onlineOrders + b.misc;
+      this.doughnutChartData = {
+        labels: [ 'Expenses', 'Savings', 'Investments (SIP)' ],
+        datasets: [ {
+          data: [totalExpenses, b.saved, b.sipAmount],
+          backgroundColor: ['#E24B4A', '#1D9E75', '#378ADD'],
+          borderColor: '#0a0a0f',
+          hoverOffset: 4
+        } ]
+      };
+    }
+  }
+
+  startWisdomEngine(): void {
+    setInterval(() => {
+      this.wisdomIndex.update(i => (i + 1) % this.wisdomTips.length);
+    }, 10000); // rotate every 10 seconds
+  }
+
   bumpGoal(goal: SavingsGoal, amount: number): void {
     if (!goal.id) return;
     const next = Math.max(0, goal.current + amount);
@@ -151,17 +239,57 @@ export class LifeOsComponent implements OnInit {
   goalPct(g: SavingsGoal): number { return Math.min(100, Math.round((g.current / g.target) * 100)); }
 
   /* ===== Health actions ===== */
+  logFood(food: FoodItem): void {
+    const entry: DietEntry = {
+      foodName: food.name,
+      category: food.category,
+      quantityGrams: food.baseGrams,
+      calories: food.calories,
+      proteinGrams: food.protein,
+      vitamins: food.vitamins
+    };
+    this.life.logDiet(entry).subscribe(v => {
+      this.dietHistory.update(h => [v, ...h]);
+      this.toast(`◈ Logged ${food.name}`);
+    });
+  }
+
+  generateAiHealthReport(): void {
+    this.isGeneratingReport.set(true);
+    this.aiReport.set(null);
+    this.life.generateHealthReport().subscribe({
+      next: (report) => {
+        this.aiReport.set(report);
+        this.isGeneratingReport.set(false);
+      },
+      error: () => {
+        this.toast('⚠ Failed to generate AI Report');
+        this.isGeneratingReport.set(false);
+      }
+    });
+  }
+
   addWater(): void {
     const h = this.health(); if (!h) return;
     const glasses = Math.min(8, (h.waterGlasses ?? 0) + 1);
     this.life.logWater(glasses).subscribe(v => this.health.set(v));
   }
+
   saveHealth(): void {
     const h = this.health(); if (!h) return;
-    this.life.upsertHealth(h).subscribe(v => { this.health.set(v); this.toast('◈ Health log saved'); });
+    this.life.upsertHealth(h).subscribe(v => {
+      this.health.set(v);
+      this.toast('◈ Health logged');
+    });
   }
 
   /* ===== Mind actions ===== */
+  startStoicEngine(): void {
+    setInterval(() => {
+      this.stoicQuoteIndex.update(i => (i + 1) % this.stoicQuotes.length);
+    }, 12000); // rotate every 12 seconds
+  }
+
   saveMind(): void {
     this.life.upsertMind(this.mind).subscribe(v => {
       this.mind = v; this.toast('◈ Reflection saved');
@@ -174,16 +302,46 @@ export class LifeOsComponent implements OnInit {
     this.life.upsertEnglish(this.english).subscribe(() => this.toast('◈ English session logged'));
   }
 
+  addSpeakingTime(mins: number): void {
+    this.english.speakingMin = (this.english.speakingMin || 0) + mins;
+  }
+
+  addNewWord(): void {
+    if (this.newWordInput.trim()) {
+      this.english.newWords = (this.english.newWords || 0) + 1;
+      this.newWordInput = '';
+      this.toast('◈ Vocabulary word added');
+    }
+  }
+
   /* ===== Body actions ===== */
   saveBody(): void {
     const b = this.body(); if (!b) return;
+    
+    // Calculate Pillars
+    let pillars = 0;
+    if (b.coldShower) pillars++;
+    if (b.exerciseDone) pillars++;
+    if (b.zincMeal) pillars++;
+    if (b.noSoda) pillars++;
+    if (b.noPorn) pillars++;
+    if (b.sleptBefore1130) pillars++;
+    if ((b.morningSunMin ?? 0) >= 15) pillars++;
+    b.testosteronePillars = pillars;
+
     this.life.upsertBody(b).subscribe(v => { this.body.set(v); this.toast(`◈ ${v.testosteronePillars}/7 pillars locked in`); });
   }
 
   /* ===== Relationship actions ===== */
-  saveRel(): void {
+  saveRelationship(): void {
     const r = this.relationship(); if (!r) return;
     this.life.upsertRelationship(r).subscribe(v => { this.relationship.set(v); this.toast('◈ Bonds updated'); });
+  }
+  
+  addCallTime(mins: number): void {
+    const r = this.relationship(); if (!r) return;
+    r.callDurationMin = (r.callDurationMin || 0) + mins;
+    if (r.callDurationMin > 0) r.gfCalled = true;
   }
 
   urgencyColor(u: string): string {

@@ -1,8 +1,10 @@
 package com.thesystem.service;
 
+import com.thesystem.entity.DietEntry;
 import com.thesystem.entity.ExerciseLog;
 import com.thesystem.entity.HealthLog;
 import com.thesystem.dto.SleepEntryDTO;
+import com.thesystem.repository.DietEntryRepository;
 import com.thesystem.repository.ExerciseLogRepository;
 import com.thesystem.repository.HealthLogRepository;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,17 @@ public class HealthService {
 
     private final HealthLogRepository healthRepo;
     private final ExerciseLogRepository exerciseRepo;
+    private final DietEntryRepository dietRepo;
+    private final AiProviderService aiProviderService;
 
-    public HealthService(HealthLogRepository healthRepo, ExerciseLogRepository exerciseRepo) {
+    public HealthService(HealthLogRepository healthRepo, 
+                         ExerciseLogRepository exerciseRepo,
+                         DietEntryRepository dietRepo,
+                         AiProviderService aiProviderService) {
         this.healthRepo = healthRepo;
         this.exerciseRepo = exerciseRepo;
+        this.dietRepo = dietRepo;
+        this.aiProviderService = aiProviderService;
     }
 
     public HealthLog upsertHealth(Long playerId, HealthLog body) {
@@ -124,5 +133,36 @@ public class HealthService {
         // Return oldest → newest so the chart reads left-to-right.
         java.util.Collections.reverse(out);
         return out;
+    }
+
+    /* ===== Phase 2 — Nutritional Diet Tracking ===== */
+
+    public DietEntry logDiet(Long playerId, DietEntry entry) {
+        entry.setId(null);
+        entry.setPlayerId(playerId);
+        if (entry.getConsumedDate() == null) entry.setConsumedDate(LocalDate.now());
+        return dietRepo.save(entry);
+    }
+
+    public List<DietEntry> dietHistory(Long playerId) {
+        return dietRepo.findByPlayerIdAndConsumedDateBetween(playerId, LocalDate.now().minusDays(7), LocalDate.now());
+    }
+
+    public String generateWeeklyHealthReport(Long playerId) {
+        List<DietEntry> recentDiet = dietRepo.findByPlayerIdAndConsumedDateBetween(playerId, LocalDate.now().minusDays(7), LocalDate.now());
+        
+        StringBuilder prompt = new StringBuilder("I am a user tracking my food. Here is what I ate over the last 7 days:\n");
+        if (recentDiet.isEmpty()) {
+            prompt.append("I haven't logged any food yet.\n");
+        } else {
+            for (DietEntry d : recentDiet) {
+                prompt.append(String.format("- %s (%s): %dg, %d kcal, %dg protein. Vitamins: %s\n", 
+                    d.getFoodName(), d.getCategory(), d.getQuantityGrams(), d.getCalories(), d.getProteinGrams(), d.getVitamins()));
+            }
+        }
+        
+        prompt.append("\nPlease act as a world-class nutritionist. Analyze my diet and provide a concise, brutally honest, and actionable report on what I should change or continue doing. Keep it under 150 words.");
+        
+        return aiProviderService.generate(AiProviderService.Scenario.COACHING, "Nutritionist Persona", prompt.toString());
     }
 }
