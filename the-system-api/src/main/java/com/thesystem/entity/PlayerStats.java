@@ -14,14 +14,14 @@ public class PlayerStats {
     @Column(name = "player_id", nullable = false)
     private Long playerId;
 
-    private int strength = 12;      // STR - Fitness
-    private int intelligence = 35;  // INT - Tech knowledge
+    private int strength = 10;      // STR - Fitness
+    private int intelligence = 10;  // INT - Tech knowledge
     private int vitality = 10;      // VIT - Health / food / sleep
-    private int agility = 18;       // AGI - English speaking speed
-    private int perception = 28;    // PER - Problem-solving
+    private int agility = 10;       // AGI - English speaking speed
+    private int perception = 10;    // PER - Problem-solving
 
     @Column(name = "hor")
-    private int hor = 5;            // HOR - Hormonal / Testosterone
+    private int hor = 10;            // HOR - Hormonal / Testosterone
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
