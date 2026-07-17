@@ -494,6 +494,9 @@ export class SettingsPanelComponent implements OnInit {
     this.alarmActive = true;
 
     if (this.isAndroid) {
+      // Always cancel fallback alarms to avoid duplicates if the user previously used the fallback
+      this.localNotifs.cancelAlarm();
+
       // Native full-screen alarm: plays the chosen local MP3 at alarm volume,
       // vibrates and rings over the lock screen even when the app is closed.
       SystemAlarm.setAlarm({
