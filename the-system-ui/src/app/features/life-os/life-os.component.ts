@@ -52,6 +52,10 @@ export class LifeOsComponent implements OnInit {
   // Wealth
   goals = signal<SavingsGoal[]>([]);
   budgets = signal<BudgetEntry[]>([]);
+  newBudget: BudgetEntry = { entryMonth: new Date().toISOString().slice(0, 7), salary: 0, pgRent: 0, foodSpend: 0, transport: 0, onlineOrders: 0, misc: 0, saved: 0, sipAmount: 0 };
+  showBudgetForm = false;
+  newGoal: SavingsGoal = { goalName: '', target: 0, current: 0 };
+  showGoalForm = false;
 
   // Wisdom Engine Carousel
   wisdomIndex = signal<number>(0);
@@ -204,7 +208,25 @@ export class LifeOsComponent implements OnInit {
   }
 
   addGoal(): void {
-    // Add logic later if needed
+    if (!this.newGoal.goalName || this.newGoal.target <= 0) { this.toast('⚠ Valid name and target required'); return; }
+    this.life.createGoal(this.newGoal).subscribe(g => {
+      this.toast('◈ Savings Goal Added');
+      this.goals.update(list => [...list, g]);
+      this.newGoal = { goalName: '', target: 0, current: 0 };
+      this.showGoalForm = false;
+    });
+  }
+
+  saveBudget(): void {
+    if (this.newBudget.salary <= 0) { this.toast('⚠ Salary must be > 0'); return; }
+    this.life.upsertBudget(this.newBudget).subscribe(b => {
+      this.toast('◈ Budget Logged for ' + b.entryMonth);
+      this.life.getBudgets().subscribe(v => {
+        this.budgets.set(v);
+        this.updateWealthChart(v);
+      });
+      this.showBudgetForm = false;
+    });
   }
 
   /* ===== Wealth actions ===== */
