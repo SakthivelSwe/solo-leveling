@@ -17,7 +17,6 @@
       <a routerLink="/physical" routerLinkActive="active">BODY</a>
       <a routerLink="/learning" routerLinkActive="active">LEARNING</a>
       <a routerLink="/ai" routerLinkActive="active">AI MENTOR</a>
-      <a routerLink="/stats" routerLinkActive="active">STATS</a>
       <a routerLink="/insights" routerLinkActive="active">INSIGHTS</a>
       <a routerLink="/achievements" routerLinkActive="active">RANKS</a>
     </nav>
@@ -33,9 +32,6 @@
 
       <!-- Player LV -->
       <span class="tech lv" *ngIf="status() as s">LV.{{ s.player.level }}</span>
-
-      <!-- Statistics deep-dive (visible on all screen sizes) -->
-      <a routerLink="/stats" class="icon-btn tech" title="Statistics" aria-label="Statistics deep-dive" id="stats-btn">📊</a>
 
       <!-- Notifications -->
       <a routerLink="/notifications" class="icon-btn bell" id="notif-btn"
