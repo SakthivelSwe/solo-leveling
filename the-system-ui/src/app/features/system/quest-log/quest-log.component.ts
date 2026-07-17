@@ -35,7 +35,7 @@ const SKIP_MSGS: Record<string, string[]> = {
   styleUrls: ['./quest-log.component.scss'],
   animations: [listStagger],
 })
-export class QuestLogComponent implements OnChanges {
+export class QuestLogComponent {
   @Input({ required: true }) quests: Quest[] = [];      // daily quests
   @Input() weeklyQuests: Quest[] = [];
   @Input() monthlyQuests: Quest[] = [];
