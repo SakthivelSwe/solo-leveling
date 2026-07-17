@@ -28,7 +28,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     <span class="mono diam">◈</span>
     <div class="head-text">
       <h3 class="mono title">TODAY'S DIRECTIVE</h3>
-      <p class="sub tech">{{ editMode() ? 'CONFIGURING YOUR DAY' : currentTime() }}</p>
+      <p class="sub tech">{{ editMode() ? 'CONFIGURING YOUR DAY' : currentDate() }}</p>
     </div>
     <button class="edit-btn tech" (click)="toggleEdit()" [attr.aria-pressed]="editMode()">
       {{ editMode() ? '✓ DONE' : '✎ EDIT' }}
@@ -352,6 +352,7 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
 
   // ── Clock ────────────────────────────────────────────────────────────────
   readonly currentTime = signal('');
+  readonly currentDate = signal('');
   private timer: any;
 
   private readonly _nowMins = computed(() => {
@@ -405,6 +406,8 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
   private tick(): void {
     const d = new Date();
     this.currentTime.set(`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`);
+    const opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+    this.currentDate.set(d.toLocaleDateString('en-GB', opts).toUpperCase());
   }
 
   // ── Anchor helpers ───────────────────────────────────────────────────────

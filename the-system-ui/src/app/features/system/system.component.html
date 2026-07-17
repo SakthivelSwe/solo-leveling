@@ -23,12 +23,6 @@
     </nav>
 
     <div class="topbar-right">
-      <!-- Date Display -->
-      <div class="tech" style="display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; margin-right: 12px;">
-        <span style="font-size: 0.65rem; color: #8a8a9a;">TODAY: <span style="color: #cfc9ff;">{{ todayDateStr() }}</span></span>
-        <span style="font-size: 0.65rem; color: #8a8a9a;">NEXT: <span style="color: #6a6a7a;">{{ tomorrowDateStr() }}</span></span>
-      </div>
-
       <!-- Live sync indicator -->
       <span class="live-link tech" [class.on]="sse.connected()"
             role="status" [attr.aria-label]="sse.connected() ? 'System link live' : 'Reconnecting'"
