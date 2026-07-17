@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Seeds THE SYSTEM's default quests on startup.
@@ -62,7 +63,9 @@ public class DataSeeder implements CommandLineRunner {
     // ── Quest Seeding ──────────────────────────────────────────────────────────
 
     private void seedQuestsIfEmpty() {
-        if (questRepository.count() > 0) return;
+        Set<String> existingKeys = questRepository.findAll().stream()
+            .map(Quest::getQuestKey)
+            .collect(java.util.stream.Collectors.toSet());
 
         List<Quest> quests = List.of(
 
@@ -241,7 +244,13 @@ public class DataSeeder implements CommandLineRunner {
                 QuestCategory.MILESTONE, 300, "{\"AGI\":6,\"PER\":4}")
         );
 
-        questRepository.saveAll(quests);
+        List<Quest> newQuests = quests.stream()
+            .filter(q -> !existingKeys.contains(q.getQuestKey()))
+            .collect(java.util.stream.Collectors.toList());
+
+        if (!newQuests.isEmpty()) {
+            questRepository.saveAll(newQuests);
+        }
     }
 
     // ── Builder Helpers ────────────────────────────────────────────────────────
