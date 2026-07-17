@@ -1,5 +1,7 @@
 package com.thesystem.config;
 
+import jakarta.servlet.DispatcherType;
+
 import com.thesystem.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +67,7 @@ public class SecurityConfig {
                             .maxAgeInSeconds(31536000));
             })
             .authorizeHttpRequests(auth -> auth
+                .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.ASYNC, DispatcherType.FORWARD).permitAll()
                 .requestMatchers(publicMatchers).permitAll()
                 .anyRequest().authenticated()
             )

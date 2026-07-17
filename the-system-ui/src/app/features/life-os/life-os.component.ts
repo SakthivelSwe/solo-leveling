@@ -176,9 +176,16 @@ export class LifeOsComponent implements OnInit {
   }
 
   syncDevMastery(): void {
-    this.life.syncDevMastery().subscribe(v => {
-      this.devMastery.set(v);
-      this.toast('◈ Dev-Mastery Progress Synced!');
+    this.toast('◈ Syncing with Dev-Mastery...');
+    this.life.syncDevMastery().subscribe({
+      next: v => {
+        this.devMastery.set(v);
+        this.toast('◈ Dev-Mastery Progress Synced!');
+      },
+      error: err => {
+        const msg = err.error?.message || 'Sync failed. Ensure Dev-Mastery is running.';
+        this.toast('⚠ ' + msg);
+      }
     });
   }
 
