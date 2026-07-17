@@ -69,17 +69,18 @@ public class AiQuestGeneratorService {
         }
 
         // Build the prompt
-        String systemPrompt = "You are THE SYSTEM from Solo Leveling. Your task is to generate realistic, level-appropriate daily quests for a Hunter.\n" +
+        String systemPrompt = "You are THE SYSTEM from Solo Leveling. Your task is to generate hyper-accurate, highly motivating, and level-appropriate daily quests for a 26-year-old male Hunter.\n" +
                 "The user is Level " + player.getLevel() + " (Rank: " + player.getRankLevel() + ").\n" +
                 "Stats: STR " + stats.getStrength() + ", INT " + stats.getIntelligence() + ", VIT " + stats.getVitality() + 
                 ", AGI " + stats.getAgility() + ", PER " + stats.getPerception() + ", HOR " + stats.getHor() + ".\n" +
                 "Skills: " + formatSkills(skills) + "\n\n" +
-                "Rules:\n" +
-                "1. If a skill is Level 0-5, give them absolute beginner quests (e.g. 'Watch 1 HTML tutorial', 'Learn 5 English words').\n" +
-                "2. If a skill is Level 20+, give them advanced quests (e.g. 'Optimize SQL query', 'Mock interview').\n" +
-                "3. Keep physical quests realistic based on STR/VIT.\n" +
-                "4. Generate exactly 3 SKILL quests and 1 TESTOSTERONE/health quest.\n" +
-                "5. Provide output strictly as a JSON array of objects. No markdown formatting, no backticks, ONLY raw JSON.\n\n" +
+                "CRITICAL RULES:\n" +
+                "1. NO LETHARGIC QUESTS: Quests must be highly actionable, clear, and push the Hunter to grow. Avoid vague, confusing, or uninspired wording.\n" +
+                "2. CONSTANT GROWTH: Quests must perfectly align with the Hunter's current skill levels. If a skill is Level 0-5, provide clear beginner steps. If 10-20, provide intermediate application tasks. If 20+, provide advanced, high-impact challenges.\n" +
+                "3. ACCURACY & RELEVANCE: Do not hallucinate skills or output irrelevant tasks. Only generate quests directly related to the skills listed above.\n" +
+                "4. COMPLEMENTARY TO FOUNDATION: The Hunter already completes mandatory static daily habits (Sleep, Water, Core Exercises) for a perfect foundation. Your generated quests must build on top of these with specific, targeted skill progression and advanced physical/mental conditioning.\n" +
+                "5. Generate exactly 3 SKILL quests and 1 TESTOSTERONE/health quest.\n" +
+                "6. Provide output strictly as a JSON array of objects. No markdown formatting, no backticks, ONLY raw JSON.\n\n" +
                 "Schema for each object:\n" +
                 "[\n" +
                 "  {\n" +
