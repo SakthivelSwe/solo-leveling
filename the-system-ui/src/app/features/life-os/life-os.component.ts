@@ -82,12 +82,14 @@ export class LifeOsComponent implements OnInit {
   isGeneratingReport = signal<boolean>(false);
 
   foodCatalog: FoodItem[] = [
-    { name: 'Almonds', category: 'Nut', baseGrams: 30, calories: 173, protein: 6, vitamins: 'Vitamin E, Magnesium', icon: '🥜' },
-    { name: 'Apple', category: 'Fruit', baseGrams: 100, calories: 52, protein: 0, vitamins: 'Vitamin C', icon: '🍎' },
-    { name: 'Chicken Breast', category: 'Meat', baseGrams: 150, calories: 165, protein: 31, vitamins: 'B6, Niacin', icon: '🍗' },
-    { name: 'Eggs (2)', category: 'Protein', baseGrams: 100, calories: 155, protein: 13, vitamins: 'B12, Vitamin D', icon: '🥚' },
-    { name: 'Spinach', category: 'Veg', baseGrams: 100, calories: 23, protein: 3, vitamins: 'Iron, Vitamin A, Vitamin K', icon: '🥬' },
-    { name: 'Oats', category: 'Carb', baseGrams: 50, calories: 194, protein: 7, vitamins: 'Iron, Magnesium', icon: '🥣' }
+    { name: 'Idli (3 pcs)', category: 'Carb', baseGrams: 150, calories: 117, protein: 3, vitamins: 'Iron, B-Vitamins', icon: '🍚' },
+    { name: 'Curd Rice', category: 'Probiotic', baseGrams: 200, calories: 230, protein: 6, vitamins: 'Calcium, B12', icon: '🍛' },
+    { name: 'Boiled Eggs (2)', category: 'Protein', baseGrams: 100, calories: 155, protein: 13, vitamins: 'B12, Vitamin D', icon: '🥚' },
+    { name: 'Peanuts (Roasted)', category: 'Nut', baseGrams: 30, calories: 161, protein: 7, vitamins: 'Vitamin E, Magnesium', icon: '🥜' },
+    { name: 'Banana', category: 'Fruit', baseGrams: 118, calories: 105, protein: 1, vitamins: 'Potassium, Vitamin B6', icon: '🍌' },
+    { name: 'Chana / Sundal', category: 'Protein', baseGrams: 100, calories: 164, protein: 9, vitamins: 'Iron, Folate', icon: '🧆' },
+    { name: 'Chapati (2 pcs)', category: 'Carb', baseGrams: 80, calories: 200, protein: 6, vitamins: 'Iron, Magnesium', icon: '🫓' },
+    { name: 'Milk (1 Glass)', category: 'Dairy', baseGrams: 200, calories: 122, protein: 6, vitamins: 'Calcium, Vitamin D', icon: '🥛' }
   ];
 
   // Mind

@@ -196,18 +196,31 @@
         </div>
 
         <!-- Recent Diet History -->
-        <div style="margin-bottom: 12px;"><span class="tech" style="color: #8a8a9a;">RECENT LOGS:</span></div>
-        <ul class="mini-list" @listStagger style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
-          <li *ngFor="let d of dietHistory()" style="background: rgba(0,0,0,0.3); border-radius: 4px; padding: 12px; border-left: 2px solid #1D9E75;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-              <span class="pn" style="font-weight: bold;">{{ d.foodName }}</span>
-              <span class="tech dt" style="color: #8a8a9a;">{{ d.consumedDate | date:'shortDate' }}</span>
+        <div style="margin-bottom: 12px;"><span class="tech" style="color: #8a8a9a; font-size: 0.85rem; letter-spacing: 2px;">RECENT LOGS</span></div>
+        <div class="diet-grid" @listStagger style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+          <div *ngFor="let d of dietHistory()" class="diet-card" style="background: rgba(9, 9, 18, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; border-top: 3px solid #1D9E75; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 600; font-size: 1.1rem; color: #fff;">{{ d.foodName }}</span>
+              <span class="tech" style="color: #8a8a9a; font-size: 0.75rem;">{{ d.consumedDate | date:'dd MMM' }}</span>
             </div>
-            <div class="tech" style="font-size: 0.8rem; color: #1D9E75; margin-bottom: 4px;">{{ d.calories }} kcal | {{ d.proteinGrams }}g protein</div>
-            <div class="tech" style="font-size: 0.7rem; color: #8a8a9a;">{{ d.quantityGrams }}g • {{ d.vitamins }}</div>
-          </li>
-          <li *ngIf="!dietHistory().length" class="empty tech">No foods logged recently.</li>
-        </ul>
+            
+            <div style="display: flex; gap: 12px; margin-top: 4px;">
+              <div style="background: rgba(29, 158, 117, 0.1); padding: 6px 10px; border-radius: 6px; display: flex; flex-direction: column;">
+                <span class="mono" style="color: #1D9E75; font-size: 1.1rem;">{{ d.calories }}</span>
+                <span class="tech" style="color: #1D9E75; font-size: 0.6rem; opacity: 0.8;">KCAL</span>
+              </div>
+              <div style="background: rgba(83, 74, 183, 0.1); padding: 6px 10px; border-radius: 6px; display: flex; flex-direction: column;">
+                <span class="mono" style="color: #b3aef0; font-size: 1.1rem;">{{ d.proteinGrams }}g</span>
+                <span class="tech" style="color: #b3aef0; font-size: 0.6rem; opacity: 0.8;">PROTEIN</span>
+              </div>
+            </div>
+
+            <div class="tech" style="font-size: 0.75rem; color: #8a8a9a; margin-top: 4px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1);">
+              <span style="color: #fff;">{{ d.quantityGrams }}g</span> • {{ d.vitamins }}
+            </div>
+          </div>
+          <div *ngIf="!dietHistory().length" class="empty tech" style="padding: 16px; color: #8a8a9a; font-style: italic;">No foods logged recently.</div>
+        </div>
       </div>
 
       <div class="system-card block" *ngIf="health() as h">
