@@ -53,6 +53,10 @@ export class SystemComponent implements OnInit, OnDestroy {
   shadows = signal<import('../../core/models/models').Shadow[]>([]);
   showAllQuests = signal<boolean>(false);
 
+  weeklyQuests = signal<Quest[]>([]);
+  monthlyQuests = signal<Quest[]>([]);
+  milestoneQuests = signal<Quest[]>([]);
+
   /** Debounce handle for coalescing bursts of live SSE events into one reload. */
   private reloadTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -113,6 +117,34 @@ export class SystemComponent implements OnInit, OnDestroy {
       next: (shadows) => this.shadows.set(shadows),
       error: () => this.shadows.set([]),
     });
+    this.loadQuestTabs();
+  }
+
+  loadQuestTabs(): void {
+    this.playerService.getWeeklyQuests().subscribe({
+      next: (q) => this.weeklyQuests.set(q),
+      error: () => this.weeklyQuests.set([]),
+    });
+    this.playerService.getMonthlyQuests().subscribe({
+      next: (q) => this.monthlyQuests.set(q),
+      error: () => this.monthlyQuests.set([]),
+    });
+    this.playerService.getMilestoneQuests().subscribe({
+      next: (q) => this.milestoneQuests.set(q),
+      error: () => this.milestoneQuests.set([]),
+    });
+  }
+
+  /** Called when user adds a custom quest — reload the relevant tab. */
+  onQuestAdded(quest: Quest): void {
+    this.loadQuestTabs();
+    this.load();
+  }
+
+  /** Called when user deletes a custom quest — reload to reflect change. */
+  onQuestDeleted(questKey: string): void {
+    this.loadQuestTabs();
+    this.load();
   }
 
   @HostListener('document:click')

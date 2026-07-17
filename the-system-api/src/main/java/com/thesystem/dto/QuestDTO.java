@@ -12,6 +12,14 @@ public record QuestDTO(
         int priority,
         boolean isCritical,
         int bossDamage,
-        boolean isRecoveryQuest
+        boolean isRecoveryQuest,
+        /** DAILY | WEEKLY | MONTHLY | ONE_TIME */
+        String timeType,
+        /** true if created by the player (can be deleted) */
+        boolean isCustom,
+        /** For WEEKLY quests: how many times completed this week */
+        int weeklyDoneCount,
+        /** For MONTHLY quests: how many times completed this month */
+        int monthlyDoneCount
 ) {}
 

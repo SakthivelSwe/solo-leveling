@@ -162,7 +162,7 @@ import { RouterLink } from '@angular/router';
     }
 
     .top-nav {
-      padding: 20px 0;
+      padding: max(env(safe-area-inset-top, 20px), 20px) 0 20px 0;
       position: sticky;
       top: 0;
       background: rgba(5, 5, 5, 0.9);

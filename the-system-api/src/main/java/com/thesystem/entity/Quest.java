@@ -34,7 +34,7 @@ public class Quest {
     private boolean active = true;
 
     /**
-     * Priority tier for the Daily Mission Generator (1=lowest … 5=critical).
+     * Priority tier for the Daily Mission Generator (1=lowest ... 5=critical).
      * Critical quests (CODE_NO_AI, LEETCODE, ENGLISH, EXERCISE, SLEEP) = 5.
      */
     @Column(columnDefinition = "integer default 3")
@@ -49,19 +49,36 @@ public class Quest {
 
     /**
      * Damage this quest deals to the weekly dungeon boss.
-     * Replaces the old flat 10-damage-per-quest constant.
-     * High-effort quests (CODE_NO_AI=80, LEETCODE=50) deal more damage,
-     * making boss fights require meaningful work to clear.
      */
     @Column(name = "boss_damage", columnDefinition = "integer default 10")
     private int bossDamage = 10;
 
     /**
-     * Recovery quests count double toward the minimum daily threshold on rest days
-     * (Meditation, Walking, Stretching, Journaling, Sunlight).
+     * Recovery quests count double toward the minimum daily threshold on rest days.
      */
     @Column(name = "is_recovery_quest", columnDefinition = "boolean default false")
     private boolean recoveryQuest = false;
+
+    /**
+     * Reset frequency: DAILY (midnight), WEEKLY (Monday), MONTHLY (1st), ONE_TIME (never resets).
+     * Determines how often the player can complete and earn XP from this quest.
+     */
+    @Column(name = "time_type", length = 20, columnDefinition = "varchar(20) default 'DAILY'")
+    private String timeType = "DAILY";
+
+    /**
+     * True for quests created by a specific player (not seeded system quests).
+     * Custom quests are owned by one player and can be deleted by them.
+     */
+    @Column(name = "is_custom", columnDefinition = "boolean default false")
+    private boolean custom = false;
+
+    /**
+     * Owner player ID for custom quests. Null for global system quests.
+     * Custom quests with a playerId are only visible to that player.
+     */
+    @Column(name = "player_id")
+    private Long ownerId;
 
     public Quest() {}
 
@@ -74,6 +91,8 @@ public class Quest {
         this.statBoosts = statBoosts;
         this.skillBoosts = skillBoosts;
     }
+
+    // ── Getters & Setters ──────────────────────────────────────────────────────
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -99,5 +118,18 @@ public class Quest {
     public void setBossDamage(int bossDamage) { this.bossDamage = bossDamage; }
     public boolean isRecoveryQuest() { return recoveryQuest; }
     public void setRecoveryQuest(boolean recoveryQuest) { this.recoveryQuest = recoveryQuest; }
+    public String getTimeType() { return timeType; }
+    public void setTimeType(String timeType) { this.timeType = timeType; }
+    public boolean isCustom() { return custom; }
+    public void setCustom(boolean custom) { this.custom = custom; }
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+
+    /** True if this is a one-time milestone quest (never resets after completion). */
+    public boolean isOneTime() {
+        return "ONE_TIME".equals(timeType)
+                || category == QuestCategory.SIDE
+                || category == QuestCategory.MILESTONE;
+    }
 }
 

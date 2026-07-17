@@ -6,19 +6,34 @@
   container-name: questlog;
 }
 
-.header { margin-bottom: 16px; }
-.title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.diamond { font-size: 1.5rem; color: var(--accent-purple); text-shadow: 0 0 18px var(--accent-purple); }
-.title { margin: 0; font-size: 1.2rem; letter-spacing: 4px; font-weight: 900; }
-.subtitle { margin: 2px 0 0; font-size: .64rem; letter-spacing: 2px; color: var(--text-secondary); }
-.subtitle .warn { color: var(--accent-gold); }
-.subtitle .crit { color: #E24B4A; font-weight: 700; animation: blink .9s step-end infinite; }
-@keyframes blink { 50% { opacity: 0; } }
+/* ── Header ─────────────────────────────────────────────── */
+.header { margin-bottom: 12px; }
+.title-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+}
+.title-body { flex: 1; min-width: 0; }
+.diamond { font-size: 1.4rem; color: var(--accent-purple); text-shadow: 0 0 18px var(--accent-purple); }
+.title { margin: 0; font-size: 1.1rem; letter-spacing: 4px; font-weight: 900; }
+.subtitle { margin: 2px 0 0; font-size: .62rem; letter-spacing: 1.5px; color: var(--text-secondary); }
+
+/* Add Quest button */
+.add-quest-btn {
+  flex: 0 0 auto; width: 34px; height: 34px;
+  border-radius: 50%; border: 1px solid rgba(83,74,183,0.5);
+  background: rgba(83,74,183,0.12); color: var(--accent-purple);
+  font-size: 1.2rem; cursor: pointer; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.add-quest-btn:hover, .add-quest-btn.active {
+  background: rgba(83,74,183,0.28); border-color: var(--accent-purple);
+  box-shadow: 0 0 14px rgba(83,74,183,0.4);
+}
 
 /* Day progress bar */
 .day-bar {
-  height: 5px; border-radius: 4px; background: rgba(255,255,255,0.05);
-  overflow: hidden; border: 1px solid var(--border);
+  height: 4px; border-radius: 4px; background: rgba(255,255,255,0.05);
+  overflow: hidden; border: 1px solid var(--border); margin-bottom: 14px;
 }
 .day-fill {
   height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-teal));
@@ -26,6 +41,71 @@
   box-shadow: 0 0 10px rgba(83,74,183,0.6);
 }
 
+/* ── Tab Navigation ──────────────────────────────────────── */
+.tab-nav {
+  display: flex; gap: 4px; margin-bottom: 14px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex: 1; min-width: 0; padding: 8px 6px;
+  border-radius: 10px; border: 1px solid var(--border);
+  background: rgba(6,6,16,0.6); color: var(--text-secondary);
+  font-size: .58rem; letter-spacing: 1px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: all .2s; position: relative;
+}
+.tab-btn .tab-icon { font-size: .9rem; }
+.tab-btn:hover { color: var(--text-primary); border-color: rgba(83,74,183,0.5); }
+.tab-btn.active {
+  border-color: var(--accent-purple); color: #c8c4f5;
+  background: rgba(83,74,183,0.16);
+  box-shadow: 0 0 12px -4px rgba(83,74,183,0.5);
+}
+.tab-badge {
+  position: absolute; top: 4px; right: 4px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 8px; background: var(--accent-red);
+  color: #fff; font-size: .52rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.tab-badge.done { background: var(--accent-teal); }
+
+/* ── Add Quest Form ──────────────────────────────────────── */
+.add-form-panel {
+  margin-bottom: 14px; padding: 14px;
+  border: 1px solid rgba(83,74,183,0.3); border-radius: 12px;
+  background: rgba(83,74,183,0.06);
+  animation: fadeSlideIn .25s cubic-bezier(.22,1,.36,1);
+}
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:none; } }
+.add-hint { font-size: .66rem; letter-spacing: .8px; color: var(--accent-purple); margin: 0 0 10px; }
+.add-form-fields { display: flex; flex-direction: column; gap: 8px; }
+.add-form-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.add-input {
+  background: rgba(6,6,16,0.9); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-primary); padding: 9px 12px; font-family: inherit; font-size: .78rem;
+  flex: 1; min-width: 120px;
+}
+.add-input:focus { outline: none; border-color: var(--accent-purple); }
+.add-input.xp-input { max-width: 130px; flex: 0 0 auto; }
+.add-select {
+  background: rgba(6,6,16,0.9); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-primary); padding: 9px 10px; font-family: inherit; font-size: .76rem;
+  flex: 0 0 auto;
+}
+.add-select:focus { outline: none; border-color: var(--accent-purple); }
+.add-submit-btn {
+  padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--accent-teal); background: rgba(29,158,117,0.15);
+  color: #5dcaa5; font-size: .72rem; letter-spacing: 2px; white-space: nowrap;
+  transition: all .2s;
+}
+.add-submit-btn:hover:not(:disabled) { background: rgba(29,158,117,0.28); }
+.add-submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+.add-err { color: #f09595; font-size: .68rem; letter-spacing: 1px; margin-top: 2px; }
+
+/* ── Category Filters (Today tab) ────────────────────────── */
 .filters {
   display: flex; gap: 7px; margin-bottom: 14px;
   overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
@@ -34,10 +114,10 @@
 .filters::-webkit-scrollbar { display: none; }
 .filter-btn {
   --fc: #4fc3f7;
-  flex: 0 0 auto; /* prevent shrink/wrap in scroll container */
+  flex: 0 0 auto;
   padding: 6px 12px; border-radius: 18px; cursor: pointer;
   border: 1px solid var(--border); background: rgba(6,6,16,0.6);
-  color: var(--text-secondary); font-size: .66rem; letter-spacing: 1px;
+  color: var(--text-secondary); font-size: .64rem; letter-spacing: 1px;
   font-weight: 600; transition: all .2s;
 }
 .filter-btn:hover { color: var(--text-primary); border-color: var(--fc); }
@@ -47,7 +127,7 @@
   box-shadow: 0 0 14px -4px var(--fc);
 }
 
-/* Skip warning */
+/* ── Skip Warning ─────────────────────────────────────────── */
 .skip-warn {
   margin-bottom: 12px; padding: 10px 14px; border-radius: 9px;
   background: rgba(226,75,74,0.10); border: 1px solid rgba(226,75,74,0.30);
@@ -57,81 +137,95 @@
 }
 @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
 
+/* ── Quest List ──────────────────────────────────────────── */
 .quest-list { display: flex; flex-direction: column; gap: 8px; }
 
 .quest-item {
-  --cat: #4fc3f7;
+  --cat: var(--accent-purple);
   display: flex; align-items: flex-start; gap: 12px;
-  min-height: 52px; padding: 11px 12px;
-  border: 1px solid var(--border); border-radius: 12px;
-  background: linear-gradient(160deg, rgba(20,20,38,0.6), rgba(6,6,16,0.55));
-  cursor: pointer; position: relative; overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.03) inset;
-  transition: transform .22s cubic-bezier(.22,1,.36,1), border-color .2s, background .2s, box-shadow .22s;
-  animation: itemIn .35s both;
+  padding: 12px 14px; border-radius: 12px; cursor: pointer;
+  border: 1px solid var(--border); background: rgba(6,6,16,0.5);
+  transition: border-color .2s, background .2s;
+  position: relative;
 }
-@keyframes itemIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
-.quest-item:hover:not(.done):not(.pending) {
-  transform: translateX(5px) translateY(-2px); border-color: var(--cat);
-  background: rgba(255,255,255,0.03);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.45), 0 0 18px -6px var(--cat), 0 1px 0 rgba(255,255,255,0.05) inset;
+.quest-item:hover:not(.done) {
+  border-color: color-mix(in srgb, var(--cat) 40%, transparent);
+  background: color-mix(in srgb, var(--cat) 6%, rgba(6,6,16,0.5));
 }
-.quest-item::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-  background: var(--cat); opacity: .75;
-}
-.quest-item.done {
-  border-color: rgba(29,158,117,0.4); background: rgba(29,158,117,0.05); opacity: .60;
-}
-.quest-item.done::before { background: var(--accent-teal); }
-.quest-item.done .label { text-decoration: line-through; color: var(--text-secondary); }
-.quest-item.pending { pointer-events: none; opacity: .8; }
+.quest-item.done { opacity: .52; }
+.quest-item.pending { opacity: .75; pointer-events: none; }
+.quest-item.custom-quest { border-left: 2px solid rgba(83,74,183,0.5); }
 
-.checkbox {
-  width: 24px; height: 24px; flex-shrink: 0; margin-top: 1px;
-  border: 2px solid var(--cat); border-radius: 7px;
-  display: grid; place-items: center; transition: all .2s;
-  box-shadow: 0 0 0 0 var(--cat), 0 2px 6px rgba(0,0,0,0.4) inset;
-}
-.quest-item:hover:not(.done) .checkbox { box-shadow: 0 0 14px -2px var(--cat); }
-.done .checkbox { background: var(--accent-teal); border-color: var(--accent-teal); box-shadow: 0 0 16px -2px var(--accent-teal); }
-.check { color: #fff; font-weight: 900; font-size: .8rem; animation: checkPop .35s cubic-bezier(.22,1,.36,1); }
-@keyframes checkPop { from { transform:scale(0) rotate(-15deg); } to { transform:none; } }
+/* Weekly / Monthly specific borders */
+.weekly-item  { border-left: 3px solid rgba(79,195,247,0.4); }
+.monthly-item { border-left: 3px solid rgba(206,147,216,0.4); }
+.milestone-item { border-left: 3px solid rgba(250,199,117,0.4); }
+
+/* Checkbox */
+.checkbox { flex: 0 0 28px; height: 28px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); margin-top: 1px; }
+.check { font-size: .8rem; color: var(--accent-teal); font-weight: 700; }
+.check.achieved { color: var(--accent-gold); font-size: .85rem; }
 .empty-box { width: 10px; height: 10px; border-radius: 3px; border: 1.5px solid rgba(255,255,255,0.2); }
-
-.spinner {
-  width: 12px; height: 12px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--cat);
-  animation: spin .7s linear infinite;
-}
+.spinner { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--accent-purple); border-top-color: transparent; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.quest-body { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.cat-tag { font-size: .54rem; letter-spacing: 2px; font-weight: 700; opacity: .8; }
-.label { font-size: .86rem; line-height: 1.4; }
-.stat-hints { font-size: .60rem; letter-spacing: 1px; color: rgba(83,74,183,0.8); margin-top: 2px; }
+/* Quest body */
+.quest-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.quest-tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cat-tag { font-size: .52rem; letter-spacing: 1.5px; font-weight: 700; opacity: .9; }
+.custom-tag { font-size: .48rem; letter-spacing: 1px; color: #b3aef0; background: rgba(83,74,183,0.2); padding: 1px 6px; border-radius: 4px; }
+.milestone-tag { font-size: .52rem; letter-spacing: 1.5px; }
+.label { font-size: .82rem; color: var(--text-primary); line-height: 1.4; word-break: break-word; }
+.stat-hints { font-size: .62rem; letter-spacing: .5px; color: var(--text-secondary); }
 
-.right-col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+/* Weekly/Monthly progress */
+.progress-line { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+.progress-text { font-size: .6rem; letter-spacing: .5px; color: var(--text-secondary); white-space: nowrap; }
+.mini-bar { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); overflow: hidden; }
+.mini-fill { height: 100%; border-radius: 2px; transition: width .5s; }
+
+/* Right column */
+.right-col { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: 0 0 auto; }
 .xp-badge {
-  flex-shrink: 0; padding: 4px 9px; border-radius: 7px;
-  background: rgba(250,199,117,0.10); color: var(--accent-gold);
-  font-weight: 700; font-size: .82rem; border: 1px solid rgba(250,199,117,0.28);
+  font-size: .8rem; font-weight: 700; color: var(--accent-gold);
+  background: rgba(250,199,117,0.12); border: 1px solid rgba(250,199,117,0.25);
+  border-radius: 8px; padding: 3px 9px; white-space: nowrap;
 }
-.xp-unit { font-size: .56rem; margin-left: 2px; opacity: .75; }
+.weekly-xp  { color: #4FC3F7; background: rgba(79,195,247,0.1); border-color: rgba(79,195,247,0.25); }
+.monthly-xp { color: #CE93D8; background: rgba(206,147,216,0.1); border-color: rgba(206,147,216,0.25); }
+.milestone-xp { color: var(--accent-gold); }
+.xp-unit { font-size: .58rem; margin-left: 2px; opacity: .7; }
 
-.empty { text-align: center; padding: 22px; color: var(--text-secondary); letter-spacing: 2px; font-size: .72rem; }
+/* Delete button */
+.delete-btn {
+  width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(226,75,74,0.3);
+  background: rgba(226,75,74,0.08); color: rgba(240,149,149,0.6);
+  font-size: .58rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .2s; opacity: 0;
+}
+.quest-item:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { background: rgba(226,75,74,0.2); color: #f09595; border-color: rgba(226,75,74,0.6); }
 
+/* Achieved label */
+.achieved-label { font-size: .52rem; letter-spacing: 1.5px; color: var(--accent-gold); }
+
+/* Weekly note */
+.weekly-note {
+  font-size: .64rem; letter-spacing: .8px; color: var(--text-secondary);
+  padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border); margin-bottom: 4px;
+}
+
+/* Empty state */
+.empty {
+  text-align: center; padding: 32px 16px; font-size: .72rem;
+  letter-spacing: 2px; color: var(--text-secondary); border: 1px dashed var(--border);
+  border-radius: 12px; background: rgba(255,255,255,0.02);
+}
+
+/* Bottom message */
 .bottom-msg {
-  margin-top: 14px; padding: 10px 12px; border-radius: 9px;
-  background: rgba(83,74,183,0.06); border: 1px solid rgba(83,74,183,0.18);
-  font-size: .66rem; letter-spacing: 1px; color: rgba(179,174,240,0.7); line-height: 1.5;
+  margin-top: 12px; padding: 10px 14px; border-radius: 9px;
+  background: rgba(83,74,183,0.08); border: 1px solid rgba(83,74,183,0.2);
+  color: var(--text-secondary); font-size: .68rem; letter-spacing: .8px; line-height: 1.5;
 }
-
-/* ── Container queries ──────────────────────────────────────── */
-@container questlog (min-width: 480px) {
-  .title { font-size: 1.35rem; }
-  .filter-btn { padding: 7px 16px; font-size: .7rem; }
-  .quest-item { padding: 13px 14px; }
-  .label { font-size: .9rem; }
-}
-

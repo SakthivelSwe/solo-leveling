@@ -3,7 +3,7 @@
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
-  padding: 12px 20px; margin-bottom: 18px;
+  padding: max(env(safe-area-inset-top, 12px), 12px) 20px 12px 20px; margin-bottom: 18px;
   border: 1px solid var(--border); border-radius: 0 0 16px 16px;
   background: linear-gradient(160deg,rgba(16,16,30,.97),rgba(10,10,26,.97));
   backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 20;

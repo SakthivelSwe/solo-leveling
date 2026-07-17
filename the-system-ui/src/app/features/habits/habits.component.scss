@@ -1,5 +1,5 @@
 :host { display: block; position: relative; z-index: 1; }
-.habits-shell { max-width: 1200px; margin: 0 auto; padding: 20px 20px 80px; }
+.habits-shell { max-width: 1200px; margin: 0 auto; padding: max(env(safe-area-inset-top, 20px), 20px) 20px 80px; }
 
 /* Topbar (mirrors achievements page) */
 .topbar {

@@ -1,23 +1,94 @@
 <div class="quest-log system-card">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
   <div class="header">
     <div class="title-row">
       <span class="mono diamond">◈</span>
-      <div>
-        <h2 class="mono title">DAILY QUEST LOG</h2>
-        <p class="tech subtitle">
-          {{ doneCount }}/{{ quests.length }} CLEARED ·
-          <span [class.warn]="pendingCount > 5" [class.crit]="pendingCount > 8">{{ pendingCount }} REMAINING</span>
-        </p>
+      <div class="title-body">
+        <h2 class="mono title">{{ tabLabel }}</h2>
+        <p class="tech subtitle">{{ tabSubtitle }}</p>
       </div>
+      <!-- Add Quest button -->
+      <button class="add-quest-btn mono" (click)="toggleAddForm()"
+              [class.active]="showAddForm()"
+              title="Add custom quest" aria-label="Add custom quest">
+        {{ showAddForm() ? '✕' : '＋' }}
+      </button>
     </div>
-    <!-- XP progress of today -->
-    <div class="day-bar">
-      <div class="day-fill" [style.width.%]="(doneCount / quests.length) * 100"></div>
+
+    <!-- Progress bar for current tab -->
+    <div class="day-bar" aria-hidden="true">
+      <div class="day-fill" [style.width.%]="progressPct(activeTab)"></div>
     </div>
   </div>
 
-  <div class="filters">
-    <button *ngFor="let c of categories" class="filter-btn tech"
+  <!-- ══ TAB NAVIGATION ═══════════════════════════════════════ -->
+  <div class="tab-nav">
+    <button class="tab-btn tech"
+            [class.active]="activeTab === 'today'"
+            (click)="setTab('today')" id="tab-today-btn">
+      <span class="tab-icon">⚔</span>
+      <span>TODAY</span>
+      <span class="tab-badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+    </button>
+    <button class="tab-btn tech"
+            [class.active]="activeTab === 'weekly'"
+            (click)="setTab('weekly')" id="tab-weekly-btn">
+      <span class="tab-icon">📅</span>
+      <span>WEEK</span>
+      <span class="tab-badge done" *ngIf="weeklyDone > 0">{{ weeklyDone }}/{{ weeklyQuests.length }}</span>
+    </button>
+    <button class="tab-btn tech"
+            [class.active]="activeTab === 'monthly'"
+            (click)="setTab('monthly')" id="tab-monthly-btn">
+      <span class="tab-icon">🗓</span>
+      <span>MONTH</span>
+      <span class="tab-badge done" *ngIf="monthlyDone > 0">{{ monthlyDone }}/{{ monthlyQuests.length }}</span>
+    </button>
+    <button class="tab-btn tech"
+            [class.active]="activeTab === 'milestones'"
+            (click)="setTab('milestones')" id="tab-milestones-btn">
+      <span class="tab-icon">🏆</span>
+      <span>MILESTONES</span>
+      <span class="tab-badge done" *ngIf="milestonesDone > 0">{{ milestonesDone }}/{{ milestoneQuests.length }}</span>
+    </button>
+  </div>
+
+  <!-- ══ ADD QUEST FORM ═══════════════════════════════════════ -->
+  <div class="add-form-panel" *ngIf="showAddForm()" [@listStagger]="'in'">
+    <p class="tech add-hint">◈ Create your own quest. It will appear in the right tab immediately.</p>
+    <div class="add-form-fields">
+      <input class="add-input" type="text"
+             placeholder="Quest label e.g. Read 2 pages of a book"
+             [(ngModel)]="newQuestLabel"
+             maxlength="120"
+             aria-label="Quest label" />
+      <div class="add-form-row">
+        <select class="add-select" [(ngModel)]="newQuestCategory" (ngModelChange)="newQuestXp = null">
+          <option value="DAILY">DAILY</option>
+          <option value="SKILL">SKILL</option>
+          <option value="TESTOSTERONE">TESTOSTERONE</option>
+          <option value="WEEKLY">WEEKLY</option>
+          <option value="MONTHLY">MONTHLY</option>
+        </select>
+        <input class="add-input xp-input" type="number"
+               [placeholder]="xpPlaceholder"
+               [(ngModel)]="newQuestXp"
+               min="10" max="2000"
+               aria-label="XP reward (optional)" />
+        <button class="add-submit-btn mono"
+                [disabled]="addLoading() || !newQuestLabel.trim()"
+                (click)="submitAddQuest()">
+          {{ addLoading() ? '…' : '+ ADD' }}
+        </button>
+      </div>
+      <div class="add-err tech" *ngIf="addError()">{{ addError() }}</div>
+    </div>
+  </div>
+
+  <!-- ══ DAILY CATEGORY FILTERS (Today tab only) ══════════════ -->
+  <div class="filters" *ngIf="activeTab === 'today'">
+    <button *ngFor="let c of dailyCategories" class="filter-btn tech"
             [class.active]="selectedCategory === c.key"
             [style.--fc]="c.color"
             (click)="selectedCategory = c.key">
@@ -25,15 +96,19 @@
     </button>
   </div>
 
-  <!-- Skip warning -->
+  <!-- ══ SKIP WARNING ═════════════════════════════════════════ -->
   <div class="skip-warn tech" *ngIf="skipWarningKey" (click)="dismissWarning()">
     <span class="mono">⚠</span> {{ skipMsg }}
   </div>
 
-  <div class="quest-list" [@listStagger]="selectedCategory">
-    <div class="quest-item" *ngFor="let q of filtered; trackBy: trackByKey"
+  <!-- ══════════════════════════════════════════════════════════
+       TODAY TAB — Daily quests (DAILY / SKILL / TESTOSTERONE)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="quest-list" *ngIf="activeTab === 'today'" [@listStagger]="selectedCategory">
+    <div class="quest-item" *ngFor="let q of filteredDaily; trackBy: trackByKey"
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
+         [class.custom-quest]="q.isCustom"
          [style.--cat]="categoryColor(q.category)"
          (click)="onComplete(q)">
       <div class="checkbox">
@@ -42,7 +117,10 @@
         <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
       </div>
       <div class="quest-body">
-        <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
+        <div class="quest-tags">
+          <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
+          <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
+        </div>
         <span class="label">{{ q.label }}</span>
         <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
           {{ formatBoosts(q.statBoosts) }}
@@ -50,17 +128,153 @@
       </div>
       <div class="right-col">
         <div class="xp-badge mono">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
+        <button class="delete-btn tech" *ngIf="q.isCustom"
+                (click)="onDeleteCustom(q, $event)"
+                title="Delete custom quest" aria-label="Delete custom quest">✕</button>
       </div>
     </div>
 
-    <div class="empty tech" *ngIf="filtered.length === 0">
-      NO QUESTS IN THIS GATE.
+    <div class="empty tech" *ngIf="filteredDaily.length === 0">
+      NO QUESTS IN THIS CATEGORY.
     </div>
   </div>
 
-  <!-- Bottom discipline message -->
-  <div class="bottom-msg tech" *ngIf="pendingCount > 0">
+  <!-- ══════════════════════════════════════════════════════════
+       WEEKLY TAB — Weekly missions with progress counters
+       ══════════════════════════════════════════════════════════ -->
+  <div class="quest-list weekly-list" *ngIf="activeTab === 'weekly'" [@listStagger]="'weekly'">
+    <div class="weekly-note tech">
+      ◈ Weekly quests reset every Monday midnight. Complete them anytime this week.
+    </div>
+
+    <div class="quest-item weekly-item" *ngFor="let q of filteredWeekly; trackBy: trackByKey"
+         [class.done]="q.isCompleted"
+         [class.pending]="pendingKey === q.questKey"
+         [class.custom-quest]="q.isCustom"
+         [style.--cat]="categoryColor(q.category)"
+         (click)="onComplete(q)">
+      <div class="checkbox">
+        <span *ngIf="q.isCompleted" class="check">✓</span>
+        <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
+        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+      </div>
+      <div class="quest-body">
+        <div class="quest-tags">
+          <span class="cat-tag mono" [style.color]="categoryColor(q.category)">WEEKLY</span>
+          <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
+        </div>
+        <span class="label">{{ q.label }}</span>
+        <!-- Progress counter (BOTH: checkbox + counter) -->
+        <div class="progress-line tech" *ngIf="!q.isCompleted">
+          <span class="progress-text">{{ weeklyProgress(q) }}</span>
+          <div class="mini-bar">
+            <div class="mini-fill"
+                 [style.width.%]="Math.min(100, ((q.weeklyDoneCount ?? 0) / 1) * 100)"
+                 [style.background]="categoryColor('WEEKLY')"></div>
+          </div>
+        </div>
+        <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
+          {{ formatBoosts(q.statBoosts) }}
+        </span>
+      </div>
+      <div class="right-col">
+        <div class="xp-badge mono weekly-xp">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
+        <button class="delete-btn tech" *ngIf="q.isCustom"
+                (click)="onDeleteCustom(q, $event)"
+                title="Delete" aria-label="Delete custom quest">✕</button>
+      </div>
+    </div>
+
+    <div class="empty tech" *ngIf="filteredWeekly.length === 0">
+      NO WEEKLY QUESTS DEFINED YET. ADD ONE WITH THE + BUTTON ABOVE.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MONTHLY TAB — Monthly goals
+       ══════════════════════════════════════════════════════════ -->
+  <div class="quest-list monthly-list" *ngIf="activeTab === 'monthly'" [@listStagger]="'monthly'">
+    <div class="weekly-note tech">
+      ◈ Monthly quests reset on the 1st of each month. These are your big goals.
+    </div>
+
+    <div class="quest-item monthly-item" *ngFor="let q of filteredMonthly; trackBy: trackByKey"
+         [class.done]="q.isCompleted"
+         [class.pending]="pendingKey === q.questKey"
+         [class.custom-quest]="q.isCustom"
+         [style.--cat]="categoryColor(q.category)"
+         (click)="onComplete(q)">
+      <div class="checkbox">
+        <span *ngIf="q.isCompleted" class="check">✓</span>
+        <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
+        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+      </div>
+      <div class="quest-body">
+        <div class="quest-tags">
+          <span class="cat-tag mono" [style.color]="categoryColor(q.category)">MONTHLY</span>
+          <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
+        </div>
+        <span class="label">{{ q.label }}</span>
+        <div class="progress-line tech" *ngIf="!q.isCompleted">
+          <span class="progress-text">{{ monthlyProgress(q) }}</span>
+        </div>
+        <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
+          {{ formatBoosts(q.statBoosts) }}
+        </span>
+      </div>
+      <div class="right-col">
+        <div class="xp-badge mono monthly-xp">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
+        <button class="delete-btn tech" *ngIf="q.isCustom"
+                (click)="onDeleteCustom(q, $event)"
+                title="Delete" aria-label="Delete custom quest">✕</button>
+      </div>
+    </div>
+
+    <div class="empty tech" *ngIf="filteredMonthly.length === 0">
+      NO MONTHLY GOALS DEFINED. ADD ONE WITH THE + BUTTON ABOVE.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MILESTONES TAB — One-time achievement quests
+       ══════════════════════════════════════════════════════════ -->
+  <div class="quest-list milestone-list" *ngIf="activeTab === 'milestones'" [@listStagger]="'milestones'">
+    <div class="weekly-note tech">
+      ◈ Milestone quests are completed once, forever. Each is a real-world achievement.
+    </div>
+
+    <div class="quest-item milestone-item" *ngFor="let q of filteredMilestones; trackBy: trackByKey"
+         [class.done]="q.isCompleted"
+         [class.pending]="pendingKey === q.questKey"
+         [style.--cat]="categoryColor('MILESTONE')"
+         (click)="onComplete(q)">
+      <div class="checkbox">
+        <span *ngIf="q.isCompleted" class="check achieved">★</span>
+        <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
+        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+      </div>
+      <div class="quest-body">
+        <span class="cat-tag mono milestone-tag" [style.color]="categoryColor('MILESTONE')">MILESTONE</span>
+        <span class="label">{{ q.label }}</span>
+        <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
+          {{ formatBoosts(q.statBoosts) }}
+        </span>
+      </div>
+      <div class="right-col">
+        <div class="xp-badge mono milestone-xp">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
+        <span class="achieved-label tech" *ngIf="q.isCompleted">ACHIEVED</span>
+      </div>
+    </div>
+
+    <div class="empty tech" *ngIf="filteredMilestones.length === 0">
+      NO MILESTONE QUESTS AVAILABLE.
+    </div>
+  </div>
+
+  <!-- ══ BOTTOM MESSAGE (Today tab only) ══════════════════════ -->
+  <div class="bottom-msg tech" *ngIf="activeTab === 'today' && pendingCount > 0">
     ◈ {{ pendingCount }} gate{{ pendingCount > 1 ? 's' : '' }} not cleared.
     Each uncleared quest costs you stat growth. There are no shortcuts to S-Rank.
   </div>
+
 </div>

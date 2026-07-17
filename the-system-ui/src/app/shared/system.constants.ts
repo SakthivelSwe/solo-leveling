@@ -43,9 +43,13 @@ export const STATS_META: StatMeta[] = [
 ];
 
 export const CATEGORY_META: Record<string, { label: string; color: string }> = {
-  DAILY: { label: 'Daily Habits', color: '#1D9E75' },
-  SKILL: { label: 'Skill Grind', color: '#534AB7' },
-  TESTOSTERONE: { label: 'Testosterone', color: '#E24B4A' },
-  SIDE: { label: 'Side Quests', color: '#FAC775' },
+  DAILY:        { label: 'Daily Habits',  color: '#1D9E75' },
+  SKILL:        { label: 'Skill Grind',   color: '#534AB7' },
+  TESTOSTERONE: { label: 'Testosterone',  color: '#E24B4A' },
+  SIDE:         { label: 'Milestones',    color: '#FAC775' },
+  MILESTONE:    { label: 'Milestones',    color: '#FAC775' },
+  WEEKLY:       { label: 'Weekly',        color: '#4FC3F7' },
+  MONTHLY:      { label: 'Monthly',       color: '#CE93D8' },
 };
+
 

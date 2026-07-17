@@ -59,7 +59,7 @@ import { StatusWindow, LeetcodeStats, LeetcodeLog } from '../../core/models/mode
   `,
   styles: [`
   :host { display: block; }
-  .st-shell { max-width: 900px; margin: 0 auto; padding: 20px 16px 48px; }
+  .st-shell { max-width: 900px; margin: 0 auto; padding: max(env(safe-area-inset-top, 20px), 20px) 16px 48px; }
   .st-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .st-topbar h1 { margin: 0; flex: 1; text-align: center; font-size: .88rem; letter-spacing: 2px; color: var(--text-primary); }
   .st-topbar .back { text-decoration: none; color: var(--text-secondary); font-size: .72rem; letter-spacing: 1.5px; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; }

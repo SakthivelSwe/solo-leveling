@@ -48,7 +48,8 @@ interface QuestItem {
             <option value="DAILY">DAILY</option>
             <option value="SKILL">SKILL</option>
             <option value="TESTOSTERONE">TESTOSTERONE</option>
-            <option value="SIDE">SIDE</option>
+            <option value="WEEKLY">WEEKLY</option>
+            <option value="MONTHLY">MONTHLY</option>
           </select>
           <input class="fin sm" type="number" placeholder="XP" [(ngModel)]="newQuest.xpReward" min="10" max="500" />
           <input class="fin sm" placeholder="Stat boosts e.g. STR:3,VIT:2" [(ngModel)]="boostsRaw" />

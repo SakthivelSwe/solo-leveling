@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import {
-  StatusWindow, Quest, QuestCompletionResult, PlayerSkill,
+  StatusWindow, Quest, QuestCompletionResult, PlayerSkill, CustomQuestRequest,
   Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon
 } from '../models/models';
 import { environment } from '../../../environments/environment';
@@ -43,8 +43,39 @@ export class PlayerService {
     return this.http.get<Quest[]>(`${this.api}/quests/today`);
   }
 
+  /** WEEKLY quests — resets every Monday. Includes weeklyDoneCount. */
+  getWeeklyQuests(): Observable<Quest[]> {
+    return this.http.get<Quest[]>(`${this.api}/quests/weekly`);
+  }
+
+  /** MONTHLY quests — resets on the 1st. Includes monthlyDoneCount. */
+  getMonthlyQuests(): Observable<Quest[]> {
+    return this.http.get<Quest[]>(`${this.api}/quests/monthly`);
+  }
+
+  /** ONE_TIME milestone quests — completed ones remain visible as achievements. */
+  getMilestoneQuests(): Observable<Quest[]> {
+    return this.http.get<Quest[]>(`${this.api}/quests/milestones`);
+  }
+
   completeQuest(key: string): Observable<QuestCompletionResult> {
     return this.http.post<QuestCompletionResult>(`${this.api}/quests/${key}/complete`, {});
+  }
+
+  /**
+   * Create a custom quest owned by the current player.
+   * XP defaults (pre-filled, Option C): DAILY=50, WEEKLY=150, MONTHLY=300.
+   */
+  addCustomQuest(req: CustomQuestRequest): Observable<Quest> {
+    return this.http.post<Quest>(`${this.api}/quests/custom`, req);
+  }
+
+  /**
+   * Delete a custom quest owned by this player.
+   * Cascades: removes all past completions for this quest.
+   */
+  deleteCustomQuest(questKey: string): Observable<{ status: string; questKey: string }> {
+    return this.http.delete<{ status: string; questKey: string }>(`${this.api}/quests/custom/${questKey}`);
   }
 
   getSkills(): Observable<PlayerSkill[]> {
@@ -79,4 +110,3 @@ export class PlayerService {
     return this.http.get<Dungeon>(`${this.api}/dungeon`);
   }
 }
-

@@ -1,7 +1,7 @@
 :host { display: block; }
 
 .insights-shell {
-  max-width: 1100px; margin: 0 auto; padding: 20px 22px 60px;
+  max-width: 1100px; margin: 0 auto; padding: max(env(safe-area-inset-top, 20px), 20px) 22px 60px;
 }
 
 /* Topbar (mirrors the dashboard) */

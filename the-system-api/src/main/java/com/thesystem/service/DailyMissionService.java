@@ -90,7 +90,8 @@ public class DailyMissionService {
         String weakest = weakestStat(stats);
         String secondWeakest = secondWeakestStat(stats, weakest);
 
-        List<Quest> allQuests = questRepository.findByActiveTrueOrderByCategoryAscXpRewardDesc();
+        // Use player-scoped query: includes custom daily quests, excludes MILESTONE/SIDE
+        List<Quest> allQuests = questRepository.findDailyQuestsForPlayer(playerId);
 
         // Step 1: Always-include critical quests (CODE_NO_AI, LEETCODE, ENGLISH, etc.)
         List<Quest> criticalQuests = allQuests.stream()

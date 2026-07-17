@@ -44,7 +44,7 @@ export interface Quest {
   id: number;
   questKey: string;
   label: string;
-  category: 'DAILY' | 'SKILL' | 'TESTOSTERONE' | 'SIDE';
+  category: 'DAILY' | 'SKILL' | 'TESTOSTERONE' | 'SIDE' | 'MILESTONE' | 'WEEKLY' | 'MONTHLY';
   xpReward: number;
   statBoosts: string | null;
   skillBoosts: string | null;
@@ -52,7 +52,24 @@ export interface Quest {
   priority?: number;
   critical?: boolean;
   bossDamage?: number;
+  /** DAILY | WEEKLY | MONTHLY | ONE_TIME */
+  timeType?: string;
+  /** true if created by this player — can be deleted */
+  isCustom?: boolean;
+  /** For WEEKLY quests: how many times completed this week */
+  weeklyDoneCount?: number;
+  /** For MONTHLY quests: how many times completed this month */
+  monthlyDoneCount?: number;
 }
+
+export interface CustomQuestRequest {
+  label: string;
+  /** DAILY | SKILL | TESTOSTERONE | WEEKLY | MONTHLY */
+  category: string;
+  xpReward?: number;
+  statBoosts?: string;
+}
+
 
 export interface DayProgress {
   date: string;

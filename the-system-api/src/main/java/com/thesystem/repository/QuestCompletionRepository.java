@@ -8,13 +8,31 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface QuestCompletionRepository extends JpaRepository<QuestCompletion, Long> {
+
     List<QuestCompletion> findByPlayerIdAndCompletedAt(Long playerId, LocalDate date);
+
     boolean existsByPlayerIdAndQuestIdAndCompletedAt(Long playerId, Long questId, LocalDate date);
+
     List<QuestCompletion> findByPlayerIdAndCompletedAtBetween(Long playerId, LocalDate start, LocalDate end);
+
     long countByPlayerId(Long playerId);
+
     long countByPlayerIdAndQuestId(Long playerId, Long questId);
+
     long countByPlayerIdAndCompletedAt(Long playerId, LocalDate date);
+
     List<QuestCompletion> findByPlayerIdOrderByCompletedAtDesc(Long playerId);
+
+    /** Counts completions in a date window — used for WEEKLY and MONTHLY quest duplicate checks. */
+    boolean existsByPlayerIdAndQuestIdAndCompletedAtBetween(Long playerId, Long questId,
+                                                             LocalDate start, LocalDate end);
+
+    /** How many times this player completed this quest in a date window (for progress counters). */
+    long countByPlayerIdAndQuestIdAndCompletedAtBetween(Long playerId, Long questId,
+                                                         LocalDate start, LocalDate end);
+
+    /** Delete all completions for a specific quest owned by a player (used when deleting custom quests). */
+    void deleteByPlayerIdAndQuestId(Long playerId, Long questId);
 
     /**
      * Counts completions for quests flagged as recovery quests on a given date.

@@ -37,7 +37,7 @@ type Tab = 'body' | 'sleep' | 'mood' | 'workout';
   `,
   styles: [`
   :host { display: block; }
-  .pt-shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+  .pt-shell { max-width: 760px; margin: 0 auto; padding: max(env(safe-area-inset-top, 20px), 20px) 16px 40px; }
   .pt-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .pt-topbar h1 { margin: 0; font-size: .9rem; letter-spacing: 3px; color: var(--text-primary); flex: 1; text-align: center; }
   .pt-topbar .back { text-decoration: none; color: var(--text-secondary); font-size: .72rem; letter-spacing: 1.5px; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; }

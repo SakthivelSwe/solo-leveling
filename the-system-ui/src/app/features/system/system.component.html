@@ -167,9 +167,14 @@
 
       <app-quest-log
         [quests]="getDisplayQuests(s.todayQuests)"
+        [weeklyQuests]="weeklyQuests()"
+        [monthlyQuests]="monthlyQuests()"
+        [milestoneQuests]="milestoneQuests()"
         [pendingKey]="pendingKey()"
         [pressureLevel]="pressureLevel()"
-        (complete)="onComplete($event)">
+        (complete)="onComplete($event)"
+        (questAdded)="onQuestAdded($event)"
+        (questDeleted)="onQuestDeleted($event)">
       </app-quest-log>
 
       @defer (on viewport) {

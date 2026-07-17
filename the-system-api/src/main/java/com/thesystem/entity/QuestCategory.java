@@ -4,6 +4,10 @@ public enum QuestCategory {
     DAILY,
     SKILL,
     TESTOSTERONE,
-    SIDE
+    /** One-time milestone quests (replaces SIDE — kept as alias for backward compat) */
+    SIDE,
+    MILESTONE,
+    WEEKLY,
+    MONTHLY
 }
 

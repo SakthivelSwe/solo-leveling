@@ -1,6 +1,6 @@
 :host { display: block; }
 
-.notif-shell { max-width: 760px; margin: 0 auto; padding: 20px 18px 60px; }
+.notif-shell { max-width: 760px; margin: 0 auto; padding: max(env(safe-area-inset-top, 20px), 20px) 18px 60px; }
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between;

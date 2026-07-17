@@ -420,7 +420,7 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
 .learning-page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 24px 16px 100px;
+  padding: max(env(safe-area-inset-top, 24px), 24px) 16px 100px;
 }
 
 /* Header */

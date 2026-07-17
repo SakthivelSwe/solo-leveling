@@ -1,5 +1,6 @@
 package com.thesystem.controller;
 
+import com.thesystem.dto.CustomQuestRequest;
 import com.thesystem.dto.DayProgressDTO;
 import com.thesystem.dto.QuestCompletionResult;
 import com.thesystem.dto.QuestDTO;
@@ -31,11 +32,40 @@ public class QuestController {
         this.questRepository = questRepository;
     }
 
+    /** Today's DAILY quests (excludes MILESTONE/SIDE — those are on /milestones). */
     @GetMapping("/today")
     public List<QuestDTO> today(Principal principal) {
         return questService.getTodayQuests(playerId(principal));
     }
 
+    /**
+     * This week's WEEKLY quests with completion counts.
+     * Resets every Monday midnight.
+     */
+    @GetMapping("/weekly")
+    public List<QuestDTO> weekly(Principal principal) {
+        return questService.getWeeklyQuests(playerId(principal));
+    }
+
+    /**
+     * This month's MONTHLY quests with completion counts.
+     * Resets every 1st of the month.
+     */
+    @GetMapping("/monthly")
+    public List<QuestDTO> monthly(Principal principal) {
+        return questService.getMonthlyQuests(playerId(principal));
+    }
+
+    /**
+     * One-time MILESTONE quests (formerly SIDE quests).
+     * Completed ones are marked done; they remain visible as achievements.
+     */
+    @GetMapping("/milestones")
+    public List<QuestDTO> milestones(Principal principal) {
+        return questService.getMilestoneQuests(playerId(principal));
+    }
+
+    /** Complete a quest — window enforced per timeType (today/week/month/never). */
     @PostMapping("/{key}/complete")
     public QuestCompletionResult complete(Principal principal, @PathVariable String key) {
         return questService.completeQuest(playerId(principal), key);
@@ -46,28 +76,26 @@ public class QuestController {
         return playerService.getWeeklyProgress(playerId(principal));
     }
 
-    /** Create a custom quest (from Settings Panel). */
+    /**
+     * Create a custom quest for the logged-in player.
+     * XP defaults (Option C): DAILY=50, WEEKLY=150, MONTHLY=300 (user can override).
+     */
     @PostMapping("/custom")
-    public QuestDTO createCustomQuest(Principal principal, @RequestBody Map<String, Object> body) {
-        String key = String.valueOf(body.getOrDefault("questKey", "CUSTOM"));
-        if (questRepository.existsByQuestKey(key)) {
-            key = key + "_" + System.currentTimeMillis() % 10000;
-        }
-        String label      = String.valueOf(body.getOrDefault("label", "[CUSTOM] Quest"));
-        String catStr     = String.valueOf(body.getOrDefault("category", "DAILY"));
-        int xp            = Integer.parseInt(String.valueOf(body.getOrDefault("xpReward", "60")));
-        String statBoosts = body.get("statBoosts") != null ? String.valueOf(body.get("statBoosts")) : null;
-
-        QuestCategory cat;
-        try { cat = QuestCategory.valueOf(catStr); }
-        catch (IllegalArgumentException e) { cat = QuestCategory.DAILY; }
-
-        Quest q = new Quest(key, label, cat, xp, statBoosts, null);
-        q = questRepository.save(q);
-        return questService.toDto(q, false);
+    public QuestDTO createCustomQuest(Principal principal, @RequestBody CustomQuestRequest req) {
+        return questService.addCustomQuest(playerId(principal), req);
     }
 
-    /** Toggle a quest's active flag. */
+    /**
+     * Delete a custom quest (player-owned only).
+     * Also cascades: removes all past completions of this quest by this player.
+     */
+    @DeleteMapping("/custom/{questKey}")
+    public Map<String, String> deleteCustomQuest(Principal principal, @PathVariable String questKey) {
+        questService.deleteCustomQuest(playerId(principal), questKey);
+        return Map.of("status", "deleted", "questKey", questKey);
+    }
+
+    /** Toggle a quest's active flag (for system settings panel). */
     @PatchMapping("/{id}/toggle")
     public QuestDTO toggleQuest(Principal principal, @PathVariable Long id) {
         Quest q = questRepository.findById(id)
@@ -81,6 +109,4 @@ public class QuestController {
         return playerService.getByUsername(principal.getName()).getId();
     }
 }
-
-
 
