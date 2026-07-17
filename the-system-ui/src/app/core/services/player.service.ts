@@ -62,6 +62,10 @@ export class PlayerService {
     return this.http.post<QuestCompletionResult>(`${this.api}/quests/${key}/complete`, {});
   }
 
+  generateAiQuests(): Observable<{ status: string; message: string }> {
+    return this.http.post<{ status: string; message: string }>(`${this.api}/quests/generate-ai`, {});
+  }
+
   /**
    * Create a custom quest owned by the current player.
    * XP defaults (pre-filled, Option C): DAILY=50, WEEKLY=150, MONTHLY=300.

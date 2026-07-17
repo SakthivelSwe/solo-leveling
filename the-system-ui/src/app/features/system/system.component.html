@@ -156,9 +156,15 @@
         <span *ngIf="dailyMission() as dm; else noMission">🎯 {{ showAllQuests() ? 'ALL QUESTS' : 'MISSIONS: ' + dm.focusArea + ' (' + dm.focusStat + ')' }}</span>
         <ng-template #noMission><span>🎯 ALL QUESTS</span></ng-template>
 
-        <button *ngIf="dailyMission()" class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem;" (click)="showAllQuests.set(!showAllQuests())">
-          {{ showAllQuests() ? 'SHOW MISSIONS' : 'SHOW ALL QUESTS' }}
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <button class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem; background: rgba(55,138,221,0.2); border-color: #378ADD; color: #378ADD;" 
+                  (click)="generateAiQuests()" [disabled]="isGeneratingAi()">
+            {{ isGeneratingAi() ? 'GENERATING...' : '⚡ AI QUEST SYNC' }}
+          </button>
+          <button *ngIf="dailyMission()" class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem;" (click)="showAllQuests.set(!showAllQuests())">
+            {{ showAllQuests() ? 'SHOW MISSIONS' : 'SHOW ALL QUESTS' }}
+          </button>
+        </div>
       </div>
 
       <app-quest-log

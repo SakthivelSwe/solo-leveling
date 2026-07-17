@@ -145,6 +145,29 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
   }
 
+  private toast(msg: string): void {
+    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'center', verticalPosition: 'top' });
+  }
+
+  isGeneratingAi = signal(false);
+
+  generateAiQuests(): void {
+    this.isGeneratingAi.set(true);
+    this.toast('◈ Generating personalized AI quests...');
+    this.playerService.generateAiQuests().subscribe({
+      next: () => {
+        this.isGeneratingAi.set(false);
+        this.toast('◈ New AI quests locked in');
+        this.loadQuestTabs();
+        this.load(); // Refresh today's quests from quest repository
+      },
+      error: () => {
+        this.isGeneratingAi.set(false);
+        this.toast('⚠ Failed to generate AI quests');
+      }
+    });
+  }
+
   /** Called when user adds a custom quest — reload the relevant tab. */
   onQuestAdded(quest: Quest): void {
     this.loadQuestTabs();
