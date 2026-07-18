@@ -162,7 +162,6 @@
             {{ isGeneratingAi() ? 'GENERATING...' : '⚡ AI QUEST SYNC' }}
           </button>
           <button class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem;" 
-                  [disabled]="!dailyMission()"
                   (click)="showAllQuests.set(!showAllQuests())">
             {{ showAllQuests() ? 'SHOW MISSIONS' : 'SHOW ALL QUESTS' }}
           </button>
