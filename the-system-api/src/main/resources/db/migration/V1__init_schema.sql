@@ -390,7 +390,7 @@
 
     create table player_stats (
         agility integer not null,
-        dis integer default 10,
+        hor integer default 10,
         intelligence integer not null,
         perception integer not null,
         strength integer not null,

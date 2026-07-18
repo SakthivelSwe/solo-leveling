@@ -28,7 +28,7 @@ export interface Stats {
   vit: number;
   agi: number;
   per: number;
-  hor: number;
+  dis: number;
 }
 
 export interface PlayerSkill {

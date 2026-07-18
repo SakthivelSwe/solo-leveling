@@ -25,6 +25,8 @@ spring:
     default-property-inclusion: non_null
   flyway:
     enabled: true
+    baseline-on-migrate: true
+    baseline-version: 2
 
 # THE SYSTEM game config
 thesystem:
