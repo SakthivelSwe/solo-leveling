@@ -561,3 +561,12 @@ export interface FoodItem {
   vitamins: string;
   icon: string;
 }
+
+export interface AiCommanderBriefing {
+  greeting: string;
+  yesterdayRecap: string;
+  todayPriorities: string[];
+  feedback: string;
+  estimatedCompletionPct: number;
+  expectedLevelUp: string;
+}

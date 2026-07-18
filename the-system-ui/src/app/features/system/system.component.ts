@@ -25,6 +25,7 @@ import { DailyScheduleComponent } from '../../shared/components/daily-schedule.c
 import { SettingsPanelComponent } from '../../shared/components/settings-panel.component';
 import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
 import { PomodoroComponent } from './pomodoro.component';
+import { AiCommanderComponent } from './ai-commander/ai-commander.component';
 
 import { FormsModule } from '@angular/forms';
 
@@ -35,6 +36,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule, RouterLink, RouterLinkActive, FormsModule,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
     DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, PomodoroComponent,
+    AiCommanderComponent
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
