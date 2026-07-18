@@ -278,6 +278,55 @@
   border-top: 1px solid var(--border);
 }
 
+/* ── Generic System Button ───────────────────────────────── */
+.sys-btn {
+  background: rgba(108,99,255,0.15);
+  border: 1px solid rgba(108,99,255,0.4);
+  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sys-btn:hover:not([disabled]) {
+  background: rgba(108,99,255,0.3);
+  border-color: rgba(108,99,255,0.7);
+  box-shadow: 0 0 12px rgba(108,99,255,0.4);
+}
+.sys-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Form Inputs (DSA & Jobs) ────────────────────────────── */
+.fin {
+  background: rgba(10,10,22,0.8);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  outline: none;
+}
+.fin:focus {
+  border-color: var(--system-blue);
+  box-shadow: 0 0 10px rgba(79,195,247,0.3);
+}
+.fin::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+.fin.status {
+  padding: 4px 8px;
+  background: rgba(10,10,22,0.9);
+}
+
 /* ════════════════════════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
    ════════════════════════════════════════════════════════════ */

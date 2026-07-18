@@ -226,12 +226,14 @@ export class SystemComponent implements OnInit, OnDestroy {
         this.isGeneratingAi.set(false);
         localStorage.setItem('last_ai_sync', new Date().toISOString());
         this.toast('◈ New AI quests locked in');
+        window.alert('◈ AI Sync Complete! Your new quests have been added.');
         this.loadQuestTabs();
         this.load(); // Refresh today's quests from quest repository
       },
-      error: () => {
+      error: (err) => {
         this.isGeneratingAi.set(false);
         this.toast('⚠ Failed to generate AI quests');
+        window.alert('⚠ AI Sync Failed. Please check your API keys or connection.');
       }
     });
   }
