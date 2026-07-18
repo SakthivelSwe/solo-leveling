@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  *  HEADPHONES          — 7-day deep work      → +15 Focus XP
  *  TECH_BOOK           — 10 tech articles     → +3 INT
  *  DSA_NOTEBOOK        — 30-day LC streak     → +8 INT
- *  COLD_SHOWER_BADGE   — 21-day cold shower   → +5 HOR
+ *  COLD_SHOWER_BADGE   - 21-day cold shower     +5 DIS
  */
 @Entity
 @Table(name = "inventory_items")
@@ -47,7 +47,7 @@ public class InventoryItem {
     @Column(name = "item_type", length = 20)
     private String itemType = "EQUIPMENT";
 
-    /** Stat key the bonus applies to (STR, INT, VIT, AGI, PER, HOR, FOCUS, CODING). */
+    /** Stat key the bonus applies to (STR, INT, VIT, AGI, PER, DIS, FOCUS, CODING). */
     @Column(name = "bonus_type", length = 20)
     private String bonusType;
 

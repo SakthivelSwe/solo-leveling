@@ -18,7 +18,7 @@ class LevelServiceTest {
 
     @BeforeEach
     void setUp() {
-        levelService = new LevelService();
+        levelService = new LevelService(null, null);
     }
 
     @Test

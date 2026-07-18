@@ -12,7 +12,7 @@ import { SseService } from '../../core/services/sse.service';
 import {
   StatusWindow, Quest, QuestCompletionResult, PlayerSkill,
   Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon,
-  DailyMissionDTO, DopamineSummary
+  DailyMissionDTO, DopamineSummary, JobApplication, LeetcodeLog, LeetcodeStats
 } from '../../core/models/models';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { UiStateService } from '../../core/services/ui-state.service';
@@ -26,11 +26,13 @@ import { SettingsPanelComponent } from '../../shared/components/settings-panel.c
 import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
 import { PomodoroComponent } from './pomodoro.component';
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-system',
   standalone: true,
   imports: [
-    CommonModule, RouterLink, RouterLinkActive,
+    CommonModule, RouterLink, RouterLinkActive, FormsModule,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
     DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, PomodoroComponent,
   ],
@@ -60,6 +62,43 @@ export class SystemComponent implements OnInit, OnDestroy {
   todayDateStr = signal<string>('');
   tomorrowDateStr = signal<string>('');
   private timeInterval: any;
+
+  // Career
+  jobs = signal<JobApplication[]>([]);
+  leetStats = signal<LeetcodeStats | null>(null);
+  leetHistory = signal<LeetcodeLog[]>([]);
+  newJob: JobApplication = this.blankJob();
+  newLeet: LeetcodeLog = this.blankLeet();
+  readonly statuses = ['APPLIED', 'SCREENING', 'INTERVIEW', 'REJECTED', 'OFFER'];
+
+  private blankJob(): JobApplication { return { company: '', role: '', status: 'APPLIED', ctcOffered: 0 }; }
+  private blankLeet(): LeetcodeLog { return { problemName: '', difficulty: 'EASY', topic: '', solvedWithoutAi: true }; }
+
+  addJob(): void {
+    if (!this.newJob.company || !this.newJob.role) { this.toast('⚠ Company and role required'); return; }
+    this.lifeOsService.createJob(this.newJob).subscribe(v => {
+      this.jobs.update(j => [v, ...j]);
+      this.newJob = this.blankJob();
+      this.toast('◈ Job application logged');
+    });
+  }
+
+  changeStatus(job: JobApplication, status: string): void {
+    if (!job.id) return;
+    this.lifeOsService.updateJobStatus(job.id, status).subscribe(() => {
+      this.jobs.update(list => list.map(j => j.id === job.id ? { ...j, status: status as any } : j));
+    });
+  }
+
+  addLeet(): void {
+    if (!this.newLeet.problemName) { this.toast('⚠ Problem name required'); return; }
+    this.lifeOsService.logLeetcode(this.newLeet).subscribe(() => {
+      this.toast('◈ LeetCode solve logged');
+      this.newLeet = this.blankLeet();
+      this.lifeOsService.leetcodeStats().subscribe(v => this.leetStats.set(v));
+      this.lifeOsService.leetcodeHistory().subscribe(v => this.leetHistory.set(v.slice(0, 8)));
+    });
+  }
 
   /** Debounce handle for coalescing bursts of live SSE events into one reload. */
   private reloadTimer: ReturnType<typeof setTimeout> | null = null;
@@ -127,6 +166,18 @@ export class SystemComponent implements OnInit, OnDestroy {
       next: (shadows) => this.shadows.set(shadows),
       error: () => this.shadows.set([]),
     });
+    this.lifeOsService.getJobs().subscribe({
+      next: v => this.jobs.set(v),
+      error: () => this.jobs.set([])
+    });
+    this.lifeOsService.leetcodeStats().subscribe({
+      next: v => this.leetStats.set(v),
+      error: () => this.leetStats.set(null)
+    });
+    this.lifeOsService.leetcodeHistory().subscribe({
+      next: v => this.leetHistory.set(v.slice(0, 8)),
+      error: () => this.leetHistory.set([])
+    });
     this.loadQuestTabs();
   }
 
@@ -151,12 +202,27 @@ export class SystemComponent implements OnInit, OnDestroy {
 
   isGeneratingAi = signal(false);
 
+  canSyncAi(): boolean {
+    const lastSync = localStorage.getItem('last_ai_sync');
+    if (!lastSync) return true;
+    return new Date().getTime() - new Date(lastSync).getTime() > 24 * 60 * 60 * 1000;
+  }
+
   generateAiQuests(): void {
+    if (!this.canSyncAi()) {
+      this.toast('⚠ AI Quest Sync is on cooldown (24h)');
+      return;
+    }
+    if (!window.confirm('◈ Initiate AI Quest Sync? This will analyze your current stats and generate personalized quests. Can only be used once per 24 hours.')) {
+      return;
+    }
+
     this.isGeneratingAi.set(true);
     this.toast('◈ Generating personalized AI quests...');
     this.playerService.generateAiQuests().subscribe({
       next: () => {
         this.isGeneratingAi.set(false);
+        localStorage.setItem('last_ai_sync', new Date().toISOString());
         this.toast('◈ New AI quests locked in');
         this.loadQuestTabs();
         this.load(); // Refresh today's quests from quest repository

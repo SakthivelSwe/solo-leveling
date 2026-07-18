@@ -1,6 +1,8 @@
 package com.thesystem.entity;
 
 import jakarta.persistence.*;
+import java.util.Map;
+import java.util.HashMap;
 
 @Entity
 @Table(name = "quests")
@@ -23,12 +25,17 @@ public class Quest {
     @Column(name = "xp_reward", nullable = false)
     private int xpReward;
 
-    // Stored as JSON strings (H2 friendly), parsed at runtime
-    @Column(name = "stat_boosts", length = 500)
-    private String statBoosts;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "quest_stat_boosts", joinColumns = @JoinColumn(name = "quest_id"))
+    @MapKeyColumn(name = "stat_name", length = 50)
+    @Column(name = "boost_value")
+    private Map<String, Integer> statBoosts = new HashMap<>();
 
-    @Column(name = "skill_boosts", length = 500)
-    private String skillBoosts;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "quest_skill_boosts", joinColumns = @JoinColumn(name = "quest_id"))
+    @MapKeyColumn(name = "skill_name", length = 100)
+    @Column(name = "boost_value")
+    private Map<String, Integer> skillBoosts = new HashMap<>();
 
     @Column(name = "is_active")
     private boolean active = true;
@@ -83,7 +90,7 @@ public class Quest {
     public Quest() {}
 
     public Quest(String questKey, String label, QuestCategory category, int xpReward,
-                 String statBoosts, String skillBoosts) {
+                 Map<String, Integer> statBoosts, Map<String, Integer> skillBoosts) {
         this.questKey = questKey;
         this.label = label;
         this.category = category;
@@ -104,10 +111,10 @@ public class Quest {
     public void setCategory(QuestCategory category) { this.category = category; }
     public int getXpReward() { return xpReward; }
     public void setXpReward(int xpReward) { this.xpReward = xpReward; }
-    public String getStatBoosts() { return statBoosts; }
-    public void setStatBoosts(String statBoosts) { this.statBoosts = statBoosts; }
-    public String getSkillBoosts() { return skillBoosts; }
-    public void setSkillBoosts(String skillBoosts) { this.skillBoosts = skillBoosts; }
+    public Map<String, Integer> getStatBoosts() { return statBoosts; }
+    public void setStatBoosts(Map<String, Integer> statBoosts) { this.statBoosts = statBoosts; }
+    public Map<String, Integer> getSkillBoosts() { return skillBoosts; }
+    public void setSkillBoosts(Map<String, Integer> skillBoosts) { this.skillBoosts = skillBoosts; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
     public int getPriority() { return priority; }

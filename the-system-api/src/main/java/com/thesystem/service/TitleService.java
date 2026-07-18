@@ -31,7 +31,7 @@ public class TitleService {
         new TitleDef("RELENTLESS",     "The Relentless",  "A 30-day streak, unbroken. Machine-like."),
         new TitleDef("CODE_HUNTER",    "Code Hunter",     "INT sharpened to 40+. The mind is a weapon."),
         new TitleDef("SHADOW_ATHLETE", "Shadow Athlete",  "STR raised to 40+. The body obeys."),
-        new TitleDef("HORMONE_LORD",   "Hormone Lord",    "HOR mastered to 40+. Primal power."),
+        new TitleDef("DISCIPLINE_LORD",   "Discipline Lord",    "DIS mastered to 40+. True focus."),
         new TitleDef("GATE_BREAKER",   "Gate Breaker",    "Cleared 100 total quests."),
         new TitleDef("DECORATED",      "The Decorated",   "Unlocked 5 achievements."),
         new TitleDef("DAWN_HUNTER",    "Dawn Hunter",     "Rose to C-Rank — interview-ready."),
@@ -114,7 +114,7 @@ public class TitleService {
             case "RELENTLESS"     -> longest >= 30;
             case "CODE_HUNTER"    -> s.getIntelligence() >= 40;
             case "SHADOW_ATHLETE" -> s.getStrength() >= 40;
-            case "HORMONE_LORD"   -> s.getHor() >= 40;
+            case "DISCIPLINE_LORD"   -> s.getDis() >= 40;
             case "GATE_BREAKER"   -> totalQuests >= 100;
             case "DECORATED"      -> achievements >= 5;
             case "DAWN_HUNTER"    -> rankIdx >= 2;

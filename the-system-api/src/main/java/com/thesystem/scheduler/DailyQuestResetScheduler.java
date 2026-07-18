@@ -18,10 +18,12 @@ public class DailyQuestResetScheduler {
 
     private final PlayerRepository playerRepository;
     private final AiQuestGeneratorService aiQuestGeneratorService;
+    private final com.thesystem.repository.QuestGenerationLogRepository questGenerationLogRepository;
 
-    public DailyQuestResetScheduler(PlayerRepository playerRepository, AiQuestGeneratorService aiQuestGeneratorService) {
+    public DailyQuestResetScheduler(PlayerRepository playerRepository, AiQuestGeneratorService aiQuestGeneratorService, com.thesystem.repository.QuestGenerationLogRepository questGenerationLogRepository) {
         this.playerRepository = playerRepository;
         this.aiQuestGeneratorService = aiQuestGeneratorService;
+        this.questGenerationLogRepository = questGenerationLogRepository;
     }
 
     /**
@@ -30,12 +32,18 @@ public class DailyQuestResetScheduler {
      */
     @Scheduled(cron = "0 0 0 * * *", zone = "${thesystem.scheduler.timezone}")
     public void dailyReset() {
-        log.info("◈ THE SYSTEM — Daily quest reset triggered for {}. New gates await.", LocalDate.now());
+        LocalDate today = LocalDate.now();
+        log.info("◈ THE SYSTEM — Daily quest reset triggered for {}. New gates await.", today);
         
         List<Player> players = playerRepository.findAll();
         for (Player p : players) {
             try {
-                aiQuestGeneratorService.generateDailyQuests(p.getId());
+                if (!questGenerationLogRepository.existsByPlayerIdAndGenerationDate(p.getId(), today)) {
+                    aiQuestGeneratorService.generateDailyQuests(p.getId());
+                    questGenerationLogRepository.save(new com.thesystem.entity.QuestGenerationLog(p.getId(), today));
+                } else {
+                    log.info("◈ THE SYSTEM — Quests already generated for player {} today.", p.getId());
+                }
             } catch (Exception e) {
                 log.error("Failed to generate AI quests for player {}", p.getId(), e);
             }

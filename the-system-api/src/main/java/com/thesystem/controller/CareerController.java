@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/career")
+@RequestMapping("/api/v1/career")
 public class CareerController {
 
     private final CareerService careerService;

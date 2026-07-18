@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/mind")
+@RequestMapping("/api/v1/mind")
 public class MindController {
 
     private final MindService mindService;

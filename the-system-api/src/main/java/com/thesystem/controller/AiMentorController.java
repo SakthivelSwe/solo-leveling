@@ -11,7 +11,7 @@ import java.security.Principal;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/ai")
+@RequestMapping("/api/v1/ai")
 public class AiMentorController {
 
     private final AiMentorService mentor;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/player")
+@RequestMapping("/api/v1/player")
 public class PlayerController {
 
     private final PlayerService playerService;

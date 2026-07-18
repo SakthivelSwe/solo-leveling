@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/wealth")
+@RequestMapping("/api/v1/wealth")
 public class WealthController {
 
     private final WealthService wealthService;

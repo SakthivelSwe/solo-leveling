@@ -2,7 +2,9 @@ package com.thesystem.service;
 
 import com.thesystem.dto.LevelUpDTO;
 import com.thesystem.entity.Player;
+import com.thesystem.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
+import java.util.Map;
 
 /**
  * Realistic tiered XP progression for real humans.
@@ -17,6 +19,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class LevelService {
+
+    private final PlayerRepository playerRepository;
+    private final SseService sseService;
+
+    public LevelService(PlayerRepository playerRepository, SseService sseService) {
+        this.playerRepository = playerRepository;
+        this.sseService = sseService;
+    }
 
     /**
      * XP required to advance from the given level to the next.
@@ -97,6 +107,30 @@ public class LevelService {
         player.setCurrentXp(0);
         player.setRankLevel(rankForLevel(newLevel));
         return true;
+    }
+    
+    /**
+     * Centralized method to add XP, check level up, save the player, and broadcast the SSE event.
+     */
+    public LevelUpDTO addXp(Player player, int xp, String sourceKey) {
+        player.setCurrentXp(player.getCurrentXp() + xp);
+        player.setTotalXp(player.getTotalXp() + xp);
+        
+        LevelUpDTO levelUp = checkLevelUp(player);
+        playerRepository.save(player);
+        
+        sseService.send(player.getId(), "player-update", Map.of(
+                "currentXp", player.getCurrentXp(),
+                "totalXp", player.getTotalXp(),
+                "level", player.getLevel(),
+                "rankLevel", player.getRankLevel(),
+                "hp", player.getHp(),
+                "maxHp", player.getMaxHp(),
+                "questKey", sourceKey != null ? sourceKey : "DEV_MASTERY",
+                "xpGained", xp,
+                "leveledUp", levelUp.leveledUp()));
+                
+        return levelUp;
     }
 }
 

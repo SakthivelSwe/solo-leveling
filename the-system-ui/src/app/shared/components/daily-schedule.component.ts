@@ -124,7 +124,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         <option value="REST">REST</option>
         <option value="DAILY">DAILY</option>
         <option value="SKILL">SKILL</option>
-        <option value="TESTOSTERONE">TESTOSTERONE</option>
+        <option value="DISCIPLINE">DISCIPLINE</option>
       </select>
     </div>
     <input class="fin" placeholder="What to do e.g. 5-min meditation"
@@ -228,7 +228,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 .item[data-block="MORNING"] .t { color: rgba(250,199,117,0.55); }
 .item[data-block="EVENING"] .t { color: rgba(83,74,183,0.75); }
-.item[data-cat="TESTOSTERONE"][data-block="MORNING"] .t { color: rgba(226,75,74,0.55); }
+.item[data-cat="DISCIPLINE"][data-block="MORNING"] .t { color: rgba(226,75,74,0.55); }
 
 .bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 9px; background: rgba(255,255,255,0.1); }
 .bdot[data-block="MORNING"] { background: rgba(250,199,117,0.7); }
@@ -247,7 +247,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   /* prevent mid-word break but allow the full tag text to show */
   white-space: nowrap; word-break: normal; overflow-wrap: normal;
 }
-.item[data-cat="TESTOSTERONE"] .qtag { background: rgba(226,75,74,0.14); color: #f09595; }
+.item[data-cat="DISCIPLINE"] .qtag { background: rgba(226,75,74,0.14); color: #f09595; }
 .item[data-cat="SKILL"]        .qtag { background: rgba(83,74,183,0.22); color: #b3aef0; }
 .item[data-cat="DAILY"]        .qtag { background: rgba(29,158,117,0.16); color: #5dcaa5; }
 

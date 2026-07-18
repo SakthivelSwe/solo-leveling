@@ -48,7 +48,7 @@ class TitleServiceTest {
         PlayerStats s = new PlayerStats();
         s.setIntelligence(45);      // CODE_HUNTER unlocked
         s.setStrength(10);          // SHADOW_ATHLETE locked
-        s.setHor(10);               // HORMONE_LORD locked
+        s.setDis(10);               // DISCIPLINE_LORD locked
 
         when(playerRepository.findById(1L)).thenReturn(Optional.of(p));
         when(statsRepository.findByPlayerId(1L)).thenReturn(Optional.of(s));
@@ -67,7 +67,7 @@ class TitleServiceTest {
         assertFalse(byKey.get("RELENTLESS").unlocked());
         assertTrue(byKey.get("CODE_HUNTER").unlocked());
         assertFalse(byKey.get("SHADOW_ATHLETE").unlocked());
-        assertFalse(byKey.get("HORMONE_LORD").unlocked());
+        assertFalse(byKey.get("DISCIPLINE_LORD").unlocked());
         assertFalse(byKey.get("GATE_BREAKER").unlocked());
         assertFalse(byKey.get("DECORATED").unlocked());
         assertTrue(byKey.get("DAWN_HUNTER").unlocked());   // C-Rank

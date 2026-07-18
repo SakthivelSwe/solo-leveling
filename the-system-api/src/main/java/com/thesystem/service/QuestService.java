@@ -61,10 +61,13 @@ public class QuestService {
      * Custom DAILY quests owned by this player are INCLUDED.
      */
     public List<QuestDTO> getTodayQuests(Long playerId) {
+        return getQuestsByDate(playerId, LocalDate.now());
+    }
+
+    public List<QuestDTO> getQuestsByDate(Long playerId, LocalDate date) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
-        LocalDate today = LocalDate.now();
-        Set<Long> completedIds = getCompletedQuestIds(playerId, today);
+        Set<Long> completedIds = getCompletedQuestIds(playerId, date);
 
         List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId).stream()
                 .map(q -> toDto(q, completedIds.contains(q.getId()), player))
@@ -173,8 +176,9 @@ public class QuestService {
         double energyMultiplier = energy < 40 ? 0.80 : energy < 60 ? 0.90 : energy >= 80 ? 1.10 : 1.0;
         double focusMultiplier = dopamineService.getTodayFocusMultiplier(playerId);
         int xp = (int) Math.round(baseXp * energyMultiplier * focusMultiplier);
-        player.setCurrentXp(player.getCurrentXp() + xp);
-        player.setTotalXp(player.getTotalXp() + xp);
+        
+        // Add XP, handle level-up, and send SSE notification
+        LevelUpDTO levelUp = levelService.addXp(player, xp, quest.getQuestKey());
 
         // Stat boosts
         PlayerStats stats = statsRepository.findByPlayerId(playerId)
@@ -185,10 +189,6 @@ public class QuestService {
         // Skill boosts
         applySkillBoosts(playerId, quest.getSkillBoosts());
 
-        // Level up check (uses tiered XP thresholds)
-        LevelUpDTO levelUp = levelService.checkLevelUp(player);
-        playerRepository.save(player);
-
         // Save completion
         completionRepository.save(new QuestCompletion(playerId, quest.getId(), today, xp));
 
@@ -196,21 +196,13 @@ public class QuestService {
         List<AchievementDTO> newAchievements = achievementService.evaluate(player);
 
         // Record self-doubt evidence for key discipline quests
-        recordEvidence(playerId, quest);
+        if (Boolean.TRUE.equals(quest.isRecoveryQuest()) || "COURAGE_OF_THE_WEAK".equals(quest.getQuestKey())) {
+            evidenceRepository.save(new com.thesystem.entity.SelfDoubtEvidence(
+                    playerId, "Completed discipline quest: " + quest.getLabel(), "CHARACTER"));
+        }
 
         StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
-                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getHor());
-
-        sseService.send(playerId, "player-update", Map.of(
-                "currentXp", player.getCurrentXp(),
-                "totalXp", player.getTotalXp(),
-                "level", player.getLevel(),
-                "rankLevel", player.getRankLevel(),
-                "hp", player.getHp(),
-                "maxHp", player.getMaxHp(),
-                "questKey", quest.getQuestKey(),
-                "xpGained", xp,
-                "leveledUp", levelUp.leveledUp()));
+                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getDis());
 
         return new QuestCompletionResult(
                 quest.getQuestKey(), quest.getLabel(), xp,
@@ -383,15 +375,15 @@ public class QuestService {
         PlayerStats stats = statsRepository.findByPlayerId(player.getId())
                 .orElseThrow(() -> new ApiException("Stats not found", HttpStatus.NOT_FOUND));
         StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
-                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getHor());
+                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getDis());
 
         return new QuestCompletionResult("PENALTY_SURVIVAL", "Penalty Survival", 0,
                 false, player.getLevel(), player.getRankLevel(), false, statsDto, List.of(), List.of());
     }
 
-    private List<String> applyStatBoosts(PlayerStats stats, String json) {
+    private List<String> applyStatBoosts(PlayerStats stats, Map<String, Integer> boosts) {
         List<String> gained = new ArrayList<>();
-        Map<String, Integer> boosts = parseMap(json);
+        if (boosts == null) return gained;
         boosts.forEach((key, val) -> {
             switch (key.toUpperCase()) {
                 case "STR" -> stats.setStrength(stats.getStrength() + val);
@@ -399,7 +391,7 @@ public class QuestService {
                 case "VIT" -> stats.setVitality(stats.getVitality() + val);
                 case "AGI" -> stats.setAgility(stats.getAgility() + val);
                 case "PER" -> stats.setPerception(stats.getPerception() + val);
-                case "HOR" -> stats.setHor(stats.getHor() + val);
+                case "DIS" -> stats.setDis(stats.getDis() + val);
                 default -> { return; }
             }
             gained.add(key.toUpperCase() + " +" + val);
@@ -407,8 +399,8 @@ public class QuestService {
         return gained;
     }
 
-    private void applySkillBoosts(Long playerId, String json) {
-        Map<String, Integer> boosts = parseMap(json);
+    private void applySkillBoosts(Long playerId, Map<String, Integer> boosts) {
+        if (boosts == null) return;
         boosts.forEach((skillName, val) -> {
             PlayerSkill skill = skillRepository
                     .findByPlayerIdAndSkillName(playerId, skillName)
@@ -422,14 +414,7 @@ public class QuestService {
         });
     }
 
-    private Map<String, Integer> parseMap(String json) {
-        if (json == null || json.isBlank()) return Collections.emptyMap();
-        try {
-            return objectMapper.readValue(json, new TypeReference<Map<String, Integer>>() {});
-        } catch (Exception e) {
-            return Collections.emptyMap();
-        }
-    }
+
 
     private void recordEvidence(Long playerId, Quest quest) {
         String key = quest.getQuestKey();

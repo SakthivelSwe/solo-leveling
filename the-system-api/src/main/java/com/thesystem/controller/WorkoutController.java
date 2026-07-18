@@ -12,7 +12,7 @@ import java.util.List;
  * Phase 4 — Workout logger endpoints.
  */
 @RestController
-@RequestMapping("/api/workout")
+@RequestMapping("/api/v1/workout")
 public class WorkoutController {
 
     private final WorkoutService workoutService;

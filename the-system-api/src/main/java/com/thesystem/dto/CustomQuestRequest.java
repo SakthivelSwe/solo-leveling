@@ -10,7 +10,7 @@ public record CustomQuestRequest(
         String category,
         /** Optional — defaults applied server-side based on timeType */
         Integer xpReward,
-        /** Optional JSON e.g. {"STR":2,"VIT":1} */
-        String statBoosts
+        /** Optional Map e.g. {"STR":2,"VIT":1} */
+        java.util.Map<String, Integer> statBoosts
 ) {}
 

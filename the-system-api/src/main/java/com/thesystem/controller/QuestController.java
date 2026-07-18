@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/quests")
+@RequestMapping("/api/v1/quests")
 public class QuestController {
 
     private final QuestService questService;

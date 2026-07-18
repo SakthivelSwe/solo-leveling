@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Unlockable Hunter titles — list what's earned and equip one. */
 @RestController
-@RequestMapping("/api/titles")
+@RequestMapping("/api/v1/titles")
 public class TitleController {
 
     private final TitleService titleService;

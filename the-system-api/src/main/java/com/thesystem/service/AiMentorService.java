@@ -98,11 +98,11 @@ public class AiMentorService {
         if (p == null || s == null) return "";
         return String.format(
             "Hunter: %s | Rank: %s-Rank | Level: %d | HP: %d/%d | " +
-            "Stats: STR=%d INT=%d VIT=%d AGI=%d PER=%d HOR=%d | " +
+            "Stats: STR=%d INT=%d VIT=%d AGI=%d PER=%d DIS=%d | " +
             "Today: %d/%d quests cleared | Streak: %d days",
             p.displayName() != null ? p.displayName() : p.username(),
             p.rankLevel(), p.level(), p.hp(), p.maxHp(),
-            s.str(), s.intelligence(), s.vit(), s.agi(), s.per(), s.hor(),
+            s.str(), s.intelligence(), s.vit(), s.agi(), s.per(), s.dis(),
             status.completedToday(), status.totalQuests(), status.streak()
         );
     }
@@ -111,13 +111,13 @@ public class AiMentorService {
         if (status == null || status.stats() == null) return "VIT";
         var s = status.stats();
         int min = Math.min(Math.min(Math.min(s.str(), s.intelligence()), Math.min(s.vit(), s.agi())),
-                           Math.min(s.per(), s.hor()));
+                           Math.min(s.per(), s.dis()));
         if (s.str() == min) return "STR";
         if (s.intelligence() == min) return "INT";
         if (s.vit() == min) return "VIT";
         if (s.agi() == min) return "AGI";
         if (s.per() == min) return "PER";
-        return "HOR";
+        return "DIS";
     }
 }
 

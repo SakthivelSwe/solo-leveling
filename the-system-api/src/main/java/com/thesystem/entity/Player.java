@@ -73,6 +73,9 @@ public class Player {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "consecutive_days_below_threshold")
+    private int consecutiveDaysBelowThreshold = 0;
+
     // Getters & setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -110,4 +113,6 @@ public class Player {
     public void setInPenaltyZone(Boolean inPenaltyZone) { this.inPenaltyZone = inPenaltyZone != null ? inPenaltyZone : false; }
     public LocalDateTime getPenaltyZoneEndTime() { return penaltyZoneEndTime; }
     public void setPenaltyZoneEndTime(LocalDateTime penaltyZoneEndTime) { this.penaltyZoneEndTime = penaltyZoneEndTime; }
+    public int getConsecutiveDaysBelowThreshold() { return consecutiveDaysBelowThreshold; }
+    public void setConsecutiveDaysBelowThreshold(int consecutiveDaysBelowThreshold) { this.consecutiveDaysBelowThreshold = consecutiveDaysBelowThreshold; }
 }

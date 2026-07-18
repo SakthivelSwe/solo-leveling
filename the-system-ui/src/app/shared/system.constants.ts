@@ -30,7 +30,7 @@ export interface StatKeys {
   vit: number;
   agi: number;
   per: number;
-  hor: number;
+  dis: number;
 }
 
 export const STATS_META: StatMeta[] = [
@@ -39,13 +39,13 @@ export const STATS_META: StatMeta[] = [
   { key: 'vit', label: 'VIT', full: 'Vitality — Health / Sleep / Food', color: '#1D9E75' },
   { key: 'agi', label: 'AGI', full: 'Agility — English Speaking', color: '#BA7517' },
   { key: 'per', label: 'PER', full: 'Perception — Problem Solving', color: '#378ADD' },
-  { key: 'hor', label: 'HOR', full: 'Hormones — Testosterone Level', color: '#E24B4A' },
+  { key: 'dis', label: 'DIS', full: 'Discipline / Recovery', color: '#E24B4A' },
 ];
 
 export const CATEGORY_META: Record<string, { label: string; color: string }> = {
   DAILY:        { label: 'Daily Habits',  color: '#1D9E75' },
   SKILL:        { label: 'Skill Grind',   color: '#534AB7' },
-  TESTOSTERONE: { label: 'Testosterone',  color: '#E24B4A' },
+  DISCIPLINE: { label: 'Discipline',  color: '#E24B4A' },
   SIDE:         { label: 'Milestones',    color: '#FAC775' },
   MILESTONE:    { label: 'Milestones',    color: '#FAC775' },
   WEEKLY:       { label: 'Weekly',        color: '#4FC3F7' },

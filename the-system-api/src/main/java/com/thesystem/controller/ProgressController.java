@@ -16,7 +16,7 @@ import java.util.List;
  * (Weekly progress lives in AchievementController for backwards-compatibility.)
  */
 @RestController
-@RequestMapping("/api/progress")
+@RequestMapping("/api/v1/progress")
 public class ProgressController {
 
     private final PlayerService playerService;

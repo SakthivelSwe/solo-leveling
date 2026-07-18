@@ -20,8 +20,8 @@ public class PlayerStats {
     private int agility = 10;       // AGI - English speaking speed
     private int perception = 10;    // PER - Problem-solving
 
-    @Column(name = "hor")
-    private int hor = 10;            // HOR - Hormonal / Testosterone
+    @Column(name = "dis")
+    private int dis = 10;            // DIS - Discipline / Recovery
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
@@ -40,8 +40,8 @@ public class PlayerStats {
     public void setAgility(int agility) { this.agility = agility; }
     public int getPerception() { return perception; }
     public void setPerception(int perception) { this.perception = perception; }
-    public int getHor() { return hor; }
-    public void setHor(int hor) { this.hor = hor; }
+    public int getDis() { return dis; }
+    public void setDis(int dis) { this.dis = dis; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

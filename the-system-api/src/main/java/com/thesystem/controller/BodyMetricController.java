@@ -14,7 +14,7 @@ import java.util.List;
  * existing Body OS testosterone-pillar endpoints at `/api/body`.
  */
 @RestController
-@RequestMapping("/api/body-metrics")
+@RequestMapping("/api/v1/body-metrics")
 public class BodyMetricController {
 
     private final BodyMetricService bodyMetricService;

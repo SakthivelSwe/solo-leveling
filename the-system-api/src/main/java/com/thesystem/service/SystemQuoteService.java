@@ -21,7 +21,7 @@ public class SystemQuoteService {
         "Your STR is 12. Your potential is unlimited. Train.",
         "The interview room is a Boss Gate. You are not ready yet. Keep grinding.",
         "Three months. That's all it takes. Do not waste today.",
-        "Your HOR stat is the weakest in the game. Fix it tonight — sleep before 11:30.",
+        "Your DIS stat is the weakest in the game. Fix it tonight — sleep before 11:30.",
         "A hunter who skips breakfast loses VIT. A hunter who skips code loses INT. Choose wisely."
     );
 

@@ -10,7 +10,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/english")
+@RequestMapping("/api/v1/english")
 public class EnglishController {
 
     private final EnglishService englishService;

@@ -17,7 +17,7 @@ import java.security.Principal;
  * supplied as a {@code ?token=} query param and validated by {@code JwtAuthFilter}.
  */
 @RestController
-@RequestMapping("/api/stream")
+@RequestMapping("/api/v1/stream")
 public class StreamController {
 
     private final SseService sseService;

@@ -30,7 +30,7 @@ import { StatusWindow, LeetcodeStats, LeetcodeLog } from '../../core/models/mode
     <!-- Attribute radar -->
     <section class="st-block system-card">
       <h3 class="mono">◈ ATTRIBUTE BREAKDOWN</h3>
-      <p class="tech sub">STR vs INT vs VIT vs AGI vs PER vs HOR</p>
+      <p class="tech sub">STR vs INT vs VIT vs AGI vs PER vs DIS</p>
       <div class="chart-box radar"><canvas baseChart [type]="'radar'" [data]="radarData" [options]="radarOpts"></canvas></div>
     </section>
 
@@ -141,9 +141,9 @@ export class StatisticsComponent implements OnInit {
   private buildRadar(s: StatusWindow): void {
     const st = s.stats;
     this.radarData = {
-      labels: ['STR', 'INT', 'VIT', 'AGI', 'PER', 'HOR'],
+      labels: ['STR', 'INT', 'VIT', 'AGI', 'PER', 'DIS'],
       datasets: [{
-        data: [st.str, st.intelligence, st.vit, st.agi, st.per, st.hor],
+        data: [st.str, st.intelligence, st.vit, st.agi, st.per, st.dis],
         label: 'Attributes',
         borderColor: '#6C63FF',
         backgroundColor: 'rgba(108,99,255,0.22)',

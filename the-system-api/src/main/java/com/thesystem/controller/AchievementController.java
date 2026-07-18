@@ -22,13 +22,13 @@ public class AchievementController {
         this.playerService = playerService;
     }
 
-    @GetMapping("/api/achievements")
+    @GetMapping("/api/v1/achievements")
     public List<AchievementDTO> achievements(Principal principal) {
         Long playerId = playerService.getByUsername(principal.getName()).getId();
         return achievementService.getPlayerAchievements(playerId);
     }
 
-    @GetMapping("/api/progress/weekly")
+    @GetMapping("/api/v1/progress/weekly")
     public List<DayProgressDTO> weekly(Principal principal) {
         Long playerId = playerService.getByUsername(principal.getName()).getId();
         return playerService.getWeeklyProgress(playerId);

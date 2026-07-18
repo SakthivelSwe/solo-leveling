@@ -22,8 +22,8 @@ public class BodyLog {
     @Column(name = "log_date", nullable = false)
     private LocalDate logDate = LocalDate.now();
 
-    @Column(name = "testosterone_pillars")
-    private int testosteronePillars = 0; // 0-7
+    @Column(name = "discipline_pillars")
+    private int disciplinePillars = 0; // 0-7
 
     @Column(name = "cold_shower")
     private boolean coldShower = false;

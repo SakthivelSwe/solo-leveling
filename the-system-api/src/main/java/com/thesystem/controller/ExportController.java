@@ -16,7 +16,7 @@ import java.util.Map;
  * Phase 4 — Data Export: a full personal-backup JSON of the player's own data.
  */
 @RestController
-@RequestMapping("/api/export")
+@RequestMapping("/api/v1/export")
 public class ExportController {
 
     private final ExportService exportService;

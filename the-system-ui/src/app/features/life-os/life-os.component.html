@@ -49,35 +49,6 @@
         </ul>
       </div>
 
-      <!-- LeetCode stats -->
-      <div class="system-card block">
-        <h3 class="mono head">◈ DSA GRIND</h3>
-        <div class="leet-stats" *ngIf="leetStats() as ls">
-          <div class="stat-pill"><span class="v mono">{{ ls.total }}</span><span class="k tech">TOTAL</span></div>
-          <div class="stat-pill easy"><span class="v mono">{{ ls.easy }}</span><span class="k tech">EASY</span></div>
-          <div class="stat-pill medium"><span class="v mono">{{ ls.medium }}</span><span class="k tech">MED</span></div>
-          <div class="stat-pill hard"><span class="v mono">{{ ls.hard }}</span><span class="k tech">HARD</span></div>
-          <div class="stat-pill streak"><span class="v mono">{{ ls.streak }}🔥</span><span class="k tech">STREAK</span></div>
-        </div>
-        <div class="form-row">
-          <input class="fin" placeholder="Problem name" [(ngModel)]="newLeet.problemName" />
-          <select class="fin" [(ngModel)]="newLeet.difficulty">
-            <option value="EASY">Easy</option><option value="MEDIUM">Medium</option><option value="HARD">Hard</option>
-          </select>
-          <input class="fin sm" placeholder="Topic" [(ngModel)]="newLeet.topic" />
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="newLeet.solvedWithoutAi" /> No AI</label>
-          <button class="btn" (click)="addLeet()">+ LOG</button>
-        </div>
-        <ul class="mini-list" @listStagger>
-          <li *ngFor="let l of leetHistory()">
-            <span class="badge" [class.easy]="l.difficulty==='EASY'" [class.medium]="l.difficulty==='MEDIUM'" [class.hard]="l.difficulty==='HARD'">{{ l.difficulty }}</span>
-            <span class="pn">{{ l.problemName }}</span>
-            <span class="tech dt">{{ l.solvedDate }}</span>
-          </li>
-          <li *ngIf="!leetHistory().length" class="empty tech">No problems logged yet. Begin the grind.</li>
-        </ul>
-      </div>
-
       <!-- Skills gap -->
       <div class="system-card block" *ngIf="gap() as g">
         <h3 class="mono head">◈ SKILLS GAP — TARGET ROLE</h3>
@@ -142,25 +113,6 @@
         </ul>
       </div>
 
-      <!-- Job applications -->
-      <div class="system-card block wide">
-        <h3 class="mono head">◈ JOB APPLICATIONS</h3>
-        <div class="form-row">
-          <input class="fin" placeholder="Company" [(ngModel)]="newJob.company" />
-          <input class="fin" placeholder="Role" [(ngModel)]="newJob.role" />
-          <input class="fin sm" type="number" placeholder="CTC" [(ngModel)]="newJob.ctcOffered" />
-          <button class="btn" (click)="addJob()">+ APPLY</button>
-        </div>
-        <ul class="mini-list" @listStagger>
-          <li *ngFor="let j of jobs()" class="job">
-            <div class="jinfo"><span class="pn">{{ j.company }}</span><span class="tech role">{{ j.role }}</span></div>
-            <select class="fin status" [ngModel]="j.status" (ngModelChange)="changeStatus(j, $event)">
-              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-            </select>
-          </li>
-          <li *ngIf="!jobs().length" class="empty tech">No applications yet. The first job app is a Side Quest — +300 XP.</li>
-        </ul>
-      </div>
     </div>
   </section>
 

@@ -67,7 +67,7 @@
         <select class="add-select" [(ngModel)]="newQuestCategory" (ngModelChange)="newQuestXp = null">
           <option value="DAILY">DAILY</option>
           <option value="SKILL">SKILL</option>
-          <option value="TESTOSTERONE">TESTOSTERONE</option>
+          <option value="DISCIPLINE">DISCIPLINE</option>
           <option value="WEEKLY">WEEKLY</option>
           <option value="MONTHLY">MONTHLY</option>
         </select>
@@ -102,7 +102,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       TODAY TAB — Daily quests (DAILY / SKILL / TESTOSTERONE)
+       TODAY TAB - Daily quests (DAILY / SKILL / DISCIPLINE)
        ══════════════════════════════════════════════════════════ -->
   <div class="quest-list" *ngIf="activeTab === 'today'" [@listStagger]="selectedCategory">
     <div class="quest-item" *ngFor="let q of filteredDaily; trackBy: trackByKey"

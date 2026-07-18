@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/habits")
+@RequestMapping("/api/v1/habits")
 public class HabitController {
 
     private final HabitService habitService;

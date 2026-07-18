@@ -135,7 +135,7 @@ public class PlayerService {
                 .orElseThrow(() -> new ApiException("Stats not found", HttpStatus.NOT_FOUND));
 
         StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
-                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getHor());
+                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getDis());
 
         List<PlayerSkillDTO> skills = skillService.getPlayerSkills(playerId);
         List<QuestDTO> todayQuests = questService.getTodayQuests(playerId);
@@ -256,7 +256,7 @@ public class PlayerService {
         PlayerStats stats = statsRepository.findByPlayerId(playerId)
                 .orElseThrow(() -> new ApiException("Stats not found", HttpStatus.NOT_FOUND));
         StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
-                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getHor());
+                stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getDis());
 
         LocalDate today = LocalDate.now();
         LocalDate monthStart = today.withDayOfMonth(1);
@@ -296,7 +296,7 @@ public class PlayerService {
         map.put("Vitality", s.vit());
         map.put("Agility", s.agi());
         map.put("Perception", s.per());
-        map.put("Hormonal Health", s.hor());
+        map.put("Discipline/Recovery", s.dis());
         return map.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
@@ -351,7 +351,7 @@ public class PlayerService {
         map.put("Vitality", s.vit());
         map.put("Agility", s.agi());
         map.put("Perception", s.per());
-        map.put("Hormonal Health", s.hor());
+        map.put("Discipline/Recovery", s.dis());
         return map.entrySet().stream()
                 .min(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)

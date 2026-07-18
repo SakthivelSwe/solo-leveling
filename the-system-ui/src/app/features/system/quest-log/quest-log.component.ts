@@ -71,7 +71,7 @@ export class QuestLogComponent {
     { key: 'ALL',          label: 'All Quests',   color: '#4fc3f7' },
     { key: 'DAILY',        label: 'Daily Habits', color: CATEGORY_META['DAILY'].color },
     { key: 'SKILL',        label: 'Skill Grind',  color: CATEGORY_META['SKILL'].color },
-    { key: 'TESTOSTERONE', label: 'Testosterone', color: CATEGORY_META['TESTOSTERONE'].color },
+    { key: 'DISCIPLINE', label: 'Discipline', color: CATEGORY_META['DISCIPLINE'].color },
   ];
 
   constructor(private playerService: PlayerService) {}

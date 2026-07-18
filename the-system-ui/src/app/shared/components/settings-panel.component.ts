@@ -47,7 +47,7 @@ interface QuestItem {
           <select class="fin" [(ngModel)]="newQuest.category">
             <option value="DAILY">DAILY</option>
             <option value="SKILL">SKILL</option>
-            <option value="TESTOSTERONE">TESTOSTERONE</option>
+            <option value="DISCIPLINE">DISCIPLINE</option>
             <option value="WEEKLY">WEEKLY</option>
             <option value="MONTHLY">MONTHLY</option>
           </select>
@@ -259,7 +259,7 @@ interface QuestItem {
 .qinfo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .qcat { font-size: .54rem; letter-spacing: 1px; padding: 2px 7px; border-radius: 5px; background: rgba(83,74,183,0.2); color: #b3aef0; white-space: nowrap; }
 .qcat[data-cat="DAILY"] { background: rgba(29,158,117,0.2); color: #5dcaa5; }
-.qcat[data-cat="TESTOSTERONE"] { background: rgba(226,75,74,0.2); color: #f09595; }
+.qcat[data-cat="DISCIPLINE"] { background: rgba(226,75,74,0.2); color: #f09595; }
 .qcat[data-cat="SIDE"] { background: rgba(250,199,117,0.2); color: #fac775; }
 .qlabel { font-size: .74rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .qactions { display: flex; align-items: center; gap: 8px; }

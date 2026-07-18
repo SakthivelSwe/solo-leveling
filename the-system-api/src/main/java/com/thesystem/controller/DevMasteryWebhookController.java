@@ -25,7 +25,7 @@ import java.util.Map;
  *   POST /api/devmastery/sync     — manual sync: pull latest progress from DevMastery API
  */
 @RestController
-@RequestMapping("/api/devmastery")
+@RequestMapping("/api/v1/devmastery")
 public class DevMasteryWebhookController {
 
     private static final Logger log = LoggerFactory.getLogger(DevMasteryWebhookController.class);

@@ -6,6 +6,6 @@ public record StatsDTO(
         int vit,
         int agi,
         int per,
-        int hor
+        int dis
 ) {}
 

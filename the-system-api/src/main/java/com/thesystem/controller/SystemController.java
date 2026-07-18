@@ -14,7 +14,7 @@ import java.util.Map;
  * Miscellaneous SYSTEM endpoints: the daily rotating quote and the leaderboard.
  */
 @RestController
-@RequestMapping("/api/system")
+@RequestMapping("/api/v1/system")
 public class SystemController {
 
     private final SystemQuoteService systemQuoteService;

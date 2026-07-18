@@ -14,7 +14,7 @@ import java.util.List;
 public class HabitTemplateService {
 
     private static final List<HabitTemplateDTO> TEMPLATES = List.of(
-        // === IDENTITY: HUNTER (physical / testosterone) ===
+        // === IDENTITY: HUNTER (physical / discipline) ===
         new HabitTemplateDTO("H_COLD_SHOWER", "Cold shower", "Hunter",
             "Right after waking, before opening phone",
             "Discipline over comfort — dopamine reset before the world begins",

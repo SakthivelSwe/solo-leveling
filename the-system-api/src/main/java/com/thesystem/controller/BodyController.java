@@ -9,7 +9,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/body")
+@RequestMapping("/api/v1/body")
 public class BodyController {
 
     private final BodyService bodyService;

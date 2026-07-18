@@ -24,7 +24,7 @@ import java.util.Map;
  *   POST   /api/learning/analyze-url    — Gemini Smart Notebook: analyze YouTube URL
  */
 @RestController
-@RequestMapping("/api/learning")
+@RequestMapping("/api/v1/learning")
 public class LearningController {
 
     private final LearningService learningService;

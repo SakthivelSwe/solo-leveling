@@ -41,7 +41,7 @@ public class Shadow {
 
     /**
      * Shadow archetype drives the category of XP bonus applied.
-     * FIGHTER (STR/HOR), SCHOLAR (INT/PER), MONK (VIT), WARRIOR (AGI).
+     * FIGHTER (STR/DIS), SCHOLAR (INT/PER), MONK (VIT), WARRIOR (AGI).
      */
     @Column(name = "shadow_type", length = 20)
     private String shadowType;

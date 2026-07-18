@@ -93,14 +93,21 @@ public class EndOfDayScheduler {
             int newHp = Math.max(0, Math.min(player.getMaxHp(), player.getHp() + hpChange));
             player.setHp(newHp);
 
-            if (newHp == 0) {
+            if (effectiveDone < thresholdMinimum) {
+                player.setConsecutiveDaysBelowThreshold(player.getConsecutiveDaysBelowThreshold() + 1);
+            } else {
+                player.setConsecutiveDaysBelowThreshold(0);
+            }
+
+            if (player.getConsecutiveDaysBelowThreshold() >= 3) {
                 boolean demoted = levelService.demoteRank(player);
+                player.setConsecutiveDaysBelowThreshold(0);
                 player.setHp(50);
                 if (demoted) {
                     notificationService.push(player.getId(), "◈ RANK DROP",
-                            "Your HP reached 0. The System has demoted you to " + player.getRankLevel()
+                            "Failed minimum requirements for 3 consecutive days. The System demoted you to " + player.getRankLevel()
                                     + "-Rank. Rise again, Hunter.", "RANK_DROP");
-                    log.warn("◈ Player {} demoted to {}-Rank (HP depleted).",
+                    log.warn("◈ Player {} demoted to {}-Rank (3 consecutive days failed).",
                             player.getUsername(), player.getRankLevel());
                 }
             } else if (hpChange < 0) {

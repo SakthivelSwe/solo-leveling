@@ -9,7 +9,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/relationship")
+@RequestMapping("/api/v1/relationship")
 public class RelationshipController {
 
     private final RelationshipService relationshipService;

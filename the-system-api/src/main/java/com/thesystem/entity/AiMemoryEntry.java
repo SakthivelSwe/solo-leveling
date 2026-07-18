@@ -44,7 +44,7 @@ public class AiMemoryEntry {
      * Human-readable memory text injected into the AI prompt.
      * Example: "Skipped LEETCODE 3 times this week."
      */
-    @Column(nullable = false, length = 500)
+    @Column(name = "memory_value", nullable = false, length = 500)
     private String value;
 
     /** The week this memory was generated for (Monday = start). */

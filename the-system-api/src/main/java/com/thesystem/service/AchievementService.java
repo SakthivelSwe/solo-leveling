@@ -80,10 +80,10 @@ public class AchievementService {
                     "Reach C-Rank", unlocked);
         }
 
-        // TESTOSTERONE achievements
-        if (allTestosteroneToday(pid, today)) {
-            tryUnlock(pid, "HORMONE_WARRIOR", "Hormone Warrior",
-                    "Complete all 6 testosterone quests in one day", unlocked);
+        // DISCIPLINE achievements
+        if (allDisciplineToday(pid, today)) {
+            tryUnlock(pid, "DISCIPLINE_WARRIOR", "Discipline Warrior",
+                    "Complete all 6 discipline quests in one day", unlocked);
         }
         if (consecutiveDays(pid, "MORNING_SUN", today) >= 10) {
             tryUnlock(pid, "DAWN_HUNTER", "Dawn Hunter",
@@ -219,15 +219,15 @@ public class AchievementService {
         return streak;
     }
 
-    private boolean allTestosteroneToday(Long playerId, LocalDate today) {
-        Set<Long> testoQuestIds = questRepository.findAll().stream()
-                .filter(q -> q.getCategory().name().equals("TESTOSTERONE"))
+    private boolean allDisciplineToday(Long playerId, LocalDate today) {
+        Set<Long> discQuestIds = questRepository.findAll().stream()
+                .filter(q -> q.getCategory().name().equals("DISCIPLINE"))
                 .map(Quest::getId).collect(Collectors.toSet());
-        if (testoQuestIds.isEmpty()) return false;
+        if (discQuestIds.isEmpty()) return false;
         Set<Long> doneToday = completionRepository
                 .findByPlayerIdAndCompletedAt(playerId, today).stream()
                 .map(QuestCompletion::getQuestId).collect(Collectors.toSet());
-        return doneToday.containsAll(testoQuestIds);
+        return doneToday.containsAll(discQuestIds);
     }
 
     /** Number of distinct calendar days on which the player completed any quest. */

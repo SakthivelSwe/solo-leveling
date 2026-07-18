@@ -283,10 +283,7 @@ public class LearningService {
         if (xp <= 0) return;
         Player player = playerRepo.findById(playerId).orElse(null);
         if (player == null) return;
-        player.setCurrentXp(player.getCurrentXp() + xp);
-        player.setTotalXp(player.getTotalXp() + xp);
-        levelService.checkLevelUp(player);
-        playerRepo.save(player);
+        levelService.addXp(player, xp, "LEARNING");
     }
 
     @Transactional

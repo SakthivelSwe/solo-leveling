@@ -11,7 +11,7 @@ import java.security.Principal;
 
 /** Weekly Gate raid — the current week's boss and clear progress. */
 @RestController
-@RequestMapping("/api/dungeon")
+@RequestMapping("/api/v1/dungeon")
 public class DungeonController {
 
     private final DungeonService dungeonService;

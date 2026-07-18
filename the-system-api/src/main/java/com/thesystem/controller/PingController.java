@@ -12,7 +12,7 @@ public class PingController {
      * An empty API endpoint that just returns 200 OK.
      * Used by the keep-alive scheduler to prevent the Render free-tier from sleeping.
      */
-    @GetMapping("/api/public/ping")
+    @GetMapping("/api/v1/public/ping")
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("pong");
     }

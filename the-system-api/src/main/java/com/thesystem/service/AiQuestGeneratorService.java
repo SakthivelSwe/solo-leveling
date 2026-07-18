@@ -72,14 +72,14 @@ public class AiQuestGeneratorService {
         String systemPrompt = "You are THE SYSTEM from Solo Leveling. Your task is to generate hyper-accurate, highly motivating, and level-appropriate daily quests for a 26-year-old male Hunter.\n" +
                 "The user is Level " + player.getLevel() + " (Rank: " + player.getRankLevel() + ").\n" +
                 "Stats: STR " + stats.getStrength() + ", INT " + stats.getIntelligence() + ", VIT " + stats.getVitality() + 
-                ", AGI " + stats.getAgility() + ", PER " + stats.getPerception() + ", HOR " + stats.getHor() + ".\n" +
+                ", AGI " + stats.getAgility() + ", PER " + stats.getPerception() + ", DIS " + stats.getDis() + ".\n" +
                 "Skills: " + formatSkills(skills) + "\n\n" +
                 "CRITICAL RULES:\n" +
                 "1. NO LETHARGIC QUESTS: Quests must be highly actionable, clear, and push the Hunter to grow. Avoid vague, confusing, or uninspired wording.\n" +
                 "2. CONSTANT GROWTH: Quests must perfectly align with the Hunter's current skill levels. If a skill is Level 0-5, provide clear beginner steps. If 10-20, provide intermediate application tasks. If 20+, provide advanced, high-impact challenges.\n" +
                 "3. ACCURACY & RELEVANCE: Do not hallucinate skills or output irrelevant tasks. Only generate quests directly related to the skills listed above.\n" +
                 "4. COMPLEMENTARY TO FOUNDATION: The Hunter already completes mandatory static daily habits (Sleep, Water, Core Exercises) for a perfect foundation. Your generated quests must build on top of these with specific, targeted skill progression and advanced physical/mental conditioning.\n" +
-                "5. Generate exactly 3 SKILL quests and 1 TESTOSTERONE/health quest.\n" +
+                "5. Generate exactly 3 SKILL quests and 1 DISCIPLINE/health quest.\n" +
                 "6. Provide output strictly as a JSON array of objects. No markdown formatting, no backticks, ONLY raw JSON.\n\n" +
                 "Schema for each object:\n" +
                 "[\n" +
@@ -87,8 +87,8 @@ public class AiQuestGeneratorService {
                 "    \"label\": \"[SKILL] Read 1 page of documentation\",\n" +
                 "    \"category\": \"SKILL\",\n" +
                 "    \"xpReward\": 80,\n" +
-                "    \"statBoosts\": \"{\\\"INT\\\":2}\",\n" +
-                "    \"skillBoosts\": \"{\\\"Java + Spring Boot\\\":1}\"\n" +
+                "    \"statBoosts\": {\"INT\":2},\n" +
+                "    \"skillBoosts\": {\"Java + Spring Boot\":1}\n" +
                 "  }\n" +
                 "]";
 
@@ -105,8 +105,8 @@ public class AiQuestGeneratorService {
                 String label = (String) gq.get("label");
                 String categoryStr = (String) gq.get("category");
                 int xpReward = (Integer) gq.get("xpReward");
-                String statBoosts = (String) gq.get("statBoosts");
-                String skillBoosts = (String) gq.get("skillBoosts");
+                Map<String, Integer> statBoosts = (Map<String, Integer>) gq.get("statBoosts");
+                Map<String, Integer> skillBoosts = (Map<String, Integer>) gq.get("skillBoosts");
 
                 QuestCategory category;
                 try { category = QuestCategory.valueOf(categoryStr); }

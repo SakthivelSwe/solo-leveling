@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Module 6 — Body OS: the 7 testosterone pillars tracked per day.
+ * Module 6 — Body OS: the 7 discipline pillars tracked per day.
  */
 @Service
 public class BodyService {
@@ -40,7 +40,7 @@ public class BodyService {
         if (log.isNoPorn()) pillars++;
         if (log.isExerciseDone()) pillars++;
         if (log.isSleptBefore1130()) pillars++;
-        log.setTestosteronePillars(pillars);
+        log.setDisciplinePillars(pillars);
         return bodyRepo.save(log);
     }
 

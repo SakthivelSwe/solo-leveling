@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/boss-battle")
+@RequestMapping("/api/v1/boss-battle")
 public class BossBattleController {
 
     private final BossBattleService battleService;

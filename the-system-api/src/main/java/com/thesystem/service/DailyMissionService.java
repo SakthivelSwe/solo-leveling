@@ -159,7 +159,7 @@ public class DailyMissionService {
     /** Maps a stat name to quest keys that train that stat. */
     private boolean questMatchesStat(Quest q, String stat) {
         if (stat == null || q.getStatBoosts() == null) return false;
-        return q.getStatBoosts().toUpperCase().contains(stat.toUpperCase());
+        return q.getStatBoosts().keySet().stream().anyMatch(k -> k.equalsIgnoreCase(stat));
     }
 
     private String weakestStat(PlayerStats s) {
@@ -169,7 +169,7 @@ public class DailyMissionService {
         stats.put("VIT", s.getVitality());
         stats.put("AGI", s.getAgility());
         stats.put("PER", s.getPerception());
-        stats.put("HOR", s.getHor());
+        stats.put("DIS", s.getDis());
         return stats.entrySet().stream()
                 .min(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey).orElse("INT");
@@ -182,7 +182,7 @@ public class DailyMissionService {
         stats.put("VIT", s.getVitality());
         stats.put("AGI", s.getAgility());
         stats.put("PER", s.getPerception());
-        stats.put("HOR", s.getHor());
+        stats.put("DIS", s.getDis());
         return stats.entrySet().stream()
                 .filter(e -> !e.getKey().equals(weakest))
                 .min(Map.Entry.comparingByValue())
@@ -193,7 +193,7 @@ public class DailyMissionService {
         return switch (stat) {
             case "INT", "PER" -> "CAREER";
             case "AGI"        -> "ENGLISH";
-            case "STR", "HOR" -> "HEALTH";
+            case "STR", "DIS" -> "HEALTH";
             case "VIT"        -> "VITALITY";
             default           -> "GENERAL";
         };
