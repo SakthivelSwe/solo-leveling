@@ -43,9 +43,9 @@ public class SecurityConfig {
         List<String> publicPaths = new ArrayList<>();
         publicPaths.add("/"); // For Render health checks
         publicPaths.add("/error"); // For Spring Boot error dispatch
-        publicPaths.add("/api/auth/**");
-        publicPaths.add("/api/public/**");
-        publicPaths.add("/api/devmastery/webhook"); // uses X-Webhook-Secret, not JWT
+        publicPaths.add("/api/v1/auth/**");
+        publicPaths.add("/api/v1/public/**");
+        publicPaths.add("/api/v1/devmastery/webhook"); // uses X-Webhook-Secret, not JWT
         if (devToolsEnabled) {
             publicPaths.add("/swagger-ui/**");
             publicPaths.add("/swagger-ui.html");

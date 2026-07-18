@@ -21,7 +21,7 @@ public class KeepAliveScheduler {
     @Scheduled(initialDelay = 840000, fixedRate = 840000)
     public void pingSelf() {
         try {
-            String targetUrl = appUrl + "/api/public/ping";
+            String targetUrl = appUrl + "/api/v1/public/ping";
             log.info("Ping scheduler: sending keep-alive request to {}", targetUrl);
             String response = restTemplate.getForObject(targetUrl, String.class);
             log.info("Ping scheduler: received '{}'", response);
