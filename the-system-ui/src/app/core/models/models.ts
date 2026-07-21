@@ -14,6 +14,7 @@ export interface Player {
   currentEnergy?: number;
   inPenaltyZone?: boolean;
   penaltyZoneEndTime?: string;
+  createdAt?: string;
 }
 
 export interface AuthResponse {

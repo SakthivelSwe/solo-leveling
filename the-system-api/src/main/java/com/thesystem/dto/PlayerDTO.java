@@ -14,6 +14,7 @@ public record PlayerDTO(
         int maxHp,
         String equippedTitle,
         boolean inPenaltyZone,
-        String penaltyZoneEndTime
+        String penaltyZoneEndTime,
+        String createdAt
 ) {}
 

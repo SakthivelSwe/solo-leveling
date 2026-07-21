@@ -5,6 +5,9 @@
       <div>
         <h2 class="mono title">STATUS</h2>
         <p class="tech subtitle">PLAYER: {{ player.displayName || player.username }}</p>
+        <p class="tech subtitle" style="font-size: 0.6rem; color: var(--accent-gold); margin-top: 2px;" *ngIf="player.createdAt">
+          AWAKENED: {{ player.createdAt | date:'longDate' | uppercase }}
+        </p>
       </div>
     </div>
     <app-rank-badge [rank]="player.rankLevel"></app-rank-badge>
