@@ -70,6 +70,15 @@
     <p class="tech loader-sub">SCANNING HUNTER DATA...</p>
   </div>
 
+  <div class="loader" *ngIf="!loading() && !status()" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <span class="mono diamond" style="font-size: 2rem; color: #E24B4A; margin-bottom: 16px;">⚠</span>
+    <p class="mono" style="color: #E24B4A; font-size: 1.2rem;">SYSTEM DISCONNECTED</p>
+    <p class="tech loader-sub" style="margin-top: 8px;">The backend server is unreachable. If it is asleep, it may take 1-2 minutes to wake up.</p>
+    <button class="sys-btn" style="margin-top: 24px; padding: 8px 16px; border-color: #E24B4A; color: #E24B4A;" (click)="load()">
+      RETRY CONNECTION
+    </button>
+  </div>
+
   <!-- ═══ MOBILE SECTION TABS ══════════════════════════════════ -->
   <div class="mobile-tabs" *ngIf="status() && !loading()">
     <button class="mtab" [class.active]="mobileTab() === 'status'"

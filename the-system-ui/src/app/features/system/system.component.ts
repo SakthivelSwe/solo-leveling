@@ -148,9 +148,10 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   load(): void {
+    this.loading.set(true);
     this.playerService.getStatus().subscribe({
       next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); this.loading.set(false); },
-      error: () => this.loading.set(false),
+      error: () => { this.loading.set(false); this.toast('⚠ Connection to the System lost'); },
     });
     this.lifeOsService.getDailyMissions().subscribe({
       next: (dm) => this.dailyMission.set(dm),
