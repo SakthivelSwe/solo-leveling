@@ -23,9 +23,20 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="THE SYSTEM">
+  <!-- Preconnect to font origins so DNS+TLS is resolved before the CSS is parsed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Preconnect to the API backend so the first API call doesn't pay TLS setup cost -->
+  <link rel="preconnect" href="https://solo-leveling-0rpl.onrender.com">
+  <!-- Non-render-blocking font load: preload as style, swap to stylesheet on load.
+       This prevents fonts from blocking the First Contentful Paint. -->
+  <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap">
+  </noscript>
 </head>
 <body>
   <app-root></app-root>

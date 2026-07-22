@@ -89,6 +89,23 @@ public class PlayerService {
     }
 
     /**
+     * Configures the player's weekly rest day / cheat day.
+     * When active, the EndOfDayScheduler applies reduced HP thresholds on the chosen day.
+     *
+     * @param dayOfWeek 1=Monday … 7=Sunday (ISO-8601)
+     */
+    @Transactional
+    public PlayerDTO updateRestDay(Long playerId, boolean active, int dayOfWeek) {
+        if (dayOfWeek < 1 || dayOfWeek > 7) {
+            throw new ApiException("Invalid day of week (1=Mon … 7=Sun)", HttpStatus.BAD_REQUEST);
+        }
+        Player p = find(playerId);
+        p.setRestDayActive(active);
+        p.setRestDayDayOfWeek(dayOfWeek);
+        return toDto(playerRepository.save(p));
+    }
+
+    /**
      * Permanently deletes the player and every record they own. All player-scoped
      * entities reference the player through a plain {@code playerId} column, so a
      * set of JPQL bulk deletes fully wipes the account. Shared catalogs (e.g. the

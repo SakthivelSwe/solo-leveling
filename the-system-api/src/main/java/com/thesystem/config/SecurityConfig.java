@@ -81,16 +81,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Angular dev server + the Capacitor Android WebView (origin http://localhost).
+        // Exact origins only — no wildcards to prevent any *.pages.dev or *.onrender.com
+        // from making credentialed requests to this API.
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "http://localhost",
                 "https://localhost",
                 "capacitor://localhost",
                 "http://10.0.2.2:*",
-                "https://solo-leveling-1h5.pages.dev",
-                "https://*.pages.dev",
-                "https://*.onrender.com"
+                "https://solo-leveling-1h5.pages.dev"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

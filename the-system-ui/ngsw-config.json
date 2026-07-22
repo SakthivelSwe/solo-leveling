@@ -27,6 +27,37 @@
         ]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "quest-api-freshness",
+      "urls": [
+        "/api/v1/quests/today",
+        "/api/v1/quests/weekly",
+        "/api/v1/quests/monthly",
+        "/api/v1/quests/milestones",
+        "/api/v1/player/status"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxAge": "60s",
+        "timeout": "5s",
+        "maxSize": 20
+      }
+    },
+    {
+      "name": "static-api-data",
+      "urls": [
+        "/api/v1/achievements",
+        "/api/v1/titles",
+        "/api/v1/skills",
+        "/api/v1/dungeon"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxAge": "5m",
+        "maxSize": 20
+      }
+    }
   ]
 }
-

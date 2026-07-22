@@ -12,6 +12,13 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 5        # Conservative for 512MB Render free tier
+      minimum-idle: 2
+      connection-timeout: 20000   # 20 seconds
+      idle-timeout: 300000        # 5 minutes
+      max-lifetime: 600000        # 10 minutes
+      pool-name: TheSystemPool
   jpa:
     hibernate:
       ddl-auto: update
@@ -37,7 +44,7 @@ thesystem:
     # REQUIRED. Boot fails fast if this is missing, too short (< 32 bytes),
     # or left at the old public default. Generate with: openssl rand -base64 48
     secret: "${JWT_SECRET:}"
-    access-expiration-ms: 86400000      # 24 hours
+    access-expiration-ms: 7200000       # 2 hours (reduced from 24h to limit token-in-URL exposure)
     refresh-expiration-ms: 604800000    # 7 days
   game:
     xp-threshold: 100                    # XP required per level

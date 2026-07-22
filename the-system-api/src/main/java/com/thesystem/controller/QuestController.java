@@ -10,6 +10,7 @@ import com.thesystem.exception.ApiException;
 import com.thesystem.repository.QuestRepository;
 import com.thesystem.service.PlayerService;
 import com.thesystem.service.QuestService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,7 +92,7 @@ public class QuestController {
      * XP defaults (Option C): DAILY=50, WEEKLY=150, MONTHLY=300 (user can override).
      */
     @PostMapping("/custom")
-    public QuestDTO createCustomQuest(Principal principal, @RequestBody CustomQuestRequest req) {
+    public QuestDTO createCustomQuest(Principal principal, @Valid @RequestBody CustomQuestRequest req) {
         return questService.addCustomQuest(playerId(principal), req);
     }
 
@@ -105,11 +106,17 @@ public class QuestController {
         return Map.of("status", "deleted", "questKey", questKey);
     }
 
-    /** Toggle a quest's active flag (for system settings panel). */
+    /** Toggle a quest's active flag — only for quests owned by the current player. */
     @PatchMapping("/{id}/toggle")
     public QuestDTO toggleQuest(Principal principal, @PathVariable Long id) {
+        Long pid = playerId(principal);
         Quest q = questRepository.findById(id)
                 .orElseThrow(() -> new ApiException("Quest not found", HttpStatus.NOT_FOUND));
+        // Security: only allow toggling quests this player owns (ownerId == playerId)
+        // System-wide quests (ownerId == null) cannot be toggled by any player.
+        if (q.getOwnerId() == null || !q.getOwnerId().equals(pid)) {
+            throw new ApiException("You do not have permission to modify this quest", HttpStatus.FORBIDDEN);
+        }
         q.setActive(!q.isActive());
         q = questRepository.save(q);
         return questService.toDto(q, false);

@@ -99,6 +99,27 @@ interface QuestItem {
         EVENING DIRECTIVE — Show "You haven't done X yet" reminder after 9 PM</label>
     </section>
 
+    <!-- Cheat Day / Rest Day -->
+    <section class="section">
+      <h3 class="mono sh">◈ REST DAY / CHEAT DAY</h3>
+      <p class="tech hint">On your designated rest day, the HP penalty threshold is halved and recovery quests count double. Missing quests on a rest day does NOT trigger the Penalty Zone.</p>
+      <label class="chk tech" style="margin-bottom:12px;">
+        <input type="checkbox" [(ngModel)]="restDayActive" (change)="saveRestDay()" id="rest-day-toggle" />
+        ENABLE REST DAY MODE
+      </label>
+      <div *ngIf="restDayActive" class="alarm-days-row" style="margin-top:8px;">
+        <button *ngFor="let d of restDays; let i = index"
+                class="day-chip tech"
+                [class.active]="restDayDow === (i + 1)"
+                (click)="setRestDayDow(i + 1)" [id]="'rest-day-' + (i+1)">
+          {{ d }}
+        </button>
+      </div>
+      <p class="tech hint" *ngIf="restDayActive" style="margin-top:8px;color:#1D9E75;">
+        ◈ Rest day: {{ restDayLabel() }} — reduced thresholds active on this day.
+      </p>
+    </section>
+
     <!-- Alarm Clock -->
     <section class="section">
       <h3 class="mono sh">◈ ALARM CLOCK</h3>
@@ -430,7 +451,12 @@ export class SettingsPanelComponent implements OnInit {
   alarmSoundUri  = localStorage.getItem('sys_alarm_sound_uri') ?? '';
   alarmSoundName = localStorage.getItem('sys_alarm_sound_name') ?? '';
   readonly weekDays  = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  readonly restDays  = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   readonly isAndroid = Capacitor.getPlatform() === 'android';
+
+  // Rest Day / Cheat Day — loaded from localStorage cache for instant display
+  restDayActive = localStorage.getItem('sys_rest_day_active') === '1';
+  restDayDow    = parseInt(localStorage.getItem('sys_rest_day_dow') ?? '7', 10);
 
   constructor(private http: HttpClient) {}
 
@@ -440,6 +466,36 @@ export class SettingsPanelComponent implements OnInit {
     this.http.get<QuestItem[]>(`${environment.apiUrl}/quests/today`, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe((list: QuestItem[]) => this.quests.set(list));
+  }
+
+  restDayLabel(): string {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return days[(this.restDayDow - 1)] ?? 'Sunday';
+  }
+
+  setRestDayDow(dow: number): void {
+    this.restDayDow = dow;
+    this.saveRestDay();
+  }
+
+  saveRestDay(): void {
+    const token = localStorage.getItem('system_access_token');
+    if (!token) return;
+    localStorage.setItem('sys_rest_day_active', this.restDayActive ? '1' : '0');
+    localStorage.setItem('sys_rest_day_dow', String(this.restDayDow));
+    this.http.patch(
+      `${environment.apiUrl}/player/rest-day`,
+      { active: this.restDayActive, dayOfWeek: this.restDayDow },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).subscribe({
+      next: () => this.snack.open(
+        this.restDayActive
+          ? `◈ REST DAY SET — ${this.restDayLabel()} thresholds halved`
+          : '◈ REST DAY DISABLED',
+        '✕', { duration: 3000 }
+      ),
+      error: () => this.snack.open('◈ Failed to save rest day settings', '✕', { duration: 3000 })
+    });
   }
 
   addQuest(): void {

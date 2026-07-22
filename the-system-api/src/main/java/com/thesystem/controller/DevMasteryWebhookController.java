@@ -180,9 +180,11 @@ public class DevMasteryWebhookController {
 
     private void validateSecret(String provided) {
         if (webhookSecret.isBlank()) {
-            // Secret not configured — allow (useful for local dev)
-            log.warn("DevMastery webhook secret not configured — running in open mode");
-            return;
+            // No secret configured — fail CLOSED for safety (prevents XP injection
+            // if the env var is accidentally unset in production).
+            log.error("DevMastery webhook secret not configured — rejecting all webhook calls. " +
+                      "Set DEVMASTERY_WEBHOOK_SECRET env var in Render.");
+            throw new ApiException("Webhook endpoint not configured", HttpStatus.SERVICE_UNAVAILABLE);
         }
         if (!webhookSecret.equals(provided)) {
             throw new ApiException("Invalid webhook secret", HttpStatus.UNAUTHORIZED);

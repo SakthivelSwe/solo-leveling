@@ -8,6 +8,7 @@ import com.thesystem.service.PlayerService;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/player")
@@ -38,6 +39,19 @@ public class PlayerController {
     @DeleteMapping("/account")
     public void deleteAccount(Principal principal) {
         playerService.deleteAccount(playerId(principal));
+    }
+
+    /**
+     * Configure the player's weekly rest day (Cheat Day / Vacation Mode).
+     * Body: { "active": true, "dayOfWeek": 7 }  (1=Mon … 7=Sun)
+     * When active, the midnight HP scheduler applies reduced thresholds on this day.
+     */
+    @PatchMapping("/rest-day")
+    public PlayerDTO updateRestDay(Principal principal, @RequestBody Map<String, Object> body) {
+        boolean active = Boolean.TRUE.equals(body.get("active"));
+        int dayOfWeek = body.containsKey("dayOfWeek")
+                ? ((Number) body.get("dayOfWeek")).intValue() : 7;
+        return playerService.updateRestDay(playerId(principal), active, dayOfWeek);
     }
 
     private Long playerId(Principal principal) {
