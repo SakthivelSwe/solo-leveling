@@ -8,6 +8,7 @@ public enum QuestCategory {
     SIDE,
     MILESTONE,
     WEEKLY,
-    MONTHLY
+    MONTHLY,
+    TESTOSTERONE
 }
 
