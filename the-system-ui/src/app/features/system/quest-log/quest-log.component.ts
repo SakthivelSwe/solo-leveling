@@ -68,10 +68,11 @@ export class QuestLogComponent {
   }
 
   readonly dailyCategories = [
-    { key: 'ALL',          label: 'All Quests',   color: '#4fc3f7' },
-    { key: 'DAILY',        label: 'Daily Habits', color: CATEGORY_META['DAILY'].color },
-    { key: 'SKILL',        label: 'Skill Grind',  color: CATEGORY_META['SKILL'].color },
-    { key: 'DISCIPLINE', label: 'Discipline', color: CATEGORY_META['DISCIPLINE'].color },
+    { key: 'ALL',          label: 'All Quests',      color: '#4fc3f7' },
+    { key: 'DAILY',        label: 'Daily Habits',    color: CATEGORY_META['DAILY'].color },
+    { key: 'SKILL',        label: 'Skill Grind',     color: CATEGORY_META['SKILL'].color },
+    { key: 'DISCIPLINE',   label: 'Discipline',      color: CATEGORY_META['DISCIPLINE'].color },
+    { key: 'TESTOSTERONE', label: 'Testosterone',    color: '#D85A30' },
   ];
 
   constructor(private playerService: PlayerService) {}

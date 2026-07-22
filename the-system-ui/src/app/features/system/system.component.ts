@@ -55,7 +55,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   dopamine = signal<DopamineSummary | null>(null);
   skillTreeNodes = signal<import('../../core/models/models').SkillTreeNode[]>([]);
   shadows = signal<import('../../core/models/models').Shadow[]>([]);
-  showAllQuests = signal<boolean>(false);
+  showAllQuests = signal<boolean>(true);
 
   weeklyQuests = signal<Quest[]>([]);
   monthlyQuests = signal<Quest[]>([]);

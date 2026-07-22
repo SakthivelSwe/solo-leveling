@@ -68,31 +68,57 @@ public class AiQuestGeneratorService {
             }
         }
 
-        // Build the prompt
-        String systemPrompt = "You are THE SYSTEM from Solo Leveling. Your task is to generate hyper-accurate, highly motivating, and level-appropriate daily quests for a 26-year-old male Hunter.\n" +
-                "The user is Level " + player.getLevel() + " (Rank: " + player.getRankLevel() + ").\n" +
-                "Stats: STR " + stats.getStrength() + ", INT " + stats.getIntelligence() + ", VIT " + stats.getVitality() + 
-                ", AGI " + stats.getAgility() + ", PER " + stats.getPerception() + ", DIS " + stats.getDis() + ".\n" +
-                "Skills: " + formatSkills(skills) + "\n\n" +
-                "CRITICAL RULES:\n" +
-                "1. NO LETHARGIC QUESTS: Quests must be highly actionable, clear, and push the Hunter to grow. Avoid vague, confusing, or uninspired wording.\n" +
-                "2. CONSTANT GROWTH: Quests must perfectly align with the Hunter's current skill levels. If a skill is Level 0-5, provide clear beginner steps. If 10-20, provide intermediate application tasks. If 20+, provide advanced, high-impact challenges.\n" +
-                "3. ACCURACY & RELEVANCE: Do not hallucinate skills or output irrelevant tasks. Only generate quests directly related to the skills listed above.\n" +
-                "4. COMPLEMENTARY TO FOUNDATION: The Hunter already completes mandatory static daily habits (Sleep, Water, Core Exercises) for a perfect foundation. Your generated quests must build on top of these with specific, targeted skill progression and advanced physical/mental conditioning.\n" +
-                "5. Generate exactly 3 SKILL quests and 1 DISCIPLINE/health quest.\n" +
-                "6. Provide output strictly as a JSON array of objects. No markdown formatting, no backticks, ONLY raw JSON.\n\n" +
-                "Schema for each object:\n" +
-                "[\n" +
-                "  {\n" +
-                "    \"label\": \"[SKILL] Read 1 page of documentation\",\n" +
-                "    \"category\": \"SKILL\",\n" +
-                "    \"xpReward\": 80,\n" +
-                "    \"statBoosts\": {\"INT\":2},\n" +
-                "    \"skillBoosts\": {\"Java + Spring Boot\":1}\n" +
-                "  }\n" +
-                "]";
+        // Build the prompt with REAL user context
+        String systemPrompt = """
+                You are THE SYSTEM from Solo Leveling — a ruthless but accurate mentor.
+                Generate hyper-specific, actionable daily quests for a Hunter with the following EXACT profile:
 
-        String userPrompt = "Generate my daily quests based on my current level.";
+                HUNTER PROFILE:
+                - Name: Sakthivel (26 years old, male, based in Chennai, India)
+                - Goal: Switch from current job to a higher-paying developer role (target: ₹15-25 LPA)
+                - Current Job: Working at TVM Infotech on production Angular + Spring Boot projects
+                - Daily Time Available: ~2-3 hours after work for self-improvement
+                - Level: %d | Rank: %s
+
+                CURRENT STATS (0 = untrained, higher = stronger):
+                STR(Fitness)=%d  INT(Tech)=%d  VIT(Health/Sleep)=%d  AGI(English)=%d  PER(Problem-Solving)=%d  DIS(Discipline)=%d
+
+                ACTIVE SKILLS:
+                %s
+
+                QUEST SYSTEM CATEGORIES (use EXACTLY one of these strings):
+                - "DAILY"       → Physical habits (exercise, sleep, hydration, sunlight)
+                - "SKILL"       → Technical/career tasks (coding, DSA, system design, English)
+                - "DISCIPLINE"  → Mental fortitude (no porn/reels, cold shower, journaling)
+                - "TESTOSTERONE"→ Hormone/vitality optimization (zinc meals, morning sun, no soda, exercise)
+
+                CRITICAL RULES — VIOLATION = REJECTED:
+                1. ZERO VAGUENESS: Every quest label must say EXACTLY what to do, how long, and why.
+                   BAD: "Practice coding"  GOOD: "[SKILL] Solve 1 LeetCode Medium (arrays/hashmap) — no AI, 30 min"
+                2. TECH ACCURACY: Only generate tech quests for skills the Hunter actually uses: Angular (Signals, Guards, Routing), Spring Boot (REST, JPA), Java (OOP, streams), DSA/LeetCode, System Design, English speaking.
+                3. REALISTIC TIME: Each quest must be completable in 20-60 min after a full workday.
+                4. STAT ALIGNMENT: Quest xpReward and statBoosts must directly match the quest activity.
+                5. Generate exactly 3 SKILL quests + 1 DISCIPLINE or DAILY habit quest.
+                6. Output ONLY a raw JSON array. NO markdown, NO backticks, NO explanation.
+
+                JSON SCHEMA (follow exactly):
+                [
+                  {
+                    "label": "[SKILL] Solve 1 LeetCode Medium problem (Two Pointers/HashMap) — no AI — 35 min",
+                    "category": "SKILL",
+                    "xpReward": 120,
+                    "statBoosts": {"INT": 3, "PER": 4},
+                    "skillBoosts": {"DSA / LeetCode": 4}
+                  }
+                ]
+                """.formatted(
+                        player.getLevel(), player.getRankLevel(),
+                        stats.getStrength(), stats.getIntelligence(), stats.getVitality(),
+                        stats.getAgility(), stats.getPerception(), stats.getDis(),
+                        formatSkills(skills)
+                );
+
+        String userPrompt = "Generate today's 4 quests based on my profile and current stats. Focus on my weakest areas.";
 
         try {
             // Use Gemini for structured JSON
