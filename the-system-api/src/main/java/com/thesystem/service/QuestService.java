@@ -69,7 +69,7 @@ public class QuestService {
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
         Set<Long> completedIds = getCompletedQuestIds(playerId, date);
 
-        List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId).stream()
+        List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .map(q -> toDto(q, completedIds.contains(q.getId()), player))
                 .collect(Collectors.toList());
 
@@ -93,7 +93,7 @@ public class QuestService {
         LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate weekEnd = today;
 
-        return questRepository.findWeeklyQuestsForPlayer(playerId).stream()
+        return questRepository.findWeeklyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .map(q -> {
                     long doneCount = completionRepository.countByPlayerIdAndQuestIdAndCompletedAtBetween(
                             playerId, q.getId(), weekStart, weekEnd);
@@ -118,7 +118,7 @@ public class QuestService {
         LocalDate monthStart = today.withDayOfMonth(1);
         LocalDate monthEnd = today;
 
-        return questRepository.findMonthlyQuestsForPlayer(playerId).stream()
+        return questRepository.findMonthlyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .map(q -> {
                     long doneCount = completionRepository.countByPlayerIdAndQuestIdAndCompletedAtBetween(
                             playerId, q.getId(), monthStart, monthEnd);
@@ -137,11 +137,14 @@ public class QuestService {
      * Already-completed ones are marked done; they still appear (greyed out) for the full achievement view.
      */
     public List<QuestDTO> getMilestoneQuests(Long playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
+
         Set<Long> completedAllTime = completionRepository.findByPlayerIdOrderByCompletedAtDesc(playerId)
                 .stream().map(QuestCompletion::getQuestId).collect(Collectors.toSet());
 
-        return questRepository.findMilestoneQuests().stream()
-                .map(q -> toDto(q, completedAllTime.contains(q.getId()), null))
+        return questRepository.findMilestoneQuests(player.getLevel()).stream()
+                .map(q -> toDto(q, completedAllTime.contains(q.getId()), player))
                 .collect(Collectors.toList());
     }
 

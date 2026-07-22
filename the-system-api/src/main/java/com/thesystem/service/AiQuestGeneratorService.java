@@ -98,8 +98,9 @@ public class AiQuestGeneratorService {
                 2. TECH ACCURACY: Only generate tech quests for skills the Hunter actually uses: Angular (Signals, Guards, Routing), Spring Boot (REST, JPA), Java (OOP, streams), DSA/LeetCode, System Design, English speaking.
                 3. REALISTIC TIME: Each quest must be completable in 20-60 min after a full workday.
                 4. STAT ALIGNMENT: Quest xpReward and statBoosts must directly match the quest activity.
-                5. Generate exactly 3 SKILL quests + 1 DISCIPLINE or DAILY habit quest.
-                6. Output ONLY a raw JSON array. NO markdown, NO backticks, NO explanation.
+                5. DYNAMIC DIFFICULTY: If Level < 3, quests MUST be beginner-friendly (e.g., "Read 1 article", "Watch 1 tutorial"). If Level >= 5, increase difficulty (e.g., "Build a component"). If Level >= 10, use advanced tasks ("Mock interview", "System Architecture").
+                6. Generate exactly 3 SKILL quests + 1 DISCIPLINE or DAILY habit quest.
+                7. Output ONLY a raw JSON array. NO markdown, NO backticks, NO explanation.
 
                 JSON SCHEMA (follow exactly):
                 [

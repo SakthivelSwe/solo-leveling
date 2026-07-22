@@ -87,6 +87,13 @@ public class Quest {
     @Column(name = "player_id")
     private Long ownerId;
 
+    /**
+     * Minimum player level required to unlock this quest.
+     * Prevents level 1 players from getting overwhelmed by level 10 quests.
+     */
+    @Column(name = "min_level", columnDefinition = "integer default 1")
+    private int minLevel = 1;
+
     public Quest() {}
 
     public Quest(String questKey, String label, QuestCategory category, int xpReward,
@@ -131,6 +138,8 @@ public class Quest {
     public void setCustom(boolean custom) { this.custom = custom; }
     public Long getOwnerId() { return ownerId; }
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public int getMinLevel() { return minLevel; }
+    public void setMinLevel(int minLevel) { this.minLevel = minLevel; }
 
     /** True if this is a one-time milestone quest (never resets after completion). */
     public boolean isOneTime() {
