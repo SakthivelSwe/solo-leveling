@@ -85,6 +85,11 @@ export class LifeOsService {
   getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission`); }
   regenerateDailyMissions(): Observable<DailyMissionDTO> { return this.http.post<DailyMissionDTO>(`${this.api}/daily-mission/regenerate`, {}); }
 
+  /* ===== AI Commander ===== */
+  generateAiDirective(config: any): Observable<any[]> {
+    return this.http.post<any[]>(`${this.api}/ai/commander/directive`, config);
+  }
+
   /* ===== Dopamine OS ===== */
   logDopamine(b: DopamineLog): Observable<DopamineLog> { return this.http.post<DopamineLog>(`${this.api}/dopamine/log`, b); }
   getDopamineToday(): Observable<DopamineSummary> { return this.http.get<DopamineSummary>(`${this.api}/dopamine/today`); }

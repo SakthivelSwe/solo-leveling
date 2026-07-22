@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   DirectiveService, DirectiveItem, DirectiveBlock,
-  DirectiveAnchorKey, DirectiveCategory, toMins
+  DirectiveAnchorKey, DirectiveCategory, toMins, logicalMins
 } from '../../core/services/directive.service';
 
 interface DraftForm {
@@ -15,6 +15,8 @@ interface DraftForm {
 
 import { LocalNotificationsService } from '../../core/services/local-notifications.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LifeOsService } from '../../core/services/life-os.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-daily-schedule',
@@ -133,11 +135,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
            [(ngModel)]="draft.tagsRaw" aria-label="Tags" />
 
     <div class="ed-actions">
-      <button class="btn-save mono" (click)="save()">
+      <button class="btn-save mono" (click)="save()" [disabled]="isGenerating()">
         {{ draftId() ? 'SAVE CHANGES' : '＋ ADD TO SCHEDULE' }}
       </button>
-      <button class="btn-ghost tech" *ngIf="draftId()" (click)="clearDraft()">CANCEL</button>
-      <button class="btn-reset tech" (click)="resetDefault()">↺ RESET ALL</button>
+      <button class="btn-ghost tech" *ngIf="draftId()" (click)="clearDraft()" [disabled]="isGenerating()">CANCEL</button>
+      
+      <div style="flex: 1"></div>
+      
+      <button class="btn-ai mono" (click)="generateWithAI()" [disabled]="isGenerating()">
+        {{ isGenerating() ? 'GENERATING...' : '✦ AI AUTO-GENERATE' }}
+      </button>
+      
+      <button class="btn-reset tech" (click)="resetDefault()" [disabled]="isGenerating()">↺ RESET ALL</button>
     </div>
     <p class="err tech" *ngIf="err()">{{ err() }}</p>
   </div>
@@ -228,12 +237,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 .item[data-block="MORNING"] .t { color: rgba(250,199,117,0.55); }
 .item[data-block="EVENING"] .t { color: rgba(83,74,183,0.75); }
+.item[data-block="NIGHT"] .t   { color: rgba(108,99,255,0.75); }
 .item[data-cat="DISCIPLINE"][data-block="MORNING"] .t { color: rgba(226,75,74,0.55); }
 
 .bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 9px; background: rgba(255,255,255,0.1); }
 .bdot[data-block="MORNING"] { background: rgba(250,199,117,0.7); }
 .bdot[data-block="WORK"]    { background: rgba(59,155,255,0.6); }
 .bdot[data-block="EVENING"] { background: rgba(83,74,183,0.8); }
+.bdot[data-block="NIGHT"]   { background: rgba(108,99,255,0.8); }
 
 .content { flex: 1; min-width: 0; }
 .action   { font-size: .8rem; letter-spacing: .4px; color: var(--text-primary); display: block; line-height: 1.45; }
@@ -287,6 +298,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 .blk-pill[data-block="MORNING"] { color: #FAC775; border-color: rgba(250,199,117,0.3); background: rgba(250,199,117,0.08); }
 .blk-pill[data-block="WORK"]    { color: #3B9BFF; border-color: rgba(59,155,255,0.3);  background: rgba(59,155,255,0.08); }
 .blk-pill[data-block="EVENING"] { color: #b3aef0; border-color: rgba(83,74,183,0.3);   background: rgba(83,74,183,0.08); }
+.blk-pill[data-block="NIGHT"]   { color: #6c63ff; border-color: rgba(108,99,255,0.3);  background: rgba(108,99,255,0.08); }
 .blk-note { color: var(--text-dim); font-size: .6rem; }
 .ed-row { display: flex; gap: 7px; }
 .fin {
@@ -310,8 +322,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   transition: all .2s; min-height: unset;
 }
 .btn-ghost:hover { color: var(--text-primary); border-color: var(--accent-purple); }
-.btn-reset { margin-left: auto; }
+.btn-reset { margin-left: 10px; }
 .btn-reset:hover { color: #f09595; border-color: var(--accent-red); }
+.btn-ai {
+  cursor: pointer; border: 1px solid var(--accent-purple); border-radius: 8px;
+  background: rgba(108,99,255,0.1); color: #b3aef0; padding: 9px 12px;
+  font-size: .64rem; letter-spacing: 1px; font-family: inherit; transition: all .2s;
+}
+.btn-ai:hover:not(:disabled) { background: rgba(108,99,255,0.2); color: #fff; }
+.btn-ai:disabled { opacity: 0.5; cursor: not-allowed; }
 .err { color: #f09595; font-size: .66rem; letter-spacing: 1px; margin: 0; }
 .empty-day { text-align: center; padding: 20px; color: var(--text-secondary); font-size: .7rem; letter-spacing: 2px; }
 
@@ -340,6 +359,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class DailyScheduleComponent implements OnInit, OnDestroy {
   private readonly svc = inject(DirectiveService);
+  private readonly lifeOsSvc = inject(LifeOsService);
   private readonly notificationsSvc = inject(LocalNotificationsService);
   private readonly snack = inject(MatSnackBar);
   readonly schedule   = this.svc.items;
@@ -357,7 +377,7 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
 
   private readonly _nowMins = computed(() => {
     const t = this.currentTime();
-    return t ? toMins(t) : (() => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); })();
+    return t ? logicalMins(t) : (() => { const d = new Date(); return logicalMins(`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`); })();
   });
 
   /** Index of the first upcoming item (not yet started). -1 = all done. */
@@ -365,7 +385,7 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
     const list = this.schedule();
     const nm = this._nowMins();
     for (let i = 0; i < list.length; i++) {
-      if (toMins(list[i].time) > nm) return i;
+      if (logicalMins(list[i].time) > nm) return i;
     }
     return -1;
   });
@@ -377,10 +397,11 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
     const warns: DirectiveItem[] = [];
     for (const it of list) {
       if (it.anchorKey) continue;
-      const tm = toMins(it.time);
-      if (it.block === 'MORNING' && tm >= toMins(cfg.officeStart)) warns.push(it);
-      if (it.block === 'WORK'    && tm >= toMins(cfg.officeEnd))   warns.push(it);
-      if (it.block === 'EVENING' && tm >= toMins(cfg.sleepTime))   warns.push(it);
+      const tm = logicalMins(it.time);
+      if (it.block === 'MORNING' && tm >= logicalMins(cfg.officeStart)) warns.push(it);
+      if (it.block === 'WORK'    && tm >= logicalMins(cfg.officeEnd))   warns.push(it);
+      if (it.block === 'EVENING' && tm >= logicalMins(cfg.sleepTime))   warns.push(it);
+      if (it.block === 'NIGHT'   && tm >= logicalMins(cfg.wakeTime))    warns.push(it);
     }
     return warns;
   });
@@ -398,6 +419,7 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
   draftId   = signal<string | null>(null);
   draftBlock = signal<DirectiveBlock | null>(null);
   err       = signal<string | null>(null);
+  isGenerating = signal(false);
   draft: DraftForm = this.emptyDraft();
 
   ngOnInit():  void { this.tick(); this.timer = setInterval(() => this.tick(), 30_000); }
@@ -432,13 +454,14 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
       case 'MORNING': return 'WAKE';
       case 'WORK':    return 'OFFICE IN';
       case 'EVENING': return 'OFFICE OUT';
+      case 'NIGHT':   return 'SLEEP';
       default:        return '';
     }
   }
 
   // ── Now / next helpers ───────────────────────────────────────────────────
   isPastOnly(time: string, idx: number): boolean {
-    return toMins(time) < this._nowMins() && !this.isNow(idx);
+    return logicalMins(time) < this._nowMins() && !this.isNow(idx);
   }
 
   isNow(idx: number): boolean {
@@ -446,9 +469,9 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
     const curr = list[idx];
     if (!curr) return false;
     const nm = this._nowMins();
-    if (toMins(curr.time) > nm) return false;
+    if (logicalMins(curr.time) > nm) return false;
     const next = list[idx + 1];
-    return !next || toMins(next.time) > nm;
+    return !next || logicalMins(next.time) > nm;
   }
 
   // ── Edit actions ─────────────────────────────────────────────────────────
@@ -497,6 +520,27 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
     if (confirm('Restore the full default directive and reset all anchor times?')) {
       this.svc.reset(); this.clearDraft();
     }
+  }
+
+  generateWithAI(): void {
+    if (!confirm('This will replace your current schedule with an AI-generated one based on your active quests. Proceed?')) return;
+    
+    this.isGenerating.set(true);
+    this.err.set(null);
+
+    this.lifeOsSvc.generateAiDirective(this.config())
+      .pipe(finalize(() => this.isGenerating.set(false)))
+      .subscribe({
+        next: (items) => {
+          this.svc.setRawItems(items);
+          this.snack.open('◈ DIRECTIVE GENERATED BY AI', '✕', { duration: 3000, panelClass: 'system-snack' });
+          this.editMode.set(false);
+        },
+        error: (err) => {
+          console.error(err);
+          this.err.set('AI Generation failed. Check console for details.');
+        }
+      });
   }
 
   private emptyDraft(): DraftForm {

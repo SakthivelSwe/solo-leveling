@@ -2,7 +2,7 @@ import { Injectable, computed, signal } from '@angular/core';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type DirectiveCategory = 'TESTOSTERONE' | 'DAILY' | 'SKILL' | 'REST';
-export type DirectiveBlock     = 'MORNING' | 'WORK' | 'EVENING';
+export type DirectiveBlock     = 'MORNING' | 'WORK' | 'EVENING' | 'NIGHT';
 export type DirectiveAnchorKey = 'WAKE' | 'OFFICE_START' | 'OFFICE_END' | 'SLEEP';
 
 export interface DirectiveConfig {
@@ -34,8 +34,8 @@ export interface DirectiveItem extends RawDirectiveItem {
 }
 
 // ── Storage keys ───────────────────────────────────────────────────────────────
-const CFG_KEY   = 'sys_dir_cfg_v2';
-const ITEMS_KEY = 'sys_dir_items_v2';
+const CFG_KEY   = 'sys_dir_cfg_v4';
+const ITEMS_KEY = 'sys_dir_items_v4';
 
 // ── Helpers (exported so component can use them) ───────────────────────────────
 export function toMins(hhmm: string): number {
@@ -45,6 +45,11 @@ export function toMins(hhmm: string): number {
 export function fromMins(total: number): string {
   const t = ((total % 1440) + 1440) % 1440;
   return `${String(Math.floor(t / 60)).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+}
+export function logicalMins(hhmm: string, dayStart: string = '04:00'): number {
+  const m = toMins(hhmm);
+  const start = toMins(dayStart);
+  return m < start ? m + 1440 : m;
 }
 
 // ── Defaults ───────────────────────────────────────────────────────────────────
@@ -57,12 +62,10 @@ export const DEFAULT_CONFIG: DirectiveConfig = {
 
 /**
  * Default items with block-relative offsets.
- * MORNING offsets are from wakeTime (08:00 default):
- *   shower=5, exercise=15, breakfast=35  → 08:05, 08:15, 08:35
- * WORK offsets from officeStart (09:00):
- *   water1=120 → 11:00, lunch=240 → 13:00, breathe=260 → 13:20, water2=480 → 17:00
- * EVENING offsets from officeEnd (20:30):
- *   code=30 → 21:00, leet=90 → 22:00, english=120 → 22:30, noreels=150 → 23:00, sleep=180 → 23:30
+ * MORNING offsets are from wakeTime (08:00 default).
+ * WORK offsets from officeStart (09:00).
+ * EVENING offsets from officeEnd (20:30).
+ * NIGHT offsets from sleepTime (23:30) (negative offsets for leading up to sleep).
  */
 export const DEFAULT_RAW: RawDirectiveItem[] = [
   // ── MORNING (anchor = wakeTime) ────────────────────────────────────────────
@@ -89,16 +92,17 @@ export const DEFAULT_RAW: RawDirectiveItem[] = [
   { id:'logoff',   block:'EVENING', offsetMins:0,   anchorKey:'OFFICE_END',
     action:'Office logoff — your grind begins',                tags:[],                           category:'REST'         },
   { id:'code',     block:'EVENING', offsetMins:30,
-    action:'1 hr coding WITHOUT AI',                           tags:['CODE_NO_AI'],               category:'SKILL'        },
+    action:'1 hr coding — use AI only if needed',              tags:['DEEP_WORK'],                category:'SKILL'        },
   { id:'leet',     block:'EVENING', offsetMins:90,
     action:'Solve 1 LeetCode problem',                         tags:['LEETCODE'],                 category:'SKILL'        },
-  { id:'english',  block:'EVENING', offsetMins:120,
+  // ── NIGHT (anchor = sleepTime) ─────────────────────────────────────────────
+  { id:'english',  block:'NIGHT',   offsetMins:-60,
     action:'20-min English speaking practice',                 tags:['ENGLISH'],                  category:'SKILL'        },
-  { id:'winddown', block:'EVENING', offsetMins:145,
+  { id:'winddown', block:'NIGHT',   offsetMins:-35,
     action:'Reflect + message someone who matters',            tags:[],                           category:'REST'         },
-  { id:'noreels',  block:'EVENING', offsetMins:150,
+  { id:'noreels',  block:'NIGHT',   offsetMins:-30,
     action:'Phone down — no reels, no porn',                   tags:['NO_REELS','NO_PORN'],       category:'TESTOSTERONE' },
-  { id:'sleep',    block:'EVENING', offsetMins:0,   anchorKey:'SLEEP',
+  { id:'sleep',    block:'NIGHT',   offsetMins:0,   anchorKey:'SLEEP',
     action:'Sleep — recovery is where you level up',           tags:['SLEEP'],                    category:'DAILY'        },
 ];
 
@@ -125,7 +129,7 @@ export class DirectiveService {
     const cfg = this.config();
     return this._raw()
       .map(it => ({ ...it, time: this.calcTime(it, cfg) }))
-      .sort((a, b) => toMins(a.time) - toMins(b.time));
+      .sort((a, b) => logicalMins(a.time) - logicalMins(b.time));
   });
 
   // ── Anchor mutations ────────────────────────────────────────────────────────
@@ -155,6 +159,10 @@ export class DirectiveService {
     this.persist(this._raw().filter((it: RawDirectiveItem) => it.id !== id));
   }
 
+  setRawItems(items: RawDirectiveItem[]): void {
+    this.persist(items);
+  }
+
   reset(): void {
     const cfg = { ...DEFAULT_CONFIG };
     this.config.set(cfg);
@@ -174,6 +182,7 @@ export class DirectiveService {
     const base =
       item.block === 'MORNING' ? toMins(cfg.wakeTime) :
       item.block === 'WORK'    ? toMins(cfg.officeStart) :
+      item.block === 'NIGHT'   ? toMins(cfg.sleepTime) :
                                  toMins(cfg.officeEnd);
     return fromMins(base + item.offsetMins);
   }
@@ -185,10 +194,17 @@ export class DirectiveService {
    */
   resolveBlock(hhmm: string): { block: DirectiveBlock; offsetMins: number } {
     const cfg = this.config();
-    const m   = toMins(hhmm);
-    if (m >= toMins(cfg.officeEnd))   return { block:'EVENING', offsetMins: m - toMins(cfg.officeEnd)   };
-    if (m >= toMins(cfg.officeStart)) return { block:'WORK',    offsetMins: m - toMins(cfg.officeStart) };
-    return                                   { block:'MORNING', offsetMins: m - toMins(cfg.wakeTime)    };
+    const m   = logicalMins(hhmm);
+    
+    const sleepM = logicalMins(cfg.sleepTime);
+    const endM   = logicalMins(cfg.officeEnd);
+    const startM = logicalMins(cfg.officeStart);
+    const wakeM  = logicalMins(cfg.wakeTime);
+
+    if (m >= sleepM - 180 && m <= sleepM + 120) return { block:'NIGHT',   offsetMins: m - sleepM };
+    if (m >= endM)                              return { block:'EVENING', offsetMins: m - endM };
+    if (m >= startM)                            return { block:'WORK',    offsetMins: m - startM };
+    return                                             { block:'MORNING', offsetMins: m - wakeM };
   }
 
   // ── Private ─────────────────────────────────────────────────────────────────
