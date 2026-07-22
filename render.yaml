@@ -15,7 +15,8 @@ services:
     healthCheckPath: /api/public/ping    # Lightweight public GET endpoint for Render health checks
     envVars:
       - key: DB_URL
-        value: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
+        sync: false             # Set in Render dashboard → Environment → DB_URL → Secret
+                                # Value: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
       - key: DB_USERNAME
         value: postgres.yipgagmkgunnvzsxvnkq
       - key: DB_PASSWORD
