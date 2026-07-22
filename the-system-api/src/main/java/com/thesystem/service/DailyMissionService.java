@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thesystem.dto.DailyMissionDTO;
 import com.thesystem.dto.QuestDTO;
 import com.thesystem.entity.DailyMission;
+import com.thesystem.entity.Player;
 import com.thesystem.entity.PlayerStats;
 import com.thesystem.entity.Quest;
 import com.thesystem.exception.ApiException;
 import com.thesystem.repository.DailyMissionRepository;
+import com.thesystem.repository.PlayerRepository;
 import com.thesystem.repository.PlayerStatsRepository;
 import com.thesystem.repository.QuestCompletionRepository;
 import com.thesystem.repository.QuestRepository;
@@ -40,6 +42,7 @@ public class DailyMissionService {
     private final QuestRepository questRepository;
     private final QuestCompletionRepository completionRepository;
     private final PlayerStatsRepository statsRepository;
+    private final PlayerRepository playerRepository;
     private final QuestService questService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,11 +50,13 @@ public class DailyMissionService {
                                QuestRepository questRepository,
                                QuestCompletionRepository completionRepository,
                                PlayerStatsRepository statsRepository,
+                               PlayerRepository playerRepository,
                                QuestService questService) {
         this.missionRepository = missionRepository;
         this.questRepository = questRepository;
         this.completionRepository = completionRepository;
         this.statsRepository = statsRepository;
+        this.playerRepository = playerRepository;
         this.questService = questService;
     }
 
@@ -83,6 +88,8 @@ public class DailyMissionService {
     // ── Private helpers ────────────────────────────────────────────────────────
 
     private DailyMission generate(Long playerId, LocalDate date) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
         PlayerStats stats = statsRepository.findByPlayerId(playerId)
                 .orElseThrow(() -> new ApiException("Stats not found", HttpStatus.NOT_FOUND));
 
@@ -91,7 +98,7 @@ public class DailyMissionService {
         String secondWeakest = secondWeakestStat(stats, weakest);
 
         // Use player-scoped query: includes custom daily quests, excludes MILESTONE/SIDE
-        List<Quest> allQuests = questRepository.findDailyQuestsForPlayer(playerId);
+        List<Quest> allQuests = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel());
 
         // Step 1: Always-include critical quests (CODE_NO_AI, LEETCODE, ENGLISH, etc.)
         List<Quest> criticalQuests = allQuests.stream()
