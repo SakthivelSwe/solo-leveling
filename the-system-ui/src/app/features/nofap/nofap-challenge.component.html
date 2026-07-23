@@ -1,0 +1,286 @@
+<div class="nf-shell">
+
+  <!-- ═══ LOADING ═══════════════════════════════════════════════ -->
+  @if (loading()) {
+    <div class="nf-loading">
+      <div class="nf-spinner"></div>
+      <p class="tech">CONNECTING TO THE SYSTEM...</p>
+    </div>
+  }
+
+  @if (!loading() && status(); as s) {
+
+    <!-- ═══ MILESTONE ANIMATION OVERLAY ══════════════════════════ -->
+    @if (showMilestoneAnimation()) {
+      <div class="milestone-overlay">
+        <div class="milestone-burst">
+          <div class="burst-ring ring-1"></div>
+          <div class="burst-ring ring-2"></div>
+          <div class="burst-ring ring-3"></div>
+          <div class="milestone-text">
+            <span class="milestone-emoji">{{ s.phaseIcon }}</span>
+            <span class="milestone-label mono">MILESTONE CLEARED</span>
+            <span class="milestone-day tech">DAY {{ s.currentStreak }}</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ═══ HEADER ════════════════════════════════════════════════ -->
+    <header class="nf-topbar">
+      <a class="back tech" routerLink="/system">‹ BACK</a>
+      <h1 class="mono">🔥 DISCIPLINE PROTOCOL</h1>
+      <div class="nf-xp-badge tech" [title]="'+' + s.xpBonusPct + '% XP bonus'">
+        +{{ s.xpBonusPct | number:'1.0-0' }}% XP
+      </div>
+    </header>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 1 — STREAK COUNTER
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section nf-hero system-card">
+      <div class="hero-layout">
+
+        <!-- Circular streak ring -->
+        <div class="streak-ring-wrap">
+          <svg class="streak-svg" viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="54"/>
+            <circle class="ring-fill"
+                    cx="60" cy="60" r="54"
+                    [style.stroke]="s.phaseColor"
+                    [style.strokeDashoffset]="circleOffset()"/>
+          </svg>
+          <div class="streak-center">
+            <span class="streak-num mono">{{ s.currentStreak }}</span>
+            <span class="streak-lbl tech">DAYS</span>
+          </div>
+        </div>
+
+        <!-- Streak info -->
+        <div class="hero-info">
+          <div class="phase-badge tech" [style.color]="s.phaseColor">
+            {{ s.phaseIcon }} {{ s.phaseName | uppercase }} PHASE
+          </div>
+          <p class="verdict-text">{{ s.systemVerdict }}</p>
+
+          <!-- Progress to next milestone -->
+          <div class="milestone-progress">
+            <div class="mp-labels tech">
+              <span>{{ s.milestone > 0 ? 'DAY ' + s.milestone : 'START' }}</span>
+              <span>DAY {{ s.nextMilestone }}</span>
+            </div>
+            <div class="mp-bar">
+              <div class="mp-fill" [style.width.%]="phaseProgressPct()"
+                   [style.background]="s.phaseColor"></div>
+            </div>
+            <p class="mp-hint tech">{{ s.daysToNextMilestone }} days to next milestone</p>
+          </div>
+
+          <!-- Status badges -->
+          <div class="status-badges">
+            <div class="s-badge" [class.clean]="s.todayClean" [class.relapse]="!s.todayClean">
+              {{ s.todayConfirmed ? (s.todayClean ? '✅ CLEAN TODAY' : '☠ RELAPSED') : '⏳ NOT CONFIRMED' }}
+            </div>
+            <div class="s-badge percentile">{{ percentileLabel(s.currentStreak) }}</div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="action-buttons">
+            <button class="btn-confirm tech" (click)="confirmClean()" [disabled]="confirming()">
+              {{ confirming() ? '...' : '✅ CONFIRM CLEAN DAY' }}
+            </button>
+            <button class="btn-relapse tech" (click)="reportRelapse()" [disabled]="reporting()">
+              {{ reporting() ? '...' : '☠ HONEST RELAPSE' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 2 — TODAY'S BRAIN SCIENCE CARD
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ YOUR BRAIN RIGHT NOW — DAY {{ s.currentStreak }}</h2>
+      <div class="science-today-card" [attr.data-category]="s.scienceCategory">
+        <div class="stc-icon">{{ getCategoryIcon(s.scienceCategory) }}</div>
+        <div class="stc-body">
+          <div class="stc-category tech">{{ s.scienceCategory }}</div>
+          <h3 class="stc-title mono">{{ s.scienceTitle }}</h3>
+          <p class="stc-desc">{{ s.scienceFact }}</p>
+        </div>
+        <div class="stc-pulse"></div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 3 — DAY-BY-DAY SCIENCE TIMELINE
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ 90-DAY BRAIN JOURNEY</h2>
+      <p class="section-sub tech">What happens inside your brain when you stay clean</p>
+
+      <!-- Phase legend -->
+      <div class="phase-legend">
+        <span class="pl-dot" style="background:#E24B4A"></span><span class="tech">REWIRING</span>
+        <span class="pl-dot" style="background:#FAC775"></span><span class="tech">CLARITY</span>
+        <span class="pl-dot" style="background:#1FBE8E"></span><span class="tech">TRANSFORMATION</span>
+        <span class="pl-dot" style="background:#A855F7"></span><span class="tech">MASTERY</span>
+      </div>
+
+      <div class="timeline-scroll">
+        @for (card of s.dayByDayScience; track card.day) {
+          <div class="tl-card"
+               [class.tl-active]="s.currentStreak >= card.day"
+               [class.tl-current]="isTodayCard(card, s.currentStreak)"
+               [attr.data-phase]="card.phase"
+               (click)="selectScienceDay(card)">
+            <div class="tl-day mono">D{{ card.day }}</div>
+            <div class="tl-icon">{{ card.icon }}</div>
+            <div class="tl-title tech">{{ card.title.split('—')[1]?.trim() ?? card.title }}</div>
+            <div class="tl-phase-dot" [style.background]="phaseColor(card.phase)"></div>
+          </div>
+        }
+      </div>
+
+      <!-- Expanded card detail -->
+      @if (activeScienceDay(); as sc) {
+        <div class="tl-detail system-card">
+          <div class="tld-header">
+            <span class="tld-icon">{{ sc.icon }}</span>
+            <div>
+              <div class="tech tld-cat">{{ sc.category }} · {{ sc.phase }}</div>
+              <h3 class="mono tld-title">{{ sc.title }}</h3>
+            </div>
+          </div>
+          <p class="tld-desc">{{ sc.description }}</p>
+        </div>
+      }
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 4 — STATUS BOARD
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ STATUS BOARD</h2>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-lbl tech">CURRENT STREAK</span>
+          <span class="stat-val mono">{{ s.currentStreak }}</span>
+          <span class="stat-unit tech">DAYS</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-lbl tech">LONGEST STREAK</span>
+          <span class="stat-val mono">{{ s.longestStreak }}</span>
+          <span class="stat-unit tech">DAYS</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-lbl tech">XP BONUS</span>
+          <span class="stat-val mono" style="color: var(--accent-gold)">+{{ s.xpBonusPct | number:'1.0-0' }}%</span>
+          <span class="stat-unit tech">MULTIPLIER</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-lbl tech">PHASE</span>
+          <span class="stat-val" style="font-size: 1.6rem">{{ s.phaseIcon }}</span>
+          <span class="stat-unit tech">{{ s.phaseName | uppercase }}</span>
+        </div>
+      </div>
+
+      <!-- 90-day heatmap -->
+      <div class="heatmap-section">
+        <h3 class="mono hm-title">90-DAY HEATMAP</h3>
+        <div class="heatmap-grid">
+          @for (day of s.last90Days; track $index) {
+            <div class="hm-cell" [class]="heatmapClass(day)"
+                 [title]="'Day ' + ($index - 89)"></div>
+          }
+        </div>
+        <div class="hm-legend tech">
+          <span class="hm-cell hm-clean"></span>Clean
+          <span class="hm-cell hm-relapse"></span>Relapse
+          <span class="hm-cell hm-empty"></span>No record
+        </div>
+      </div>
+
+      <!-- World stats comparison -->
+      <div class="world-stats">
+        <h3 class="mono ws-title">WORLD COMPARISON</h3>
+        <div class="ws-list">
+          @for (stat of s.worldStats; track $index) {
+            <div class="ws-item">
+              <span class="ws-dot">◈</span>
+              <span class="ws-text">{{ stat }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 5 — REWARDS SHOWCASE
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ MILESTONE REWARDS</h2>
+      <p class="section-sub tech">XP awarded automatically on unlock</p>
+
+      <div class="rewards-grid">
+        @for (m of milestones; track m.day) {
+          <div class="reward-card" [class.unlocked]="milestoneUnlocked(m.day)" [class.locked]="milestoneLocked(m.day)">
+            <div class="rw-icon">{{ m.icon }}</div>
+            <div class="rw-day tech">DAY {{ m.day }}</div>
+            <div class="rw-label mono">{{ m.label }}</div>
+            <div class="rw-xp tech">+{{ m.xp | number }} XP</div>
+            @if (milestoneLocked(m.day)) {
+              <div class="rw-lock tech">🔒 {{ daysToMilestone(m.day) }} days</div>
+            } @else {
+              <div class="rw-unlocked tech">✅ UNLOCKED</div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 6 — PORN ADDICTION INSIGHTS
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ WHAT PORN DOES TO YOUR BRAIN</h2>
+      <p class="section-sub tech">Science-backed evidence — know your enemy</p>
+
+      <!-- Insight tabs -->
+      <div class="insight-tabs">
+        <button class="it-tab tech" [class.active]="activeInsightTab() === 'BRAIN'"
+                (click)="setInsightTab('BRAIN')">🧠 BRAIN</button>
+        <button class="it-tab tech" [class.active]="activeInsightTab() === 'TESTOSTERONE'"
+                (click)="setInsightTab('TESTOSTERONE')">⚡ TESTOSTERONE</button>
+        <button class="it-tab tech" [class.active]="activeInsightTab() === 'RELATIONSHIPS'"
+                (click)="setInsightTab('RELATIONSHIPS')">💔 RELATIONSHIPS</button>
+        <button class="it-tab tech" [class.active]="activeInsightTab() === 'WORLD_STATS'"
+                (click)="setInsightTab('WORLD_STATS')">🌍 WORLD STATS</button>
+      </div>
+
+      <!-- Insight cards -->
+      <div class="insight-cards">
+        @for (insight of filteredInsights(activeInsightTab()); track $index) {
+          <div class="insight-card" [attr.data-severity]="insight.severity">
+            <div class="ic-header">
+              <span class="ic-icon">{{ insight.icon }}</span>
+              <div>
+                <div class="ic-severity tech" [attr.data-severity]="insight.severity">
+                  {{ insight.severity }}
+                </div>
+                <h3 class="ic-title mono">{{ insight.title }}</h3>
+              </div>
+            </div>
+            <p class="ic-desc">{{ insight.description }}</p>
+          </div>
+        }
+      </div>
+    </section>
+
+  } <!-- end status block -->
+
+</div>

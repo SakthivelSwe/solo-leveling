@@ -78,5 +78,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/guide/system-guide.component').then(m => m.SystemGuideComponent),
   },
+  {
+    path: 'nofap',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/nofap/nofap-challenge.component').then(m => m.NoFapChallengeComponent),
+  },
   { path: '**', redirectTo: 'system' },
 ];

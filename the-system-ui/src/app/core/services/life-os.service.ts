@@ -123,5 +123,10 @@ export class LifeOsService {
 
   // Full data export (Phase 4)
   exportData(): Observable<Record<string, unknown>> { return this.http.get<Record<string, unknown>>(`${this.api}/export`); }
+
+  /* ===== No Fap Challenge ===== */
+  getNoFapStatus(): Observable<any> { return this.http.get<any>(`${this.api}/nofap/status`); }
+  confirmCleanDay(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/confirm-clean`, {}); }
+  reportRelapse(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/relapse`, {}); }
 }
 

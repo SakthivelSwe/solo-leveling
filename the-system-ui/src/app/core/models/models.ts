@@ -571,3 +571,49 @@ export interface AiCommanderBriefing {
   estimatedCompletionPct: number;
   expectedLevelUp: string;
 }
+
+/* ============ No Fap Challenge ============ */
+
+export interface ScienceDayCard {
+  day: number;
+  /** REWIRING | CLARITY | TRANSFORMATION | MASTERY */
+  phase: string;
+  icon: string;
+  title: string;
+  description: string;
+  /** DOPAMINE | TESTOSTERONE | MEMORY | FOCUS | CONFIDENCE | SLEEP | NEUROPLASTICITY */
+  category: string;
+}
+
+export interface AddictionInsight {
+  /** BRAIN | TESTOSTERONE | RELATIONSHIPS | WORLD_STATS */
+  category: string;
+  icon: string;
+  title: string;
+  description: string;
+  /** LOW | MEDIUM | HIGH | CRITICAL */
+  severity: string;
+}
+
+export interface NoFapStatus {
+  currentStreak: number;
+  longestStreak: number;
+  todayClean: boolean;
+  todayConfirmed: boolean;
+  milestone: number;
+  nextMilestone: number;
+  daysToNextMilestone: number;
+  phaseName: string;
+  phaseIcon: string;
+  phaseColor: string;
+  scienceTitle: string;
+  scienceFact: string;
+  scienceCategory: string;
+  dayByDayScience: ScienceDayCard[];
+  addictionInsights: AddictionInsight[];
+  worldStats: string[];
+  xpBonusPct: number;
+  systemVerdict: string;
+  /** Index 0 = 89 days ago, last = today. null = no record, true = clean, false = relapse */
+  last90Days: (boolean | null)[];
+}
