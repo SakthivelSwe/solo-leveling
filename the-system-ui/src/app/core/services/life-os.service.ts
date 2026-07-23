@@ -128,5 +128,9 @@ export class LifeOsService {
   getNoFapStatus(): Observable<any> { return this.http.get<any>(`${this.api}/nofap/status`); }
   confirmCleanDay(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/confirm-clean`, {}); }
   reportRelapse(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/relapse`, {}); }
+  /** Backfill clean days from a past start date. startDate = 'YYYY-MM-DD' */
+  setNoFapStartDate(startDate: string): Observable<any> {
+    return this.http.post<any>(`${this.api}/nofap/set-start-date`, { startDate });
+  }
 }
 

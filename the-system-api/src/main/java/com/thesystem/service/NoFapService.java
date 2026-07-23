@@ -38,6 +38,65 @@ public class NoFapService {
     // Public API
     // ────────────────────────────────────────────────────────────────────────
 
+    /**
+     * Backfill clean days from a user-supplied start date to yesterday.
+     *
+     * Use case: User started their challenge before installing the app.
+     * They pick "I started 5 days ago" → we create pornViewed=false entries
+     * for each of those past days so the streak is computed correctly.
+     *
+     * Rules:
+     *  - startDate must be in the past (not today or future).
+     *  - Max look-back: 365 days to prevent abuse.
+     *  - We do NOT overwrite any existing log entries (skip days already recorded).
+     *  - Today is NOT touched — user must confirm/relapse today separately.
+     *
+     * @param playerId  The authenticated player's ID.
+     * @param startDate The date the challenge actually began.
+     * @return Updated NoFapStatusDTO reflecting the new streak.
+     */
+    @Transactional
+    public NoFapStatusDTO setStartDate(Long playerId, LocalDate startDate) {
+        LocalDate today    = LocalDate.now();
+        LocalDate earliest = today.minusDays(365);
+
+        // Validate: must be a past date within 365 days
+        if (!startDate.isBefore(today)) {
+            throw new IllegalArgumentException("Start date must be before today.");
+        }
+        if (startDate.isBefore(earliest)) {
+            throw new IllegalArgumentException("Start date cannot be more than 365 days ago.");
+        }
+
+        // Fetch all existing logs in the range so we don't overwrite them
+        Map<LocalDate, DopamineLog> existing = logRepo
+                .findByPlayerIdAndLogDateBetweenOrderByLogDateDesc(playerId, startDate, today.minusDays(1))
+                .stream()
+                .collect(Collectors.toMap(DopamineLog::getLogDate, l -> l));
+
+        // Walk each day from startDate up to (but not including) today
+        LocalDate cursor = startDate;
+        List<DopamineLog> toSave = new ArrayList<>();
+        while (cursor.isBefore(today)) {
+            if (!existing.containsKey(cursor)) {
+                // Day not yet recorded — create a clean entry
+                DopamineLog log = new DopamineLog();
+                log.setPlayerId(playerId);
+                log.setLogDate(cursor);
+                log.setPornViewed(false);
+                log.setDopamineScore(0);
+                log.setFocusPct(100);
+                toSave.add(log);
+            }
+            cursor = cursor.plusDays(1);
+        }
+        if (!toSave.isEmpty()) {
+            logRepo.saveAll(toSave);
+        }
+
+        return getStatus(playerId);
+    }
+
     public NoFapStatusDTO getStatus(Long playerId) {
         List<DopamineLog> last90 = logRepo.findByPlayerIdAndLogDateBetweenOrderByLogDateDesc(
                 playerId, LocalDate.now().minusDays(89), LocalDate.now());

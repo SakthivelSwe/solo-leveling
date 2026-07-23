@@ -1,6 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoFapStatus, ScienceDayCard, AddictionInsight } from '../../core/models/models';
@@ -8,7 +9,7 @@ import { NoFapStatus, ScienceDayCard, AddictionInsight } from '../../core/models
 @Component({
   selector: 'app-nofap-challenge',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './nofap-challenge.component.html',
   styleUrls: ['./nofap-challenge.component.scss'],
 })
@@ -17,9 +18,33 @@ export class NoFapChallengeComponent implements OnInit {
   loading = signal(true);
   confirming = signal(false);
   reporting = signal(false);
+  settingStartDate = signal(false);
+  showStartDatePicker = signal(false);
+  selectedStartDate = '';
   activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS'>('BRAIN');
   activeScienceDay = signal<ScienceDayCard | null>(null);
   showMilestoneAnimation = signal(false);
+
+  /** True when the user has zero logs — show the "I Already Started" onboarding banner */
+  showOnboarding = computed(() => {
+    const s = this.status();
+    if (!s) return false;
+    return s.currentStreak === 0 && !s.todayConfirmed && s.last90Days.every(d => d === null);
+  });
+
+  /** Today's date as YYYY-MM-DD for max attribute on date input */
+  readonly todayDateString = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1); // yesterday = max valid start date
+    return d.toISOString().split('T')[0];
+  })();
+
+  /** Earliest allowed start date (1 year ago) */
+  readonly earliestDateString = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 1);
+    return d.toISOString().split('T')[0];
+  })();
 
   // Milestone definitions
   readonly milestones = [
@@ -79,6 +104,51 @@ export class NoFapChallengeComponent implements OnInit {
       },
       error: () => { this.reporting.set(false); this.toast('⚠ Failed to log relapse'); },
     });
+  }
+
+  setStartDate(): void {
+    if (!this.selectedStartDate) {
+      this.toast('⚠ Please pick your actual start date first');
+      return;
+    }
+    if (this.settingStartDate()) return;
+    this.settingStartDate.set(true);
+
+    this.lifeOs.setNoFapStartDate(this.selectedStartDate).subscribe({
+      next: (s: NoFapStatus) => {
+        this.status.set(s);
+        this.settingStartDate.set(false);
+        this.showStartDatePicker.set(false);
+        this.triggerMilestone();
+        this.toast(`◈ Streak backfilled! ${s.currentStreak} days of discipline recognized. Welcome back, Hunter.`);
+      },
+      error: (e: any) => {
+        this.settingStartDate.set(false);
+        const msg = e?.error ?? '⚠ Failed to set start date';
+        this.toast(typeof msg === 'string' ? msg : '⚠ Failed to set start date');
+      },
+    });
+  }
+
+  /** How many days ago a given date is (for the quick-select buttons) */
+  dateForDaysAgo(days: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return d.toISOString().split('T')[0];
+  }
+
+  selectDaysAgo(days: number): void {
+    this.selectedStartDate = this.dateForDaysAgo(days);
+  }
+
+  /** Days from a date string (YYYY-MM-DD) to today */
+  daysBetween(dateStr: string): number {
+    if (!dateStr) return 0;
+    const start = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    start.setHours(0,0,0,0);
+    return Math.max(0, Math.round((today.getTime() - start.getTime()) / 86400000));
   }
 
   setInsightTab(tab: 'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS'): void {

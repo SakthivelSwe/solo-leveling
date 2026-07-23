@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Map;
+
 /**
  * No Fap Challenge REST Controller.
  *
@@ -15,9 +18,10 @@ import org.springframework.web.bind.annotation.*;
  * Reuses existing dopamine_logs table via NoFapService.
  *
  * Endpoints:
- *   GET  /api/v1/nofap/status          — full status DTO
- *   POST /api/v1/nofap/confirm-clean   — mark today as clean
- *   POST /api/v1/nofap/relapse         — honest relapse report
+ *   GET  /api/v1/nofap/status           — full status DTO
+ *   POST /api/v1/nofap/confirm-clean    — mark today as clean
+ *   POST /api/v1/nofap/relapse          — honest relapse report
+ *   POST /api/v1/nofap/set-start-date   — backfill clean days from a past start date
  */
 @RestController
 @RequestMapping("/api/v1/nofap")
@@ -48,6 +52,31 @@ public class NoFapController {
     @PostMapping("/relapse")
     public ResponseEntity<NoFapStatusDTO> relapse(HttpServletRequest request) {
         return ResponseEntity.ok(noFapService.reportRelapse(playerId(request)));
+    }
+
+    /**
+     * Set the actual start date of the challenge.
+     *
+     * Body: { "startDate": "2026-07-18" }
+     *
+     * Backfills pornViewed=false entries for each day from startDate to
+     * yesterday (skipping any days already logged). Returns the updated status.
+     */
+    @PostMapping("/set-start-date")
+    public ResponseEntity<?> setStartDate(HttpServletRequest request,
+                                          @RequestBody Map<String, String> body) {
+        String dateStr = body.get("startDate");
+        if (dateStr == null || dateStr.isBlank()) {
+            return ResponseEntity.badRequest().body("startDate is required (YYYY-MM-DD)");
+        }
+        try {
+            LocalDate startDate = LocalDate.parse(dateStr);
+            return ResponseEntity.ok(noFapService.setStartDate(playerId(request), startDate));
+        } catch (java.time.format.DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Use YYYY-MM-DD.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     private Long playerId(HttpServletRequest request) {

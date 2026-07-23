@@ -36,6 +36,63 @@
     </header>
 
     <!-- ════════════════════════════════════════════════════════════
+         START DATE ONBOARDING — shown when no logs exist yet
+         ════════════════════════════════════════════════════════════ -->
+    @if (showOnboarding()) {
+      <section class="nf-section nf-onboarding system-card">
+        <div class="ob-icon">🔥</div>
+        <h2 class="ob-title mono">ALREADY STARTED YOUR CHALLENGE?</h2>
+        <p class="ob-desc">You began before using this app. Set your actual start date and the System will recognize every day of discipline you've already completed.</p>
+
+        <!-- Quick-select buttons -->
+        <div class="ob-quick">
+          <span class="tech ob-quick-lbl">QUICK SELECT:</span>
+          <div class="ob-quick-btns">
+            @for (d of [1,2,3,4,5,7,10,14,21,30]; track d) {
+              <button class="ob-q-btn tech"
+                      [class.selected]="selectedStartDate === dateForDaysAgo(d)"
+                      (click)="selectDaysAgo(d)">
+                {{ d }}d ago
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Date picker -->
+        <div class="ob-picker">
+          <label class="tech ob-picker-lbl">OR PICK EXACT DATE:</label>
+          <input class="ob-date-input"
+                 type="date"
+                 [(ngModel)]="selectedStartDate"
+                 [max]="todayDateString"
+                 [min]="earliestDateString" />
+        </div>
+
+        <!-- Preview -->
+        @if (selectedStartDate) {
+          <div class="ob-preview">
+            <span class="tech" style="color: var(--accent-gold)">
+              ◈ {{ daysBetween(selectedStartDate) }} days will be recognized as clean →
+              Streak jumps to Day {{ daysBetween(selectedStartDate) }}
+            </span>
+          </div>
+        }
+
+        <button class="btn-start-date tech"
+                (click)="setStartDate()"
+                [disabled]="!selectedStartDate || settingStartDate()">
+          {{ settingStartDate() ? 'LOADING...' : '⚡ APPLY START DATE & RESTORE STREAK' }}
+        </button>
+
+        <div class="ob-skip">
+          <button class="ob-skip-btn tech" (click)="confirmClean()">
+            I'm starting from today →
+          </button>
+        </div>
+      </section>
+    }
+
+    <!-- ════════════════════════════════════════════════════════════
          SECTION 1 — STREAK COUNTER
          ════════════════════════════════════════════════════════════ -->
     <section class="nf-section nf-hero system-card">
