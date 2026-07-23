@@ -343,12 +343,32 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
         <a href="https://dev-mastery.pages.dev" target="_blank" class="dm-link">Open DevMastery →</a>
       </div>
       <div class="dm-info">
-        <p>When you complete a topic in DevMastery, it automatically syncs here via webhook and awards you <strong>50 XP</strong> in THE SYSTEM.</p>
+        <p>When you complete a topic in DevMastery, it automatically syncs here and awards you <strong>50 XP</strong> in THE SYSTEM. You can also run a manual sync to import existing progress.</p>
         <div class="dm-stats">
           <div class="dm-stat">
             <span class="dm-stat-val">{{ devMasterySessions() }}</span>
             <span class="dm-stat-lbl">Topics Synced</span>
           </div>
+          <div class="dm-stat" *ngIf="stats()">
+            <span class="dm-stat-val" style="color:var(--accent-gold)">{{ stats()!.totalXpEarned }}</span>
+            <span class="dm-stat-lbl">Total XP (Learning)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sync result banner -->
+      <div class="sync-result success" *ngIf="syncResult() && !syncResult()!.error" @fadeInUp>
+        <span class="sync-result-icon">✅</span>
+        <div>
+          <strong>SYNC COMPLETE</strong>
+          <div>{{ syncResult()!.topicsSynced }} new topics imported · +{{ syncResult()!.xpAwarded }} XP awarded</div>
+        </div>
+      </div>
+      <div class="sync-result error" *ngIf="syncResult()?.error" @fadeInUp>
+        <span class="sync-result-icon">❌</span>
+        <div>
+          <strong>SYNC FAILED</strong>
+          <div>{{ syncResult()!.error }}</div>
         </div>
       </div>
 
@@ -356,7 +376,7 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
         <button class="sync-btn" (click)="manualSync()" [disabled]="syncing()">
           {{ syncing() ? '⏳ SYNCING...' : '🔄 MANUAL SYNC' }}
         </button>
-        <div class="sync-note">Use this to import existing DevMastery progress.</div>
+        <div class="sync-note">Pulls all completed topics from DevMastery into THE SYSTEM log.</div>
       </div>
     </div>
   </div>
@@ -846,6 +866,31 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
 .subject-bar { height: 100%; background: var(--accent-purple); border-radius: 3px; transition: width .5s ease; }
 .subject-time { font-size: 0.75rem; color: var(--text-secondary); width: 50px; text-align: right; }
 
+.sync-result {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  &.success {
+    background: rgba(31,190,142,0.1);
+    border: 1px solid rgba(31,190,142,0.3);
+    color: var(--accent-teal);
+    strong { display: block; margin-bottom: 2px; font-family: 'Orbitron',monospace; font-size: 0.78rem; }
+    div { color: var(--text-secondary); }
+  }
+  &.error {
+    background: rgba(226,75,74,0.1);
+    border: 1px solid rgba(226,75,74,0.3);
+    color: var(--accent-red);
+    strong { display: block; margin-bottom: 2px; font-family: 'Orbitron',monospace; font-size: 0.78rem; }
+    div { color: var(--text-secondary); }
+  }
+}
+.sync-result-icon { font-size: 1.3rem; flex-shrink: 0; }
+
 /* DevMastery card */
 .devmastery-card { }
 .dm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -986,6 +1031,7 @@ export class LearningComponent implements OnInit {
   syncing = signal(false);
   successMsg = signal('');
   errorMsg = signal('');
+  syncResult = signal<{ topicsSynced: number; xpAwarded: number; error?: string } | null>(null);
 
   // ── Form state ────────────────────────────────────────────────────────────
   youtubeUrl = '';
@@ -1041,20 +1087,27 @@ export class LearningComponent implements OnInit {
   ngOnInit() {
     this.loadStats();
     this.loadDueRecalls();
+    // Pre-load DevMastery session count without switching to history tab
+    this.ls.getHistory().subscribe(h => {
+      this.devMasterySessions.set(h.filter(log => log.source === 'DEVMASTERY').length);
+    });
   }
 
   loadStats() {
     this.ls.getStats().subscribe({
       next: s => {
         this.stats.set(s);
-        this.devMasterySessions.set(0); // will update from stats when devmastery count added
       }
     });
   }
 
   loadHistory() {
     this.activeTab.set('history');
-    this.ls.getHistory().subscribe(h => this.history.set(h));
+    this.ls.getHistory().subscribe(h => {
+      this.history.set(h);
+      // Count DEVMASTERY-sourced entries for the synced counter
+      this.devMasterySessions.set(h.filter(log => log.source === 'DEVMASTERY').length);
+    });
   }
 
   loadDueRecalls() {
@@ -1153,23 +1206,29 @@ export class LearningComponent implements OnInit {
 
   manualSync() {
     this.syncing.set(true);
+    this.syncResult.set(null);
     const playerRaw = localStorage.getItem('system_player');
     const email = playerRaw ? JSON.parse(playerRaw).email : null;
-    
+
     if (!email) {
-      alert('Error: User email not found in local storage.');
+      this.syncResult.set({ topicsSynced: 0, xpAwarded: 0, error: 'User email not found in local storage.' });
       this.syncing.set(false);
       return;
     }
 
     this.ls.manualSyncDevMastery(email).pipe(finalize(() => this.syncing.set(false))).subscribe({
       next: (res) => {
-        alert(`Sync complete! Synced ${res.topicsSynced} new topics. Earned ${res.xpAwarded} XP.`);
+        this.syncResult.set({ topicsSynced: res.topicsSynced, xpAwarded: res.xpAwarded });
         this.loadStats();
         this.loadHistory();
+        // Auto-dismiss result after 8 seconds
+        setTimeout(() => this.syncResult.set(null), 8000);
       },
       error: (e) => {
-        alert('Sync failed: ' + (e.error?.message || e.message));
+        this.syncResult.set({
+          topicsSynced: 0, xpAwarded: 0,
+          error: e.error?.message || e.message || 'Sync failed. Try again.'
+        });
       }
     });
   }
