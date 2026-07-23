@@ -34,7 +34,7 @@ export class AppComponent {
   public auth       = inject(AuthService);
 
   /** Reactive signal: true when the biometric lock overlay should be shown. */
-  isLocked = computed(() => this.biometric.isLocked);
+  isLocked = computed(() => this.biometric.lockedSignal());
 
   /** Show bottom nav on all authenticated routes; hide on login/register pages. */
   showBottomNav = computed(() => {

@@ -60,9 +60,12 @@ export class NativeService {
       if (isActive && this.auth.isAuthenticated()) {
         this.playerService.getStatus().subscribe({ error: () => {} });
 
-        // Trigger biometric lock if outside grace period
         if (this.biometric.shouldLock()) {
+          // Biometric is enabled and grace period expired → prompt.
           await this.biometric.authenticate();
+        } else if (!this.biometric.isBiometricEnabled) {
+          // Biometric is disabled → make sure overlay is never shown.
+          this.biometric.unlock();
         }
       }
     });
@@ -70,10 +73,14 @@ export class NativeService {
     // Initialize biometrics (check device capability).
     await this.biometric.init();
 
-    // Lock on first open if biometrics are available and user is already logged in.
-    // This guards against someone who has the app already open.
-    if (this.auth.isAuthenticated() && this.biometric.shouldLock()) {
-      await this.biometric.authenticate();
+    // Lock on first open if biometrics are available, user enabled it, and user is logged in.
+    // If biometrics are disabled → ensure unlocked so user goes straight to the app.
+    if (this.auth.isAuthenticated()) {
+      if (this.biometric.shouldLock()) {
+        await this.biometric.authenticate();
+      } else {
+        this.biometric.unlock();
+      }
     }
 
     // 1. Initialize action types and listeners

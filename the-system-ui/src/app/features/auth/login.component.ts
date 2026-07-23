@@ -38,7 +38,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   charIdx = 0;
   private timer: any;
 
-  ngOnInit(): void { this.typeNext(); }
+  ngOnInit(): void {
+    // Instagram-style: if the user is already logged in (token in storage),
+    // skip the login screen entirely and go straight to the app.
+    if (this.auth.isAuthenticated()) {
+      this.router.navigate(['/system'], { replaceUrl: true });
+      return;
+    }
+    this.typeNext();
+  }
   ngOnDestroy(): void { clearTimeout(this.timer); }
 
   /** True when a field is invalid and the user has interacted with it. */
