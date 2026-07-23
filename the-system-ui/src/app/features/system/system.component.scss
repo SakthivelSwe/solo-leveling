@@ -72,6 +72,28 @@
   box-shadow: 0 0 12px rgba(79,195,247,0.35);
 }
 
+/* Special highlight for the Discipline Protocol link */
+.desktop-nav a.nav-discipline {
+  color: #FAC775;
+  border: 1px solid rgba(250,199,117,.3);
+  border-radius: 20px;
+  padding: 3px 10px;
+  background: rgba(250,199,117,.07);
+  transition: all .2s;
+}
+.desktop-nav a.nav-discipline:hover,
+.desktop-nav a.nav-discipline.active {
+  background: rgba(250,199,117,.15);
+  border-color: rgba(250,199,117,.6);
+  color: #FAC775;
+  text-shadow: 0 0 12px rgba(250,199,117,.5);
+  box-shadow: 0 0 16px rgba(250,199,117,.15);
+}
+.desktop-nav a.nav-discipline.active::after {
+  background: linear-gradient(90deg, #FAC775, #e6a83a);
+  box-shadow: 0 0 12px rgba(250,199,117,.5);
+}
+
 /* Right cluster */
 .topbar-right {
   display: flex; align-items: center; gap: 8px; flex-shrink: 0;
