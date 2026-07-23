@@ -4,7 +4,10 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { NoFapStatus, ScienceDayCard, AddictionInsight } from '../../core/models/models';
+import { RelapseDialogComponent } from './dialogs/relapse-dialog.component';
+import { UrgeProtocolComponent } from './dialogs/urge-protocol.component';
 
 @Component({
   selector: 'app-nofap-challenge',
@@ -54,7 +57,7 @@ export class NoFapChallengeComponent implements OnInit {
     { day: 365, label: 'Shadow Monarch',      xp: 15000, icon: '👑' },
   ];
 
-  constructor(private lifeOs: LifeOsService, private snack: MatSnackBar) {}
+  constructor(private lifeOs: LifeOsService, private snack: MatSnackBar, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.load();
@@ -94,15 +97,46 @@ export class NoFapChallengeComponent implements OnInit {
   }
 
   reportRelapse(): void {
-    if (!confirm('☠ Confirm relapse? Honesty is the foundation of real progress.')) return;
-    this.reporting.set(true);
-    this.lifeOs.reportRelapse().subscribe({
-      next: (s: NoFapStatus) => {
-        this.status.set(s);
-        this.reporting.set(false);
-        this.toast('◈ Relapse logged. Day 0. The System respects your honesty. Begin again.');
-      },
-      error: () => { this.reporting.set(false); this.toast('⚠ Failed to log relapse'); },
+    const dialogRef = this.dialog.open(RelapseDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      panelClass: 'dark-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.trigger) {
+        this.reporting.set(true);
+        this.lifeOs.reportRelapse().subscribe({
+          next: (s: NoFapStatus) => {
+            this.status.set(s);
+            this.reporting.set(false);
+            this.toast(`◈ Relapse logged (Trigger: ${result.trigger}). Day 0. The System respects your honesty. Begin again.`);
+          },
+          error: () => { this.reporting.set(false); this.toast('⚠ Failed to log relapse'); },
+        });
+      }
+    });
+  }
+
+  openUrgeProtocol(): void {
+    const s = this.status();
+    const dialogRef = this.dialog.open(UrgeProtocolComponent, {
+      width: '100vw',
+      maxWidth: '100vw',
+      height: '100vh',
+      panelClass: 'fullscreen-dark-dialog',
+      data: { insights: s?.addictionInsights || [] }
+    });
+
+    dialogRef.afterClosed().subscribe(survived => {
+      if (survived) {
+        this.lifeOs.reportUrgeSurvived().subscribe({
+          next: (res: any) => {
+            this.toast(`◈ ${res.message} (+${res.xpAwarded} XP)`);
+          },
+          error: () => { this.toast('⚠ System error updating XP, but good job surviving.'); }
+        });
+      }
     });
   }
 

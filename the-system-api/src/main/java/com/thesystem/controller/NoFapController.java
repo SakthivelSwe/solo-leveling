@@ -79,6 +79,11 @@ public class NoFapController {
         }
     }
 
+    @PostMapping("/urge-survived")
+    public ResponseEntity<Map<String, Object>> urgeSurvived(HttpServletRequest request) {
+        return ResponseEntity.ok(noFapService.urgeSurvived(playerId(request)));
+    }
+
     private Long playerId(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return playerService.getByUsername(jwtService.extractUsername(token)).getId();

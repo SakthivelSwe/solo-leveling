@@ -12,6 +12,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.thesystem.entity.Player;
+import com.thesystem.repository.PlayerRepository;
+import com.thesystem.service.LevelService;
+
 /**
  * No Fap Challenge Service.
  *
@@ -29,9 +33,15 @@ import java.util.stream.Collectors;
 public class NoFapService {
 
     private final DopamineLogRepository logRepo;
+    private final PlayerRepository playerRepo;
+    private final LevelService levelService;
 
-    public NoFapService(DopamineLogRepository logRepo) {
+    public NoFapService(DopamineLogRepository logRepo,
+                        PlayerRepository playerRepo,
+                        LevelService levelService) {
         this.logRepo = logRepo;
+        this.playerRepo = playerRepo;
+        this.levelService = levelService;
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -57,6 +67,8 @@ public class NoFapService {
      */
     @Transactional
     public NoFapStatusDTO setStartDate(Long playerId, LocalDate startDate) {
+        int oldStreak = getStatus(playerId).getCurrentStreak();
+
         LocalDate today    = LocalDate.now();
         LocalDate earliest = today.minusDays(365);
 
@@ -94,7 +106,9 @@ public class NoFapService {
             logRepo.saveAll(toSave);
         }
 
-        return getStatus(playerId);
+        NoFapStatusDTO newStatus = getStatus(playerId);
+        checkAndAwardMilestoneXp(playerId, oldStreak, newStatus.getCurrentStreak());
+        return newStatus;
     }
 
     public NoFapStatusDTO getStatus(Long playerId) {
@@ -169,14 +183,32 @@ public class NoFapService {
 
     @Transactional
     public NoFapStatusDTO confirmCleanDay(Long playerId) {
+        int oldStreak = getStatus(playerId).getCurrentStreak();
         upsertPornViewed(playerId, false);
-        return getStatus(playerId);
+        NoFapStatusDTO newStatus = getStatus(playerId);
+        checkAndAwardMilestoneXp(playerId, oldStreak, newStatus.getCurrentStreak());
+        return newStatus;
     }
 
     @Transactional
     public NoFapStatusDTO reportRelapse(Long playerId) {
         upsertPornViewed(playerId, true);
         return getStatus(playerId);
+    }
+
+    @Transactional
+    public Map<String, Object> urgeSurvived(Long playerId) {
+        Player player = playerRepo.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        
+        // Award willpower XP for surfing the urge
+        levelService.addXp(player, 20, "NOFAP_URGE_SURVIVED");
+        
+        return Map.of(
+            "status", "survived",
+            "xpAwarded", 20,
+            "message", "Urge defeated. Willpower strengthened."
+        );
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -189,10 +221,33 @@ public class NoFapService {
                     DopamineLog n = new DopamineLog();
                     n.setPlayerId(playerId);
                     n.setLogDate(LocalDate.now());
+                    n.setDopamineScore(0);
+                    n.setFocusPct(100);
                     return n;
                 });
         log.setPornViewed(pornViewed);
         logRepo.save(log);
+    }
+
+    private void checkAndAwardMilestoneXp(Long playerId, int oldStreak, int newStreak) {
+        if (oldStreak == newStreak || newStreak < 7) return;
+        
+        Player player = playerRepo.findById(playerId).orElse(null);
+        if (player == null) return;
+        
+        // We only award XP if the *new* streak crossed a milestone boundary that the old streak had not.
+        if (oldStreak < 7 && newStreak >= 7) {
+            levelService.addXp(player, 500, "NOFAP_MILESTONE_7");
+        }
+        if (oldStreak < 30 && newStreak >= 30) {
+            levelService.addXp(player, 2000, "NOFAP_MILESTONE_30");
+        }
+        if (oldStreak < 90 && newStreak >= 90) {
+            levelService.addXp(player, 5000, "NOFAP_MILESTONE_90");
+        }
+        if (oldStreak < 365 && newStreak >= 365) {
+            levelService.addXp(player, 15000, "NOFAP_MILESTONE_365");
+        }
     }
 
     /**

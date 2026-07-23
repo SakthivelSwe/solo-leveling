@@ -143,12 +143,17 @@
 
           <!-- Action buttons -->
           <div class="action-buttons">
-            <button class="btn-confirm tech" (click)="confirmClean()" [disabled]="confirming()">
-              {{ confirming() ? '...' : '✅ CONFIRM CLEAN DAY' }}
+            <button class="btn-urge tech" (click)="openUrgeProtocol()">
+              🚨 EMERGENCY URGE PROTOCOL
             </button>
-            <button class="btn-relapse tech" (click)="reportRelapse()" [disabled]="reporting()">
-              {{ reporting() ? '...' : '☠ HONEST RELAPSE' }}
-            </button>
+            <div class="action-row">
+              <button class="btn-confirm tech" (click)="confirmClean()" [disabled]="confirming()" [class.pulse]="!s.todayConfirmed">
+                {{ confirming() ? '...' : '✅ CONFIRM CLEAN DAY' }}
+              </button>
+              <button class="btn-relapse tech" (click)="reportRelapse()" [disabled]="reporting()">
+                {{ reporting() ? '...' : '☠ HONEST RELAPSE' }}
+              </button>
+            </div>
           </div>
         </div>
 

@@ -132,5 +132,6 @@ export class LifeOsService {
   setNoFapStartDate(startDate: string): Observable<any> {
     return this.http.post<any>(`${this.api}/nofap/set-start-date`, { startDate });
   }
+  reportUrgeSurvived(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/urge-survived`, {}); }
 }
 
