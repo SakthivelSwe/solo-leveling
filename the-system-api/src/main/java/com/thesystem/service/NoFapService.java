@@ -318,14 +318,14 @@ public class NoFapService {
 
     private String systemVerdict(int streak) {
         if (streak == 0) return "◈ Day 0. The battle begins now. Every hour clean is a victory.";
-        if (streak < 3) return "◈ Day " + streak + ". Withdrawal is real. Push through the fog.";
-        if (streak < 7) return "◈ Day " + streak + ". Receptors are waking up. Stay disciplined.";
-        if (streak < 14) return "◈ Day " + streak + ". First milestone cleared. Dopamine is resetting.";
-        if (streak < 21) return "◈ Day " + streak + ". Memory and focus sharpening. You're changing.";
-        if (streak < 30) return "◈ Day " + streak + ". Testosterone surge incoming. The warrior awakens.";
-        if (streak < 60) return "◈ Day " + streak + ". You're in the top 15%. Deep work is natural now.";
-        if (streak < 90) return "◈ Day " + streak + ". Elite territory. Neuroplasticity at full swing.";
-        return "◈ Day " + streak + ". NEUROLOGICAL REBOOT COMPLETE. Shadow Monarch discipline achieved.";
+        if (streak < 3) return "◈ Day " + streak + ". The hardest part. Push through the struggle.";
+        if (streak < 7) return "◈ Day " + streak + ". Your brain is healing. Stay strong.";
+        if (streak < 14) return "◈ Day " + streak + ". First milestone cleared. Your reward system is resetting.";
+        if (streak < 21) return "◈ Day " + streak + ". Memory and focus are improving. You're changing.";
+        if (streak < 30) return "◈ Day " + streak + ". Energy surge incoming. The warrior awakens.";
+        if (streak < 60) return "◈ Day " + streak + ". You're in the top 15%. Hard work feels easier now.";
+        if (streak < 90) return "◈ Day " + streak + ". Elite territory. Your brain is fully rewiring itself.";
+        return "◈ Day " + streak + ". FULL REBOOT COMPLETE. Shadow Monarch discipline achieved.";
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -346,61 +346,61 @@ public class NoFapService {
         List<ScienceDayCard> cards = new ArrayList<>();
 
         cards.add(new ScienceDayCard(0, "REWIRING", "🔴", "Day 0 — The Starting Line",
-                "Dopamine baseline is artificially elevated from chronic stimulation. Your brain has been hijacked. The rewiring begins now. Expect intense urges in the first 72 hours — this is withdrawal.", "DOPAMINE"));
+                "Your brain's reward system is used to being overstimulated. The healing begins now. Expect strong urges in the first few days — this is normal when breaking a bad habit.", "DOPAMINE"));
 
-        cards.add(new ScienceDayCard(1, "REWIRING", "🧠", "Day 1 — Withdrawal Begins",
-                "Dopamine crashes as artificial stimulation stops. Brain fog, irritability, and restlessness are normal withdrawal symptoms. Your prefrontal cortex is starting to regain control.", "DOPAMINE"));
+        cards.add(new ScienceDayCard(1, "REWIRING", "🧠", "Day 1 — The Struggle Begins",
+                "As you stop the bad habit, you might feel tired, grumpy, and have 'brain fog'. This is just your brain realizing it's not getting that fake reward anymore. Stay strong.", "DOPAMINE"));
 
         cards.add(new ScienceDayCard(3, "REWIRING", "⚡", "Day 3 — The Flatline",
-                "Many report a 'flatline' — reduced libido and emotional numbness. This is your brain recalibrating. The flatline is proof the rewiring is working. It will pass.", "DOPAMINE"));
+                "You might feel empty, bored, or have zero energy. This is called a 'flatline'. It means your brain is resetting itself. It will pass soon.", "DOPAMINE"));
 
-        cards.add(new ScienceDayCard(5, "REWIRING", "💤", "Day 5 — Sleep Improving",
-                "Without the prolactin crash from PMO, sleep quality begins improving. REM sleep deepens. You may notice more vivid dreams as your brain consolidates memories properly.", "SLEEP"));
+        cards.add(new ScienceDayCard(5, "REWIRING", "💤", "Day 5 — Better Sleep",
+                "Without the heavy energy crash from relapsing, your sleep starts getting better. You might sleep deeper and start remembering your dreams clearly.", "SLEEP"));
 
-        cards.add(new ScienceDayCard(7, "REWIRING", "🔋", "Day 7 — Dopamine Receptors Upregulating",
-                "After 7 days, D2 dopamine receptors begin recovering. Baseline pleasure from real-world activities (+15%) starts returning. Food tastes better. Music sounds richer. First milestone cleared.", "DOPAMINE"));
+        cards.add(new ScienceDayCard(7, "REWIRING", "🔋", "Day 7 — Happiness Returning",
+                "After 7 days, your brain starts enjoying normal things again. Food tastes better. Music sounds richer. You are finding joy in the real world again. First milestone cleared.", "DOPAMINE"));
 
         cards.add(new ScienceDayCard(10, "REWIRING", "🎯", "Day 10 — Focus Returning",
-                "The prefrontal cortex (executive control center) is regaining strength. You'll notice improved ability to concentrate on boring tasks. Your brain's executive function is coming back online.", "FOCUS"));
+                "The 'CEO' part of your brain is getting stronger. You will notice it's much easier to focus on boring or hard tasks without getting distracted.", "FOCUS"));
 
-        cards.add(new ScienceDayCard(14, "CLARITY", "📚", "Day 14 — Memory Recall Improving",
-                "Two weeks clean. Prefrontal cortex activity measurably increases. Working memory improves — you'll find it easier to remember names, learn skills, and retain information.", "MEMORY"));
+        cards.add(new ScienceDayCard(14, "CLARITY", "📚", "Day 14 — Sharper Memory",
+                "Two weeks clean. Your mind is getting sharper. You will find it easier to remember things, learn new skills, and solve problems at work or school.", "MEMORY"));
 
-        cards.add(new ScienceDayCard(16, "CLARITY", "😤", "Day 16 — Social Confidence Emerging",
-                "Oxytocin and vasopressin levels normalizing. Social bonding hormones return. You may notice less social anxiety, more eye contact, stronger desire for real human connection.", "CONFIDENCE"));
+        cards.add(new ScienceDayCard(16, "CLARITY", "😤", "Day 16 — Social Confidence",
+                "Your connection hormones are back to normal. You might notice less shyness, find it easier to look people in the eye, and actually want to talk to people.", "CONFIDENCE"));
 
-        cards.add(new ScienceDayCard(21, "CLARITY", "💪", "Day 21 — Testosterone Surge (+21%)",
-                "Jiangsu University study (2003): Men abstaining for 21 days showed a 21% increase in testosterone. LH and FSH normalize, driving testosterone production. Confidence, aggression, muscle growth all increase.", "TESTOSTERONE"));
+        cards.add(new ScienceDayCard(21, "CLARITY", "💪", "Day 21 — Energy Surge",
+                "Men often report a huge boost in male energy around 3 weeks. You will likely feel more confident, motivated, and physically stronger. Use this energy to work out or build something.", "TESTOSTERONE"));
 
-        cards.add(new ScienceDayCard(25, "CLARITY", "🔥", "Day 25 — Aura and Presence",
-                "Higher testosterone combined with normalized dopamine creates what the community calls 'the aura' — an increased magnetic social presence. People notice the change in your energy and confidence.", "CONFIDENCE"));
+        cards.add(new ScienceDayCard(25, "CLARITY", "🔥", "Day 25 — The Aura",
+                "Higher energy and confidence create what people call 'the aura'. People will notice a change in your vibe and how you carry yourself.", "CONFIDENCE"));
 
         cards.add(new ScienceDayCard(30, "TRANSFORMATION", "🌊", "Day 30 — Deep Focus Unlocked",
-                "Default Mode Network (DMN) normalizes. Your brain no longer defaults to urges — it defaults to creative thinking and problem solving. Deep work sessions become effortless and natural.", "FOCUS"));
+                "Your brain is no longer constantly looking for a quick hit. It now naturally focuses on creative thinking and solving real problems. Hard work feels easier.", "FOCUS"));
 
         cards.add(new ScienceDayCard(40, "TRANSFORMATION", "🎨", "Day 40 — Creativity Peaks",
-                "Sexual energy (transmuted) fuels creativity. Many artists, athletes, and builders report peak creative output during extended abstinence. Your motivation systems are now driving real-world goals.", "FOCUS"));
+                "You are turning your built-up energy into creativity. Many people report doing their best work, writing, or art during this time. You are highly motivated.", "FOCUS"));
 
-        cards.add(new ScienceDayCard(45, "TRANSFORMATION", "👥", "Day 45 — Social Rewiring Complete",
-                "Social anxiety measurably decreases. Eye contact feels natural. You approach people with calm confidence instead of avoidance. Real intimacy becomes possible again as oxytocin is no longer blunted.", "CONFIDENCE"));
+        cards.add(new ScienceDayCard(45, "TRANSFORMATION", "👥", "Day 45 — Better Relationships",
+                "Social fear is fading away. Eye contact feels totally natural. You approach people with calm confidence instead of hiding away. Real connection feels good again.", "CONFIDENCE"));
 
-        cards.add(new ScienceDayCard(60, "TRANSFORMATION", "🧬", "Day 60 — Neuroplasticity Peaks",
-                "Gray matter density begins increasing in the nucleus accumbens and prefrontal cortex — the same regions shrunk by addiction. Your brain is physically rebuilding itself at the cellular level.", "NEUROPLASTICITY"));
+        cards.add(new ScienceDayCard(60, "TRANSFORMATION", "🧬", "Day 60 — Brain Healing",
+                "Your brain is physically rebuilding itself. The parts that were damaged by the bad habit are getting stronger every single day.", "NEUROPLASTICITY"));
 
-        cards.add(new ScienceDayCard(75, "TRANSFORMATION", "⚙️", "Day 75 — Hormonal Equilibrium",
-                "Prolactin, cortisol, dopamine, testosterone — all hormonal systems fully recalibrated. Energy levels are consistently high. Mood is stable. The emotional rollercoaster is over.", "TESTOSTERONE"));
+        cards.add(new ScienceDayCard(75, "TRANSFORMATION", "⚙️", "Day 75 — Stable Moods",
+                "Your energy and hormones are completely balanced. Your energy levels are high all day long. Your mood is stable. The emotional rollercoaster is finally over.", "TESTOSTERONE"));
 
-        cards.add(new ScienceDayCard(90, "MASTERY", "👑", "Day 90 — NEUROLOGICAL REBOOT",
-                "The gold standard milestone. Brain reward system fully re-sensitized. Dopamine receptors restored to baseline. You are now in the top 3% globally who reach this milestone. Identity shift: you are no longer an addict.", "NEUROPLASTICITY"));
+        cards.add(new ScienceDayCard(90, "MASTERY", "👑", "Day 90 — FULL REBOOT",
+                "The ultimate milestone. Your brain's reward system is fully healed. You are now in the top 3% globally who reach this goal. You are no longer an addict.", "NEUROPLASTICITY"));
 
-        cards.add(new ScienceDayCard(120, "MASTERY", "🏔️", "Day 120 — Sustained Peak Performance",
-                "Long-term potentiation in the hippocampus strengthens. Learning speed accelerates. Every discipline in your life — fitness, coding, relationships — benefits from the neural pathways you've built.", "MEMORY"));
+        cards.add(new ScienceDayCard(120, "MASTERY", "🏔️", "Day 120 — Peak Performance",
+                "Your ability to learn and grow is at its absolute best. Every area of your life — fitness, coding, relationships — benefits from your new, healthy mind.", "MEMORY"));
 
-        cards.add(new ScienceDayCard(180, "MASTERY", "🌟", "Day 180 — Identity Transformation Complete",
-                "At 6 months, the identity shift is complete. Self-discipline learned through NoFap generalizes to all life areas. Men report major life improvements in career, relationships, fitness, and mental clarity.", "CONFIDENCE"));
+        cards.add(new ScienceDayCard(180, "MASTERY", "🌟", "Day 180 — A New Person",
+                "At 6 months, you are a completely new person. The discipline you learned here helps you succeed in your career, fitness, and life.", "CONFIDENCE"));
 
         cards.add(new ScienceDayCard(365, "MASTERY", "💎", "Day 365 — SHADOW MONARCH",
-                "One full year. The rarest achievement. Your neural architecture is fundamentally different from who you were 365 days ago. You have conquered the addiction that controls the majority of men on the planet.", "NEUROPLASTICITY"));
+                "One full year. The rarest achievement. Your brain is fundamentally different and stronger than it was a year ago. You have conquered a habit that controls millions.", "NEUROPLASTICITY"));
 
         return cards;
     }
@@ -409,74 +409,74 @@ public class NoFapService {
         List<AddictionInsight> insights = new ArrayList<>();
 
         // ── BRAIN category ──
-        insights.add(new AddictionInsight("BRAIN", "🧠", "Prefrontal Cortex Shrinkage",
-                "Chronic porn use causes measurable gray matter reduction in the prefrontal cortex — the brain's CEO. This leads to poor impulse control, procrastination, inability to delay gratification, and reduced willpower.",
+        insights.add(new AddictionInsight("BRAIN", "🧠", "Brain Damage from Porn",
+                "Watching too much porn damages the part of your brain that controls willpower. This makes you lazy, causes you to put off important work, and makes it harder to control your impulses.",
                 "CRITICAL"));
-        insights.add(new AddictionInsight("BRAIN", "⚡", "Dopamine System Hijacked",
-                "Porn exploits the Coolidge Effect — the brain's novelty-seeking circuit. Infinite novelty on screens desensitizes D2 receptors. Everyday life becomes bland and unstimulating. You need more extreme content to feel anything.",
+        insights.add(new AddictionInsight("BRAIN", "⚡", "The Reward System Trap",
+                "Porn gives your brain fake, massive rewards. Because of this, normal everyday life starts feeling boring. You stop finding joy in simple things like hobbies or hanging out with friends.",
                 "CRITICAL"));
-        insights.add(new AddictionInsight("BRAIN", "😤", "Amygdala Hyper-Activation",
-                "The amygdala (threat/emotion center) becomes chronically over-activated. This manifests as anxiety, irritability, emotional dysregulation, and hypersensitivity. Social situations feel threatening.",
+        insights.add(new AddictionInsight("BRAIN", "😤", "High Stress and Anxiety",
+                "The fear and emotion center of your brain becomes overactive. This makes you feel easily annoyed, highly anxious, and overwhelmed by normal social situations.",
                 "HIGH"));
-        insights.add(new AddictionInsight("BRAIN", "🌀", "Default Mode Network Corrupted",
-                "Instead of defaulting to creative thinking or future planning, the hijacked brain defaults to urges and fantasy. This is why you feel mentally foggy and uncreative — your brain's idle mode is broken.",
+        insights.add(new AddictionInsight("BRAIN", "🌀", "Broken Thought Process",
+                "Instead of naturally thinking about creative ideas or your future goals, your mind constantly wanders to urges and fantasies. This causes 'brain fog' and makes you uncreative.",
                 "HIGH"));
-        insights.add(new AddictionInsight("BRAIN", "📉", "Memory and Learning Impaired",
-                "Reduced prefrontal-hippocampal connectivity impairs working memory, long-term potentiation, and learning speed. Students and coders who watch porn frequently consistently report difficulty retaining information.",
+        insights.add(new AddictionInsight("BRAIN", "📉", "Memory Problems",
+                "The bad habit blocks the learning pathways in your brain. Students and workers who watch a lot of porn often struggle to remember things and learn new skills.",
                 "HIGH"));
-        insights.add(new AddictionInsight("BRAIN", "🩻", "Brain Scans Match Cocaine Addicts",
-                "Cambridge University (2014): Brain imaging of compulsive porn users showed the same patterns of activation as cocaine and alcohol addicts when shown their drug of choice. Porn addiction is neurologically real.",
+        insights.add(new AddictionInsight("BRAIN", "🩻", "Like Hard Drugs",
+                "Researchers have found that when people look at porn, their brains show the exact same damage and reactions as someone addicted to hard drugs like cocaine.",
                 "CRITICAL"));
 
         // ── TESTOSTERONE category ──
-        insights.add(new AddictionInsight("TESTOSTERONE", "💉", "Prolactin Crash After PMO",
-                "Ejaculation triggers a prolactin spike that suppresses dopamine for 24-48 hours. This causes the post-PMO 'crash' — fatigue, brain fog, social withdrawal, and reduced motivation that men mistake for laziness.",
+        insights.add(new AddictionInsight("TESTOSTERONE", "💉", "The Energy Drain",
+                "Relapsing releases a 'tired' hormone that kills your motivation for 24-48 hours. This is the huge energy crash that makes you feel exhausted, lazy, and want to hide from the world.",
                 "HIGH"));
-        insights.add(new AddictionInsight("TESTOSTERONE", "📉", "LH/FSH Suppression",
-                "Chronic overstimulation suppresses Luteinizing Hormone (LH) and Follicle-Stimulating Hormone (FSH) — the signals that tell your testes to produce testosterone. Result: chronically low-T symptoms.",
+        insights.add(new AddictionInsight("TESTOSTERONE", "📉", "Low Male Energy",
+                "Constant overstimulation stops your body from naturally producing male hormones. This makes you feel physically weak, passive, and lacking the drive to achieve your goals.",
                 "HIGH"));
-        insights.add(new AddictionInsight("TESTOSTERONE", "💪", "DHT and Androgen Receptors Blunted",
-                "Low DHT (dihydrotestosterone) reduces the androgenic drive behind confidence, muscle synthesis, assertiveness, and sexual vitality. Men feel passive, unmotivated, and physically weak.",
+        insights.add(new AddictionInsight("TESTOSTERONE", "💪", "Loss of Confidence",
+                "Without strong, healthy hormone levels, you lose the natural confidence, assertiveness, and physical strength that makes you feel powerful and alive.",
                 "MEDIUM"));
-        insights.add(new AddictionInsight("TESTOSTERONE", "😴", "Sleep Architecture Disrupted",
-                "PMO before bed suppresses melatonin and disrupts REM sleep cycles. 70-80% of daily testosterone is produced during deep sleep. Disrupted sleep = chronically low testosterone the next day.",
+        insights.add(new AddictionInsight("TESTOSTERONE", "😴", "Ruined Sleep Quality",
+                "Looking at screens and engaging in this bad habit before bed ruins your sleep. Since your body builds most of its energy during deep sleep, you wake up feeling drained.",
                 "HIGH"));
-        insights.add(new AddictionInsight("TESTOSTERONE", "⚡", "Cortisol Elevation",
-                "Chronic dopamine dysregulation elevates baseline cortisol (stress hormone). Cortisol is directly antagonistic to testosterone. High cortisol + low testosterone = the 'defeated male' hormonal profile.",
+        insights.add(new AddictionInsight("TESTOSTERONE", "⚡", "High Stress Hormones",
+                "This addiction keeps your stress levels constantly high. High stress fights against your body's natural strength, creating a 'defeated' feeling.",
                 "HIGH"));
 
         // ── RELATIONSHIPS category ──
-        insights.add(new AddictionInsight("RELATIONSHIPS", "💔", "Porn-Induced ED (PIED)",
-                "Desensitization to 2D fantasy makes real partners less stimulating. Porn-Induced Erectile Dysfunction affects men in their 20s and 30s at alarming rates. The brain has been rewired to respond only to screens.",
+        insights.add(new AddictionInsight("RELATIONSHIPS", "💔", "Real World Problems",
+                "Getting used to fake, extreme videos makes real partners seem boring. Many young men now suffer from severe performance issues in real life because their brains are trained only for screens.",
                 "CRITICAL"));
-        insights.add(new AddictionInsight("RELATIONSHIPS", "🤝", "Oxytocin Blunted",
-                "The bonding hormone oxytocin is blunted by chronic PMO. This reduces the ability to form deep emotional connections with real partners. Men report feeling emotionally detached even in healthy relationships.",
+        insights.add(new AddictionInsight("RELATIONSHIPS", "🤝", "Losing Connection",
+                "The addiction blocks the natural 'bonding' chemicals in your brain. This makes it very hard to feel true love, care, or deep connection, even with good people in your life.",
                 "HIGH"));
-        insights.add(new AddictionInsight("RELATIONSHIPS", "👁️", "Objectification Rewiring",
-                "The brain learns to see people as objects rather than full human beings. This creates a comparison mindset that makes real-world relationships feel inadequate and destroys genuine intimacy.",
+        insights.add(new AddictionInsight("RELATIONSHIPS", "👁️", "Seeing People as Objects",
+                "Your brain gets trained to look at people like objects instead of real humans. This destroys your ability to have normal, healthy, and happy relationships.",
                 "HIGH"));
-        insights.add(new AddictionInsight("RELATIONSHIPS", "😰", "Social Anxiety Amplified",
-                "Shame, low self-worth, and dopamine-driven social withdrawal combine to create severe social anxiety. Men avoid social situations, eye contact, and romantic pursuit — not from shyness but from addiction shame.",
+        insights.add(new AddictionInsight("RELATIONSHIPS", "😰", "Social Fear",
+                "Deep down, the shame of the addiction destroys your self-esteem. You might start avoiding eye contact, skipping social events, and hiding from people because of this hidden shame.",
                 "HIGH"));
 
         // ── WORLD_STATS category ──
         insights.add(new AddictionInsight("WORLD_STATS", "🌍", "40 Million Daily Visitors",
-                "40 million Americans visit pornographic websites every day. It is the most consumed type of content on the internet globally — more than news, social media, or entertainment platforms combined.",
+                "40 million Americans visit these websites every single day. It is the most consumed type of content on the internet — pulling millions of men away from achieving their real potential.",
                 "MEDIUM"));
-        insights.add(new AddictionInsight("WORLD_STATS", "👦", "Average First Exposure: Age 11",
-                "The average age of first pornography exposure is 11 years old. Adolescent brains are in critical development stages — early exposure creates deep addiction pathways before the prefrontal cortex is even formed.",
+        insights.add(new AddictionInsight("WORLD_STATS", "👦", "Exposed Too Young",
+                "The average age a person first sees this content is 11 years old. This early exposure severely damages the brain before it even has a chance to fully grow and mature.",
                 "CRITICAL"));
-        insights.add(new AddictionInsight("WORLD_STATS", "💑", "56% of Divorces Cite Porn",
-                "56% of divorce cases in the United States cite one partner's pornography use as a major contributing factor. Porn addiction destroys real-world intimacy at a societal scale.",
+        insights.add(new AddictionInsight("WORLD_STATS", "💑", "Destroying Marriages",
+                "Over half of divorce cases in the US cite this addiction as a major problem. It is destroying real-world families and intimacy everywhere.",
                 "HIGH"));
         insights.add(new AddictionInsight("WORLD_STATS", "📊", "Only 3% Reach Day 90",
-                "Based on NoFap community data (n=500,000+), only approximately 3% of those who attempt the challenge reach Day 90. Reaching this milestone places you in an elite minority of self-disciplined men.",
+                "Based on community data, only about 3% of people who attempt this challenge actually reach Day 90. Reaching this milestone proves you have incredible self-discipline.",
                 "MEDIUM"));
         insights.add(new AddictionInsight("WORLD_STATS", "⏱️", "Average Relapse: Day 5",
-                "The average relapse day globally is Day 5. The first week is the hardest neurological battle. If you can make it past Day 7, your success rate increases dramatically.",
+                "Most people fail around Day 5. The first week is the absolute hardest battle. If you can push past Day 7, your chances of winning go way up.",
                 "MEDIUM"));
         insights.add(new AddictionInsight("WORLD_STATS", "📈", "34% Productivity Increase",
-                "A survey of 10,000 men who completed 30+ day streaks reported an average 34% self-reported increase in work productivity, focus, and daily output. The correlation between abstinence and performance is consistent.",
+                "Men who stay clean for 30 days or more report a massive 34% increase in their focus, work output, and daily success. The benefits are real and proven.",
                 "MEDIUM"));
 
         return insights;
@@ -484,14 +484,14 @@ public class NoFapService {
 
     private List<String> worldStats() {
         return List.of(
-                "70% of men relapse before Day 7 — you're already beating the odds",
+                "70% of men fail before Day 7 — you're already beating the odds",
                 "Only 15% of challengers reach Day 30",
                 "Only 3% reach Day 90 — elite territory",
-                "21% testosterone increase documented at Day 21 (Jiangsu University, 2003)",
-                "Average global relapse day: Day 5 — you've outlasted most already",
-                "Men with 30+ day streaks report 34% higher productivity",
-                "Brain scans of porn addicts mirror cocaine addicts (Cambridge, 2014)",
-                "Dopamine receptors take 14–21 days to upregulate after chronic use"
+                "Huge boost in natural male energy around Day 21",
+                "Average global fail day: Day 5 — you've outlasted most already",
+                "Men with 30+ day streaks report getting 34% more work done",
+                "Brain scans show this addiction is as damaging as hard drugs",
+                "Your brain takes about 14–21 days to start enjoying normal things again"
         );
     }
 }
