@@ -73,6 +73,13 @@ export class NativeService {
     // Initialize biometrics (check device capability).
     await this.biometric.init();
 
+    // Hide Splash Screen early so the UI is visible before the native biometric dialog overlays it
+    try {
+      await SplashScreen.hide();
+    } catch {
+      /* SplashScreen unavailable — ignore */
+    }
+
     // Lock on first open if biometrics are available, user enabled it, and user is logged in.
     // If biometrics are disabled → ensure unlocked so user goes straight to the app.
     if (this.auth.isAuthenticated()) {
@@ -104,12 +111,6 @@ export class NativeService {
       }
     } catch {
       /* ignore if permissions check fails or unsupported */
-    }
-
-    try {
-      await SplashScreen.hide();
-    } catch {
-      /* SplashScreen unavailable — ignore */
     }
   }
 }

@@ -26,8 +26,7 @@ export class BiometricLockComponent implements OnInit {
   failed = signal(false);
 
   ngOnInit(): void {
-    // Auto-trigger on mount
-    this.authenticate();
+    // Component acts as a manual fallback screen. NativeService handles the auto-prompt.
   }
 
   async authenticate(): Promise<void> {

@@ -30,6 +30,7 @@ export class BiometricService {
   private readonly _isAvailable = signal(false);
 
   private _biometricPlugin: any = null;
+  private _authPromise: Promise<boolean> | null = null;
 
   /** True when the full-screen lock overlay should be shown. */
   get isLocked(): boolean { return this._isLocked(); }
@@ -93,33 +94,40 @@ export class BiometricService {
 
   /**
    * Show the device biometric prompt.
-   * Sets isLocked = true before the native dialog, then false on success.
-   * Resolves true on success, false on cancellation/failure.
+   * Returns a shared Promise so concurrent calls (e.g. from UI and NativeService) resolve together safely.
    */
-  async authenticate(): Promise<boolean> {
-    if (!this._biometricPlugin) {
-      // No native plugin (web/dev environment) — treat as success.
-      this._isLocked.set(false);
-      this._updateGrace();
-      return true;
-    }
+  authenticate(): Promise<boolean> {
+    if (this._authPromise) return this._authPromise;
 
-    this._isLocked.set(true);
-    try {
-      await this._biometricPlugin.verifyIdentity({
-        reason:      'Verify your identity to access THE SYSTEM',
-        title:       'Authentication Required',
-        subtitle:    'THE SYSTEM',
-        description: 'Please authenticate to unlock.',
-      });
-      this._updateGrace();
-      this._isLocked.set(false);
-      return true;
-    } catch {
-      // Auth failed or cancelled — stay locked.
+    this._authPromise = (async () => {
+      if (!this._biometricPlugin) {
+        // No native plugin (web/dev environment) — treat as success.
+        this._isLocked.set(false);
+        this._updateGrace();
+        return true;
+      }
+
       this._isLocked.set(true);
-      return false;
-    }
+      try {
+        await this._biometricPlugin.verifyIdentity({
+          reason:      'Verify your identity to access THE SYSTEM',
+          title:       'Authentication Required',
+          subtitle:    'THE SYSTEM',
+          description: 'Please authenticate to unlock.',
+        });
+        this._updateGrace();
+        this._isLocked.set(false);
+        return true;
+      } catch {
+        // Auth failed or cancelled — stay locked.
+        this._isLocked.set(true);
+        return false;
+      } finally {
+        this._authPromise = null;
+      }
+    })();
+
+    return this._authPromise;
   }
 
   /**
