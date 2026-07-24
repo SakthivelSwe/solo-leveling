@@ -1,4 +1,4 @@
-/* ════════════════════════════════════════════════════════════════
+﻿/* ════════════════════════════════════════════════════════════════
    NO FAP CHALLENGE — Styles
    Dark, premium solo-leveling aesthetic with phase-color theming
    ════════════════════════════════════════════════════════════════ */
@@ -719,6 +719,118 @@
 .ic-severity[data-severity="LOW"] { color: var(--text-dim); }
 .ic-title { font-size: .8rem; letter-spacing: 1px; color: var(--text-primary); margin: 0; }
 .ic-desc { font-size: .75rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   SECTION 7 — NIGHT EMISSION GUIDE
+   ════════════════════════════════════════════════════════════════ */
+.ne-section {
+  margin-top: 24px;
+  background: linear-gradient(180deg, rgba(14,14,28,0.4), rgba(8,8,18,0.8));
+  border-top: 2px solid rgba(108,99,255,0.4);
+}
+.ne-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.ne-icon { font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(108,99,255,0.8)); }
+
+/* Verdict Banner */
+.ne-verdict {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(31,190,142,0.1);
+  border: 1px solid rgba(31,190,142,0.4);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+.ne-verdict-icon { font-size: 1.8rem; flex-shrink: 0; }
+.ne-verdict-title { font-size: .88rem; color: #1FBE8E; margin: 0 0 6px; letter-spacing: 1.5px; }
+.ne-verdict-sub { font-size: .74rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.ne-verdict-sub strong { color: var(--text-primary); }
+
+/* Science Cards */
+.ne-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.ne-card {
+  padding: 18px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  transition: transform .2s, border-color .2s;
+}
+.ne-card:hover { transform: translateY(-3px); border-color: rgba(108,99,255,0.3); }
+.ne-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+.ne-card-title { font-size: .78rem; letter-spacing: 1.5px; color: var(--text-primary); margin: 0 0 10px; }
+.ne-card-desc { font-size: .74rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+.ne-card-desc strong { color: var(--accent-purple); }
+
+.ne-card-gold {
+  background: rgba(250,199,117,0.05);
+  border-color: rgba(250,199,117,0.3);
+}
+.ne-card-gold .ne-card-title { color: var(--accent-gold); }
+.ne-verdict-list {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ne-verdict-list li {
+  font-size: .68rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.ne-verdict-list li:last-child { border-bottom: none; padding-bottom: 0; }
+.ne-verdict-list strong { color: var(--text-primary); font-family: 'Rajdhani', sans-serif; font-size: .74rem; }
+
+/* How to Reduce Grid */
+.ne-reduce { margin-bottom: 24px; }
+.ne-reduce-title { font-size: .88rem; letter-spacing: 2px; color: var(--accent-gold); margin: 0 0 6px; }
+.ne-reduce-sub { font-size: .74rem; color: var(--text-secondary); margin: 0 0 16px; }
+
+.ne-tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.ne-tip {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  align-items: flex-start;
+}
+.ne-tip-icon { font-size: 1.4rem; flex-shrink: 0; }
+.ne-tip-title { display: block; font-family: 'Rajdhani', sans-serif; font-size: .8rem; letter-spacing: 1px; color: var(--text-primary); margin-bottom: 4px; }
+.ne-tip-desc { font-size: .7rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* Reassurance Footer */
+.ne-reassurance {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  background: rgba(226,75,74,0.08);
+  border-radius: 10px;
+  border-left: 3px solid #E24B4A;
+}
+.ne-reassurance span { font-size: 1.8rem; }
+.ne-reassurance p { font-size: .74rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+.ne-reassurance em { color: #E24B4A; font-style: normal; font-weight: bold; }
 
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
