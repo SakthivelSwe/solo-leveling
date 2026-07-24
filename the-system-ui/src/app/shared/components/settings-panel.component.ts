@@ -11,6 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { LocalNotificationsService } from '../../core/services/local-notifications.service';
 import { SystemAlarm } from '../../core/native/system-alarm.plugin';
 import { LifeOsService } from '../../core/services/life-os.service';
+import { BiometricService } from '../../core/services/biometric.service';
 
 interface QuestItem {
   id?: number;
@@ -97,6 +98,13 @@ interface QuestItem {
         HP WARNINGS — Show brutal warning when HP drops below 40</label>
       <label class="chk tech"><input type="checkbox" [(ngModel)]="settings.dailyReminder" (change)="saveSettings()" />
         EVENING DIRECTIVE — Show "You haven't done X yet" reminder after 9 PM</label>
+    </section>
+
+    <!-- Security -->
+    <section class="section" *ngIf="biometric.isAvailable">
+      <h3 class="mono sh">◈ SECURITY</h3>
+      <label class="chk tech"><input type="checkbox" [(ngModel)]="biometricEnabled" (change)="toggleBiometric()" />
+        BIOMETRIC LOCK — Require fingerprint/FaceID to open the app</label>
     </section>
 
     <!-- Cheat Day / Rest Day -->
@@ -427,7 +435,9 @@ export class SettingsPanelComponent implements OnInit {
   private readonly localNotifs = inject(LocalNotificationsService);
   private readonly snack = inject(MatSnackBar);
   private readonly lifeOs = inject(LifeOsService);
+  public readonly biometric = inject(BiometricService);
   exporting = signal(false);
+  biometricEnabled = false;
 
   settings = {
     noSkipMode: localStorage.getItem('sys_noskip') === '1',
@@ -461,6 +471,7 @@ export class SettingsPanelComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.biometricEnabled = this.biometric.isBiometricEnabled;
     const token = localStorage.getItem('system_access_token');
     if (!token) return;
     this.http.get<QuestItem[]>(`${environment.apiUrl}/quests/today`, {
@@ -642,6 +653,15 @@ export class SettingsPanelComponent implements OnInit {
     localStorage.setItem('sys_noskip', this.settings.noSkipMode ? '1' : '0');
     localStorage.setItem('sys_hpwarn', this.settings.hpWarnings ? '1' : '0');
     localStorage.setItem('sys_reminder', this.settings.dailyReminder ? '1' : '0');
+  }
+
+  toggleBiometric(): void {
+    this.biometric.setBiometricEnabled(this.biometricEnabled);
+    if (this.biometricEnabled) {
+      this.snack.open('◈ BIOMETRIC LOCK ENABLED', '✕', { duration: 3000, panelClass: 'system-snack' });
+    } else {
+      this.snack.open('◈ BIOMETRIC LOCK DISABLED', '✕', { duration: 3000, panelClass: 'system-snack' });
+    }
   }
 
   cancelDelete(): void {
