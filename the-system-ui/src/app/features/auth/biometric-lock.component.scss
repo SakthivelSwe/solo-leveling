@@ -99,3 +99,48 @@
 
 .dots::after { content: ''; animation: dots 1.2s steps(4) infinite; }
 @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+/* Password fallback */
+.fallback-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+.fallback-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border, #1c1c34);
+  }
+  span {
+    font-size: .58rem;
+    letter-spacing: 3px;
+    color: var(--text-dim, #3a4050);
+  }
+}
+.fallback-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: var(--text-secondary, #7a8494);
+  padding: 12px 20px;
+  font-size: .72rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color .2s, color .2s, background .2s;
+  min-height: 44px;
+}
+.fallback-btn:hover {
+  border-color: rgba(108,99,255,0.4);
+  color: var(--text-primary, #EEF3FA);
+  background: rgba(108,99,255,0.06);
+}

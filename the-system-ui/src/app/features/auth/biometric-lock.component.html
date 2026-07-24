@@ -27,13 +27,13 @@
       @if (authenticating()) {
         <span class="dots">Verifying identity</span>
       } @else if (failed()) {
-        Authentication failed. Try again.
+        Authentication failed. Tap below to try again.
       } @else {
         Authenticate to access THE SYSTEM
       }
     </p>
 
-    <!-- CTA button -->
+    <!-- Primary CTA button -->
     <button class="verify-btn submit" (click)="authenticate()" [disabled]="authenticating()">
       @if (authenticating()) {
         <span class="dots">SCANNING</span>
@@ -45,5 +45,13 @@
     <p class="lock-hint tech">
       Fingerprint · Face · PIN
     </p>
+
+    <!-- Password fallback -->
+    <div class="fallback-section">
+      <div class="fallback-divider"><span class="tech">OR</span></div>
+      <button class="fallback-btn tech" (click)="usePassword()">
+        🔑 Use Password Instead
+      </button>
+    </div>
   </div>
 </div>

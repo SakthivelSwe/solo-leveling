@@ -56,9 +56,8 @@
   --s-8: 32px;
   --s-10: 40px;
 
-  /* ── Mobile navigation ──────────────────────────────────── */
-  /* Bottom nav bar height + safe-area-inset-bottom */
-  --bottom-nav-height: 70px;
+  /* ── Mobile navigation ──────────────────────────────────────── */
+  --bottom-nav-height: 64px;
   --bottom-nav-total: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
 
   /* ── Border radius scale ────────────────────────────────── */
@@ -456,6 +455,23 @@ body.native-platform .route-host {
 }
 
 /* ── Global responsive shell padding ────────────────────────── */
+/* Add safe-area-inset-top to all page shells — prevents content going under status bar on Android */
+.system-shell,
+.habits-shell,
+.life-shell,
+.ai-shell,
+.ach-shell,
+.notif-shell,
+.nf-shell,
+.phys-shell,
+.learn-shell,
+.prog-shell,
+.stats-shell,
+.dungeon-shell,
+.insight-shell {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+
 @media (max-width: 400px) {
   .system-shell,
   .habits-shell,

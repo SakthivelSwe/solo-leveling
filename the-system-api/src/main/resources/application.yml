@@ -44,8 +44,8 @@ thesystem:
     # REQUIRED. Boot fails fast if this is missing, too short (< 32 bytes),
     # or left at the old public default. Generate with: openssl rand -base64 48
     secret: "${JWT_SECRET:}"
-    access-expiration-ms: 7200000       # 2 hours (reduced from 24h to limit token-in-URL exposure)
-    refresh-expiration-ms: 604800000    # 7 days
+    access-expiration-ms: 86400000       # 24 hours — refresh interceptor silently renews before this
+    refresh-expiration-ms: 2592000000   # 30 days
   game:
     xp-threshold: 100                    # XP required per level
   scheduler:

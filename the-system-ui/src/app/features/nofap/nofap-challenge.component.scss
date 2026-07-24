@@ -8,7 +8,13 @@
 .nf-shell {
   max-width: 860px;
   margin: 0 auto;
-  padding: max(env(safe-area-inset-top, 20px), 20px) 16px 80px;
+  /* Remove top padding here — styles.scss adds safe-area-inset-top globally */
+  padding: 12px 14px 90px;
+
+  @media (max-width: 400px) {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 
 /* ── Loading ──────────────────────────────────────────────────── */
@@ -32,10 +38,10 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Shared section ───────────────────────────────────────────── */
+/* ── Shared section ──────────────────────────────────────── */
 .nf-section {
-  padding: 22px;
-  margin-bottom: 16px;
+  padding: clamp(14px, 4vw, 22px);
+  margin-bottom: 14px;
   border-radius: 14px;
   position: relative;
   overflow: hidden;
@@ -214,9 +220,17 @@
 
 .hero-layout {
   display: flex;
-  gap: 28px;
+  gap: 20px;
   align-items: center;
   flex-wrap: wrap;
+
+  /* On mobile: stack vertically with ring centered */
+  @media (max-width: 540px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
 }
 
 /* Circular ring */
@@ -263,7 +277,7 @@
 }
 
 /* Hero info */
-.hero-info { flex: 1; min-width: 200px; }
+.hero-info { flex: 1; min-width: 160px; }
 
 .phase-badge {
   font-size: .64rem;
@@ -331,57 +345,59 @@
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  width: 100%;
 }
 .action-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  width: 100%;
 }
 .btn-urge {
-  padding: 12px 18px;
+  padding: 11px 14px;
   border-radius: 10px;
   border: 1px solid #ff3333;
-  background: rgba(255, 51, 51, 0.1);
+  background: rgba(255, 51, 51, 0.08);
   color: #ff3333;
   cursor: pointer;
-  font-size: .68rem;
-  letter-spacing: 2px;
+  font-size: clamp(.6rem, 2vw, .68rem);
+  letter-spacing: 1.5px;
   font-family: 'Rajdhani', monospace;
   font-weight: 700;
   text-align: center;
   transition: all .2s;
-  box-shadow: 0 0 15px rgba(255, 51, 51, 0.2);
+  width: 100%;
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.15);
+  min-height: 44px;
 }
-.btn-urge:hover {
-  background: #ff3333;
-  color: #000;
-  box-shadow: 0 0 25px rgba(255, 51, 51, 0.5);
-  transform: translateY(-2px);
-}
+.btn-urge:hover, .btn-urge:active { background: rgba(255,51,51,0.18); }
 .btn-confirm, .btn-relapse {
-  padding: 10px 18px;
+  flex: 1;
+  min-width: 120px;
+  padding: 11px 12px;
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-size: .68rem;
-  letter-spacing: 1.5px;
+  font-size: clamp(.6rem, 2vw, .68rem);
+  letter-spacing: 1px;
   font-family: 'Rajdhani', monospace;
   font-weight: 700;
   transition: transform .15s, box-shadow .15s, opacity .15s;
+  min-height: 44px;
 }
 .btn-confirm {
   background: linear-gradient(135deg, #1FBE8E, #12907a);
   color: #000;
-  box-shadow: 0 4px 16px rgba(31,190,142,.35);
+  box-shadow: 0 4px 14px rgba(31,190,142,.3);
 }
-.btn-confirm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(31,190,142,.5); }
+.btn-confirm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(31,190,142,.48); }
 .btn-relapse {
-  background: rgba(226,75,74,.12);
+  background: rgba(226,75,74,.1);
   color: #E24B4A;
-  border: 1px solid rgba(226,75,74,.35);
+  border: 1px solid rgba(226,75,74,.3);
 }
-.btn-relapse:hover:not(:disabled) { background: rgba(226,75,74,.2); }
+.btn-relapse:hover:not(:disabled) { background: rgba(226,75,74,.18); }
 .btn-confirm:disabled, .btn-relapse:disabled { opacity: .5; cursor: not-allowed; }
 
 @keyframes pulse-btn {
@@ -441,13 +457,18 @@
 .science-today-card {
   position: relative;
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-start;
-  padding: 20px;
+  padding: clamp(14px, 4vw, 20px);
   border-radius: 12px;
   background: rgba(108,99,255,.07);
   border: 1px solid rgba(108,99,255,.2);
   overflow: hidden;
+
+  @media (max-width: 380px) {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 .stc-icon { font-size: 2.2rem; flex-shrink: 0; }
 .stc-body { flex: 1; }
@@ -546,8 +567,12 @@
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 18px;
+
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .stat-card {
   display: flex;
@@ -697,11 +722,24 @@
 
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
+  /* hero-layout already has @media block, but keep this as fallback */
   .hero-layout { flex-direction: column; align-items: center; text-align: center; }
   .status-badges { justify-content: center; }
-  .action-buttons { justify-content: center; }
+  .action-buttons { align-items: stretch; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .heatmap-grid { grid-template-columns: repeat(15, 1fr); }
   .rewards-grid { grid-template-columns: repeat(2, 1fr); }
   .insight-tabs { justify-content: center; }
+  .it-tab { font-size: .56rem; padding: 6px 10px; }
+}
+
+@media (max-width: 380px) {
+  .nf-topbar h1 { font-size: .72rem; }
+  .section-title { font-size: .7rem; letter-spacing: 2px; }
+  .rewards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .reward-card { padding: 14px 8px; }
+  .rw-icon { font-size: 1.6rem; }
+  .stat-val { font-size: 1.1rem; }
+  .streak-num { font-size: 2rem; }
+  .heatmap-grid { grid-template-columns: repeat(10, 1fr); }
 }

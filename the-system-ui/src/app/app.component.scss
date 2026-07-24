@@ -19,22 +19,28 @@
   z-index: 100;
 
   /* Height + safe area for home indicator */
-  height: calc(var(--bottom-nav-height, 70px) + env(safe-area-inset-bottom, 0px));
+  height: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* Layout */
+  /* Layout — scrollable on very small screens */
   display: flex;
   align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Hide scrollbar on all platforms for a native look */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
 
   /* Premium glass surface */
-  background: linear-gradient(180deg, rgba(14,14,28,0.96), rgba(8,8,18,0.98));
-  border-top: 1px solid rgba(108,99,255,0.25);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: linear-gradient(180deg, rgba(14,14,28,0.97), rgba(8,8,18,0.99));
+  border-top: 1px solid rgba(108,99,255,0.20);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   box-shadow:
-    0 -8px 32px rgba(0,0,0,0.6),
-    0 -1px 0 rgba(108,99,255,0.15),
-    0 1px 0 rgba(255,255,255,0.03) inset;
+    0 -6px 24px rgba(0,0,0,0.55),
+    0 -1px 0 rgba(108,99,255,0.12),
+    0 1px 0 rgba(255,255,255,0.02) inset;
 
   /* Only show on mobile */
   @media (min-width: 761px) {
@@ -43,38 +49,50 @@
 }
 
 .bnav-item {
-  flex: 1;
+  flex: 0 0 auto;   /* Don't shrink — scroll instead */
+  min-width: 56px;  /* Tighter than 44px min-touch but enough with scroll */
+  max-width: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   text-decoration: none;
   color: var(--text-secondary, #7a8494);
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  padding: 4px 2px;
-  min-width: 0;
+  padding: 4px 6px;
+  /* Give a bit of flex on wider screens */
+  @media (min-width: 400px) {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
 }
 
 .bnav-icon {
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .bnav-label {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.42rem;
-  letter-spacing: 1px;
+  font-size: 0.38rem;
+  letter-spacing: 0.5px;
   font-weight: 700;
   transition: color 0.2s;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+
+  @media (min-width: 400px) {
+    font-size: 0.42rem;
+    letter-spacing: 1px;
+  }
 }
 
 /* Active tab */
@@ -96,11 +114,11 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 32px;
+  width: 28px;
   height: 2px;
   border-radius: 0 0 4px 4px;
   background: linear-gradient(90deg, var(--accent-purple, #6C63FF), var(--system-blue, #4fc3f7));
-  box-shadow: 0 0 12px rgba(108,99,255,0.9), 0 0 6px rgba(79,195,247,0.6);
+  box-shadow: 0 0 10px rgba(108,99,255,0.8), 0 0 5px rgba(79,195,247,0.5);
 }
 
 /* Tap ripple feedback */

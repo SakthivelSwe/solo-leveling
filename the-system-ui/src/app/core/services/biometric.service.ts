@@ -20,8 +20,8 @@ const NativeBiometric = registerPlugin<any>('NativeBiometric');
  */
 @Injectable({ providedIn: 'root' })
 export class BiometricService {
-  /** Grace period after a successful auth — won't re-prompt within this window (5 min). */
-  private static readonly GRACE_MS      = 5 * 60 * 1000;
+  /** Grace period after a successful auth — won't re-prompt within this window (30 min). */
+  private static readonly GRACE_MS      = 30 * 60 * 1000;
   private static readonly LAST_AUTH_KEY = 'system_last_biometric_auth';
   private static readonly ENABLED_KEY   = 'system_biometric_enabled';
 

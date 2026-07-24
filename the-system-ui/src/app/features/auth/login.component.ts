@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -20,9 +20,10 @@ const SYSTEM_PROMPTS = [
   styleUrls: ['./auth.shared.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  private fb = inject(FormBuilder);
-  private auth = inject(AuthService);
+  private fb   = inject(FormBuilder);
+  private auth  = inject(AuthService);
   private router = inject(Router);
+  private zone  = inject(NgZone);
 
   form = this.fb.group({
     username: ['', Validators.required],
@@ -58,14 +59,17 @@ export class LoginComponent implements OnInit, OnDestroy {
   private typeNext(): void {
     const msg = SYSTEM_PROMPTS[this.promptIdx];
     if (this.charIdx <= msg.length) {
-      this.typedText.set(msg.slice(0, this.charIdx++));
-      this.timer = setTimeout(() => this.typeNext(), 45);
+      // NgZone.run() ensures Angular change detection fires inside setTimeout on Android WebView
+      this.timer = setTimeout(() => this.zone.run(() => {
+        this.typedText.set(msg.slice(0, this.charIdx++));
+        this.typeNext();
+      }), 45);
     } else {
-      this.timer = setTimeout(() => {
+      this.timer = setTimeout(() => this.zone.run(() => {
         this.promptIdx = (this.promptIdx + 1) % SYSTEM_PROMPTS.length;
         this.charIdx = 0;
         this.typeNext();
-      }, 2400);
+      }), 2400);
     }
   }
 
