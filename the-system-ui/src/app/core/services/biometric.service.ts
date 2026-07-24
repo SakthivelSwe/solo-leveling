@@ -20,8 +20,8 @@ const NativeBiometric = registerPlugin<any>('NativeBiometric');
  */
 @Injectable({ providedIn: 'root' })
 export class BiometricService {
-  /** Grace period after a successful auth — won't re-prompt within this window (30 min). */
-  private static readonly GRACE_MS      = 30 * 60 * 1000;
+  /** Grace period after a successful auth — won't re-prompt within this window (10 seconds). */
+  private static readonly GRACE_MS      = 10 * 1000;
   private static readonly LAST_AUTH_KEY = 'system_last_biometric_auth';
   private static readonly ENABLED_KEY   = 'system_biometric_enabled';
 
@@ -84,6 +84,7 @@ export class BiometricService {
    * Conditions: hardware available AND user enabled biometrics AND outside grace period.
    */
   shouldLock(): boolean {
+    if (this.isLocked) return false; // Prevent double prompting if already locked/prompting
     if (!this._isAvailable()) return false;
     if (!this.isBiometricEnabled) return false;
     const last = Number(localStorage.getItem(BiometricService.LAST_AUTH_KEY) ?? '0');
