@@ -1,0 +1,169 @@
+<div class="system-container">
+  <div class="page-header">
+    <h1 class="sys-title mono">DOPAMINE DETOX</h1>
+    <p class="sys-subtitle tech">Monitor neural drains. Protect your XP multiplier.</p>
+  </div>
+
+  <div class="content-grid">
+    <!-- LEFT: Inputs -->
+    <div class="left-col">
+      <div class="system-card input-card">
+        <h2 class="mono"><span class="icon">🔻</span> NEGATIVE DRAINS</h2>
+        <p class="tech label-desc">These behaviors spike cheap dopamine and reduce your capacity to focus on hard tasks. Log honestly.</p>
+
+        <!-- Social Media -->
+        <div class="metric-row">
+          <div class="metric-info">
+            <span class="m-label tech">SOCIAL MEDIA</span>
+            <span class="m-sub tech">+8 penalty per 30m</span>
+          </div>
+          <div class="m-controls">
+            <button class="adj-btn" (click)="adjust(socialMediaMin, -15)">-15</button>
+            <div class="m-val mono">{{ socialMediaMin() }} <span class="unit">min</span></div>
+            <button class="adj-btn" (click)="adjust(socialMediaMin, 15)">+15</button>
+          </div>
+        </div>
+
+        <!-- Reels / Shorts -->
+        <div class="metric-row">
+          <div class="metric-info">
+            <span class="m-label tech text-danger">REELS / SHORTS</span>
+            <span class="m-sub tech">+15 penalty per 30m</span>
+          </div>
+          <div class="m-controls">
+            <button class="adj-btn" (click)="adjust(reelsMin, -15)">-15</button>
+            <div class="m-val mono">{{ reelsMin() }} <span class="unit">min</span></div>
+            <button class="adj-btn" (click)="adjust(reelsMin, 15)">+15</button>
+          </div>
+        </div>
+
+        <!-- Gaming -->
+        <div class="metric-row">
+          <div class="metric-info">
+            <span class="m-label tech">GAMING</span>
+            <span class="m-sub tech">+12 penalty if > 60m</span>
+          </div>
+          <div class="m-controls">
+            <button class="adj-btn" (click)="adjust(gamingMin, -30)">-30</button>
+            <div class="m-val mono">{{ gamingMin() }} <span class="unit">min</span></div>
+            <button class="adj-btn" (click)="adjust(gamingMin, 30)">+30</button>
+          </div>
+        </div>
+
+        <!-- Junk Food -->
+        <div class="metric-row">
+          <div class="metric-info">
+            <span class="m-label tech">JUNK FOOD</span>
+            <span class="m-sub tech">+5 penalty per item</span>
+          </div>
+          <div class="m-controls">
+            <button class="adj-btn" (click)="adjust(junkFoodItems, -1)">-1</button>
+            <div class="m-val mono">{{ junkFoodItems() }} <span class="unit">items</span></div>
+            <button class="adj-btn" (click)="adjust(junkFoodItems, 1)">+1</button>
+          </div>
+        </div>
+
+        <!-- Porn -->
+        <div class="metric-row toggle-row">
+          <div class="metric-info">
+            <span class="m-label tech text-danger">ADULT CONTENT</span>
+            <span class="m-sub tech">+20 penalty</span>
+          </div>
+          <button class="toggle-btn mono" [class.active-danger]="pornViewed()" (click)="pornViewed.set(!pornViewed())">
+            {{ pornViewed() ? 'VIEWED' : 'CLEAN' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="system-card input-card mt-4">
+        <h2 class="mono"><span class="icon">🔋</span> POSITIVE RECOVERY</h2>
+        <p class="tech label-desc">These behaviors increase baseline dopamine and repair receptors.</p>
+
+        <!-- Exercise -->
+        <div class="metric-row toggle-row">
+          <div class="metric-info">
+            <span class="m-label tech text-success">EXERCISE</span>
+            <span class="m-sub tech">-20 penalty</span>
+          </div>
+          <button class="toggle-btn mono" [class.active-success]="exerciseDone()" (click)="exerciseDone.set(!exerciseDone())">
+            {{ exerciseDone() ? 'COMPLETED' : 'NO' }}
+          </button>
+        </div>
+
+        <!-- Cold Shower -->
+        <div class="metric-row toggle-row">
+          <div class="metric-info">
+            <span class="m-label tech text-success">COLD SHOWER</span>
+            <span class="m-sub tech">-10 penalty</span>
+          </div>
+          <button class="toggle-btn mono" [class.active-success]="coldShower()" (click)="coldShower.set(!coldShower())">
+            {{ coldShower() ? 'COMPLETED' : 'NO' }}
+          </button>
+        </div>
+      </div>
+      
+      <button class="btn-save tech" [disabled]="isSaving()" (click)="saveLog()">
+        {{ isSaving() ? 'SYNCING...' : 'SYNC NEURAL STATE' }}
+      </button>
+      
+      @if (saveSuccess()) {
+        <div class="success-msg tech">DATA SYNCED WITH SYSTEM.</div>
+      }
+    </div>
+
+    <!-- RIGHT: Status & History -->
+    <div class="right-col">
+      <!-- Live Impact -->
+      <div class="system-card impact-card">
+        <h2 class="mono">LIVE IMPACT</h2>
+        
+        <div class="gauges">
+          <div class="gauge-box">
+            <div class="g-label tech">DOPAMINE LOAD (0-100)</div>
+            <div class="g-val mono" [class.danger]="projectedScore() > 60" [class.safe]="projectedScore() <= 30">
+              {{ projectedScore() }}
+            </div>
+            <div class="g-bar">
+              <div class="g-fill" [style.width.%]="projectedScore()" [class.danger-bg]="projectedScore() > 60"></div>
+            </div>
+            <div class="g-desc tech">Higher score = more brain fog</div>
+          </div>
+
+          <div class="gauge-box">
+            <div class="g-label tech">XP MULTIPLIER</div>
+            <div class="g-val mono" [class.danger]="projectedMultiplier() < 1.0">
+              {{ projectedMultiplier() | percent }}
+            </div>
+            <div class="g-desc tech">Affects all Quest XP earned today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 14-Day History -->
+      <div class="system-card history-card mt-4">
+        <h2 class="mono">14-DAY HISTORY</h2>
+        
+        @if (history().length > 0) {
+          <div class="chart-container">
+            @for (log of history(); track log.id) {
+              <div class="bar-col">
+                <div class="bar-wrap">
+                  <div class="bar" 
+                       [style.height.%]="log.dopamineScore"
+                       [class.bar-danger]="log.dopamineScore > 60"
+                       [class.bar-warning]="log.dopamineScore > 30 && log.dopamineScore <= 60"
+                       [class.bar-safe]="log.dopamineScore <= 30">
+                  </div>
+                  <div class="bar-val tech">{{ log.dopamineScore }}</div>
+                </div>
+                <div class="bar-date tech">{{ log.logDate | slice:5:10 }}</div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state tech">NO DATA LOGGED YET.</div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

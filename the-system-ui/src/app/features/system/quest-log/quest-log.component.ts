@@ -245,4 +245,26 @@ export class QuestLogComponent {
     const done = q.monthlyDoneCount ?? 0;
     return `${done} completed this month`;
   }
+
+  // ── Solo Leveling Ranks ───────────────────────────────────────────────────────
+
+  getRank(xpReward: number | undefined): string {
+    const xp = xpReward || 0;
+    if (xp <= 50) return 'E-RANK';
+    if (xp <= 100) return 'D-RANK';
+    if (xp <= 200) return 'C-RANK';
+    if (xp <= 500) return 'B-RANK';
+    if (xp <= 1000) return 'A-RANK';
+    return 'S-RANK';
+  }
+
+  getRankColor(xpReward: number | undefined): string {
+    const xp = xpReward || 0;
+    if (xp <= 50) return '#94a3b8'; // E-Rank gray
+    if (xp <= 100) return '#1FBE8E'; // D-Rank green
+    if (xp <= 200) return '#4fc3f7'; // C-Rank blue
+    if (xp <= 500) return '#A855F7'; // B-Rank purple
+    if (xp <= 1000) return '#FAC775'; // A-Rank gold
+    return '#E24B4A'; // S-Rank red
+  }
 }

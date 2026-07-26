@@ -28,12 +28,19 @@ export class AiCommanderComponent implements OnInit {
   isOpen = false;
 
   ngOnInit(): void {
-    // We can auto-fetch or wait for user to open it.
-    // Given it's a morning briefing, maybe auto-fetch on init.
-    this.fetchBriefing();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('sys_ai_briefing_date');
+
+    if (lastDate === todayStr) {
+      // Already seen today, stay closed.
+      this.isOpen = false;
+    } else {
+      // First login of the day, fetch and show.
+      this.fetchBriefing(todayStr);
+    }
   }
 
-  fetchBriefing(): void {
+  fetchBriefing(todayStr?: string): void {
     this.loading = true;
     this.error = null;
     this.aiService.getMorningBriefing().subscribe({
@@ -42,6 +49,10 @@ export class AiCommanderComponent implements OnInit {
         this.loading = false;
         // Auto-open if we successfully got a briefing
         this.isOpen = true;
+        // Mark as seen for today
+        if (todayStr) {
+          localStorage.setItem('sys_ai_briefing_date', todayStr);
+        }
       },
       error: (err) => {
         console.error('Failed to load morning briefing', err);

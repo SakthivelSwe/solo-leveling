@@ -1,0 +1,32 @@
+<div class="penalty-overlay">
+  <div class="blood-vignette"></div>
+  
+  <div class="penalty-content">
+    <div class="alert-icon-wrapper">
+      <i class="fas fa-skull alert-icon"></i>
+    </div>
+    
+    <h1 class="glitch" data-text="PENALTY ZONE">PENALTY ZONE</h1>
+    
+    <div class="message-box">
+      <p class="warning-text mono">CRITICAL FAILURE DETECTED</p>
+      <p class="desc">
+        Your HP has reached 0. You have failed to maintain the System's minimum requirements. 
+        To survive and restore your standing, you must complete the Penalty Quest immediately.
+      </p>
+      
+      <div class="quest-box">
+        <span class="quest-title tech">PENALTY QUEST: SURVIVAL</span>
+        <div class="task-row">
+          <i class="fas fa-dumbbell"></i>
+          <span>Complete 50 Pushups</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="survive-btn" [class.loading]="loading()" (click)="survive()">
+      <span *ngIf="!loading()">I HAVE SURVIVED</span>
+      <div class="spinner" *ngIf="loading()"></div>
+    </button>
+  </div>
+</div>

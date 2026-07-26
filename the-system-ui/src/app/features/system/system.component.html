@@ -1,6 +1,9 @@
 <div class="system-shell">
 
-  <!-- ═══ TOPBAR ═══════════════════════════════════════════════ -->
+  <!-- PENALTY ZONE OVERLAY -->
+  <app-penalty-zone *ngIf="status()?.player?.hp === 0" (survived)="onPenaltySurvived()"></app-penalty-zone>
+
+  <!-- AI COMMANDER OVERLAY -->
   <header class="topbar">
     <div class="brand">
       <img src="assets/logo.png" alt="Logo" class="brand-logo" />
@@ -112,15 +115,24 @@
         [systemQuote]="s.systemQuote"
         [completedToday]="s.completedToday"
         [totalQuests]="s.totalQuests"
-        [dopamine]="dopamine()">
+        [dopamine]="dopamine()"
+        [noFap]="noFap()">
       </app-status-window>
 
       <app-skill-tree [skills]="s.skills" [nodes]="skillTreeNodes()"></app-skill-tree>
 
       <!-- Phase 5: Shadow Army -->
-      <div class="system-card block" style="margin-top: 16px;" *ngIf="shadows().length > 0">
+      <div class="system-card block" style="margin-top: 16px;">
         <h3 class="mono head" style="color: #BA7517;">◈ SHADOW ARMY</h3>
         <p class="tech subtitle" style="margin-bottom: 12px; font-size: 0.7rem;">MASTERED HABITS TRANSCEND INTO SHADOWS</p>
+        
+        <!-- ARISE Button (Unlocked at 90 days NoFap) -->
+        <div class="arise-container" *ngIf="noFap() && noFap()!.currentStreak >= 90 && !hasIgris()" style="margin-bottom: 12px;">
+          <button class="btn-arise tech" (click)="extractShadow()" [disabled]="extractingShadow()">
+            {{ extractingShadow() ? 'EXTRACTING...' : 'ARISE (Extract Shadow of Discipline)' }}
+          </button>
+        </div>
+
         <div class="shadows-list" style="display: flex; flex-direction: column; gap: 8px;">
           <div class="shadow-item" *ngFor="let sh of shadows()"
                style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(186,117,23,0.1); border: 1px solid rgba(186,117,23,0.3); border-radius: 6px;">
@@ -128,7 +140,9 @@
               <span class="mono" style="color: #BA7517; font-weight: bold; font-size: 0.9rem;">{{ sh.shadowName }}</span>
               <div class="tech" style="font-size: 0.65rem; color: #8a8a9a;">Lv.{{ sh.shadowLevel }} (Power: {{ sh.powerLevel }}) · +{{ sh.powerLevel }}% {{ sh.shadowType }} XP</div>
             </div>
-            <span class="tech" style="font-size: 0.7rem; color: #FAC775;">ARISE</span>
+          </div>
+          <div class="empty-shadows tech" *ngIf="shadows().length === 0 && (!noFap() || noFap()!.currentStreak < 90)" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); text-align: center; padding: 12px;">
+            No shadows extracted yet. Prove your discipline.
           </div>
         </div>
       </div>
@@ -201,6 +215,49 @@
     <div class="col-right" [class.mob-hidden]="mobileTab() !== 'schedule'">
       <app-dungeon-card></app-dungeon-card>
       <app-pomodoro></app-pomodoro>
+
+      <!-- ── NoFap Discipline Mini-Widget ─────────────────────── -->
+      @if (noFap(); as nf) {
+        <div class="system-card block nofap-widget" style="margin-top: 16px;">
+          <div class="nfw-header">
+            <div class="nfw-left">
+              <span class="mono nfw-title">🔥 DISCIPLINE PROTOCOL</span>
+              <span class="tech nfw-phase" [style.color]="nf.phaseColor">
+                {{ nf.phaseIcon }} {{ nf.phaseName | uppercase }} · {{ nf.phaseTitle }}
+              </span>
+            </div>
+            <a routerLink="/nofap" class="tech nfw-link">FULL VIEW →</a>
+          </div>
+
+          <!-- Streak + Status Row -->
+          <div class="nfw-streak-row">
+            <div class="nfw-streak-num">
+              <span class="mono nfw-num" [style.color]="nf.phaseColor">{{ nf.currentStreak }}</span>
+              <span class="tech nfw-unit">DAYS CLEAN</span>
+            </div>
+            <div class="nfw-badges">
+              <span class="nfw-badge tech" [class.clean]="nf.todayClean" [class.unconfirmed]="!nf.todayConfirmed" [class.relapse]="!nf.todayClean && nf.todayConfirmed">
+                {{ nf.todayConfirmed ? (nf.todayClean ? '✅ CLEAN' : '☠ RELAPSED') : '⏳ UNCONFIRMED' }}
+              </span>
+              <span class="nfw-badge tech velocity" [style.color]="nf.recoveryVelocity >= 200 ? '#1FBE8E' : '#FAC775'">
+                ⚡ {{ nf.recoveryVelocity | number:'1.0-0' }} RV
+              </span>
+            </div>
+          </div>
+
+          <!-- Mini 14-day heatmap -->
+          <div class="nfw-heatmap">
+            @for (day of nf.last90Days | slice:-14; track $index) {
+              <div class="nfw-cell" [class.clean]="day === true" [class.relapse]="day === false" [class.empty]="day === null"></div>
+            }
+          </div>
+          <span class="tech nfw-hm-label">LAST 14 DAYS</span>
+
+          <!-- Quote -->
+          <div class="nfw-quote tech">"{{ nf.dailyQuote }}"</div>
+        </div>
+      }
+
       
       <!-- Career: LeetCode stats -->
       <div class="system-card block" style="margin-top: 16px;">

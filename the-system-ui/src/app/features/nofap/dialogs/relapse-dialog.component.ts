@@ -1,4 +1,4 @@
-import { Component, Inject, signal } from '@angular/core';
+import { Component, Inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -30,18 +30,26 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
           }
         </div>
 
-        <label class="tech label mt-4">CONFIRMATION:</label>
+        <label class="tech label mt-4">REFLECTION (MIN 50 WORDS):</label>
         <p class="desc tech" style="font-size: 0.65rem; color: #ff5252;">
-          Type "I AM RELAPSING" below to confirm.
+          Write down exactly how this happened. What was the sequence of events? How do you feel now? How will you prevent this exact scenario next time?
         </p>
-        <input class="tech-input" type="text" [(ngModel)]="confirmText" placeholder="I AM RELAPSING" />
+        <textarea class="tech-input textarea" 
+                  [(ngModel)]="reflectionText" 
+                  (ngModelChange)="onReflectionChange($event)"
+                  placeholder="I failed because... Next time I will..." 
+                  rows="5"></textarea>
+                  
+        <div class="word-counter tech" [class.valid]="wordCount() >= 50">
+          WORDS: {{ wordCount() }} / 50
+        </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn-cancel tech" (click)="dialogRef.close(false)">ABORT</button>
         <button class="btn-confirm tech" 
                 [disabled]="!isValid()" 
-                (click)="dialogRef.close({ trigger: selectedTrigger() })">
+                (click)="confirmFailure()">
           CONFIRM FAILURE
         </button>
       </div>
@@ -92,8 +100,18 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
       letter-spacing: 1px;
       border-radius: 4px;
       box-sizing: border-box;
+      resize: vertical;
     }
     .tech-input:focus { outline: none; border-color: #ff5252; }
+    
+    .word-counter {
+      text-align: right;
+      font-size: 0.65rem;
+      color: #ff5252;
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+    .word-counter.valid { color: #4ade80; }
 
     .modal-footer { display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; }
     .btn-cancel { background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 0.75rem; letter-spacing: 1px; }
@@ -124,11 +142,46 @@ export class RelapseDialogComponent {
   ];
   
   selectedTrigger = signal<string | null>(null);
-  confirmText = '';
+  reflectionText = signal('');
+  
+  wordCount = computed(() => {
+    const text = this.reflectionText().trim();
+    if (!text) return 0;
+    return text.split(/\s+/).length;
+  });
 
   constructor(public dialogRef: MatDialogRef<RelapseDialogComponent>) {}
 
+  onReflectionChange(val: string) {
+    this.reflectionText.set(val);
+  }
+
   isValid(): boolean {
-    return this.selectedTrigger() !== null && this.confirmText === 'I AM RELAPSING';
+    return this.selectedTrigger() !== null && this.wordCount() >= 50;
+  }
+
+  confirmFailure() {
+    if (!this.isValid()) return;
+    
+    const autopsy = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      trigger: this.selectedTrigger(),
+      reflection: this.reflectionText().trim()
+    };
+    
+    // Save to localStorage
+    const year = new Date().getFullYear();
+    const key = `nf_relapses_${year}`;
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    existing.push(autopsy);
+    localStorage.setItem(key, JSON.stringify(existing));
+    
+    // Pass back to component
+    this.dialogRef.close({ 
+      trigger: this.selectedTrigger(),
+      autopsy: autopsy
+    });
   }
 }
+

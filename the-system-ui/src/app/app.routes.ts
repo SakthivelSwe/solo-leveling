@@ -84,5 +84,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/nofap/nofap-challenge.component').then(m => m.NoFapChallengeComponent),
   },
+  {
+    path: 'dopamine',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dopamine/dopamine-tracker.component').then(m => m.DopamineTrackerComponent),
+  },
   { path: '**', redirectTo: 'system' },
 ];

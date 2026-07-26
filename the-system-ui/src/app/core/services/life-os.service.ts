@@ -7,7 +7,7 @@ import {
   SavingsGoal, BudgetEntry, HealthLog, MindLog, SelfDoubtEvidence,
   EnglishLog, VocabularyLog, BodyLog, RelationshipLog,
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
-  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry
+  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -81,8 +81,11 @@ export class LifeOsService {
   getRelationshipToday(): Observable<RelationshipLog> { return this.http.get<RelationshipLog>(`${this.api}/relationship/today`); }
   upsertRelationship(b: RelationshipLog): Observable<RelationshipLog> { return this.http.post<RelationshipLog>(`${this.api}/relationship/log`, b); }
 
-  /* ===== Daily Mission Generator ===== */
-  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission`); }
+  /* ===== Daily Missions ===== */
+  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/missions/today`); }
+
+
+  /* ===== System Notes ===== */
   regenerateDailyMissions(): Observable<DailyMissionDTO> { return this.http.post<DailyMissionDTO>(`${this.api}/daily-mission/regenerate`, {}); }
 
   /* ===== AI Commander ===== */
@@ -100,6 +103,10 @@ export class LifeOsService {
 
   /* ===== Shadow Army ===== */
   getShadows(): Observable<Shadow[]> { return this.http.get<Shadow[]>(`${this.api}/shadows`); }
+
+  extractDisciplineShadow(): Observable<Shadow> {
+    return this.http.post<Shadow>(`${this.api}/shadows/extract-discipline`, {});
+  }
 
   /* ===== Phase 2 — Physical Tracking ===== */
   // Body metrics (weight + body-fat)
@@ -133,5 +140,8 @@ export class LifeOsService {
     return this.http.post<any>(`${this.api}/nofap/set-start-date`, { startDate });
   }
   reportUrgeSurvived(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/urge-survived`, {}); }
+
+  /* ===== Penalty Zone ===== */
+  survivePenalty(): Observable<Player> { return this.http.post<Player>(`${this.api}/player/survive-penalty`, {}); }
 }
 

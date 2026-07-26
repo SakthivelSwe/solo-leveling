@@ -616,4 +616,13 @@ export interface NoFapStatus {
   systemVerdict: string;
   /** Index 0 = 89 days ago, last = today. null = no record, true = clean, false = relapse */
   last90Days: (boolean | null)[];
+  /** Today's motivational quote matched to current streak day */
+  dailyQuote: string;
+  /** Quote author / source */
+  dailyQuoteAuthor: string;
+  /** Recovery speed vs global avg (100 = on pace, >100 = faster than average) */
+  recoveryVelocity: number;
+  /** Phase-based unlockable title, e.g. "Week Warrior", "Shadow Monarch" */
+  phaseTitle: string;
 }
+

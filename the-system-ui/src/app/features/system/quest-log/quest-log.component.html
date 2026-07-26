@@ -118,6 +118,9 @@
       </div>
       <div class="quest-body">
         <div class="quest-tags">
+          <span class="rank-badge mono" [style.color]="getRankColor(q.xpReward)" [style.border-color]="getRankColor(q.xpReward)" [style.background-color]="getRankColor(q.xpReward) + '15'">
+            {{ getRank(q.xpReward) }}
+          </span>
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
@@ -160,6 +163,9 @@
       </div>
       <div class="quest-body">
         <div class="quest-tags">
+          <span class="rank-badge mono" [style.color]="getRankColor(q.xpReward)" [style.border-color]="getRankColor(q.xpReward)" [style.background-color]="getRankColor(q.xpReward) + '15'">
+            {{ getRank(q.xpReward) }}
+          </span>
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">WEEKLY</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
@@ -211,6 +217,9 @@
       </div>
       <div class="quest-body">
         <div class="quest-tags">
+          <span class="rank-badge mono" [style.color]="getRankColor(q.xpReward)" [style.border-color]="getRankColor(q.xpReward)" [style.background-color]="getRankColor(q.xpReward) + '15'">
+            {{ getRank(q.xpReward) }}
+          </span>
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">MONTHLY</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
@@ -254,7 +263,12 @@
         <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
       </div>
       <div class="quest-body">
-        <span class="cat-tag mono milestone-tag" [style.color]="categoryColor('MILESTONE')">MILESTONE</span>
+        <div class="quest-tags">
+          <span class="rank-badge mono" [style.color]="getRankColor(q.xpReward)" [style.border-color]="getRankColor(q.xpReward)" [style.background-color]="getRankColor(q.xpReward) + '15'">
+            {{ getRank(q.xpReward) }}
+          </span>
+          <span class="cat-tag mono milestone-tag" [style.color]="categoryColor('MILESTONE')">MILESTONE</span>
+        </div>
         <span class="label">{{ q.label }}</span>
         <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
           {{ formatBoosts(q.statBoosts) }}

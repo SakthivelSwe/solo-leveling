@@ -62,6 +62,20 @@ public class NoFapStatusDTO {
     /** Index 0 = 89 days ago, last element = today. null = no data, true = clean, false = relapse */
     private List<Boolean> last90Days;
 
+    // ── Daily motivational quote ──────────────────────────────────────────────
+    /** Today's motivational quote based on streak day */
+    private String dailyQuote;
+    /** Quote author / source */
+    private String dailyQuoteAuthor;
+
+    // ── Recovery velocity ─────────────────────────────────────────────────────
+    /** Recovery velocity score vs global average (0–200+, 100 = on par with average) */
+    private double recoveryVelocity;
+
+    // ── Phase title ───────────────────────────────────────────────────────────
+    /** Unlockable title based on current phase milestone, e.g. "Awakening Hunter" */
+    private String phaseTitle;
+
     // ────────────────────────────────────────────────────────────────────────
     // Nested types
     // ────────────────────────────────────────────────────────────────────────

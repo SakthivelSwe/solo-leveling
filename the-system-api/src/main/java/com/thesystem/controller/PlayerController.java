@@ -54,6 +54,11 @@ public class PlayerController {
         return playerService.updateRestDay(playerId(principal), active, dayOfWeek);
     }
 
+    @PostMapping("/survive-penalty")
+    public PlayerDTO survivePenalty(Principal principal) {
+        return playerService.survivePenalty(playerId(principal));
+    }
+
     private Long playerId(Principal principal) {
         Player player = playerService.getByUsername(principal.getName());
         return player.getId();

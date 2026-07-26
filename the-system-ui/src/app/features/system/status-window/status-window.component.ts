@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Player, Stats } from '../../../core/models/models';
+import { RouterLink } from '@angular/router';
+import { Player, Stats, NoFapStatus } from '../../../core/models/models';
 import { RankBadgeComponent } from '../../../shared/components/rank-badge.component';
 import { RotatingQuoteComponent } from './rotating-quote.component';
 import { STATS_META } from '../../../shared/system.constants';
@@ -9,7 +10,7 @@ import { fadeInUp } from '../../../shared/animations';
 @Component({
   selector: 'app-status-window',
   standalone: true,
-  imports: [CommonModule, RankBadgeComponent, RotatingQuoteComponent],
+  imports: [CommonModule, RouterLink, RankBadgeComponent, RotatingQuoteComponent],
   templateUrl: './status-window.component.html',
   styleUrls: ['./status-window.component.scss'],
   animations: [fadeInUp],
@@ -23,6 +24,7 @@ export class StatusWindowComponent {
   @Input() completedToday = 0;
   @Input() totalQuests = 0;
   @Input() dopamine?: import('../../../core/models/models').DopamineSummary | null;
+  @Input() noFap?: NoFapStatus | null;
 
   readonly statsMeta = STATS_META;
 

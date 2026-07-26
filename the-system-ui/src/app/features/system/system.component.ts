@@ -12,7 +12,8 @@ import { SseService } from '../../core/services/sse.service';
 import {
   StatusWindow, Quest, QuestCompletionResult, PlayerSkill,
   Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon,
-  DailyMissionDTO, DopamineSummary, JobApplication, LeetcodeLog, LeetcodeStats
+  DailyMissionDTO, DopamineSummary, JobApplication, LeetcodeLog, LeetcodeStats,
+  NoFapStatus
 } from '../../core/models/models';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { UiStateService } from '../../core/services/ui-state.service';
@@ -26,6 +27,7 @@ import { SettingsPanelComponent } from '../../shared/components/settings-panel.c
 import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
 import { PomodoroComponent } from './pomodoro.component';
 import { AiCommanderComponent } from './ai-commander/ai-commander.component';
+import { PenaltyZoneComponent } from './penalty-zone/penalty-zone.component';
 
 import { FormsModule } from '@angular/forms';
 
@@ -36,7 +38,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule, RouterLink, RouterLinkActive, FormsModule,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
     DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, PomodoroComponent,
-    AiCommanderComponent
+    AiCommanderComponent, PenaltyZoneComponent
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
@@ -60,6 +62,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   weeklyQuests = signal<Quest[]>([]);
   monthlyQuests = signal<Quest[]>([]);
   milestoneQuests = signal<Quest[]>([]);
+  noFap = signal<NoFapStatus | null>(null);
   
   todayDateStr = signal<string>('');
   tomorrowDateStr = signal<string>('');
@@ -182,6 +185,11 @@ export class SystemComponent implements OnInit, OnDestroy {
       error: () => this.leetHistory.set([])
     });
     this.loadQuestTabs();
+    // NoFap streak — non-blocking; silently omit if not started
+    this.lifeOsService.getNoFapStatus().subscribe({
+      next: (nf) => this.noFap.set(nf),
+      error: () => this.noFap.set(null),
+    });
   }
 
   loadQuestTabs(): void {
@@ -201,6 +209,36 @@ export class SystemComponent implements OnInit, OnDestroy {
 
   private toast(msg: string): void {
     this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'center', verticalPosition: 'top' });
+  }
+
+  onPenaltySurvived(): void {
+    // Reload the full status window to update HP
+    this.load();
+    this.toast('◈ Penalty Cleared. HP Restored.');
+  }
+
+  extractingShadow = signal(false);
+
+  hasIgris(): boolean {
+    return this.shadows().some(s => s.shadowName === 'IGRIS (Discipline)');
+  }
+
+  extractShadow(): void {
+    if (this.extractingShadow()) return;
+    this.extractingShadow.set(true);
+    
+    this.lifeOsService.extractDisciplineShadow().subscribe({
+      next: (shadow) => {
+        this.extractingShadow.set(false);
+        this.toast('◈ ARISE. The Shadow of Discipline has joined your army.');
+        this.haptics.streak();
+        this.shadows.update(s => [...s, shadow]);
+      },
+      error: (err) => {
+        this.extractingShadow.set(false);
+        this.toast('⚠ Failed to extract shadow.');
+      }
+    });
   }
 
   isGeneratingAi = signal(false);

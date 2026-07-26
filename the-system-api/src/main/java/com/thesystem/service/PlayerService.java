@@ -105,6 +105,24 @@ public class PlayerService {
         return toDto(playerRepository.save(p));
     }
 
+    @Transactional
+    public PlayerDTO survivePenalty(Long playerId) {
+        Player player = find(playerId);
+        
+        if (player.getHp() > 0) {
+            throw new ApiException("You are not currently in the Penalty Zone.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Penalty survived: restore HP to 50
+        player.setHp(50);
+        player = playerRepository.save(player);
+        
+        // Reward some XP for surviving the grueling penalty
+        levelService.addXp(player, 50, "PENALTY_SURVIVAL");
+        
+        return toDto(player);
+    }
+
     /**
      * Permanently deletes the player and every record they own. All player-scoped
      * entities reference the player through a plain {@code playerId} column, so a

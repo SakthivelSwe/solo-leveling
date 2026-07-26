@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { NoFapStatus, ScienceDayCard, AddictionInsight } from '../../core/models/models';
 import { RelapseDialogComponent } from './dialogs/relapse-dialog.component';
 import { UrgeProtocolComponent } from './dialogs/urge-protocol.component';
+import { PastAutopsiesComponent } from './dialogs/past-autopsies.component';
 
 @Component({
   selector: 'app-nofap-challenge',
@@ -27,6 +28,52 @@ export class NoFapChallengeComponent implements OnInit {
   activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS'>('BRAIN');
   activeScienceDay = signal<ScienceDayCard | null>(null);
   showMilestoneAnimation = signal(false);
+
+  // Breathing widget
+  breathingActive = signal(false);
+  breathingPhase = signal<'inhale' | 'hold' | 'exhale' | 'idle'>('idle');
+  breathingSeconds = signal(0);
+  private breathingInterval: any = null;
+  private breathingCycle = 0;
+
+  // Timeline view mode
+  timelineViewMode = signal<'scroll' | 'grid'>('scroll');
+  selectedPhaseFilter = signal<string | null>(null);
+
+  // Quote display
+  quoteVisible = signal(true);
+  showQuotePulse = signal(false);
+
+  // Expanded day detail visibility
+  showDayDetail = signal(true);
+
+  // ── Mood Journal ─────────────────────────────────────────────
+  readonly moods: MoodEntry['mood'][] = ['GREAT', 'GOOD', 'NEUTRAL', 'LOW', 'URGE'];
+  readonly moodEmoji: Record<MoodEntry['mood'], string> = {
+    GREAT: '🔥', GOOD: '😊', NEUTRAL: '😐', LOW: '😔', URGE: '⚡'
+  };
+  readonly moodColor: Record<MoodEntry['mood'], string> = {
+    GREAT: '#1FBE8E', GOOD: '#6C63FF', NEUTRAL: '#FAC775', LOW: '#E24B4A', URGE: '#A855F7'
+  };
+  todayMood = signal<MoodEntry['mood'] | null>(null);
+  moodHistory = signal<MoodEntry[]>([]);
+  moodNote = '';
+
+  // ── Trigger Tracker ────────────────────────────────────────────
+  readonly commonTriggers = [
+    { key: 'BOREDOM',    label: 'Boredom',         icon: '😴' },
+    { key: 'STRESS',     label: 'Stress',           icon: '😤' },
+    { key: 'LONELINESS', label: 'Loneliness',       icon: '😶' },
+    { key: 'SOCIAL',     label: 'Social Media',     icon: '📱' },
+    { key: 'NIGHT',      label: 'Late Night',       icon: '🌙' },
+    { key: 'FANTASY',    label: 'Fantasy/Thoughts', icon: '💭' },
+    { key: 'ANGER',      label: 'Anger/Frustration',icon: '😡' },
+    { key: 'REJECTION',  label: 'Rejection',        icon: '💔' },
+  ];
+  triggerLog = signal<TriggerEntry[]>([]);
+  triggerFreq = signal<Record<string, number>>({});
+  customTriggerInput = '';
+  todayTriggerLogged = signal(false);
 
   /** True when the user has zero logs — show the "I Already Started" onboarding banner */
   showOnboarding = computed(() => {
@@ -49,6 +96,16 @@ export class NoFapChallengeComponent implements OnInit {
     return d.toISOString().split('T')[0];
   })();
 
+  // ── Nightfall Tracker ────────────────────────────────────────────
+  nightfallDates = signal<string[]>([]);
+  
+  // Flatline Warning System
+  isFlatline = computed(() => {
+    const s = this.status();
+    if (!s) return false;
+    return s.currentStreak >= 14 && s.currentStreak <= 45;
+  });
+
   // Milestone definitions
   readonly milestones = [
     { day: 7,   label: 'Week Warrior',       xp: 500,   icon: '⚔️' },
@@ -61,6 +118,9 @@ export class NoFapChallengeComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.loadMoodJournal();
+    this.loadTriggerLog();
+    this.loadNightfalls();
   }
 
   load(): void {
@@ -68,8 +128,15 @@ export class NoFapChallengeComponent implements OnInit {
     this.lifeOs.getNoFapStatus().subscribe({
       next: (s: NoFapStatus) => {
         this.status.set(s);
-        this.activeScienceDay.set(s.dayByDayScience?.[0] ?? null);
+        // Select the card for the current streak day
+        const cards = s.dayByDayScience ?? [];
+        const todayCard = cards.find(c => c.day === s.currentStreak)
+          ?? cards.reduce((best, c) => c.day <= s.currentStreak ? c : best, cards[0]);
+        this.activeScienceDay.set(todayCard ?? cards[0] ?? null);
         this.loading.set(false);
+        // Brief quote pulse animation
+        this.showQuotePulse.set(true);
+        setTimeout(() => this.showQuotePulse.set(false), 1200);
       },
       error: () => {
         this.loading.set(false);
@@ -115,6 +182,13 @@ export class NoFapChallengeComponent implements OnInit {
           error: () => { this.reporting.set(false); this.toast('⚠ Failed to log relapse'); },
         });
       }
+    });
+  }
+
+  viewPastAutopsies(): void {
+    this.dialog.open(PastAutopsiesComponent, {
+      width: '600px',
+      panelClass: 'dark-dialog'
     });
   }
 
@@ -261,17 +335,206 @@ export class NoFapChallengeComponent implements OnInit {
   }
 
   isTodayCard(card: ScienceDayCard, streak: number): boolean {
+    // The current day card is the one whose day matches the streak exactly,
+    // or the closest one without exceeding it
     const cards = this.status()?.dayByDayScience ?? [];
-    let bestDay = 0;
+    let bestDay = -1;
     for (const c of cards) {
       if (c.day <= streak) bestDay = c.day;
     }
     return card.day === bestDay;
   }
 
+  toggleTimelineView(): void {
+    this.timelineViewMode.set(this.timelineViewMode() === 'scroll' ? 'grid' : 'scroll');
+  }
+
+  setPhaseFilter(phase: string | null): void {
+    this.selectedPhaseFilter.set(phase);
+  }
+
+  filteredTimelineCards(): ScienceDayCard[] {
+    const cards = this.status()?.dayByDayScience ?? [];
+    const filter = this.selectedPhaseFilter();
+    if (!filter) return cards;
+    return cards.filter(c => c.phase === filter);
+  }
+
+  recoveryVelocityLabel(velocity: number): string {
+    if (velocity >= 1000) return 'LEGENDARY';
+    if (velocity >= 500) return 'ELITE';
+    if (velocity >= 200) return 'STRONG';
+    if (velocity >= 100) return 'ON TRACK';
+    if (velocity >= 50) return 'BUILDING';
+    return 'STARTING';
+  }
+
+  recoveryVelocityColor(velocity: number): string {
+    if (velocity >= 1000) return '#A855F7';
+    if (velocity >= 500) return '#1FBE8E';
+    if (velocity >= 200) return '#FAC775';
+    if (velocity >= 100) return '#6C63FF';
+    return '#E24B4A';
+  }
+
+  // ── Breathing Widget ────────────────────────────────────────────
+  startBreathing(): void {
+    if (this.breathingActive()) {
+      this.stopBreathing();
+      return;
+    }
+    this.breathingActive.set(true);
+    this.breathingCycle = 0;
+    this.runBreathingCycle();
+  }
+
+  private runBreathingCycle(): void {
+    const phases: Array<{ phase: 'inhale' | 'hold' | 'exhale'; duration: number; label: string }> = [
+      { phase: 'inhale', duration: 4, label: 'BREATHE IN' },
+      { phase: 'hold',   duration: 7, label: 'HOLD' },
+      { phase: 'exhale', duration: 8, label: 'BREATHE OUT' },
+    ];
+
+    let phaseIdx = 0;
+    let secondsLeft = phases[0].duration;
+    this.breathingPhase.set(phases[0].phase);
+    this.breathingSeconds.set(secondsLeft);
+
+    this.breathingInterval = setInterval(() => {
+      secondsLeft--;
+      this.breathingSeconds.set(secondsLeft);
+
+      if (secondsLeft <= 0) {
+        phaseIdx = (phaseIdx + 1) % phases.length;
+        if (phaseIdx === 0) {
+          this.breathingCycle++;
+          if (this.breathingCycle >= 3) {
+            this.stopBreathing();
+            this.toast('◈ 4-7-8 breathing complete. Urge suppressed.');
+            return;
+          }
+        }
+        secondsLeft = phases[phaseIdx].duration;
+        this.breathingPhase.set(phases[phaseIdx].phase);
+        this.breathingSeconds.set(secondsLeft);
+      }
+    }, 1000);
+  }
+
+  stopBreathing(): void {
+    if (this.breathingInterval) {
+      clearInterval(this.breathingInterval);
+      this.breathingInterval = null;
+    }
+    this.breathingActive.set(false);
+    this.breathingPhase.set('idle');
+    this.breathingSeconds.set(0);
+    this.breathingCycle = 0;
+  }
+
   private triggerMilestone(): void {
     this.showMilestoneAnimation.set(true);
     setTimeout(() => this.showMilestoneAnimation.set(false), 4000);
+  }
+
+  // ── Mood Journal Methods ──────────────────────────────────────
+
+  private moodStorageKey(): string {
+    return `nf_mood_${new Date().getFullYear()}`;
+  }
+
+  loadMoodJournal(): void {
+    try {
+      const raw = localStorage.getItem(this.moodStorageKey());
+      const entries: MoodEntry[] = raw ? JSON.parse(raw) : [];
+      this.moodHistory.set(entries.slice(-30)); // Last 30 days
+      // Set today's mood if already logged
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayEntry = entries.find(e => e.date === todayStr);
+      if (todayEntry) this.todayMood.set(todayEntry.mood);
+    } catch { this.moodHistory.set([]); }
+  }
+
+  logMood(mood: MoodEntry['mood']): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+    try {
+      const raw = localStorage.getItem(this.moodStorageKey());
+      const entries: MoodEntry[] = raw ? JSON.parse(raw) : [];
+      // Remove today's entry if exists
+      const filtered = entries.filter(e => e.date !== todayStr);
+      filtered.push({ date: todayStr, mood, note: this.moodNote.trim() || undefined });
+      localStorage.setItem(this.moodStorageKey(), JSON.stringify(filtered));
+      this.todayMood.set(mood);
+      this.moodHistory.set(filtered.slice(-30));
+      this.moodNote = '';
+      this.toast(`${this.moodEmoji[mood]} Mood logged: ${mood}`);
+    } catch { this.toast('⚠ Could not save mood'); }
+  }
+
+  last7MoodHistory(): MoodEntry[] {
+    const all = this.moodHistory();
+    return all.slice(-7);
+  }
+
+  moodBarHeight(mood: MoodEntry['mood']): number {
+    const map: Record<MoodEntry['mood'], number> = {
+      GREAT: 100, GOOD: 80, NEUTRAL: 55, LOW: 30, URGE: 20
+    };
+    return map[mood];
+  }
+
+  // ── Trigger Tracker Methods ───────────────────────────────────
+
+  private triggerStorageKey(): string {
+    return `nf_triggers_${new Date().getFullYear()}`;
+  }
+
+  loadTriggerLog(): void {
+    try {
+      const raw = localStorage.getItem(this.triggerStorageKey());
+      const entries: TriggerEntry[] = raw ? JSON.parse(raw) : [];
+      this.triggerLog.set(entries.slice(-50));
+      // Build frequency map
+      const freq: Record<string, number> = {};
+      for (const e of entries) { freq[e.trigger] = (freq[e.trigger] ?? 0) + 1; }
+      this.triggerFreq.set(freq);
+      // Check if already logged today
+      const todayStr = new Date().toISOString().split('T')[0];
+      this.todayTriggerLogged.set(entries.some(e => e.date === todayStr));
+    } catch { this.triggerLog.set([]); }
+  }
+
+  logTrigger(triggerKey: string, label: string): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+    try {
+      const raw = localStorage.getItem(this.triggerStorageKey());
+      const entries: TriggerEntry[] = raw ? JSON.parse(raw) : [];
+      entries.push({ date: todayStr, trigger: triggerKey, label });
+      localStorage.setItem(this.triggerStorageKey(), JSON.stringify(entries));
+      this.loadTriggerLog();
+      this.toast(`◈ Trigger logged: ${label}. Awareness is the first defence.`);
+    } catch { this.toast('⚠ Could not save trigger'); }
+  }
+
+  logCustomTrigger(): void {
+    const val = this.customTriggerInput.trim();
+    if (!val) { this.toast('⚠ Enter a trigger first'); return; }
+    this.logTrigger('CUSTOM_' + val.toUpperCase().replace(/\s/g, '_'), val);
+    this.customTriggerInput = '';
+  }
+
+  topTriggers(): Array<{ trigger: string; label: string; count: number }> {
+    const freq = this.triggerFreq();
+    const all = this.triggerLog();
+    const map = new Map<string, { label: string; count: number }>();
+    for (const e of all) {
+      if (!map.has(e.trigger)) map.set(e.trigger, { label: e.label, count: 0 });
+      map.get(e.trigger)!.count++;
+    }
+    return Array.from(map.entries())
+      .map(([trigger, v]) => ({ trigger, ...v }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
   }
 
   private toast(msg: string): void {
@@ -282,4 +545,63 @@ export class NoFapChallengeComponent implements OnInit {
       verticalPosition: 'top',
     });
   }
+
+  // ── Nightfall Tracker Methods ─────────────────────────────────
+
+  private nightfallStorageKey(): string {
+    return `nf_nightfalls_${new Date().getFullYear()}`;
+  }
+
+  loadNightfalls(): void {
+    try {
+      const raw = localStorage.getItem(this.nightfallStorageKey());
+      const entries: string[] = raw ? JSON.parse(raw) : [];
+      this.nightfallDates.set(entries);
+    } catch {
+      this.nightfallDates.set([]);
+    }
+  }
+
+  logNightfall(): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+    try {
+      const raw = localStorage.getItem(this.nightfallStorageKey());
+      const entries: string[] = raw ? JSON.parse(raw) : [];
+      
+      if (!entries.includes(todayStr)) {
+        entries.push(todayStr);
+        localStorage.setItem(this.nightfallStorageKey(), JSON.stringify(entries));
+        this.nightfallDates.set(entries);
+        this.toast(`◈ Nightfall logged. This is a natural release. Your streak remains pure.`);
+      } else {
+        this.toast(`⚠ Nightfall already logged for today.`);
+      }
+    } catch { 
+      this.toast('⚠ Could not log nightfall'); 
+    }
+  }
+
+  isNightfall(dateStr: string): boolean {
+    return this.nightfallDates().includes(dateStr);
+  }
+
+  isNightfallForHeatmapIndex(index: number): boolean {
+    const daysAgo = 89 - index;
+    const dateStr = this.dateForDaysAgo(daysAgo);
+    return this.isNightfall(dateStr);
+  }
 }
+
+// ── Local-storage data types ──────────────────────────────────────
+interface MoodEntry {
+  date: string;         // YYYY-MM-DD
+  mood: 'GREAT' | 'GOOD' | 'NEUTRAL' | 'LOW' | 'URGE';
+  note?: string;
+}
+
+interface TriggerEntry {
+  date: string;         // YYYY-MM-DD
+  trigger: string;      // key e.g. BOREDOM, STRESS, CUSTOM_...
+  label: string;        // human label
+}
+

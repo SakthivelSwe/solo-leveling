@@ -56,6 +56,15 @@
         <span class="mono v">{{ completedToday }}/{{ totalQuests }}</span>
       </div>
     </div>
+    <!-- NoFap Streak chip -->
+    @if (noFap) {
+      <a routerLink="/nofap" class="meta-chip nofap-chip" [style.borderColor]="noFap.phaseColor + '55'">
+        <span class="tech k">🔥 DISCIPLINE</span>
+        <span class="mono v" [style.color]="noFap.phaseColor">{{ noFap.currentStreak }}</span>
+        <span class="tech k" style="font-size:.52rem">DAYS · {{ noFap.phaseTitle }}</span>
+      </a>
+    }
+
     <!-- Phase 2/3 Gauges -->
     <div class="gauges" style="display: flex; gap: 16px; margin-top: 16px;">
       <div class="gauge" *ngIf="player.currentEnergy !== undefined" style="flex: 1;">
@@ -67,14 +76,14 @@
         <div class="tech" style="text-align: right; font-size: 0.7rem; color: #FAC775; margin-top: 4px;">{{ player.currentEnergy }}/100</div>
       </div>
 
-      <div class="gauge" *ngIf="dopamine" style="flex: 1;">
+      <a routerLink="/dopamine" class="gauge" *ngIf="dopamine" style="flex: 1; text-decoration: none; display: block; cursor: pointer; transition: transform 0.2s; padding: 4px; border-radius: 4px;" onmouseover="this.style.background='rgba(226,75,74,0.1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='transparent'; this.style.transform='translateY(0)'">
         <span class="tech" style="color: #E24B4A; font-size: 0.75rem;">🎯 FOCUS MULTIPLIER</span>
         <div class="stat-track" style="height: 6px; margin-top: 6px; background: rgba(226,75,74,0.1);">
           <div class="stat-fill" [style.width.%]="dopamine.focusPct"
                style="background: linear-gradient(90deg, rgba(226,75,74,0.4), #E24B4A); box-shadow: 0 0 8px rgba(226,75,74,0.5);"></div>
         </div>
-        <div class="tech" style="text-align: right; font-size: 0.7rem; color: #E24B4A; margin-top: 4px;">{{ dopamine.focusMultiplier }}x</div>
-      </div>
+        <div class="tech" style="text-align: right; font-size: 0.7rem; color: #E24B4A; margin-top: 4px;">{{ dopamine.focusMultiplier }}x (Manage)</div>
+      </a>
     </div>
   </div>
 

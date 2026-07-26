@@ -35,6 +35,48 @@
       </div>
     </header>
 
+    <!-- ═══════════════════════════════════════════════════════════
+         DAILY QUOTE BANNER
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="nf-section nf-quote-banner" [class.quote-pulse]="showQuotePulse()">
+      <div class="quote-stripe" [style.background]="s.phaseColor"></div>
+      <div class="quote-body">
+        <span class="quote-icon">💬</span>
+        <div class="quote-content">
+          <p class="quote-text">"{{ s.dailyQuote }}"</p>
+          <span class="quote-author tech">— {{ s.dailyQuoteAuthor }}</span>
+        </div>
+      </div>
+      <div class="quote-day-tag tech">DAY {{ s.currentStreak }}</div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         FLATLINE WARNING SYSTEM
+         ════════════════════════════════════════════════════════════ -->
+    @if (isFlatline()) {
+      <section class="nf-section flatline-warning system-card">
+        <div class="fl-header">
+          <span class="fl-icon">⚠️</span>
+          <div>
+            <h2 class="fl-title mono">SYSTEM ALERT: THE FLATLINE PHASE</h2>
+            <p class="fl-subtitle tech">Expected between Days 14 and 45</p>
+          </div>
+        </div>
+        <div class="fl-content">
+          <p class="fl-text">
+            You may be experiencing low energy, zero libido, brain fog, or mild depression. 
+            <strong>DO NOT PANIC.</strong> This is the <em>Flatline</em>. Your brain is aggressively down-regulating dopamine receptors to heal from hyper-stimulation. 
+          </p>
+          <ul class="fl-list tech">
+            <li>It means the healing process is working.</li>
+            <li>Your libido is not permanently gone; it is resetting to baseline.</li>
+            <li>A relapse now will instantly shatter this repair cycle.</li>
+          </ul>
+          <p class="fl-text fl-push">Endure the shadow. The light returns on the other side.</p>
+        </div>
+      </section>
+    }
+
     <!-- ════════════════════════════════════════════════════════════
          START DATE ONBOARDING — shown when no logs exist yet
          ════════════════════════════════════════════════════════════ -->
@@ -115,8 +157,13 @@
 
         <!-- Streak info -->
         <div class="hero-info">
-          <div class="phase-badge tech" [style.color]="s.phaseColor">
-            {{ s.phaseIcon }} {{ s.phaseName | uppercase }} PHASE
+          <div class="phase-title-row">
+            <div class="phase-badge tech" [style.color]="s.phaseColor">
+              {{ s.phaseIcon }} {{ s.phaseName | uppercase }} PHASE
+            </div>
+            <div class="phase-title-badge tech" [style.borderColor]="s.phaseColor" [style.color]="s.phaseColor">
+              {{ s.phaseTitle }}
+            </div>
           </div>
           <p class="verdict-text">{{ s.systemVerdict }}</p>
 
@@ -146,7 +193,7 @@
             <button class="btn-urge tech" (click)="openUrgeProtocol()">
               🚨 EMERGENCY URGE PROTOCOL
             </button>
-            <div class="action-row">
+            <div class="action-row" style="margin-bottom: 8px;">
               <button class="btn-confirm tech" (click)="confirmClean()" [disabled]="confirming()" [class.pulse]="!s.todayConfirmed">
                 {{ confirming() ? '...' : '✅ CONFIRM CLEAN DAY' }}
               </button>
@@ -154,9 +201,68 @@
                 {{ reporting() ? '...' : '☠ HONEST RELAPSE' }}
               </button>
             </div>
+            
+            <div class="action-row meta-actions" style="display: flex; gap: 8px;">
+              <button class="btn-secondary tech" (click)="logNightfall()" style="flex: 1; padding: 6px; font-size: 0.65rem; background: rgba(79, 195, 247, 0.1); border: 1px solid rgba(79, 195, 247, 0.3); color: #4fc3f7; border-radius: 4px; cursor: pointer;">
+                🌙 LOG NIGHTFALL
+              </button>
+              <button class="btn-secondary tech" (click)="viewPastAutopsies()" style="flex: 1; padding: 6px; font-size: 0.65rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; border-radius: 4px; cursor: pointer;">
+                ☠ PAST AUTOPSIES
+              </button>
+            </div>
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         BREATHING WIDGET — Inline 4-7-8 Technique
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card nf-breathing">
+      <div class="breathing-header">
+        <div>
+          <h2 class="section-title mono">◈ 4-7-8 BREATHING TECHNIQUE</h2>
+          <p class="section-sub tech">Proven urge suppressor — 3 cycles takes only 57 seconds</p>
+        </div>
+        <button class="btn-breathe tech" [class.active]="breathingActive()" (click)="startBreathing()">
+          {{ breathingActive() ? '⏹ STOP' : '▶ START' }}
+        </button>
+      </div>
+
+      <div class="breathing-visual" [class.active]="breathingActive()" [attr.data-phase]="breathingPhase()">
+        <div class="breathing-circle">
+          <div class="breathing-ring ring-outer"></div>
+          <div class="breathing-ring ring-inner"></div>
+          <div class="breathing-center">
+            @if (breathingActive()) {
+              <span class="breath-seconds mono">{{ breathingSeconds() }}</span>
+              <span class="breath-phase-label tech">
+                {{ breathingPhase() === 'inhale' ? 'BREATHE IN' : breathingPhase() === 'hold' ? 'HOLD' : 'BREATHE OUT' }}
+              </span>
+            } @else {
+              <span class="breath-idle-icon">🧘</span>
+              <span class="breath-idle-label tech">READY</span>
+            }
+          </div>
+        </div>
+
+        <div class="breath-steps">
+          <div class="breath-step" [class.active]="breathingPhase() === 'inhale'">
+            <span class="bs-num tech">4s</span>
+            <span class="bs-label">Inhale</span>
+          </div>
+          <div class="breath-arrow tech">→</div>
+          <div class="breath-step" [class.active]="breathingPhase() === 'hold'">
+            <span class="bs-num tech">7s</span>
+            <span class="bs-label">Hold</span>
+          </div>
+          <div class="breath-arrow tech">→</div>
+          <div class="breath-step" [class.active]="breathingPhase() === 'exhale'">
+            <span class="bs-num tech">8s</span>
+            <span class="bs-label">Exhale</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -177,11 +283,32 @@
     </section>
 
     <!-- ════════════════════════════════════════════════════════════
-         SECTION 3 — DAY-BY-DAY SCIENCE TIMELINE
+         SECTION 3 — FULL 90-DAY BRAIN JOURNEY (Every Day)
          ════════════════════════════════════════════════════════════ -->
     <section class="nf-section system-card">
-      <h2 class="section-title mono">◈ 90-DAY BRAIN JOURNEY</h2>
-      <p class="section-sub tech">What happens inside your brain when you stay clean</p>
+      <div class="timeline-header">
+        <div>
+          <h2 class="section-title mono">◈ 90-DAY BRAIN JOURNEY</h2>
+          <p class="section-sub tech">Every single day — what happens inside your brain</p>
+        </div>
+        <button class="btn-toggle-view tech" (click)="toggleTimelineView()">
+          {{ timelineViewMode() === 'scroll' ? '⊞ GRID' : '≡ SCROLL' }}
+        </button>
+      </div>
+
+      <!-- Phase filter pills -->
+      <div class="phase-filter-row">
+        <button class="pf-pill tech" [class.active]="selectedPhaseFilter() === null"
+                (click)="setPhaseFilter(null)">ALL</button>
+        <button class="pf-pill tech" [class.active]="selectedPhaseFilter() === 'REWIRING'"
+                (click)="setPhaseFilter('REWIRING')" style="--pill-color:#E24B4A">REWIRING</button>
+        <button class="pf-pill tech" [class.active]="selectedPhaseFilter() === 'CLARITY'"
+                (click)="setPhaseFilter('CLARITY')" style="--pill-color:#FAC775">CLARITY</button>
+        <button class="pf-pill tech" [class.active]="selectedPhaseFilter() === 'TRANSFORMATION'"
+                (click)="setPhaseFilter('TRANSFORMATION')" style="--pill-color:#1FBE8E">TRANSFORMATION</button>
+        <button class="pf-pill tech" [class.active]="selectedPhaseFilter() === 'MASTERY'"
+                (click)="setPhaseFilter('MASTERY')" style="--pill-color:#A855F7">MASTERY</button>
+      </div>
 
       <!-- Phase legend -->
       <div class="phase-legend">
@@ -191,20 +318,40 @@
         <span class="pl-dot" style="background:#A855F7"></span><span class="tech">MASTERY</span>
       </div>
 
-      <div class="timeline-scroll">
-        @for (card of s.dayByDayScience; track card.day) {
-          <div class="tl-card"
-               [class.tl-active]="s.currentStreak >= card.day"
-               [class.tl-current]="isTodayCard(card, s.currentStreak)"
-               [attr.data-phase]="card.phase"
-               (click)="selectScienceDay(card)">
-            <div class="tl-day mono">D{{ card.day }}</div>
-            <div class="tl-icon">{{ card.icon }}</div>
-            <div class="tl-title tech">{{ card.title.split('—')[1]?.trim() ?? card.title }}</div>
-            <div class="tl-phase-dot" [style.background]="phaseColor(card.phase)"></div>
-          </div>
-        }
-      </div>
+      <!-- Scroll view (default) -->
+      @if (timelineViewMode() === 'scroll') {
+        <div class="timeline-scroll">
+          @for (card of filteredTimelineCards(); track card.day) {
+            <div class="tl-card"
+                 [class.tl-active]="s.currentStreak >= card.day"
+                 [class.tl-current]="isTodayCard(card, s.currentStreak)"
+                 [attr.data-phase]="card.phase"
+                 (click)="selectScienceDay(card)">
+              <div class="tl-day mono">D{{ card.day }}</div>
+              <div class="tl-icon">{{ card.icon }}</div>
+              <div class="tl-title tech">{{ card.title.split('—')[1] ? card.title.split('—')[1].trim() : card.title }}</div>
+              <div class="tl-phase-dot" [style.background]="phaseColor(card.phase)"></div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Grid view -->
+      @if (timelineViewMode() === 'grid') {
+        <div class="timeline-grid">
+          @for (card of filteredTimelineCards(); track card.day) {
+            <div class="tg-card"
+                 [class.tg-active]="s.currentStreak >= card.day"
+                 [class.tg-current]="isTodayCard(card, s.currentStreak)"
+                 [attr.data-phase]="card.phase"
+                 (click)="selectScienceDay(card)">
+              <div class="tg-day mono">{{ card.day }}</div>
+              <div class="tg-icon">{{ card.icon }}</div>
+              <div class="tg-dot" [style.background]="phaseColor(card.phase)"></div>
+            </div>
+          }
+        </div>
+      }
 
       <!-- Expanded card detail -->
       @if (activeScienceDay(); as sc) {
@@ -217,6 +364,10 @@
             </div>
           </div>
           <p class="tld-desc">{{ sc.description }}</p>
+          <div class="tld-meta tech">
+            <span class="tld-phase-badge" [style.background]="phaseColor(sc.phase)">{{ sc.phase }}</span>
+            <span>DAY {{ sc.day }}</span>
+          </div>
         </div>
       }
     </section>
@@ -249,6 +400,25 @@
           <span class="stat-val" style="font-size: 1.6rem">{{ s.phaseIcon }}</span>
           <span class="stat-unit tech">{{ s.phaseName | uppercase }}</span>
         </div>
+        <!-- Recovery Velocity - NEW -->
+        <div class="stat-card stat-card-velocity" [style.borderColor]="recoveryVelocityColor(s.recoveryVelocity)">
+          <span class="stat-lbl tech">RECOVERY VELOCITY</span>
+          <span class="stat-val mono" [style.color]="recoveryVelocityColor(s.recoveryVelocity)">
+            {{ s.recoveryVelocity | number:'1.0-0' }}
+          </span>
+          <span class="stat-unit tech" [style.color]="recoveryVelocityColor(s.recoveryVelocity)">
+            {{ recoveryVelocityLabel(s.recoveryVelocity) }}
+          </span>
+          <span class="stat-hint tech">vs global avg</span>
+        </div>
+        <!-- Phase Title - NEW -->
+        <div class="stat-card stat-card-title" [style.borderColor]="s.phaseColor">
+          <span class="stat-lbl tech">TITLE EARNED</span>
+          <span class="stat-val mono" style="font-size: 0.9rem; line-height: 1.2" [style.color]="s.phaseColor">
+            {{ s.phaseTitle }}
+          </span>
+          <span class="stat-unit tech">RANK</span>
+        </div>
       </div>
 
       <!-- 90-day heatmap -->
@@ -257,13 +427,15 @@
         <div class="heatmap-grid">
           @for (day of s.last90Days; track $index) {
             <div class="hm-cell" [class]="heatmapClass(day)"
-                 [title]="'Day ' + ($index - 89)"></div>
+                 [class.hm-nightfall]="isNightfallForHeatmapIndex($index)"
+                 [title]="'Day ' + ($index - 89) + (isNightfallForHeatmapIndex($index) ? ' (Nightfall)' : '')"></div>
           }
         </div>
         <div class="hm-legend tech">
           <span class="hm-cell hm-clean"></span>Clean
           <span class="hm-cell hm-relapse"></span>Relapse
           <span class="hm-cell hm-empty"></span>No record
+          <span class="hm-cell hm-nightfall"></span>Nightfall
         </div>
       </div>
 
@@ -345,9 +517,133 @@
 
 
     <!-- ════════════════════════════════════════════════════════════
+         SECTION 7 — DAILY MOOD JOURNAL
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ DAILY MOOD JOURNAL</h2>
+      <p class="section-sub tech">Track your emotional state — patterns reveal your recovery arc</p>
+
+      <!-- Today's mood picker -->
+      <div class="mood-today">
+        <span class="tech mood-today-lbl">HOW ARE YOU TODAY?</span>
+        <div class="mood-picker">
+          @for (m of moods; track m) {
+            <button class="mood-btn"
+                    [class.selected]="todayMood() === m"
+                    [style.--mc]="moodColor[m]"
+                    (click)="logMood(m)">
+              <span class="mood-btn-emoji">{{ moodEmoji[m] }}</span>
+              <span class="mood-btn-label tech">{{ m }}</span>
+            </button>
+          }
+        </div>
+        @if (todayMood()) {
+          <div class="mood-logged-row">
+            <span class="tech mood-logged-tag" [style.color]="moodColor[todayMood()!]">
+              {{ moodEmoji[todayMood()!] }} TODAY: {{ todayMood() }}
+            </span>
+            <span class="tech mood-update-hint">Tap again to update</span>
+          </div>
+        }
+      </div>
+
+      <!-- Optional note -->
+      <div class="mood-note-row">
+        <input class="mood-note-input"
+               type="text"
+               placeholder="Optional note (what happened today?)..."
+               [(ngModel)]="moodNote"
+               maxlength="120" />
+      </div>
+
+      <!-- 7-day chart -->
+      @if (last7MoodHistory().length > 0) {
+        <div class="mood-chart-wrap">
+          <span class="tech mood-chart-title">7-DAY MOOD HISTORY</span>
+          <div class="mood-chart">
+            @for (entry of last7MoodHistory(); track entry.date) {
+              <div class="mc-col" [title]="entry.date + ' — ' + entry.mood">
+                <div class="mc-bar-wrap">
+                  <div class="mc-bar"
+                       [style.height.%]="moodBarHeight(entry.mood)"
+                       [style.background]="moodColor[entry.mood]"
+                       [style.boxShadow]="'0 0 8px ' + moodColor[entry.mood] + '88'">
+                  </div>
+                </div>
+                <span class="mc-emoji">{{ moodEmoji[entry.mood] }}</span>
+                <span class="tech mc-date">{{ entry.date | date:'d/M' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="mood-empty tech">Log your first mood to start tracking your recovery arc ↑</div>
+      }
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         SECTION 8 — TRIGGER TRACKER
+         ════════════════════════════════════════════════════════════ -->
+    <section class="nf-section system-card">
+      <h2 class="section-title mono">◈ TRIGGER TRACKER</h2>
+      <p class="section-sub tech">Know your enemy — log what caused the urge so you can defeat it next time</p>
+
+      <!-- Common triggers grid -->
+      <div class="trigger-grid">
+        @for (t of commonTriggers; track t.key) {
+          <button class="trigger-btn tech" (click)="logTrigger(t.key, t.label)">
+            <span class="trigger-icon">{{ t.icon }}</span>
+            <span class="trigger-label">{{ t.label }}</span>
+            @if ((triggerFreq()[t.key] || 0) > 0) {
+              <span class="trigger-count mono">{{ triggerFreq()[t.key] }}×</span>
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Custom trigger input -->
+      <div class="trigger-custom-row">
+        <input class="trigger-custom-input"
+               type="text"
+               placeholder="Custom trigger (e.g. 'saw an ad')..."
+               [(ngModel)]="customTriggerInput"
+               maxlength="50"
+               (keyup.enter)="logCustomTrigger()" />
+        <button class="trigger-custom-btn tech" (click)="logCustomTrigger()">+ LOG</button>
+      </div>
+
+      <!-- Top triggers frequency chart -->
+      @if (topTriggers().length > 0) {
+        <div class="top-triggers">
+          <span class="tech top-triggers-title">YOUR TOP TRIGGERS</span>
+          <div class="tt-bars">
+            @for (t of topTriggers(); track t.trigger) {
+              <div class="tt-row">
+                <span class="tt-label tech">{{ t.label }}</span>
+                <div class="tt-bar-track">
+                  <div class="tt-bar-fill"
+                       [style.width.%]="(t.count / (topTriggers()[0].count || 1)) * 100">
+                  </div>
+                </div>
+                <span class="tt-count mono">{{ t.count }}×</span>
+              </div>
+            }
+          </div>
+          <p class="tt-insight tech">
+            ◈ Your #1 trigger is <strong>{{ topTriggers()[0].label }}</strong>.
+            Next time you feel it, open the Emergency Urge Protocol immediately.
+          </p>
+        </div>
+      } @else {
+        <div class="trigger-empty tech">No triggers logged yet. When you feel an urge — tap what caused it. Awareness defeats it.</div>
+      }
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
          NIGHT EMISSION GUIDE — "Nightfall / Wet Dream" FAQ
          ════════════════════════════════════════════════════════════ -->
     <section class="nf-section system-card ne-section">
+
       <div class="ne-header">
         <span class="ne-icon">🌙</span>
         <div>
