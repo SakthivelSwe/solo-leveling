@@ -32,6 +32,10 @@ export class SseService {
   /** Bumps on every player-update so views can reload live (e.g. the dashboard). */
   readonly playerTick = signal(0);
 
+  /** Backoff state for SSE reconnect on error — prevents aggressive reconnect loops. */
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectDelayMs = 5000; // starts at 5s, caps at 30s
+
   constructor(
     private auth: AuthService,
     private notifications: NotificationService,
@@ -81,7 +85,10 @@ export class SseService {
     this.eventSource = es;
 
     es.addEventListener('connected', () =>
-      this.zone.run(() => this.connected.set(true)),
+      this.zone.run(() => {
+        this.connected.set(true);
+        this.reconnectDelayMs = 5000; // reset backoff on successful connection
+      }),
     );
 
     es.addEventListener('notification', (ev: MessageEvent) =>
@@ -97,11 +104,26 @@ export class SseService {
       this.zone.run(() => this.onPlayerUpdate(ev)),
     );
 
-    // EventSource auto-reconnects on error; just reflect the dropped state.
-    es.onerror = () => this.zone.run(() => this.connected.set(false));
+    // EventSource auto-reconnects on error; add backoff so an unreachable server
+    // doesn't trigger rapid reconnect storms that drain battery and heat the CPU.
+    es.onerror = () => this.zone.run(() => {
+      this.connected.set(false);
+      // Close the broken connection — don't let browser auto-reconnect
+      this.disconnect();
+      if (this.auth.isAuthenticated() && !document.hidden) {
+        if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = setTimeout(() => {
+          this.reconnectTimer = null;
+          this.reconnectDelayMs = Math.min(this.reconnectDelayMs * 2, 30000);
+          this.connect();
+        }, this.reconnectDelayMs);
+      }
+    });
   }
 
   private disconnect(): void {
+    if (this.reconnectTimer) { clearTimeout(this.reconnectTimer); this.reconnectTimer = null; }
+    this.reconnectDelayMs = 5000; // reset backoff on intentional disconnect
     this.eventSource?.close();
     this.eventSource = undefined;
     this.connected.set(false);

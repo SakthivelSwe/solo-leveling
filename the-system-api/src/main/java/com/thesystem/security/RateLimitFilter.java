@@ -27,6 +27,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final int MAX_REQUESTS = 15;
     private static final long WINDOW_MS = 60_000L;
 
+    /**
+     * Only trust X-Forwarded-For when running behind a known reverse proxy
+     * (Render's load balancer). If unset, fall back to the real remote address
+     * to prevent IP-spoofing attacks that bypass rate limiting.
+     *
+     * Set environment variable TRUST_PROXY=true on Render; leave unset locally.
+     */
+    private static final boolean TRUST_PROXY =
+            Boolean.parseBoolean(System.getenv().getOrDefault("TRUST_PROXY", "false"));
+
     private final Map<String, Deque<Long>> hits = new ConcurrentHashMap<>();
 
     @Override
@@ -67,9 +77,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
+        if (TRUST_PROXY) {
+            String forwarded = request.getHeader("X-Forwarded-For");
+            if (forwarded != null && !forwarded.isBlank()) {
+                // Take only the FIRST (leftmost) IP — the real client IP prepended by the proxy.
+                return forwarded.split(",")[0].trim();
+            }
         }
         return request.getRemoteAddr();
     }

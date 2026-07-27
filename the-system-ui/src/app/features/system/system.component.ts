@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, effect, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, effect, HostListener, NgZone, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -108,6 +108,8 @@ export class SystemComponent implements OnInit, OnDestroy {
   /** Debounce handle for coalescing bursts of live SSE events into one reload. */
   private reloadTimer: ReturnType<typeof setTimeout> | null = null;
 
+  private zone = inject(NgZone);
+
   constructor(
     private playerService: PlayerService,
     private lifeOsService: LifeOsService,
@@ -119,27 +121,33 @@ export class SystemComponent implements OnInit, OnDestroy {
     private haptics: HapticsService,
     private uiState: UiStateService
   ) {
-    // Live sync: reload the dashboard whenever a real-time player-update arrives
-    // (e.g. a quest completed in another tab, or midnight HP processing).
-    // Debounced so a BURST of events fires a single reload instead of hammering
-    // the backend with several HTTP requests per event (saves battery + heat).
+    // Live sync: On SSE player-update, only reload the lightweight status endpoint
+    // (player HP, XP, quests done) — NOT all 12 heavy endpoints. This is the main
+    // fix for mobile heat: reduces per-event HTTP requests from 12 → 1.
     effect(() => {
       const tick = this.sse.playerTick();
       if (tick > 0 && !this.loading()) {
         if (this.reloadTimer) clearTimeout(this.reloadTimer);
         this.reloadTimer = setTimeout(() => {
           this.reloadTimer = null;
-          this.load();
+          this.loadLive(); // lightweight: status + missions only
         }, 700);
       }
     });
   }
 
   ngOnInit(): void {
-    this.updateDates();
-    this.timeInterval = setInterval(() => this.updateDates(), 60000); // update every minute
+    // Run date-update timer OUTSIDE Angular's zone: prevents change detection
+    // from firing every 60 seconds even when nothing relevant changed.
+    this.zone.runOutsideAngular(() => {
+      this.updateDates();
+      this.timeInterval = setInterval(() => {
+        // Only re-enter the zone when we actually have new data to push
+        this.zone.run(() => this.updateDates());
+      }, 60000);
+    });
 
-    this.load();
+    this.loadFull(); // full initial load
     this.notifications.refreshUnread();
   }
 
@@ -150,7 +158,31 @@ export class SystemComponent implements OnInit, OnDestroy {
     if (this.reloadTimer) { clearTimeout(this.reloadTimer); this.reloadTimer = null; }
   }
 
-  load(): void {
+  /**
+   * LIGHTWEIGHT live refresh — called on every SSE player-update event.
+   * Only fetches the player status and daily missions (2 HTTP requests max).
+   * Keeps the dashboard responsive without hammering the radio/CPU on mobile.
+   */
+  loadLive(): void {
+    this.playerService.getStatus().subscribe({
+      next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); },
+      error: () => this.toast('⚠ Connection to the System lost'),
+    });
+    this.lifeOsService.getDailyMissions().subscribe({
+      next: (dm) => this.dailyMission.set(dm),
+      error: () => {},
+    });
+    this.lifeOsService.getNoFapStatus().subscribe({
+      next: (nf) => this.noFap.set(nf),
+      error: () => {},
+    });
+  }
+
+  /**
+   * FULL load — called once on ngOnInit and after user actions that change
+   * heavy data (shadow extraction, job add, AI sync). Fetches all 12 endpoints.
+   */
+  loadFull(): void {
     this.loading.set(true);
     this.playerService.getStatus().subscribe({
       next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); this.loading.set(false); },
@@ -185,11 +217,19 @@ export class SystemComponent implements OnInit, OnDestroy {
       error: () => this.leetHistory.set([])
     });
     this.loadQuestTabs();
-    // NoFap streak — non-blocking; silently omit if not started
     this.lifeOsService.getNoFapStatus().subscribe({
       next: (nf) => this.noFap.set(nf),
       error: () => this.noFap.set(null),
     });
+  }
+
+  /**
+   * Alias for legacy callers (quest completion, penalty survived, etc.)
+   * — reloads only the live data to keep it lean.
+   */
+  load(): void {
+    this.loadLive();
+    this.loadQuestTabs();
   }
 
   loadQuestTabs(): void {
@@ -254,26 +294,30 @@ export class SystemComponent implements OnInit, OnDestroy {
       this.toast('⚠ AI Quest Sync is on cooldown (24h)');
       return;
     }
-    if (!window.confirm('◈ Initiate AI Quest Sync? This will analyze your current stats and generate personalized quests. Can only be used once per 24 hours.')) {
-      return;
-    }
 
-    this.isGeneratingAi.set(true);
-    this.toast('◈ Generating personalized AI quests...');
-    this.playerService.generateAiQuests().subscribe({
-      next: () => {
-        this.isGeneratingAi.set(false);
-        localStorage.setItem('last_ai_sync', new Date().toISOString());
-        this.toast('◈ New AI quests locked in');
-        window.alert('◈ AI Sync Complete! Your new quests have been added.');
-        this.loadQuestTabs();
-        this.load(); // Refresh today's quests from quest repository
-      },
-      error: (err) => {
-        this.isGeneratingAi.set(false);
-        this.toast('⚠ Failed to generate AI quests');
-        window.alert('⚠ AI Sync Failed. Please check your API keys or connection.');
-      }
+    // Use snackbar with action instead of window.confirm (blocked in Android WebView)
+    const ref = this.snack.open(
+      '◈ Initiate AI Quest Sync? Analyzes your stats and generates personalized quests.',
+      'CONFIRM',
+      { duration: 8000, panelClass: 'system-snack', horizontalPosition: 'center', verticalPosition: 'top' }
+    );
+
+    ref.onAction().subscribe(() => {
+      this.isGeneratingAi.set(true);
+      this.toast('◈ Generating personalized AI quests...');
+      this.playerService.generateAiQuests().subscribe({
+        next: () => {
+          this.isGeneratingAi.set(false);
+          localStorage.setItem('last_ai_sync', new Date().toISOString());
+          this.toast('◈ AI Sync Complete! New quests locked in.');
+          this.loadQuestTabs();
+          this.load();
+        },
+        error: () => {
+          this.isGeneratingAi.set(false);
+          this.toast('⚠ AI Sync Failed. Check your API key configuration.');
+        }
+      });
     });
   }
 

@@ -51,18 +51,11 @@ public class EndOfDayScheduler {
         List<Player> players = playerRepository.findAll();
 
         for (Player player : players) {
-            boolean courageDone = completionRepository
-                    .existsByPlayerIdAndQuestKeyAndCompletedAt(player.getId(), "COURAGE_OF_THE_WEAK", yesterday);
-
-            if (!courageDone) {
-                player.setInPenaltyZone(true);
-                player.setPenaltyZoneEndTime(null);
-                notificationService.push(player.getId(), "◈ PENALTY ZONE",
-                        "You failed the Daily Quest. A Penalty Survival Quest has been assigned.", "SYSTEM_PENALTY");
-                log.warn("◈ Player {} sent to PENALTY ZONE.", player.getUsername());
-            } else {
-                player.setInPenaltyZone(false);
-            }
+            // Penalty Zone triggers only on a catastrophic failure day (hpChange == -20),
+            // evaluated after computing the HP change. Moved below HP calculation to prevent
+            // double-punishment (HP loss + penalty zone on same modest-failure day).
+            // We track this per player and apply after computing hpChange below.
+            boolean catastrophicFailure = false;
 
             long rawQuestsDone = completionRepository
                     .countByPlayerIdAndCompletedAt(player.getId(), yesterday);
@@ -119,6 +112,21 @@ public class EndOfDayScheduler {
                 notificationService.push(player.getId(), "◈ HP RESTORED",
                         "Perfect clearance yesterday. +" + hpChange + " HP. The System acknowledges you.",
                         "SYSTEM");
+            }
+
+            // Penalty Zone: only trigger on catastrophic failure (< minimum threshold = -20 HP day).
+            // This prevents double-punishment where a player loses HP AND enters penalty zone
+            // for the same mild underperformance day.
+            if (hpChange <= -20) {
+                player.setInPenaltyZone(true);
+                player.setPenaltyZoneEndTime(null);
+                notificationService.push(player.getId(), "◈ PENALTY ZONE",
+                        "Critical failure. Less than " + thresholdMinimum + " quests completed. " +
+                        "A Penalty Survival Quest has been assigned. Rise, Hunter.", "SYSTEM_PENALTY");
+                log.warn("◈ Player {} sent to PENALTY ZONE (catastrophic failure: {} effective quests).",
+                        player.getUsername(), effectiveDone);
+            } else {
+                player.setInPenaltyZone(false);
             }
 
             playerRepository.save(player);

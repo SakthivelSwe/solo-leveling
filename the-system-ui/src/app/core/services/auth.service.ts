@@ -76,7 +76,14 @@ export class AuthService {
 
   private loadPlayer(): Player | null {
     const raw = localStorage.getItem(PLAYER_KEY);
-    return raw ? JSON.parse(raw) as Player : null;
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as Player;
+    } catch {
+      // Corrupt localStorage entry — clear it so the user gets a clean login
+      localStorage.removeItem(PLAYER_KEY);
+      return null;
+    }
   }
 }
 

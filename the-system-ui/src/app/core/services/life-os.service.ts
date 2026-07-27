@@ -7,7 +7,7 @@ import {
   SavingsGoal, BudgetEntry, HealthLog, MindLog, SelfDoubtEvidence,
   EnglishLog, VocabularyLog, BodyLog, RelationshipLog,
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
-  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player
+  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player, NoFapStatus
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -82,7 +82,7 @@ export class LifeOsService {
   upsertRelationship(b: RelationshipLog): Observable<RelationshipLog> { return this.http.post<RelationshipLog>(`${this.api}/relationship/log`, b); }
 
   /* ===== Daily Missions ===== */
-  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/missions/today`); }
+  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission`); }
 
 
   /* ===== System Notes ===== */

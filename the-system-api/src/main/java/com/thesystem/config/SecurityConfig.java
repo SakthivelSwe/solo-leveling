@@ -92,7 +92,12 @@ public class SecurityConfig {
                 "https://solo-leveling-1h5.pages.dev"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        // Restrict to only headers the API actually needs — avoid wildcard
+        config.setAllowedHeaders(List.of(
+                "Authorization", "Content-Type", "Refresh-Token",
+                "X-Webhook-Secret", "Accept", "Cache-Control"
+        ));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

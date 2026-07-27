@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -111,16 +112,22 @@ public class DevMasteryWebhookController {
      * Manual sync: fetches latest progress from DevMastery API and creates
      * LearningLog entries for any newly completed topics since last sync.
      * Called by the "🔄 Sync DevMastery" button in the UI.
+     *
+     * SECURITY: Uses the authenticated principal's own email — no longer accepts
+     * an arbitrary email from the request body to prevent cross-account sync.
      */
     @PostMapping("/sync")
-    public Map<String, Object> manualSync(@RequestBody Map<String, Object> payload) {
+    public Map<String, Object> manualSync(Principal principal) {
 
-        String email = getString(payload, "email");
-        if (email == null) throw new ApiException("email is required", HttpStatus.BAD_REQUEST);
+        // Resolve the authenticated player from the JWT principal — prevents
+        // any user from triggering a sync for a different account.
+        Player player = playerRepo.findByUsername(principal.getName())
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
 
-        Player player = playerRepo.findByEmail(email)
-                .orElseThrow(() -> new ApiException(
-                        "No player found for email: " + email, HttpStatus.NOT_FOUND));
+        String email = player.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new ApiException("No email set on your account. Update your profile first.", HttpStatus.BAD_REQUEST);
+        }
 
         log.info("Manual DevMastery sync requested for player {}", player.getUsername());
 

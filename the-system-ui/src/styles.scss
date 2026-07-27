@@ -547,18 +547,24 @@ body.native-platform .cdk-overlay-dark-backdrop {
   -webkit-backdrop-filter: none !important;
   background: rgba(3,3,10,0.96);
 }
-/* Safety net: on native, no decorative animation should loop forever while the
-   Hunter is just reading the screen. Cap infinite loops to a single play so the
-   GPU can go idle — the biggest sustained heat source after backdrop-filter. */
+/* Safety net: on native, no decorative animation should loop OR fire.
+   Set animation to none entirely — not just cap the count to 1. Firing the
+   animation even once causes a GPU composite pass that wastes battery.
+   This is the strongest heat/battery guard we can apply globally. */
 body.native-platform *,
 body.native-platform *::before,
 body.native-platform *::after {
-  animation-iteration-count: 1 !important;
+  animation: none !important;
+  transition-duration: 0.12s !important; /* keep micro-transitions but make them fast */
 }
 /* …but genuine loading indicators MUST keep spinning. Re-enable them. */
 body.native-platform .loader-ring,
 body.native-platform .dots::after,
-body.native-platform .sys-spin {
+body.native-platform .sys-spin,
+body.native-platform .streak-ring circle,   /* NoFap streak ring */
+body.native-platform .mp-fill,              /* milestone progress fill */
+body.native-platform .btn-confirm.pulse {   /* confirm clean day pulse */
+  animation: unset !important;
   animation-iteration-count: infinite !important;
 }
 

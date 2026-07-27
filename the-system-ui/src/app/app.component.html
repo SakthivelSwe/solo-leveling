@@ -76,8 +76,4 @@
   (closed)="uiState.closeEveningReview()">
 </app-evening-review>
 
-<!-- Penalty Zone Overlay (Blocks everything) -->
-<app-penalty-zone
-  *ngIf="auth.player()?.inPenaltyZone"
-  [endTime]="auth.player()?.penaltyZoneEndTime || ''">
-</app-penalty-zone>
+
