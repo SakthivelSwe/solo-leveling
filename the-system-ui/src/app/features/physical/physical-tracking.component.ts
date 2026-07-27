@@ -270,22 +270,38 @@ export class PhysicalTrackingComponent implements OnInit {
     }
 
     const data = await this.health.syncToday();
+    let dataSynced = false;
+
     if (data.steps > 0) {
       if (!this.trackedExercises().includes('Steps')) {
         this.trackedExercises.update(list => [...list, 'Steps']);
+        this.savePreferences();
       }
-      this.logCustom('Steps', data.steps);
+      const currentSteps = this.getTodayProgress('Steps');
+      const stepDelta = data.steps - currentSteps;
+      if (stepDelta > 0) {
+        this.logCustom('Steps', stepDelta);
+        dataSynced = true;
+      }
     }
+
     if (data.distance > 0) {
       if (!this.trackedExercises().includes('Running')) {
         this.trackedExercises.update(list => [...list, 'Running']);
         this.cardioMap.update(map => ({ ...map, 'Running': true }));
+        this.savePreferences();
       }
-      this.logCustom('Running', data.distance);
+      const currentRunning = this.getTodayProgress('Running');
+      // Fix floating point precision issues for distance (e.g. 1.23 - 1.20 = 0.030000000000000027)
+      const distDelta = Number((data.distance - currentRunning).toFixed(3));
+      if (distDelta > 0) {
+        this.logCustom('Running', distDelta);
+        dataSynced = true;
+      }
     }
 
-    if (data.steps === 0 && data.distance === 0) {
-      this.snack.open('No new health data found for today.', 'OK', { duration: 2000 });
+    if (!dataSynced) {
+      this.snack.open('Health data is already up to date.', 'OK', { duration: 2000 });
     }
     this.syncing.set(false);
   }

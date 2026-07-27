@@ -66,7 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return authHeader.substring(7);
         }
         String param = request.getParameter("token");
-        if (param != null && !param.isBlank() && request.getRequestURI().contains("/api/stream")) {
+        if (param != null && !param.isBlank() && request.getRequestURI().contains("/stream")) {
             return param;
         }
         return null;
