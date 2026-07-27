@@ -170,3 +170,56 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ── Error State ─────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  background: rgba(226, 75, 74, 0.12);
+  border: 1px solid rgba(226, 75, 74, 0.5);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  text-align: left;
+  animation: slide-in 0.3s ease;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.error-icon {
+  font-size: 1.2rem;
+  color: #FAC775;
+  flex-shrink: 0;
+}
+
+.error-text {
+  font-size: 0.85rem;
+  color: #f0d0d0;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  background: transparent;
+  border: 2px solid rgba(226, 75, 74, 0.6);
+  color: #E24B4A;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+
+.retry-btn:hover {
+  background: rgba(226, 75, 74, 0.12);
+  border-color: #E24B4A;
+  box-shadow: 0 0 16px rgba(226, 75, 74, 0.3);
+}

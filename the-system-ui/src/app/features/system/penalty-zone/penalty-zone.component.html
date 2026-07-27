@@ -24,9 +24,23 @@
       </div>
     </div>
 
-    <button class="survive-btn" [class.loading]="loading()" (click)="survive()">
-      <span *ngIf="!loading()">I HAVE SURVIVED</span>
-      <div class="spinner" *ngIf="loading()"></div>
-    </button>
+    <!-- Error state — shown when the API call fails -->
+    @if (hasError()) {
+      <div class="error-banner">
+        <span class="error-icon">⚠</span>
+        <span class="error-text">{{ errorMsg() }}</span>
+      </div>
+      <button class="retry-btn" (click)="retry()">
+        ↺ RETRY CONNECTION
+      </button>
+    }
+
+    <!-- Normal survive button — hidden while error is shown -->
+    @if (!hasError()) {
+      <button class="survive-btn" [class.loading]="loading()" (click)="survive()" [disabled]="loading()">
+        <span *ngIf="!loading()">I HAVE SURVIVED</span>
+        <div class="spinner" *ngIf="loading()"></div>
+      </button>
+    }
   </div>
 </div>

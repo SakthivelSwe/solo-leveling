@@ -252,9 +252,9 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   onPenaltySurvived(): void {
-    // Reload the full status window to update HP
-    this.load();
-    this.toast('◈ Penalty Cleared. HP Restored.');
+    // Full reload needed to refresh HP, player state and quests after penalty clear
+    this.loadFull();
+    this.toast('◈ Penalty Cleared. The System acknowledges your will to survive.');
   }
 
   extractingShadow = signal(false);
