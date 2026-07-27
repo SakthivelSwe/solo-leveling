@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import {
   LearningService, LearningLog, SmartNotebookResult, LearningStats
 } from '../../core/services/learning.service';
+import { LifeOsService } from '../../core/services/life-os.service';
 import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
 
 @Component({
@@ -78,10 +79,58 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
     <button class="tab" [class.active]="activeTab() === 'stats'" (click)="activeTab.set('stats')">
       📊 STATS
     </button>
+    <button class="tab" [class.active]="activeTab() === 'flashcards'" (click)="activeTab.set('flashcards')">
+      🧠 FLASHCARDS
+    </button>
     <button class="tab" [class.active]="activeTab() === 'devmastery'"
             (click)="activeTab.set('devmastery')">
       🔗 DEVMASTERY
     </button>
+  </div>
+
+  <!-- ══════════════════════ FLASHCARDS TAB ══════════════════════ -->
+  <div *ngIf="activeTab() === 'flashcards'" @fadeInUp>
+    <div class="card system-card">
+      <div class="sn-header">
+        <span class="sn-icon">🧠</span>
+        <div>
+          <div class="sn-title">SPACED REPETITION</div>
+          <div class="sn-subtitle">Cards auto-generated from failed Boss Battles & Smart Notes</div>
+        </div>
+      </div>
+      
+      <div *ngIf="dueFlashcards().length === 0" class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <div>No flashcards due right now. You are up to date!</div>
+        <button class="btn secondary" (click)="loadDueFlashcards()" style="margin-top: 15px;">REFRESH</button>
+      </div>
+
+      <div *ngIf="dueFlashcards().length > 0" class="flashcard-deck">
+        <div class="fc-status tech">
+          {{ dueFlashcards().length }} Cards Due
+        </div>
+        
+        <div class="flashcard" [class.flipped]="currentCardFlipped()">
+          <div class="fc-inner">
+            <div class="fc-front">
+              <span class="fc-topic tech">{{ dueFlashcards()[0].topic }}</span>
+              <p>{{ dueFlashcards()[0].frontText }}</p>
+              <button class="btn fc-btn" (click)="currentCardFlipped.set(true)">FLIP CARD</button>
+            </div>
+            <div class="fc-back">
+              <span class="fc-topic tech">{{ dueFlashcards()[0].topic }}</span>
+              <p>{{ dueFlashcards()[0].backText }}</p>
+              
+              <div class="fc-ratings">
+                <button class="btn rating-btn hard" (click)="rateCard(dueFlashcards()[0].id, 1)">1 - HARD<br><small>Takes Damage</small></button>
+                <button class="btn rating-btn good" (click)="rateCard(dueFlashcards()[0].id, 2)">2 - GOOD</button>
+                <button class="btn rating-btn easy" (click)="rateCard(dueFlashcards()[0].id, 3)">3 - EASY</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════════════════ LOG SESSION TAB ══════════════════════ -->
@@ -819,6 +868,34 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
 /* Empty state */
 .empty-state { text-align: center; padding: 48px; color: var(--text-secondary); .empty-icon { font-size: 3rem; margin-bottom: 12px; } }
 
+/* Flashcards */
+.flashcard-deck { perspective: 1000px; display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+.fc-status { margin-bottom: 20px; font-size: 0.85rem; color: var(--accent-teal); letter-spacing: 2px; }
+.flashcard {
+  width: 100%; max-width: 400px; height: 250px; position: relative;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d;
+  &.flipped { transform: rotateY(180deg); }
+}
+.fc-inner { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; }
+.fc-front, .fc-back {
+  position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.fc-front { border-color: rgba(31,190,142,0.3); }
+.fc-back { transform: rotateY(180deg); border-color: rgba(226,75,74,0.3); }
+.fc-topic { position: absolute; top: 16px; left: 16px; font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2px; }
+.fc-front p, .fc-back p { font-size: 1.1rem; color: var(--text-primary); line-height: 1.5; margin-bottom: 24px; }
+.fc-btn { background: rgba(31,190,142,0.1); color: var(--accent-teal); border: 1px solid rgba(31,190,142,0.3); width: 100%; }
+.fc-ratings { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; }
+.rating-btn { padding: 12px 0; font-size: 0.75rem; border-radius: 8px; border: 1px solid transparent; cursor: pointer; transition: all 0.2s; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+.rating-btn.hard { background: linear-gradient(135deg, #e53935, #c62828); border-color: #ff5252; }
+.rating-btn.good { background: linear-gradient(135deg, #ffb300, #ff8f00); border-color: #ffd740; }
+.rating-btn.easy { background: linear-gradient(135deg, #43a047, #2e7d32); border-color: #69f0ae; }
+.rating-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+.rating-btn small { display: block; font-size: 0.55rem; font-weight: normal; opacity: 0.8; margin-top: 2px; }
+
 /* Stats */
 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
 @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -1020,8 +1097,12 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
 export class LearningComponent implements OnInit {
 
   // ── Signals ──────────────────────────────────────────────────────────────
-  activeTab = signal<'log' | 'history' | 'stats' | 'devmastery'>('log');
+  activeTab = signal<'log' | 'history' | 'stats' | 'flashcards' | 'devmastery'>('log');
   stats = signal<LearningStats | null>(null);
+  
+  // Flashcards (Phase 8)
+  dueFlashcards = signal<any[]>([]);
+  currentCardFlipped = signal(false);
   history = signal<LearningLog[]>([]);
   dueRecalls = signal<LearningLog[]>([]);
   notebookResult = signal<SmartNotebookResult | null>(null);
@@ -1082,14 +1163,31 @@ export class LearningComponent implements OnInit {
     return Math.max(5, Math.min(100, Math.round((base + bonus) * mult)));
   });
 
-  constructor(private ls: LearningService) {}
+  constructor(private ls: LearningService, private lifeOs: LifeOsService) {}
 
   ngOnInit() {
     this.loadStats();
     this.loadDueRecalls();
+    this.loadDueFlashcards();
     // Pre-load DevMastery session count without switching to history tab
     this.ls.getHistory().subscribe(h => {
       this.devMasterySessions.set(h.filter(log => log.source === 'DEVMASTERY').length);
+    });
+  }
+
+  loadDueFlashcards() {
+    this.lifeOs.getDueFlashcards().subscribe(cards => {
+      this.dueFlashcards.set(cards);
+      this.currentCardFlipped.set(false);
+    });
+  }
+
+  rateCard(id: number, rating: number) {
+    this.lifeOs.reviewFlashcard(id, rating).subscribe(() => {
+      // Remove card from due list
+      const cards = this.dueFlashcards();
+      this.dueFlashcards.set(cards.filter(c => c.id !== id));
+      this.currentCardFlipped.set(false);
     });
   }
 

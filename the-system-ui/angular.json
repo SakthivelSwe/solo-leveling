@@ -53,7 +53,12 @@
             "assets": [
               "src/favicon.png",
               "src/assets",
-              "src/_redirects"
+              "src/_redirects",
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor",
+                "output": "/assets/monaco/"
+              }
             ],
             "styles": [
               "src/styles.scss"

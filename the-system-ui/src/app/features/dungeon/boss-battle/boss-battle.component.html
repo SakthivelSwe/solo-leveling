@@ -1,0 +1,49 @@
+<div class="boss-battle system-card block" @fadeInUp>
+  <div class="battle-header">
+    <div class="hp-bars">
+      <div class="player-hp">
+        <span class="mono tech">PLAYER HP: {{ playerHp() }} / 100</span>
+        <div class="hpbar"><div class="hpfill player" [style.width.%]="playerHp()"></div></div>
+      </div>
+      <div class="boss-hp">
+        <span class="mono tech" style="color: #E24B4A;">BOSS HP: {{ bossHp() }} / 100</span>
+        <div class="hpbar"><div class="hpfill boss" [style.width.%]="bossHp()"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="challenge-info">
+    <h3 class="mono head" style="color: #E24B4A; letter-spacing: 2px;">◈ {{ challenge.title | uppercase }}</h3>
+    <p class="tech" style="font-size: 0.9rem; line-height: 1.6; color: #b3aef0;">
+      {{ challenge.description }}
+    </p>
+  </div>
+
+  <div class="battle-arena">
+    <!-- Code Editor -->
+    <div class="editor-container" style="border: 1px solid rgba(226,75,74,0.3); border-radius: 8px; overflow: hidden; height: 350px;">
+      <ngx-monaco-editor style="height: 100%;" [options]="editorOptions" [ngModel]="code" (ngModelChange)="onCodeChange($event)"></ngx-monaco-editor>
+    </div>
+
+    <!-- AI Mentor Terminal / Live Feedback -->
+    <div class="ai-terminal">
+      <div class="terminal-header tech">
+        <span>AI MENTOR (LIVE OVERSIGHT)</span>
+      </div>
+      <div class="terminal-body" #terminalBody>
+        <ul class="mini-list" @listStagger style="padding: 0; margin: 0; list-style: none;">
+          <li *ngFor="let msg of aiFeedback()" class="tech" style="font-size: 0.8rem; color: #FAC775; margin-bottom: 8px; border-left: 2px solid #FAC775; padding-left: 8px;">
+            > {{ msg }}
+          </li>
+          <li *ngIf="!aiFeedback().length" class="tech empty" style="color: #8a8a9a;">Watching your keystrokes... don't mess up.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="battle-footer">
+    <button class="sys-btn" (click)="submitFinal()" [disabled]="isEvaluating()" style="border-color: #E24B4A; color: #E24B4A; font-weight: bold; width: 100%; padding: 12px; font-size: 1.2rem;">
+      {{ isEvaluating() ? 'EVALUATING...' : '⚡ EXECUTE STRIKE' }}
+    </button>
+  </div>
+</div>

@@ -57,12 +57,15 @@ public class AiMentorService {
 
     /** AI Mentor free chat. Context-aware based on the provided context type. */
     public String chat(StatusWindowDTO status, String message, String context) {
+        String memory = status != null && status.player() != null
+                ? memoryService.buildMemoryContext(status.player().id()) : "";
+                
         String ctxPrompt = switch (context) {
             case "boss_battle" -> "The hunter is preparing for a technical Boss Battle interview. They need tactical advice.";
             case "system_status" -> "The hunter is reviewing their status window. They need a push.";
             default -> "General hunter query.";
         };
-        String prompt = buildStatusContext(status) +
+        String prompt = buildStatusContext(status) + memory +
             "\nContext: " + ctxPrompt +
             "\nHunter says: \"" + message + "\"" +
             "\nRespond as THE SYSTEM. Be direct, powerful, cold. Max 80 words.";

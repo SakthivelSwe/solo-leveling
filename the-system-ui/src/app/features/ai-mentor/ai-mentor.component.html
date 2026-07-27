@@ -52,7 +52,13 @@
 
       <div class="chat-input-area">
         <div class="quick-btns">
-          <button class="qb tech" (click)="getSuggestion()" [disabled]="chatLoading()">🎯 SUGGEST MY NEXT TASK</button>
+          <button class="qb tech spring-hover" (click)="getSuggestion()" [disabled]="chatLoading()">🎯 SUGGEST MY NEXT TASK</button>
+          <button class="qb tech spring-hover" (click)="toggleVoiceMode()" [class.active-voice]="isVoiceMode()">
+            {{ isVoiceMode() ? '🔊 VOICE MODE: ON' : '🔈 VOICE MODE: OFF' }}
+          </button>
+          <button *ngIf="isVoiceMode()" class="qb tech spring-hover" (click)="startListening()" [class.listening]="isListening()">
+            {{ isListening() ? '🎙️ LISTENING...' : '🎤 TAP TO SPEAK' }}
+          </button>
         </div>
         <div class="chat-input-row">
           <textarea class="ci tech" [(ngModel)]="userInput" (keydown)="onInputKey($event)"

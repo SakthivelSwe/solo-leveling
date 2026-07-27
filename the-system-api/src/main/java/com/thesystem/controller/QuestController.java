@@ -26,14 +26,17 @@ public class QuestController {
     private final PlayerService playerService;
     private final QuestRepository questRepository;
     private final com.thesystem.service.AiQuestGeneratorService aiQuestGeneratorService;
+    private final com.thesystem.service.AiProviderService aiProviderService;
 
     public QuestController(QuestService questService, PlayerService playerService,
                            QuestRepository questRepository,
-                           com.thesystem.service.AiQuestGeneratorService aiQuestGeneratorService) {
+                           com.thesystem.service.AiQuestGeneratorService aiQuestGeneratorService,
+                           com.thesystem.service.AiProviderService aiProviderService) {
         this.questService = questService;
         this.playerService = playerService;
         this.questRepository = questRepository;
         this.aiQuestGeneratorService = aiQuestGeneratorService;
+        this.aiProviderService = aiProviderService;
     }
 
     /** Manually triggers AI generation for new dynamic daily quests. */
@@ -41,6 +44,43 @@ public class QuestController {
     public Map<String, String> generateAiQuests(Principal principal) {
         aiQuestGeneratorService.generateDailyQuests(playerId(principal));
         return Map.of("status", "success", "message", "AI quests generated");
+    }
+
+    public static class CodeSubmission {
+        public String code;
+    }
+
+    @PostMapping("/boss-battle/evaluate")
+    public Map<String, Object> evaluateBossBattle(Principal principal, @RequestBody CodeSubmission submission) {
+        // Lightweight AI evaluation logic for the code snippet
+        String prompt = "You are Igris, the boss. The player is writing an algorithmic solution. " +
+                        "Here is their code:\n" + submission.code + "\n\n" +
+                        "If it has a compilation error or is O(n^2), mock them (max 1 sentence) and deal 10 damage to player (0 to boss). " +
+                        "If it is correct and O(n), express fear/anger and deal 50 damage to boss (0 to player). " +
+                        "Output JSON EXACTLY like: {\"feedback\": \"...\", \"damageToPlayer\": 10, \"damageToBoss\": 0}";
+        
+        try {
+            String aiResponse = aiProviderService.generate(
+                com.thesystem.service.AiProviderService.Scenario.BOSS_BATTLE,
+                "You are Igris...",
+                prompt
+            );
+            // Sometimes it wraps with ```json ... ```, strip it
+            aiResponse = aiResponse.replaceAll("```json", "").replaceAll("```", "").trim();
+            
+            // Basic parsing, assuming it returns exactly what we want since we forced JSON output
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<String, Object> result = mapper.readValue(aiResponse, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            
+            // Apply damage if player is hit
+            if (result.containsKey("damageToPlayer") && ((Number)result.get("damageToPlayer")).intValue() > 0) {
+                playerService.takeDamage(playerId(principal), ((Number)result.get("damageToPlayer")).intValue(), "Boss Igris Strike");
+            }
+            
+            return result;
+        } catch (Exception e) {
+            return Map.of("feedback", "Silence from the boss... (" + e.getMessage() + ")", "damageToPlayer", 0, "damageToBoss", 0);
+        }
     }
 
     /** Today's DAILY quests (excludes MILESTONE/SIDE — those are on /milestones). */
@@ -76,10 +116,42 @@ public class QuestController {
         return questService.getMilestoneQuests(playerId(principal));
     }
 
-    /** Complete a quest — window enforced per timeType (today/week/month/never). */
     @PostMapping("/{key}/complete")
-    public QuestCompletionResult complete(Principal principal, @PathVariable String key) {
-        return questService.completeQuest(playerId(principal), key);
+    public QuestCompletionResult complete(
+            Principal principal, 
+            @PathVariable String key,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
+        return questService.completeQuest(playerId(principal), key, lat, lng);
+    }
+
+    @PostMapping("/{key}/verify")
+    public Map<String, Object> verifyAndComplete(
+            Principal principal, 
+            @PathVariable String key, 
+            @RequestBody Map<String, String> payload) {
+        String base64Image = payload.get("image");
+        String mimeType = payload.getOrDefault("mimeType", "image/jpeg");
+        
+        Quest q = questRepository.findByQuestKey(key)
+            .orElseThrow(() -> new ApiException("Quest not found", HttpStatus.NOT_FOUND));
+            
+        String jsonResult = aiProviderService.verifyQuestImage(q.getLabel(), base64Image, mimeType);
+            
+        try {
+            var node = new com.fasterxml.jackson.databind.ObjectMapper().readTree(jsonResult);
+            boolean verified = node.path("verified").asBoolean(false);
+            String reason = node.path("reason").asText("");
+            
+            if (verified) {
+                QuestCompletionResult res = questService.completeQuest(playerId(principal), key, null, null);
+                return Map.of("verified", true, "reason", reason, "result", res);
+            } else {
+                return Map.of("verified", false, "reason", reason);
+            }
+        } catch (Exception e) {
+            throw new ApiException("AI verification failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/history")

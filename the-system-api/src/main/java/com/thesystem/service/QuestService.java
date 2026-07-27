@@ -76,7 +76,7 @@ public class QuestService {
         if (player.isInPenaltyZone()) {
             dtos.add(0, new QuestDTO(-1L, "PENALTY_SURVIVAL",
                     "[PENALTY] Survival: 20 Burpees or No Screen Time for 1 Hour",
-                    "DAILY", 0, null, null, false, 999, true, 0, false, "DAILY", false, 0, 0));
+                    "DAILY", 0, null, null, false, 999, true, 0, false, "DAILY", false, 0, 0, null, null, null));
         }
 
         return dtos;
@@ -102,7 +102,8 @@ public class QuestService {
                     return new QuestDTO(dto.id(), dto.questKey(), dto.label(), dto.category(),
                             dto.xpReward(), dto.statBoosts(), dto.skillBoosts(), isCompleted,
                             dto.priority(), dto.isCritical(), dto.bossDamage(), dto.isRecoveryQuest(),
-                            dto.timeType(), dto.isCustom(), (int) doneCount, 0);
+                            dto.timeType(), dto.isCustom(), (int) doneCount, 0,
+                            dto.latitude(), dto.longitude(), dto.radiusMeters());
                 })
                 .collect(Collectors.toList());
     }
@@ -127,7 +128,8 @@ public class QuestService {
                     return new QuestDTO(dto.id(), dto.questKey(), dto.label(), dto.category(),
                             dto.xpReward(), dto.statBoosts(), dto.skillBoosts(), isCompleted,
                             dto.priority(), dto.isCritical(), dto.bossDamage(), dto.isRecoveryQuest(),
-                            dto.timeType(), dto.isCustom(), 0, (int) doneCount);
+                            dto.timeType(), dto.isCustom(), 0, (int) doneCount,
+                            dto.latitude(), dto.longitude(), dto.radiusMeters());
                 })
                 .collect(Collectors.toList());
     }
@@ -151,7 +153,7 @@ public class QuestService {
     // ── Quest Completion ───────────────────────────────────────────────────────
 
     @Transactional
-    public QuestCompletionResult completeQuest(Long playerId, String questKey) {
+    public QuestCompletionResult completeQuest(Long playerId, String questKey, Double lat, Double lng) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
 
@@ -166,6 +168,18 @@ public class QuestService {
         // Ownership check: custom quest must belong to this player (or be a system quest)
         if (quest.isCustom() && quest.getOwnerId() != null && !quest.getOwnerId().equals(playerId)) {
             throw new ApiException("Not your quest", HttpStatus.FORBIDDEN);
+        }
+
+        // GEO-FENCING VALIDATION
+        if (quest.getLatitude() != null && quest.getLongitude() != null) {
+            if (lat == null || lng == null) {
+                throw new ApiException("This quest requires your GPS location to complete.", HttpStatus.BAD_REQUEST);
+            }
+            double distance = calculateDistance(quest.getLatitude(), quest.getLongitude(), lat, lng);
+            int allowedRadius = quest.getRadiusMeters() != null ? quest.getRadiusMeters() : 50;
+            if (distance > allowedRadius) {
+                throw new ApiException(String.format("You are too far from the objective. (%.0f meters away, max %d)", distance, allowedRadius), HttpStatus.BAD_REQUEST);
+            }
         }
 
         LocalDate today = LocalDate.now();
@@ -356,7 +370,8 @@ public class QuestService {
         return new QuestDTO(q.getId(), q.getQuestKey(), label, q.getCategory().name(),
                 xpReward, q.getStatBoosts(), q.getSkillBoosts(), completed,
                 q.getPriority(), q.isCritical(), q.getBossDamage(), q.isRecoveryQuest(),
-                timeType, q.isCustom(), 0, 0);
+                timeType, q.isCustom(), 0, 0,
+                q.getLatitude(), q.getLongitude(), q.getRadiusMeters());
     }
 
     // ── Private Helpers ────────────────────────────────────────────────────────
@@ -448,6 +463,18 @@ public class QuestService {
             return 200;
         }
         return q.getXpReward();
+    }
+
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Earth's radius in kilometers
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+        return distance;
     }
 }
 

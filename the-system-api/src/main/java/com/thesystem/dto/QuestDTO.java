@@ -20,6 +20,9 @@ public record QuestDTO(
         /** For WEEKLY quests: how many times completed this week */
         int weeklyDoneCount,
         /** For MONTHLY quests: how many times completed this month */
-        int monthlyDoneCount
+        int monthlyDoneCount,
+        Double latitude,
+        Double longitude,
+        Integer radiusMeters
 ) {}
 

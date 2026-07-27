@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 @Service
 public class PlayerService {
 
+    @PersistenceContext
+    private EntityManager em;
+
     private final PlayerRepository playerRepository;
     private final PlayerStatsRepository statsRepository;
     private final QuestCompletionRepository completionRepository;
@@ -29,9 +32,7 @@ public class PlayerService {
     private final AchievementService achievementService;
     private final LevelService levelService;
     private final SystemQuoteService systemQuoteService;
-
-    @PersistenceContext
-    private EntityManager em;
+    private final SseService sseService;
 
     public PlayerService(PlayerRepository playerRepository,
                          PlayerStatsRepository statsRepository,
@@ -41,7 +42,8 @@ public class PlayerService {
                          QuestService questService,
                          AchievementService achievementService,
                          LevelService levelService,
-                         SystemQuoteService systemQuoteService) {
+                         SystemQuoteService systemQuoteService,
+                         SseService sseService) {
         this.playerRepository = playerRepository;
         this.statsRepository = statsRepository;
         this.completionRepository = completionRepository;
@@ -51,6 +53,7 @@ public class PlayerService {
         this.achievementService = achievementService;
         this.levelService = levelService;
         this.systemQuoteService = systemQuoteService;
+        this.sseService = sseService;
     }
 
     public Player getByUsername(String username) {
@@ -105,7 +108,6 @@ public class PlayerService {
         return toDto(playerRepository.save(p));
     }
 
-    @Transactional
     public PlayerDTO survivePenalty(Long playerId) {
         Player player = find(playerId);
         
@@ -121,6 +123,19 @@ public class PlayerService {
         levelService.addXp(player, 50, "PENALTY_SURVIVAL");
         
         return toDto(player);
+    }
+
+    @Transactional
+    public void takeDamage(Long playerId, int damage, String reason) {
+        Player p = find(playerId);
+        int newHp = Math.max(0, p.getHp() - damage);
+        p.setHp(newHp);
+        playerRepository.save(p);
+        sseService.send(playerId, "player-update", Map.of(
+            "hp", newHp,
+            "maxHp", p.getMaxHp(),
+            "reason", reason
+        ));
     }
 
     /**

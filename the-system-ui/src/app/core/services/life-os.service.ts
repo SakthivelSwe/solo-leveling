@@ -24,6 +24,8 @@ export class LifeOsService {
   }
   getRounds(id: number): Observable<InterviewRound[]> { return this.http.get<InterviewRound[]>(`${this.api}/career/jobs/${id}/rounds`); }
   addRound(id: number, b: InterviewRound): Observable<InterviewRound> { return this.http.post<InterviewRound>(`${this.api}/career/jobs/${id}/rounds`, b); }
+  
+  triggerJobAgent(): Observable<any> { return this.http.post(`${this.api}/jobs/auto-apply`, {}, { responseType: 'text' }); }
 
   logLeetcode(b: LeetcodeLog): Observable<LeetcodeLog> { return this.http.post<LeetcodeLog>(`${this.api}/career/leetcode`, b); }
   leetcodeStats(): Observable<LeetcodeStats> { return this.http.get<LeetcodeStats>(`${this.api}/career/leetcode/stats`); }
@@ -123,10 +125,19 @@ export class LifeOsService {
   // Mood trend line
   moodTrend(days = 30): Observable<MoodPoint[]> { return this.http.get<MoodPoint[]>(`${this.api}/mind/mood-trend?days=${days}`); }
 
-  // Workout logger (Phase 4)
+  // Workout logger (Phase 4 & 7)
   logWorkout(b: WorkoutEntry): Observable<WorkoutEntry> { return this.http.post<WorkoutEntry>(`${this.api}/workout/log`, b); }
   workoutHistory(): Observable<WorkoutEntry[]> { return this.http.get<WorkoutEntry[]>(`${this.api}/workout/history`); }
   deleteWorkout(id: number): Observable<void> { return this.http.delete<void>(`${this.api}/workout/${id}`); }
+
+  // Flashcards / SRS (Phase 8)
+  getDueFlashcards(): Observable<any[]> { return this.http.get<any[]>(`${this.api}/flashcards/due`); }
+  addFlashcard(frontText: string, backText: string, topic: string): Observable<any> {
+    return this.http.post<any>(`${this.api}/flashcards/add`, { frontText, backText, topic });
+  }
+  reviewFlashcard(id: number, rating: number): Observable<any> {
+    return this.http.post<any>(`${this.api}/flashcards/${id}/review`, { rating });
+  }
 
   // Full data export (Phase 4)
   exportData(): Observable<Record<string, unknown>> { return this.http.get<Record<string, unknown>>(`${this.api}/export`); }

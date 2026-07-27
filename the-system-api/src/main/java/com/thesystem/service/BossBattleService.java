@@ -36,6 +36,8 @@ public class BossBattleService {
     private final AiProviderService ai;
     private final BossBattleRepository battleRepo;
     private final PlayerRepository playerRepo;
+    private final AiMemoryService aiMemoryService;
+    private final SrsService srsService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static final String GEN_PROMPT =
@@ -53,10 +55,12 @@ public class BossBattleService {
         "{\"score\":N,\"feedback\":\"...\",\"missedPoints\":[\"...\"],\"strongPoints\":[\"...\"]}";
 
     public BossBattleService(AiProviderService ai, BossBattleRepository battleRepo,
-                             PlayerRepository playerRepo) {
+                             PlayerRepository playerRepo, AiMemoryService aiMemoryService, SrsService srsService) {
         this.ai = ai;
         this.battleRepo = battleRepo;
         this.playerRepo = playerRepo;
+        this.aiMemoryService = aiMemoryService;
+        this.srsService = srsService;
     }
 
     // ── Start battle ──────────────────────────────────────────────────────────
@@ -122,6 +126,25 @@ public class BossBattleService {
             player.setTotalXp(player.getTotalXp() + xp);
             playerRepo.save(player);
         }
+        
+        String outcome = totalScore >= 40 ? "S-Rank Performance" : totalScore >= 25 ? "Satisfactory" : "Failed";
+        aiMemoryService.addImmediateMemory(playerId, "BEHAVIORAL", 
+            "Fought Boss Battle on '" + battle.getTopic() + "'. Score: " + totalScore + "/50 (" + outcome + ")");
+            
+        // Auto-generate SRS Flashcards for failed questions (score < 7)
+        List<Map<String, Object>> questions = parseQuestions(battle.getQuestions());
+        List<String> evals = parseStringList(battle.getEvaluations(), 5);
+        for (int i = 0; i < evals.size(); i++) {
+            if (evals.get(i) != null) {
+                EvaluationDTO eval = parseEvaluation(evals.get(i), i, String.valueOf(questions.get(i).get("question")));
+                if (eval.score() < 7 && srsService != null) {
+                    String front = eval.question();
+                    String back = "Missed Points: " + String.join(", ", eval.missedPoints());
+                    srsService.addCard(playerId, front, back, battle.getTopic());
+                }
+            }
+        }
+        
         return toDto(battle, parseQuestions(battle.getQuestions()));
     }
 

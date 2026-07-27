@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LifeOsService } from '../../core/services/life-os.service';
+import { HealthService } from '../../core/services/health.service';
 import { WorkoutEntry } from '../../core/models/models';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -43,6 +44,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         </div>
       </div>
 
+    </div>
+
+    <!-- Health Connect / Google Fit Sync -->
+    <div class="health-sync-box system-card" style="margin-bottom: 24px; padding: 20px; text-align: center;">
+      <h3 class="mono" style="color: #1FBE8E; margin: 0 0 12px; font-size: 0.85rem; letter-spacing: 3px;">◈ WEARABLE SYNC</h3>
+      <p class="tech" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;">
+        Connect to Google Fit or Health Connect to automatically log your steps and running distance.
+      </p>
+      <button class="btn add-btn mono spring-hover" (click)="syncWearable()" [disabled]="syncing()" style="width: 100%; max-width: 300px;">
+        {{ syncing() ? 'SYNCING DATA...' : '⚡ SYNC HEALTH DATA' }}
+      </button>
     </div>
 
     <!-- Add New Custom Exercise -->
@@ -155,12 +167,14 @@ export class PhysicalTrackingComponent implements OnInit {
 
   newWorkoutName = '';
   isNewCardio = false;
+  syncing = signal(false);
 
-  constructor(private lifeOs: LifeOsService, private snack: MatSnackBar) {}
+  constructor(private lifeOs: LifeOsService, private snack: MatSnackBar, public health: HealthService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.loadPreferences();
     this.loadHistory();
+    await this.health.checkAvailability();
   }
 
   loadPreferences() {
@@ -244,6 +258,36 @@ export class PhysicalTrackingComponent implements OnInit {
         this.snack.open('Failed to log training.', 'OK', { duration: 3000 });
       }
     });
+  }
+
+  async syncWearable() {
+    this.syncing.set(true);
+    const available = await this.health.checkAvailability();
+    if (!available) {
+      this.snack.open('Health Connect/Google Fit is not available or permission denied.', 'OK', { duration: 3000 });
+      this.syncing.set(false);
+      return;
+    }
+
+    const data = await this.health.syncToday();
+    if (data.steps > 0) {
+      if (!this.trackedExercises().includes('Steps')) {
+        this.trackedExercises.update(list => [...list, 'Steps']);
+      }
+      this.logCustom('Steps', data.steps);
+    }
+    if (data.distance > 0) {
+      if (!this.trackedExercises().includes('Running')) {
+        this.trackedExercises.update(list => [...list, 'Running']);
+        this.cardioMap.update(map => ({ ...map, 'Running': true }));
+      }
+      this.logCustom('Running', data.distance);
+    }
+
+    if (data.steps === 0 && data.distance === 0) {
+      this.snack.open('No new health data found for today.', 'OK', { duration: 2000 });
+    }
+    this.syncing.set(false);
   }
 
   // --- Dynamic Configuration Helpers ---

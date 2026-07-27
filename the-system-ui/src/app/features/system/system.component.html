@@ -1,4 +1,4 @@
-<div class="system-shell">
+<div class="system-shell" [class.hp-critical-glitch]="status()?.player?.hp !== undefined && status()!.player!.hp < 40">
 
   <!-- PENALTY ZONE OVERLAY -->
   <app-penalty-zone *ngIf="status()?.player?.hp === 0" (survived)="onPenaltySurvived()"></app-penalty-zone>
@@ -7,7 +7,7 @@
   <header class="topbar">
     <div class="brand">
       <img src="assets/logo.png" alt="Logo" class="brand-logo" />
-      <span class="mono name">THE SYSTEM</span>
+      <span class="mono name" [class.critical-shift-text]="status()?.player?.hp !== undefined && status()!.player!.hp < 40">THE SYSTEM</span>
       <span class="tech rank-badge-mini" *ngIf="status() as s">
         {{ s.player.rankLevel }}-RANK
       </span>
@@ -23,6 +23,7 @@
       <a routerLink="/insights" routerLinkActive="active">INSIGHTS</a>
       <a routerLink="/achievements" routerLinkActive="active">RANKS</a>
       <a routerLink="/nofap" routerLinkActive="active" class="nav-discipline">🔥 DISCIPLINE</a>
+      <a routerLink="/shadow-army" routerLinkActive="active" style="color: #7209b7; font-weight: 800;">👥 SHADOWS</a>
     </nav>
 
     <div class="topbar-right">
@@ -122,13 +123,13 @@
       <app-skill-tree [skills]="s.skills" [nodes]="skillTreeNodes()"></app-skill-tree>
 
       <!-- Phase 5: Shadow Army -->
-      <div class="system-card block" style="margin-top: 16px;">
+      <div class="system-card block spring-hover" style="margin-top: 16px;">
         <h3 class="mono head" style="color: #BA7517;">◈ SHADOW ARMY</h3>
         <p class="tech subtitle" style="margin-bottom: 12px; font-size: 0.7rem;">MASTERED HABITS TRANSCEND INTO SHADOWS</p>
         
         <!-- ARISE Button (Unlocked at 90 days NoFap) -->
         <div class="arise-container" *ngIf="noFap() && noFap()!.currentStreak >= 90 && !hasIgris()" style="margin-bottom: 12px;">
-          <button class="btn-arise tech" (click)="extractShadow()" [disabled]="extractingShadow()">
+          <button class="btn-arise tech spring-hover" (click)="extractShadow()" [disabled]="extractingShadow()">
             {{ extractingShadow() ? 'EXTRACTING...' : 'ARISE (Extract Shadow of Discipline)' }}
           </button>
         </div>
@@ -200,6 +201,7 @@
         [pendingKey]="pendingKey()"
         [pressureLevel]="pressureLevel()"
         (complete)="onComplete($event)"
+        (verify)="onVerifyQuest($event)"
         (questAdded)="onQuestAdded($event)"
         (questDeleted)="onQuestDeleted($event)">
       </app-quest-log>
@@ -214,11 +216,19 @@
     <!-- RIGHT col: Dungeon + Schedule -->
     <div class="col-right" [class.mob-hidden]="mobileTab() !== 'schedule'">
       <app-dungeon-card></app-dungeon-card>
+      
+      <div style="margin: 16px 0;">
+        <button class="sys-btn full" (click)="showBossBattle = !showBossBattle" style="border-color: #E24B4A; color: #E24B4A;">
+          {{ showBossBattle ? 'FLEE BATTLE' : '⚔ ENTER BOSS BATTLE' }}
+        </button>
+      </div>
+      <app-boss-battle *ngIf="showBossBattle"></app-boss-battle>
+      
       <app-pomodoro></app-pomodoro>
 
       <!-- ── NoFap Discipline Mini-Widget ─────────────────────── -->
       @if (noFap(); as nf) {
-        <div class="system-card block nofap-widget" style="margin-top: 16px;">
+        <div class="system-card block nofap-widget spring-hover" style="margin-top: 16px;">
           <div class="nfw-header">
             <div class="nfw-left">
               <span class="mono nfw-title">🔥 DISCIPLINE PROTOCOL</span>
@@ -260,7 +270,7 @@
 
       
       <!-- Career: LeetCode stats -->
-      <div class="system-card block" style="margin-top: 16px;">
+      <div class="system-card block spring-hover" style="margin-top: 16px;">
         <h3 class="mono head">◈ DSA GRIND</h3>
         <div class="leet-stats" *ngIf="leetStats() as ls" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
           <div class="stat-pill"><span class="v mono">{{ ls.total }}</span><span class="k tech">TOTAL</span></div>
@@ -287,9 +297,21 @@
       </div>
 
       <!-- Career: Job applications -->
-      <div class="system-card block" style="margin-top: 16px;">
-        <h3 class="mono head">◈ JOB APPLICATIONS</h3>
-        <div class="form-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
+      <div class="system-card block spring-hover" style="margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="mono head">◈ JOB APPLICATIONS</h3>
+          <button class="sys-btn" (click)="triggerJobAgent()" [disabled]="isAgentRunning()" style="padding: 4px 12px; font-size: 0.75rem; border-color: #BA7517; color: #BA7517;">
+            {{ isAgentRunning() ? 'AGENT DEPLOYED...' : '⚡ AUTO-APPLY AGENT' }}
+          </button>
+        </div>
+
+        <div *ngIf="agentLogs().length > 0" style="background: rgba(0,0,0,0.5); border: 1px solid #BA7517; padding: 12px; margin-bottom: 12px; max-height: 150px; overflow-y: auto; border-radius: 4px;">
+          <div *ngFor="let log of agentLogs()" class="tech" style="color: #BA7517; font-size: 0.75rem; margin-bottom: 4px; line-height: 1.4;">
+            {{ log }}
+          </div>
+        </div>
+
+        <div class="form-row" style="display: flex; gap: 8px; margin-bottom: 12px; margin-top: 12px;">
           <input class="fin" placeholder="Company" [(ngModel)]="newJob.company" style="flex: 1;" />
           <input class="fin" placeholder="Role" [(ngModel)]="newJob.role" style="width: 80px;" />
           <button class="sys-btn" (click)="addJob()" style="padding: 0 12px;">+ APPLY</button>

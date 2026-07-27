@@ -131,6 +131,15 @@ public class AiMemoryService {
         return sb.toString();
     }
 
+    public void addImmediateMemory(Long playerId, String type, String value) {
+        AiMemoryEntry e = new AiMemoryEntry();
+        e.setPlayerId(playerId);
+        e.setMemoryType(type);
+        e.setWeekStart(LocalDate.now());
+        e.setValue(value);
+        memoryRepository.save(e);
+    }
+
     private AiMemoryEntry entry(Long playerId, String type, String questKey,
                                 LocalDate weekStart, String value) {
         AiMemoryEntry e = new AiMemoryEntry();

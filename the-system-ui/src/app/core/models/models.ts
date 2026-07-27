@@ -61,6 +61,9 @@ export interface Quest {
   weeklyDoneCount?: number;
   /** For MONTHLY quests: how many times completed this month */
   monthlyDoneCount?: number;
+  latitude?: number;
+  longitude?: number;
+  radiusMeters?: number;
 }
 
 export interface CustomQuestRequest {

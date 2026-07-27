@@ -58,8 +58,19 @@ export class PlayerService {
     return this.http.get<Quest[]>(`${this.api}/quests/milestones`);
   }
 
-  completeQuest(key: string): Observable<QuestCompletionResult> {
-    return this.http.post<QuestCompletionResult>(`${this.api}/quests/${key}/complete`, {});
+  completeQuest(key: string, lat?: number, lng?: number): Observable<QuestCompletionResult> {
+    let url = `${this.api}/quests/${key}/complete`;
+    if (lat !== undefined && lng !== undefined) {
+      url += `?lat=${lat}&lng=${lng}`;
+    }
+    return this.http.post<QuestCompletionResult>(url, {});
+  }
+
+  verifyQuest(key: string, base64Image: string, mimeType: string): Observable<{ verified: boolean, reason: string, result?: QuestCompletionResult }> {
+    return this.http.post<{ verified: boolean, reason: string, result?: QuestCompletionResult }>(
+      `${this.api}/quests/${key}/verify`, 
+      { image: base64Image, mimeType: mimeType }
+    );
   }
 
   generateAiQuests(): Observable<{ status: string; message: string }> {

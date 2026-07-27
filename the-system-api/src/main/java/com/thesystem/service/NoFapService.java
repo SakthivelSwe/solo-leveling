@@ -35,13 +35,16 @@ public class NoFapService {
     private final DopamineLogRepository logRepo;
     private final PlayerRepository playerRepo;
     private final LevelService levelService;
+    private final AiMemoryService aiMemoryService;
 
     public NoFapService(DopamineLogRepository logRepo,
                         PlayerRepository playerRepo,
-                        LevelService levelService) {
+                        LevelService levelService,
+                        AiMemoryService aiMemoryService) {
         this.logRepo = logRepo;
         this.playerRepo = playerRepo;
         this.levelService = levelService;
+        this.aiMemoryService = aiMemoryService;
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -204,6 +207,7 @@ public class NoFapService {
     @Transactional
     public NoFapStatusDTO reportRelapse(Long playerId) {
         upsertPornViewed(playerId, true);
+        aiMemoryService.addImmediateMemory(playerId, "DECLINE", "Relapsed on NoFap Challenge today. Lost streak.");
         return getStatus(playerId);
     }
 

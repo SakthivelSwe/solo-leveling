@@ -20,10 +20,12 @@ public class MindService {
 
     private final MindLogRepository mindRepo;
     private final SelfDoubtEvidenceRepository evidenceRepo;
+    private final AiMemoryService aiMemoryService;
 
-    public MindService(MindLogRepository mindRepo, SelfDoubtEvidenceRepository evidenceRepo) {
+    public MindService(MindLogRepository mindRepo, SelfDoubtEvidenceRepository evidenceRepo, AiMemoryService aiMemoryService) {
         this.mindRepo = mindRepo;
         this.evidenceRepo = evidenceRepo;
+        this.aiMemoryService = aiMemoryService;
     }
 
     public MindLog upsert(Long playerId, MindLog body) {
@@ -43,6 +45,10 @@ public class MindService {
         // A logged win is also permanent evidence against self-doubt
         if (body.getTodayWin() != null && !body.getTodayWin().isBlank()) {
             addEvidence(playerId, body.getTodayWin(), "CHARACTER");
+            aiMemoryService.addImmediateMemory(playerId, "BEHAVIORAL", "Win of the day: " + body.getTodayWin());
+        }
+        if (body.getDarkThought() != null && !body.getDarkThought().isBlank()) {
+            aiMemoryService.addImmediateMemory(playerId, "BEHAVIORAL", "Logged a dark thought/anxiety: " + body.getDarkThought());
         }
         return mindRepo.save(log);
     }

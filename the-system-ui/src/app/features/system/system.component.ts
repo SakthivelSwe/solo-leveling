@@ -17,6 +17,7 @@ import {
 } from '../../core/models/models';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { UiStateService } from '../../core/services/ui-state.service';
+import { ScreenTimeService } from '../../core/services/screen-time.service';
 
 import { StatusWindowComponent } from './status-window/status-window.component';
 import { QuestLogComponent } from './quest-log/quest-log.component';
@@ -28,6 +29,8 @@ import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
 import { PomodoroComponent } from './pomodoro.component';
 import { AiCommanderComponent } from './ai-commander/ai-commander.component';
 import { PenaltyZoneComponent } from './penalty-zone/penalty-zone.component';
+import { BossBattleComponent } from '../dungeon/boss-battle/boss-battle.component';
+import { RankUpModalComponent } from '../../shared/components/rank-up-modal.component';
 
 import { FormsModule } from '@angular/forms';
 
@@ -38,7 +41,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule, RouterLink, RouterLinkActive, FormsModule,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
     DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, PomodoroComponent,
-    AiCommanderComponent, PenaltyZoneComponent
+    AiCommanderComponent, PenaltyZoneComponent, BossBattleComponent
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
@@ -52,6 +55,8 @@ export class SystemComponent implements OnInit, OnDestroy {
   pressureLevel = signal(localStorage.getItem('sys_pressure') ?? 'STANDARD');
   /** Mobile section tabs: 'status' | 'quests' | 'schedule' */
   mobileTab = signal<'status' | 'quests' | 'schedule'>('status');
+
+  showBossBattle = false;
 
   dailyMission = signal<DailyMissionDTO | null>(null);
   dopamine = signal<DopamineSummary | null>(null);
@@ -95,6 +100,39 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
   }
 
+  agentLogs = signal<string[]>([]);
+  isAgentRunning = signal<boolean>(false);
+
+  triggerJobAgent(): void {
+    if (this.isAgentRunning()) return;
+    this.isAgentRunning.set(true);
+    this.agentLogs.set(['[SYSTEM] INITIALIZING AUTONOMOUS AGENT...']);
+    
+    // Listen for SSE logs via window event (dispatched by SseService)
+    const logListener = (e: any) => {
+      if (e.detail?.message) {
+        this.agentLogs.update(logs => [...logs, `[AGENT] ${e.detail.message}`]);
+        if (e.detail.message.includes('MISSION ACCOMPLISHED') || e.detail.message.includes('ABORTING') || e.detail.message.includes('CRITICAL ERROR')) {
+          this.isAgentRunning.set(false);
+          window.removeEventListener('agentLog', logListener);
+          this.toast('◈ Agent run completed.');
+          // Refresh jobs
+          this.lifeOsService.getJobs().subscribe(v => this.jobs.set(v));
+        }
+      }
+    };
+    window.addEventListener('agentLog', logListener);
+
+    this.lifeOsService.triggerJobAgent().subscribe({
+      next: () => this.toast('◈ AI Agent Deployed!'),
+      error: () => {
+        this.toast('⚠ Failed to trigger AI Agent.');
+        this.isAgentRunning.set(false);
+        window.removeEventListener('agentLog', logListener);
+      }
+    });
+  }
+
   addLeet(): void {
     if (!this.newLeet.problemName) { this.toast('⚠ Problem name required'); return; }
     this.lifeOsService.logLeetcode(this.newLeet).subscribe(() => {
@@ -119,7 +157,8 @@ export class SystemComponent implements OnInit, OnDestroy {
     public notifications: NotificationService,
     public sse: SseService,
     private haptics: HapticsService,
-    private uiState: UiStateService
+    private uiState: UiStateService,
+    private screenTime: ScreenTimeService
   ) {
     // Live sync: On SSE player-update, only reload the lightweight status endpoint
     // (player HP, XP, quests done) — NOT all 12 heavy endpoints. This is the main
@@ -147,8 +186,19 @@ export class SystemComponent implements OnInit, OnDestroy {
       }, 60000);
     });
 
+    // Listen for penalty trigger from Android ScreenTimeService
+    window.addEventListener('penaltyTriggered', (e: any) => {
+      const app = e.detail?.app || 'a distracting app';
+      this.haptics.warning();
+      this.toast(`⚠ PENALTY TRIGGERED! You opened ${app} while HP is critical. FOCUS!`);
+      // Optionally trigger HP deduction here via playerService if backend supports it.
+    });
+
     this.loadFull(); // full initial load
     this.notifications.refreshUnread();
+
+    // Start aggressive background tracking
+    this.screenTime.startEnforcement();
   }
 
   ngOnDestroy(): void {
@@ -158,6 +208,21 @@ export class SystemComponent implements OnInit, OnDestroy {
     if (this.reloadTimer) { clearTimeout(this.reloadTimer); this.reloadTimer = null; }
   }
 
+  private handleStatusUpdate(s: StatusWindow) {
+    const oldStatus = this.status();
+    this.status.set(s);
+    this.auth.updatePlayer(s.player);
+    
+    // Check for Rank Up
+    if (oldStatus && oldStatus.player.rankLevel && s.player.rankLevel && oldStatus.player.rankLevel !== s.player.rankLevel) {
+      this.dialog.open(RankUpModalComponent, {
+        data: { oldRank: oldStatus.player.rankLevel, newRank: s.player.rankLevel },
+        panelClass: 'fullscreen-dialog',
+        backdropClass: 'blur-backdrop'
+      });
+    }
+  }
+
   /**
    * LIGHTWEIGHT live refresh — called on every SSE player-update event.
    * Only fetches the player status and daily missions (2 HTTP requests max).
@@ -165,7 +230,7 @@ export class SystemComponent implements OnInit, OnDestroy {
    */
   loadLive(): void {
     this.playerService.getStatus().subscribe({
-      next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); },
+      next: (s: StatusWindow) => this.handleStatusUpdate(s),
       error: () => this.toast('⚠ Connection to the System lost'),
     });
     this.lifeOsService.getDailyMissions().subscribe({
@@ -185,7 +250,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   loadFull(): void {
     this.loading.set(true);
     this.playerService.getStatus().subscribe({
-      next: (s: StatusWindow) => { this.status.set(s); this.auth.updatePlayer(s.player); this.loading.set(false); },
+      next: (s: StatusWindow) => { this.handleStatusUpdate(s); this.loading.set(false); },
       error: () => { this.loading.set(false); this.toast('⚠ Connection to the System lost'); },
     });
     this.lifeOsService.getDailyMissions().subscribe({
@@ -341,42 +406,93 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   onComplete(quest: Quest): void {
-    this.pendingKey.set(quest.questKey);
-    this.playerService.completeQuest(quest.questKey).subscribe({
-      next: (res: QuestCompletionResult) => {
+    if (quest.latitude !== undefined && quest.longitude !== undefined) {
+      this.pendingKey.set(quest.questKey);
+      this.toast('◈ Validating coordinates...');
+      if (!navigator.geolocation) {
         this.pendingKey.set(null);
-        // Native haptic — success buzz on level-up, light tap on plain XP.
-        if (res.leveledUp) { this.haptics.success(); } else { this.haptics.light(); }
-        const statStr = res.statsGained?.length ? ' · ' + res.statsGained.join(' ') : '';
-        this.snack.open(`◈ +${res.xpGained} XP${statStr}`, '✕', {
-          duration: 3400, panelClass: 'system-snack',
-          horizontalPosition: 'center', verticalPosition: 'top',
-        });
-        res.newAchievements?.forEach((a: Achievement, i: number) => {
-          setTimeout(() => {
-            this.snack.open(`🏆 ACHIEVEMENT — ${a.title}`, '✕', {
-              duration: 4200, panelClass: 'system-snack',
-              horizontalPosition: 'center', verticalPosition: 'top',
-            });
-          }, 700 * (i + 1));
-        });
-        if (res.leveledUp) {
-          setTimeout(() => {
-            this.uiState.triggerLevelUp({ newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged });
-          }, 400);
+        this.toast('⚠ Geolocation not supported by this browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.playerService.completeQuest(quest.questKey, pos.coords.latitude, pos.coords.longitude).subscribe({
+            next: (res: QuestCompletionResult) => this.handleQuestCompletionSuccess(res),
+            error: (err) => {
+              this.pendingKey.set(null);
+              this.toast(`⚠ ${err.error?.message || 'Geo-verification failed.'}`);
+            }
+          });
+        },
+        (err) => {
+          this.pendingKey.set(null);
+          this.toast('⚠ Failed to get location. Enable GPS permissions.');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      this.pendingKey.set(quest.questKey);
+      this.playerService.completeQuest(quest.questKey).subscribe({
+        next: (res: QuestCompletionResult) => this.handleQuestCompletionSuccess(res),
+        error: () => this.pendingKey.set(null),
+      });
+    }
+  }
+
+  onVerifyQuest(event: { quest: Quest; imageBase64: string; mimeType: string }): void {
+    this.pendingKey.set(event.quest.questKey);
+    this.toast('◈ AI Vision is analyzing your proof...');
+    this.playerService.verifyQuest(event.quest.questKey, event.imageBase64, event.mimeType).subscribe({
+      next: (res) => {
+        if (res.verified && res.result) {
+          this.toast('◈ AI VERIFIED: ' + res.reason);
+          this.handleQuestCompletionSuccess(res.result);
+        } else {
+          this.pendingKey.set(null);
+          this.toast('⚠ AI REJECTED: ' + res.reason);
         }
-        this.load();
-        this.notifications.refreshUnread();
       },
-      error: (e: { error?: { message?: string } }) => {
+      error: () => {
         this.pendingKey.set(null);
-        this.haptics.warning();
-        const msg = e?.error?.message ?? 'Quest failed';
-        this.snack.open(`⚠ ${msg}`, '✕', {
-          duration: 2800, panelClass: 'system-snack-warn',
+        this.toast('⚠ AI Verification Failed.');
+      }
+    });
+  }
+
+  private handleQuestCompletionSuccess(res: QuestCompletionResult): void {
+    this.pendingKey.set(null);
+    // Native haptic — success buzz on level-up, light tap on plain XP.
+    if (res.leveledUp) { this.haptics.success(); } else { this.haptics.light(); }
+    const statStr = res.statsGained?.length ? ' · ' + res.statsGained.join(' ') : '';
+    this.snack.open(`◈ +${res.xpGained} XP${statStr}`, '✕', {
+      duration: 3400, panelClass: 'system-snack',
+      horizontalPosition: 'center', verticalPosition: 'top',
+    });
+    res.newAchievements?.forEach((a: Achievement, i: number) => {
+      setTimeout(() => {
+        this.snack.open(`🏆 ACHIEVEMENT — ${a.title}`, '✕', {
+          duration: 4200, panelClass: 'system-snack',
           horizontalPosition: 'center', verticalPosition: 'top',
         });
-      },
+      }, 700 * (i + 1));
+    });
+    if (res.leveledUp) {
+      setTimeout(() => {
+        this.uiState.triggerLevelUp({ newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged });
+      }, 400);
+    }
+    this.load();
+    this.notifications.refreshUnread();
+  }
+
+  // Called if quest completion fails
+  private handleQuestCompletionError(e: any): void {
+    this.pendingKey.set(null);
+    this.haptics.warning();
+    const msg = e?.error?.message ?? 'Quest failed';
+    this.snack.open(`⚠ ${msg}`, '✕', {
+      duration: 2800, panelClass: 'system-snack-warn',
+      horizontalPosition: 'center', verticalPosition: 'top',
     });
   }
 

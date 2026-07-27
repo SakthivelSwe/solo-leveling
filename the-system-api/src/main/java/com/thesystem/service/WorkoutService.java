@@ -31,7 +31,6 @@ public class WorkoutService {
         return repo.findByPlayerIdOrderByWorkoutDateDescIdDesc(playerId);
     }
 
-    /** Deletes an entry only if it belongs to the requesting player. */
     public void delete(Long playerId, Long id) {
         repo.findById(id)
                 .filter(w -> w.getPlayerId().equals(playerId))

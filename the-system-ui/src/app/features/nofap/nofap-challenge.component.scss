@@ -47,6 +47,53 @@
   overflow: hidden;
 }
 
+/* ── Panic Button ────────────────────────────────────────────── */
+.panic-section {
+  text-align: center;
+  border: 1px solid rgba(226, 75, 74, 0.4);
+  background: rgba(226, 75, 74, 0.05);
+  box-shadow: 0 0 15px rgba(226, 75, 74, 0.1) inset;
+}
+.panic-btn {
+  background: linear-gradient(135deg, #8A0000 0%, #E24B4A 100%);
+  color: #fff;
+  border: 2px solid #E24B4A;
+  border-radius: 8px;
+  padding: 16px 24px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(226, 75, 74, 0.4);
+  animation: pulse-panic 2s infinite;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.panic-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 10px rgba(226, 75, 74, 0.2);
+}
+.panic-icon {
+  font-size: 1.5rem;
+}
+.panic-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.panic-desc {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+@keyframes pulse-panic {
+  0% { box-shadow: 0 0 0 0 rgba(226, 75, 74, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(226, 75, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(226, 75, 74, 0); }
+}
+
 .section-title {
   margin: 0 0 4px;
   font-size: .8rem;

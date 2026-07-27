@@ -90,5 +90,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dopamine/dopamine-tracker.component').then(m => m.DopamineTrackerComponent),
   },
+  {
+    path: 'shadow-army',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/system/shadow-army.component').then(m => m.ShadowArmyComponent),
+  },
   { path: '**', redirectTo: 'system' },
 ];

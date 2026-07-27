@@ -94,6 +94,16 @@ public class Quest {
     @Column(name = "min_level", columnDefinition = "integer default 1")
     private int minLevel = 1;
 
+    // --- GEO-FENCING ---
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "radius_meters", columnDefinition = "integer default 50")
+    private Integer radiusMeters = 50;
+
     public Quest() {}
 
     public Quest(String questKey, String label, QuestCategory category, int xpReward,
@@ -140,6 +150,12 @@ public class Quest {
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
     public int getMinLevel() { return minLevel; }
     public void setMinLevel(int minLevel) { this.minLevel = minLevel; }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public Integer getRadiusMeters() { return radiusMeters; }
+    public void setRadiusMeters(Integer radiusMeters) { this.radiusMeters = radiusMeters; }
 
     /** True if this is a one-time milestone quest (never resets after completion). */
     public boolean isOneTime() {

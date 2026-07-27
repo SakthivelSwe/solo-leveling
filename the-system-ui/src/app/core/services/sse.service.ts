@@ -104,6 +104,13 @@ export class SseService {
       this.zone.run(() => this.onPlayerUpdate(ev)),
     );
 
+    es.addEventListener('agent-log', (ev: MessageEvent) =>
+      this.zone.run(() => {
+        const payload = JSON.parse(ev.data);
+        window.dispatchEvent(new CustomEvent('agentLog', { detail: payload }));
+      })
+    );
+
     // EventSource auto-reconnects on error; add backoff so an unreachable server
     // doesn't trigger rapid reconnect storms that drain battery and heat the CPU.
     es.onerror = () => this.zone.run(() => {

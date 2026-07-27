@@ -22,6 +22,7 @@ type View = 'CHAT' | 'BOSS' | 'HISTORY';
 
 const CHAT_CONTEXTS = [
   { label: 'General System', value: 'general', icon: '◈' },
+  { label: 'Omni-Context Analysis', value: 'system_status', icon: '🧠' },
   { label: 'Code Reviewer', value: 'code review', icon: '💻' },
   { label: 'System Architect', value: 'system design', icon: '🏗️' },
   { label: 'Career Strategist', value: 'career advice', icon: '📈' },
@@ -61,7 +62,72 @@ export class AiMentorComponent implements OnInit {
   battleLoading = signal(false);
   battleHistory = signal<BossBattle[]>([]);
 
-  constructor(private ai: AiService) {}
+  // Web Speech API
+  isVoiceMode = signal(false);
+  isListening = signal(false);
+  recognition: any;
+  synth = window.speechSynthesis;
+
+  constructor(private ai: AiService) {
+    this.initSpeech();
+  }
+
+  private initSpeech(): void {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.onstart = () => this.isListening.set(true);
+      this.recognition.onend = () => this.isListening.set(false);
+      this.recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        this.userInput = transcript;
+        this.sendChat();
+      };
+    }
+  }
+
+  toggleVoiceMode(): void {
+    this.isVoiceMode.set(!this.isVoiceMode());
+    if (this.isVoiceMode()) {
+      this.pushSystem('◈ VOICE MODE ACTIVATED. I AM LISTENING.');
+      this.speakText('Voice mode activated. I am listening.');
+    } else {
+      this.pushSystem('◈ VOICE MODE DEACTIVATED.');
+      this.synth.cancel();
+      if (this.isListening()) this.recognition.stop();
+    }
+  }
+
+  startListening(): void {
+    if (this.recognition && !this.isListening()) {
+      try { this.recognition.start(); } catch (e) {}
+    }
+  }
+
+  private speakText(text: string): void {
+    if (!this.isVoiceMode() || !this.synth) return;
+    this.synth.cancel();
+    const cleanText = text.replace(/[◈▸*#_]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.pitch = 0.8;
+    utterance.rate = 1.0;
+    
+    // Try to find a male, robotic, or stern English voice
+    const voices = this.synth.getVoices();
+    const systemVoice = voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('Daniel') || v.lang === 'en-GB' || v.lang === 'en-US');
+    if (systemVoice) utterance.voice = systemVoice;
+
+    this.synth.speak(utterance);
+    
+    // Auto-listen after speaking if in Voice mode and chat view
+    utterance.onend = () => {
+      if (this.isVoiceMode() && this.view() === 'CHAT') {
+        this.startListening();
+      }
+    };
+  }
 
   ngOnInit(): void {
     // Load coaching message
@@ -87,8 +153,19 @@ export class AiMentorComponent implements OnInit {
     this.chatMessages.update(list => [...list, { role: 'user', text: msg, ts: new Date() }]);
     this.chatLoading.set(true);
     this.ai.chat(msg, this.selectedContext().value).subscribe({
-      next: r => { this.pushSystem(r.reply); this.chatLoading.set(false); this.scrollChat(); },
-      error: () => { this.pushSystem('◈ CONNECTION FAILED. Try again.'); this.chatLoading.set(false); }
+      next: r => { 
+        this.pushSystem(r.reply); 
+        this.chatLoading.set(false); 
+        this.scrollChat(); 
+        if (this.isVoiceMode()) {
+          this.speakText(r.reply);
+        }
+      },
+      error: () => { 
+        this.pushSystem('◈ CONNECTION FAILED. Try again.'); 
+        this.chatLoading.set(false); 
+        if (this.isVoiceMode()) this.speakText('Connection failed.');
+      }
     });
   }
 
@@ -99,7 +176,9 @@ export class AiMentorComponent implements OnInit {
         try {
           const obj = JSON.parse(r.raw);
           const steps = (obj.steps as string[]).map((s, i) => `${i+1}. ${s}`).join('\n');
-          this.pushSystem(`◈ SUGGESTED TASK: ${obj.task}\n\n${steps}\n\nXP ESTIMATE: +${obj.xpEstimate}`);
+          const msg = `◈ SUGGESTED TASK: ${obj.task}\n\n${steps}\n\nXP ESTIMATE: +${obj.xpEstimate}`;
+          this.pushSystem(msg);
+          if (this.isVoiceMode()) this.speakText(`Suggested task: ${obj.task}. ${obj.xpEstimate} XP.`);
         } catch { this.pushSystem(r.raw); }
         this.chatLoading.set(false);
         this.scrollChat();

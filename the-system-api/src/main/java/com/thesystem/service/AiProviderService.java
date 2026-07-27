@@ -135,5 +135,38 @@ public class AiProviderService {
         if (parts == null || parts.isEmpty()) throw new RuntimeException("Empty parts from Gemini");
         return String.valueOf(((Map<?, ?>) parts.get(0)).get("text")).trim();
     }
+
+    public String verifyQuestImage(String questLabel, String base64Image, String mimeType) {
+        String prompt = "You are THE SYSTEM, a stern AI verifying a player's quest. The quest is: '" + questLabel + "'. " +
+                "Look at the uploaded image. Does it prove the quest is complete? " +
+                "Respond in JSON format: {\"verified\": boolean, \"reason\": \"your strict, concise feedback (under 15 words)\"}";
+        
+        var body = Map.of(
+            "contents", List.of(
+                Map.of("parts", List.of(
+                    Map.of("text", prompt),
+                    Map.of("inlineData", Map.of(
+                        "mimeType", mimeType,
+                        "data", base64Image
+                    ))
+                ))
+            ),
+            "generationConfig", Map.of(
+                "temperature", 0.4,
+                "responseMimeType", "application/json"
+            )
+        );
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/"
+                + geminiModel + ":generateContent?key=" + geminiKey;
+
+        Map<?, ?> resp = http.post()
+            .uri(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(body)
+            .retrieve()
+            .body(Map.class);
+
+        return extractGeminiText(resp);
+    }
 }
 

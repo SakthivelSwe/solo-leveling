@@ -43,6 +43,7 @@ export class QuestLogComponent {
   @Input() pendingKey: string | null = null;
   @Input() pressureLevel = 'STANDARD';
   @Output() complete = new EventEmitter<Quest>();
+  @Output() verify = new EventEmitter<{ quest: Quest; imageBase64: string; mimeType: string }>();
   @Output() questAdded = new EventEmitter<Quest>();
   @Output() questDeleted = new EventEmitter<string>();
 
@@ -151,6 +152,28 @@ export class QuestLogComponent {
     if (q.isCompleted || this.pendingKey) return;
     this.complete.emit(q);
     this.skipWarningKey = null;
+  }
+
+  onVerify(q: Quest, event: Event): void {
+    event.stopPropagation();
+    if (q.isCompleted || this.pendingKey) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const result = e.target.result as string;
+          const mimeType = result.split(';')[0].split(':')[1];
+          const base64 = result.split(',')[1];
+          this.verify.emit({ quest: q, imageBase64: base64, mimeType });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   }
 
   onDeleteCustom(q: Quest, event: Event): void {
