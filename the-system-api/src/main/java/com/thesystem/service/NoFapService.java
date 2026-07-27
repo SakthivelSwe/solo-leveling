@@ -237,7 +237,7 @@ public class NoFapService {
                     return n;
                 });
         log.setPornViewed(pornViewed);
-        logRepo.save(log);
+        logRepo.saveAndFlush(log);
     }
 
     private void checkAndAwardMilestoneXp(Long playerId, int oldStreak, int newStreak) {
