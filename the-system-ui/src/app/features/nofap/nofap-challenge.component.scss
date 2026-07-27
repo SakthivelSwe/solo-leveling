@@ -603,10 +603,10 @@
   border-radius: 2px;
   min-width: 0;
 }
+.hm-empty { background: rgba(255,255,255,.06); }
 .hm-clean { background: #1FBE8E; }
 .hm-relapse { background: #E24B4A; }
-.hm-nightfall { background: #4fc3f7; box-shadow: 0 0 8px rgba(79, 195, 247, 0.5); }
-.hm-empty { background: rgba(255,255,255,.06); }
+.hm-nightfall { background: #4fc3f7 !important; box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important; }
 .hm-legend {
   display: flex;
   align-items: center;
