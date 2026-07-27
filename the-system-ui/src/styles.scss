@@ -355,6 +355,8 @@ $sys-theme: mat.define-dark-theme((
   --mdc-snackbar-container-color:       rgba(10, 10, 24, 0.95);
   --mdc-snackbar-supporting-text-color: #EEF3FA;
   --mat-snack-bar-button-color:         #FAC775;
+  position: fixed !important;
+  z-index: 9999 !important;
 }
 .mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
   border: 1px solid var(--accent-teal);
@@ -380,7 +382,15 @@ $sys-theme: mat.define-dark-theme((
 }
 /* Ensure the CDK overlay sits above the bottom navigation bar on mobile */
 .cdk-overlay-container {
-  z-index: 1000;
+  z-index: 10000 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.cdk-global-overlay-wrapper {
+  position: fixed !important;
 }
 
 /* ── Holographic flicker animation ──────────────────────────── */

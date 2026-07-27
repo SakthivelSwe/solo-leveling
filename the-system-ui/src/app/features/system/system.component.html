@@ -14,16 +14,16 @@
     </div>
 
     <nav class="desktop-nav tech" role="navigation" aria-label="System navigation">
-      <a routerLink="/system" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">STATUS</a>
-      <a routerLink="/habits" routerLinkActive="active">QUESTS</a>
-      <a routerLink="/life" routerLinkActive="active">LIFE OS</a>
-      <a routerLink="/physical" routerLinkActive="active">BODY</a>
-      <a routerLink="/learning" routerLinkActive="active">LEARNING</a>
-      <a routerLink="/ai" routerLinkActive="active">AI MENTOR</a>
-      <a routerLink="/insights" routerLinkActive="active">INSIGHTS</a>
-      <a routerLink="/achievements" routerLinkActive="active">RANKS</a>
-      <a routerLink="/nofap" routerLinkActive="active" class="nav-discipline">🔥 DISCIPLINE</a>
-      <a routerLink="/shadow-army" routerLinkActive="active" style="color: #7209b7; font-weight: 800;">👥 SHADOWS</a>
+      <a routerLink="/system" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" title="Status">STATUS</a>
+      <a routerLink="/habits" routerLinkActive="active" title="Quest Log">QUESTS</a>
+      <a routerLink="/life" routerLinkActive="active" title="Life OS">LIFE OS</a>
+      <a routerLink="/physical" routerLinkActive="active" title="Body Tracking">BODY</a>
+      <a routerLink="/learning" routerLinkActive="active" title="Learning Center">LEARN</a>
+      <a routerLink="/ai" routerLinkActive="active" title="AI Mentor">AI</a>
+      <a routerLink="/insights" routerLinkActive="active" title="Insights">DATA</a>
+      <a routerLink="/achievements" routerLinkActive="active" title="Ranks & Achievements">RANKS</a>
+      <a routerLink="/nofap" routerLinkActive="active" class="nav-discipline" title="Discipline Protocol">🔥</a>
+      <a routerLink="/shadow-army" routerLinkActive="active" style="color: #b366ff; font-weight: 800; font-size: 1.1rem; padding-left: 8px;" title="Shadow Army">👥</a>
     </nav>
 
     <div class="topbar-right">
@@ -122,31 +122,6 @@
 
       <app-skill-tree [skills]="s.skills" [nodes]="skillTreeNodes()"></app-skill-tree>
 
-      <!-- Phase 5: Shadow Army -->
-      <div class="system-card block spring-hover" style="margin-top: 16px;">
-        <h3 class="mono head" style="color: #BA7517;">◈ SHADOW ARMY</h3>
-        <p class="tech subtitle" style="margin-bottom: 12px; font-size: 0.7rem;">MASTERED HABITS TRANSCEND INTO SHADOWS</p>
-        
-        <!-- ARISE Button (Unlocked at 90 days NoFap) -->
-        <div class="arise-container" *ngIf="noFap() && noFap()!.currentStreak >= 90 && !hasIgris()" style="margin-bottom: 12px;">
-          <button class="btn-arise tech spring-hover" (click)="extractShadow()" [disabled]="extractingShadow()">
-            {{ extractingShadow() ? 'EXTRACTING...' : 'ARISE (Extract Shadow of Discipline)' }}
-          </button>
-        </div>
-
-        <div class="shadows-list" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="shadow-item" *ngFor="let sh of shadows()"
-               style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(186,117,23,0.1); border: 1px solid rgba(186,117,23,0.3); border-radius: 6px;">
-            <div>
-              <span class="mono" style="color: #BA7517; font-weight: bold; font-size: 0.9rem;">{{ sh.shadowName }}</span>
-              <div class="tech" style="font-size: 0.65rem; color: #8a8a9a;">Lv.{{ sh.shadowLevel }} (Power: {{ sh.powerLevel }}) · +{{ sh.powerLevel }}% {{ sh.shadowType }} XP</div>
-            </div>
-          </div>
-          <div class="empty-shadows tech" *ngIf="shadows().length === 0 && (!noFap() || noFap()!.currentStreak < 90)" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); text-align: center; padding: 12px;">
-            No shadows extracted yet. Prove your discipline.
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- CENTRE col: Quest Log + Progress -->
