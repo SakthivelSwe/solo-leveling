@@ -9,4 +9,5 @@ export const environment = {
   // For local dev, change this back to http://10.0.2.2:8080/api (emulator)
   // or http://<your-lan-ip>:8080/api (physical device).
   apiUrl: 'https://solo-leveling-psjy.onrender.com/api/v1',
+  secondaryApiUrl: 'https://solo-leveling-0rpl.onrender.com/api/v1',
 };

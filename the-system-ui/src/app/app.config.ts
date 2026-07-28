@@ -8,13 +8,15 @@ import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { fallbackInterceptor } from './core/interceptors/fallback.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withComponentInputBinding()),
     provideAnimations(),
-    provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
+    // fallbackInterceptor must run BEFORE errorInterceptor so it catches raw network errors
+    provideHttpClient(withInterceptors([jwtInterceptor, fallbackInterceptor, errorInterceptor])),
     importProvidersFrom(MonacoEditorModule.forRoot({
       baseUrl: 'assets/monaco',
       defaultOptions: { scrollBeyondLastLine: false, theme: 'vs-dark' }
