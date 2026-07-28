@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
+import { LocalNotificationsService } from './local-notifications.service';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type DirectiveCategory = 'TESTOSTERONE' | 'DAILY' | 'SKILL' | 'REST';
@@ -109,6 +110,8 @@ export const DEFAULT_RAW: RawDirectiveItem[] = [
 // ── Service ────────────────────────────────────────────────────────────────────
 @Injectable({ providedIn: 'root' })
 export class DirectiveService {
+  private localNotif = inject(LocalNotificationsService);
+
   /** The 4 key anchor times — any change auto-shifts all items in that block. */
   readonly config = signal<DirectiveConfig>(this.loadConfig());
 
@@ -141,6 +144,14 @@ export class DirectiveService {
       if (key === 'OFFICE_END')   n.officeEnd   = hhmm;
       if (key === 'SLEEP')        n.sleepTime   = hhmm;
       localStorage.setItem(CFG_KEY, JSON.stringify(n));
+
+      // Re-schedule wake + sleep notifications with updated times whenever
+      // the user changes WAKE or SLEEP so they always fire at the right time
+      // and the notification body text shows the correct time.
+      if (key === 'WAKE' || key === 'SLEEP') {
+        this.localNotif.scheduleAlarms(n.wakeTime, n.sleepTime);
+      }
+
       return n;
     });
   }

@@ -131,9 +131,28 @@ export class LocalNotificationsService {
     });
   }
 
-  async scheduleAlarms(): Promise<void> {
+  async scheduleAlarms(wakeTime = '08:00', sleepTime = '23:30'): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     try {
+      // Parse HH:mm strings into hour/minute numbers
+      const [wakeH, wakeM] = wakeTime.split(':').map(Number);
+      const [sleepH, sleepM] = sleepTime.split(':').map(Number);
+
+      // Build a human-readable sleep time for the notification body
+      const sleepDisplayH = sleepH % 12 === 0 ? 12 : sleepH % 12;
+      const sleepDisplayAmPm = sleepH >= 12 ? 'PM' : 'AM';
+      const sleepDisplay = `${sleepDisplayH}:${String(sleepM).padStart(2,'0')} ${sleepDisplayAmPm}`;
+
+      // Build a human-readable wake time for the notification body
+      const wakeDisplayH = wakeH % 12 === 0 ? 12 : wakeH % 12;
+      const wakeDisplayAmPm = wakeH >= 12 ? 'PM' : 'AM';
+      const wakeDisplay = `${wakeDisplayH}:${String(wakeM).padStart(2,'0')} ${wakeDisplayAmPm}`;
+
+      // Notification fires 30 min before sleep time to give enough warning
+      const reminderMins = (sleepH * 60 + sleepM) - 30;
+      const reminderH = Math.floor(((reminderMins % 1440) + 1440) % 1440 / 60);
+      const reminderM = ((reminderMins % 1440) + 1440) % 1440 % 60;
+
       await LocalNotifications.cancel({
         notifications: [
           { id: LocalNotificationsService.IDS.midnight },
@@ -157,20 +176,20 @@ export class LocalNotificationsService {
             id: LocalNotificationsService.IDS.wake,
             channelId: LocalNotificationsService.CH.alarms,
             title: '⚡ WAKE PROTOCOL INITIATED',
-            body: 'Cold shower. Sunlight. Eggs. Begin.',
-            largeBody: '◈ WAKE PROTOCOL ◈\n\n1. Get out of bed immediately.\n2. Expose your eyes to sunlight.\n3. Take a cold shower.\n4. Consume a high-protein breakfast.\n\nDo not let the system dictate your weakness. Level up today.',
+            body: `Rise at ${wakeDisplay}. Cold shower. Sunlight. Eggs. Begin.`,
+            largeBody: `◈ WAKE PROTOCOL — ${wakeDisplay} ◈\n\n1. Get out of bed immediately.\n2. Expose your eyes to sunlight.\n3. Take a cold shower.\n4. Consume a high-protein breakfast.\n\nDo not let the system dictate your weakness. Level up today.`,
             largeIcon: LARGE_ICON,
-            schedule: { on: { hour: 8, minute: 0 }, allowWhileIdle: true, repeats: true },
+            schedule: { on: { hour: wakeH, minute: wakeM }, allowWhileIdle: true, repeats: true },
             smallIcon: SMALL_ICON
           },
           {
             id: LocalNotificationsService.IDS.sleep,
             channelId: LocalNotificationsService.CH.alarms,
             title: '⚡ SLEEP PROTOCOL',
-            body: 'Phone down. Sleep before 11:30. System watching.',
-            largeBody: '◈ SLEEP PROTOCOL ◈\n\nYour body requires recovery to grow stronger.\n\n1. Put all screens away.\n2. Prepare for sleep.\n3. Sleep before 11:30 PM.\n\nFailure to recover is failure to level up.',
+            body: `Phone down. Sleep by ${sleepDisplay}. System watching.`,
+            largeBody: `◈ SLEEP PROTOCOL ◈\n\nYour body requires recovery to grow stronger.\n\n1. Put all screens away now.\n2. Prepare for sleep.\n3. Sleep by ${sleepDisplay}.\n\nFailure to recover is failure to level up.`,
             largeIcon: LARGE_ICON,
-            schedule: { on: { hour: 23, minute: 0 }, allowWhileIdle: true, repeats: true },
+            schedule: { on: { hour: reminderH, minute: reminderM }, allowWhileIdle: true, repeats: true },
             smallIcon: SMALL_ICON
           }
         ]

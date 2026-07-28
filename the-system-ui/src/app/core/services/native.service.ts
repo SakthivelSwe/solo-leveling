@@ -8,6 +8,7 @@ import { LocalNotificationsService } from './local-notifications.service';
 import { BiometricService } from './biometric.service';
 import { AuthService } from './auth.service';
 import { PlayerService } from './player.service';
+import { DirectiveService } from './directive.service';
 
 /**
  * Native-platform glue (Capacitor). No-ops on the web so the same codebase runs
@@ -21,11 +22,12 @@ import { PlayerService } from './player.service';
  */
 @Injectable({ providedIn: 'root' })
 export class NativeService {
-  private location         = inject(Location);
+  private location           = inject(Location);
   private localNotifications = inject(LocalNotificationsService);
-  private biometric        = inject(BiometricService);
-  private auth             = inject(AuthService);
-  private playerService    = inject(PlayerService);
+  private biometric          = inject(BiometricService);
+  private auth               = inject(AuthService);
+  private playerService      = inject(PlayerService);
+  private directive          = inject(DirectiveService);
 
   /** Exposed so AppComponent can show/hide the biometric lock overlay. */
   get biometricLocked(): boolean { return this.biometric.isLocked; }
@@ -105,8 +107,9 @@ export class NativeService {
       }
       
       if (perm.display === 'granted') {
-        // 4. Schedule exact alarms and soft reminders
-        await this.localNotifications.scheduleAlarms();
+        // 4. Schedule exact alarms and soft reminders using user-set times
+        const cfg = this.directive.config();
+        await this.localNotifications.scheduleAlarms(cfg.wakeTime, cfg.sleepTime);
         await this.localNotifications.scheduleReminders();
       }
     } catch {
