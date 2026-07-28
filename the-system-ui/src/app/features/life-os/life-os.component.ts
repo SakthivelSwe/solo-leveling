@@ -11,7 +11,7 @@ import {
   JobApplication, LeetcodeLog, LeetcodeStats, SkillsGap, SavingsGoal,
   HealthLog, MindLog, SelfDoubtEvidence, EnglishLog, BodyLog, RelationshipLog,
   InterviewReadinessDTO, DeepWorkSession, DevMasteryProgress, BudgetEntry,
-  DietEntry, FoodItem
+  DietEntry, FoodItem, NetWorthLog, SocialConnection, PlayerConfig
 } from '../../core/models/models';
 import { fadeInUp, listStagger } from '../../shared/animations';
 
@@ -52,8 +52,11 @@ export class LifeOsComponent implements OnInit {
   // Wealth
   goals = signal<SavingsGoal[]>([]);
   budgets = signal<BudgetEntry[]>([]);
+  netWorthHistory = signal<NetWorthLog[]>([]);
   newBudget: BudgetEntry = { entryMonth: new Date().toISOString().slice(0, 7), salary: 0, pgRent: 0, foodSpend: 0, transport: 0, onlineOrders: 0, misc: 0, saved: 0, sipAmount: 0 };
+  newNetWorth: NetWorthLog = { totalAssets: 0, totalLiabilities: 0, netWorth: 0, cashRunwayMonths: 0 };
   showBudgetForm = false;
+  showNetWorthForm = false;
   newGoal: SavingsGoal = { goalName: '', target: 0, current: 0 };
   showGoalForm = false;
 
@@ -116,6 +119,9 @@ export class LifeOsComponent implements OnInit {
 
   // Relationship
   relationship = signal<RelationshipLog | null>(null);
+  connections = signal<SocialConnection[]>([]);
+  newConnection: SocialConnection = { name: '', relationType: 'FRIEND', targetContactFrequencyDays: 7, lastContactDate: new Date().toISOString().split('T')[0], healthScore: 100 };
+  showConnectionForm = false;
 
   readonly statuses = ['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'GHOSTED'];
 
@@ -141,6 +147,7 @@ export class LifeOsComponent implements OnInit {
           this.budgets.set(v);
           this.updateWealthChart(v);
         });
+        this.life.getNetWorthHistory().subscribe(v => this.netWorthHistory.set(v));
         this.startWisdomEngine();
         break;
       case 'HEALTH':
@@ -157,6 +164,7 @@ export class LifeOsComponent implements OnInit {
         break;
       case 'RELATIONSHIP':
         this.life.getRelationshipToday().subscribe(v => this.relationship.set(v ?? this.blankRel()));
+        this.life.getSocialConnections().subscribe(v => this.connections.set(v));
         break;
     }
   }
@@ -233,6 +241,16 @@ export class LifeOsComponent implements OnInit {
         this.updateWealthChart(v);
       });
       this.showBudgetForm = false;
+    });
+  }
+
+  saveNetWorth(): void {
+    if (this.newNetWorth.totalAssets < 0) return;
+    this.life.logNetWorth(this.newNetWorth).subscribe(nw => {
+      this.toast('◈ Net Worth Logged');
+      this.netWorthHistory.update(list => [nw, ...list]);
+      this.showNetWorthForm = false;
+      this.newNetWorth = { totalAssets: 0, totalLiabilities: 0, netWorth: 0, cashRunwayMonths: 0 };
     });
   }
 
@@ -373,6 +391,24 @@ export class LifeOsComponent implements OnInit {
     const r = this.relationship(); if (!r) return;
     r.callDurationMin = (r.callDurationMin || 0) + mins;
     if (r.callDurationMin > 0) r.gfCalled = true;
+  }
+
+  addConnection(): void {
+    if (!this.newConnection.name) return;
+    this.life.addSocialConnection(this.newConnection).subscribe(c => {
+      this.toast('◈ Connection Added');
+      this.connections.update(list => [...list, c]);
+      this.showConnectionForm = false;
+      this.newConnection = { name: '', relationType: 'FRIEND', targetContactFrequencyDays: 7, lastContactDate: new Date().toISOString().split('T')[0], healthScore: 100 };
+    });
+  }
+
+  contactConnection(c: SocialConnection): void {
+    if (!c.id) return;
+    this.life.updateSocialContact(c.id, new Date().toISOString().split('T')[0]).subscribe(updated => {
+      this.toast(`◈ Contacted ${updated.name}`);
+      this.connections.update(list => list.map(x => x.id === updated.id ? updated : x));
+    });
   }
 
   urgencyColor(u: string): string {

@@ -631,3 +631,32 @@ export interface NoFapStatus {
   phaseTitle: string;
 }
 
+export interface NetWorthLog {
+  id?: number;
+  playerId?: number;
+  logDate?: string;
+  totalAssets: number;
+  totalLiabilities: number;
+  netWorth: number;
+  cashRunwayMonths: number;
+}
+
+export interface SocialConnection {
+  id?: number;
+  playerId?: number;
+  name: string;
+  relationType: string;
+  targetContactFrequencyDays: number;
+  lastContactDate: string;
+  healthScore: number;
+}
+
+export interface PlayerConfig {
+  id?: number;
+  playerId?: number;
+  targetProteinGrams: number;
+  targetCalories: number;
+  targetWaterGlasses: number;
+  targetSleepHours: number;
+  monthlyBaselineExpenses: number;
+}

@@ -175,6 +175,27 @@
         </div>
       </div>
 
+      <!-- Macro Targets & Sleep Debt -->
+      <div class="system-card block" style="border-color: #1D9E75;">
+        <h3 class="mono head" style="color: #1D9E75;">◈ DAILY METRICS</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+          <!-- Macros -->
+          <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; text-align: center; border-top: 3px solid #b3aef0;">
+            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">PROTEIN TARGET</div>
+            <div class="mono" style="color: #b3aef0; font-size: 1.5rem;">0 / 150g</div>
+            <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px;">
+              <div class="gap-fill" style="width: 0%; background: linear-gradient(90deg, #834ab7, #b3aef0); height: 100%;"></div>
+            </div>
+          </div>
+          <!-- Sleep Debt -->
+          <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; text-align: center; border-top: 3px solid #FAC775;">
+            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SLEEP DEBT</div>
+            <div class="mono" style="color: #FAC775; font-size: 1.5rem;">-2.5 hrs</div>
+            <div class="tech" style="color: #E24B4A; margin-top: 8px;">CRITICAL</div>
+          </div>
+        </div>
+      </div>
+
       <div class="system-card block" *ngIf="health() as h">
         <h3 class="mono head">◈ WATER INTAKE</h3>
         <div class="water">
@@ -307,6 +328,28 @@
              <div class="tech" style="font-size: 0.7rem; color: #8a8a9a; margin-bottom: 4px;">SAVINGS + SIP</div>
              <div class="mono" style="color: #1D9E75; font-size: 1.2rem;">₹{{ budgets()[0].saved + budgets()[0].sipAmount }}</div>
            </div>
+        </div>
+      </div>
+
+      <!-- Net Worth -->
+      <div class="system-card block" style="border-color: #1D9E75;">
+        <h3 class="mono head" style="color: #1D9E75; display: flex; justify-content: space-between;">
+          <span>◈ NET WORTH</span>
+          <button class="btn sm" (click)="showNetWorthForm = !showNetWorthForm" style="border-color: #1D9E75; color: #1D9E75;">+ LOG</button>
+        </h3>
+        
+        <div *ngIf="showNetWorthForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+          <input type="number" class="sys-input" placeholder="Total Assets (₹)" [(ngModel)]="newNetWorth.totalAssets" style="width: 100%; margin-bottom: 12px;" />
+          <input type="number" class="sys-input" placeholder="Total Liabilities (₹)" [(ngModel)]="newNetWorth.totalLiabilities" style="width: 100%; margin-bottom: 12px;" />
+          <button class="btn full" (click)="saveNetWorth()" style="background: rgba(29, 158, 117, 0.1); border-color: #1D9E75; color: #1D9E75;">SAVE NET WORTH</button>
+        </div>
+        
+        <div *ngIf="netWorthHistory().length > 0" style="margin-bottom: 24px;">
+          <div style="background: rgba(29, 158, 117, 0.1); padding: 16px; border-radius: 8px; text-align: center;">
+            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">CURRENT NET WORTH</div>
+            <div class="mono" style="color: #1D9E75; font-size: 2rem;">₹{{ netWorthHistory()[0].netWorth }}</div>
+            <div class="tech" style="color: #FAC775; margin-top: 8px;">RUNWAY: {{ netWorthHistory()[0].cashRunwayMonths | number:'1.1-1' }} MONTHS</div>
+          </div>
         </div>
       </div>
 
@@ -448,6 +491,33 @@
         </div>
 
         <button class="btn full" style="border-color: #D36B9B; color: #D36B9B; margin-top: 24px; font-weight: bold; letter-spacing: 1px;" (click)="saveRelationship()">SAVE BONDS</button>
+      </div>
+
+      <!-- Social Connections (CRM) -->
+      <div class="system-card block" style="border-color: #D36B9B;">
+        <h3 class="mono head" style="color: #D36B9B; display: flex; justify-content: space-between;">
+          <span>◈ SOCIAL CONSTELLATION</span>
+          <button class="btn sm" (click)="showConnectionForm = !showConnectionForm" style="border-color: #D36B9B; color: #D36B9B;">+ ADD</button>
+        </h3>
+        
+        <div *ngIf="showConnectionForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+          <input type="text" class="sys-input" placeholder="Name" [(ngModel)]="newConnection.name" style="width: 100%; margin-bottom: 12px;" />
+          <input type="number" class="sys-input" placeholder="Target Frequency (Days)" [(ngModel)]="newConnection.targetContactFrequencyDays" style="width: 100%; margin-bottom: 12px;" />
+          <button class="btn full" (click)="addConnection()" style="background: rgba(211, 107, 155, 0.1); border-color: #D36B9B; color: #D36B9B;">ADD CONNECTION</button>
+        </div>
+
+        <div *ngFor="let c of connections()" style="margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; border-left: 3px solid" [style.borderColor]="c.healthScore > 50 ? '#1D9E75' : '#E24B4A'">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="pn" style="font-size: 1.2rem;">{{ c.name }} <span class="tech" style="font-size: 0.8rem; color: #8a8a9a;">{{ c.relationType }}</span></div>
+              <div class="tech" style="color: #8a8a9a; font-size: 0.9rem; margin-top: 4px;">Last Contact: {{ c.lastContactDate }}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="mono" [style.color]="c.healthScore > 50 ? '#1D9E75' : '#E24B4A'">HP: {{ c.healthScore }}/100</div>
+              <button class="btn sm" style="margin-top: 8px; border-color: #D36B9B; color: #D36B9B;" (click)="contactConnection(c)">CONTACTED</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>

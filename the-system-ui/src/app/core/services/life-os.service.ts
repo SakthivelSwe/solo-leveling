@@ -7,7 +7,8 @@ import {
   SavingsGoal, BudgetEntry, HealthLog, MindLog, SelfDoubtEvidence,
   EnglishLog, VocabularyLog, BodyLog, RelationshipLog,
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
-  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player, NoFapStatus
+  SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player, NoFapStatus,
+  NetWorthLog, SocialConnection, PlayerConfig
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -51,6 +52,9 @@ export class LifeOsService {
   getBudgets(): Observable<BudgetEntry[]> { return this.http.get<BudgetEntry[]>(`${this.api}/wealth/budget`); }
   upsertBudget(b: BudgetEntry): Observable<BudgetEntry> { return this.http.post<BudgetEntry>(`${this.api}/wealth/budget`, b); }
 
+  getNetWorthHistory(): Observable<NetWorthLog[]> { return this.http.get<NetWorthLog[]>(`${this.api}/wealth/net-worth`); }
+  logNetWorth(b: NetWorthLog): Observable<NetWorthLog> { return this.http.post<NetWorthLog>(`${this.api}/wealth/net-worth`, b); }
+
   /* ===== Health OS ===== */
   getHealthToday(): Observable<HealthLog> { return this.http.get<HealthLog>(`${this.api}/health/today`); }
   upsertHealth(b: HealthLog): Observable<HealthLog> { return this.http.post<HealthLog>(`${this.api}/health/log`, b); }
@@ -82,6 +86,10 @@ export class LifeOsService {
   /* ===== Relationship OS ===== */
   getRelationshipToday(): Observable<RelationshipLog> { return this.http.get<RelationshipLog>(`${this.api}/relationship/today`); }
   upsertRelationship(b: RelationshipLog): Observable<RelationshipLog> { return this.http.post<RelationshipLog>(`${this.api}/relationship/log`, b); }
+  
+  getSocialConnections(): Observable<SocialConnection[]> { return this.http.get<SocialConnection[]>(`${this.api}/relationship/connections`); }
+  addSocialConnection(b: SocialConnection): Observable<SocialConnection> { return this.http.post<SocialConnection>(`${this.api}/relationship/connections`, b); }
+  updateSocialContact(id: number, date: string): Observable<SocialConnection> { return this.http.put<SocialConnection>(`${this.api}/relationship/connections/${id}/contact`, { date }); }
 
   /* ===== Daily Missions ===== */
   getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission`); }
