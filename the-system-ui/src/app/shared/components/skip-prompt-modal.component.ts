@@ -17,37 +17,58 @@ import { trigger, transition, style, animate } from '@angular/animations';
     ])
   ],
   template: `
-    <div class="skip-prompt-container" @dialogOpen>
-      <div class="system-header mono">
-        <span class="warning-icon">⚠</span>
-        SYSTEM OVERRIDE
-      </div>
-      
-      <div class="content">
-        <h2 class="title">State Your Reason</h2>
-        <p class="desc">
-          You are about to skip <strong class="quest-name">'{{ data.questName }}'</strong>.
-          <br><br>
-          <span class="hint tech">Provide a valid reason to prevent the system from punishing your streak.</span>
-        </p>
+    <div class="skip-prompt-overlay" (click)="close()">
+      <div class="skip-prompt-container" @dialogOpen (click)="$event.stopPropagation()">
+        <div class="system-header mono">
+          <span class="warning-icon">⚠</span>
+          SYSTEM OVERRIDE
+        </div>
         
-        <textarea 
-          class="reason-input tech" 
-          [(ngModel)]="reason" 
-          placeholder="e.g. Injured ankle, Overworked, etc."
-          rows="3"
-          autofocus>
-        </textarea>
-      </div>
+        <div class="content">
+          <h2 class="title">State Your Reason</h2>
+          <p class="desc">
+            You are about to skip <strong class="quest-name">'{{ data.questName }}'</strong>.
+            <br><br>
+            <span class="hint tech">Provide a valid reason to prevent the system from punishing your streak.</span>
+          </p>
+          
+          <textarea 
+            class="reason-input tech" 
+            [(ngModel)]="reason" 
+            placeholder="e.g. Injured ankle, Overworked, etc."
+            rows="3"
+            autofocus>
+          </textarea>
+        </div>
 
-      <div class="actions">
-        <button class="btn secondary tech" (click)="close()">CANCEL</button>
-        <button class="btn primary tech" [disabled]="!reason.trim()" (click)="submit()">CONFIRM SKIP</button>
+        <div class="actions">
+          <button class="btn secondary tech" (click)="close()">CANCEL</button>
+          <button class="btn primary tech" [disabled]="!reason.trim()" (click)="submit()">CONFIRM SKIP</button>
+        </div>
       </div>
     </div>
   `,
   styles: [`
+    .skip-prompt-overlay {
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      z-index: 10000; 
+    }
+
     .skip-prompt-container {
+      background: rgba(10, 10, 14, 0.95);
+      border: 1px solid rgba(226, 75, 74, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(226, 75, 74, 0.1);
+      width: 90vw;
+      max-width: 400px;
       display: flex;
       flex-direction: column;
       color: var(--text-primary);
