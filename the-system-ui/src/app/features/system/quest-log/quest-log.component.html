@@ -1,5 +1,5 @@
-<div class="quest-log system-card">
-
+<div class="quest-log system-card spring-hover" style="position: relative; overflow: hidden;">
+  <div class="card-glow"></div>
   <!-- ══ HEADER ══════════════════════════════════════════════ -->
   <div class="header">
     <div class="title-row">
@@ -105,7 +105,7 @@
        TODAY TAB - Daily quests (DAILY / SKILL / DISCIPLINE)
        ══════════════════════════════════════════════════════════ -->
   <div class="quest-list" *ngIf="activeTab === 'today'" [@listStagger]="selectedCategory">
-    <div class="quest-item" *ngFor="let q of filteredDaily; trackBy: trackByKey"
+    <div class="quest-item spring-hover" *ngFor="let q of filteredDaily; trackBy: trackByKey"
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
          [class.custom-quest]="q.isCustom"
@@ -154,7 +154,7 @@
       ◈ Weekly quests reset every Monday midnight. Complete them anytime this week.
     </div>
 
-    <div class="quest-item weekly-item" *ngFor="let q of filteredWeekly; trackBy: trackByKey"
+    <div class="quest-item weekly-item spring-hover" *ngFor="let q of filteredWeekly; trackBy: trackByKey"
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
          [class.custom-quest]="q.isCustom"
@@ -212,7 +212,7 @@
       ◈ Monthly quests reset on the 1st of each month. These are your big goals.
     </div>
 
-    <div class="quest-item monthly-item" *ngFor="let q of filteredMonthly; trackBy: trackByKey"
+    <div class="quest-item monthly-item spring-hover" *ngFor="let q of filteredMonthly; trackBy: trackByKey"
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
          [class.custom-quest]="q.isCustom"
@@ -264,7 +264,7 @@
       ◈ Milestone quests are completed once, forever. Each is a real-world achievement.
     </div>
 
-    <div class="quest-item milestone-item" *ngFor="let q of filteredMilestones; trackBy: trackByKey"
+    <div class="quest-item milestone-item spring-hover" *ngFor="let q of filteredMilestones; trackBy: trackByKey"
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
          [style.--cat]="categoryColor('MILESTONE')"

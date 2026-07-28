@@ -240,7 +240,9 @@ body::after {
    the viewport — this is the key to rock-solid responsive UX.
    ============================================================ */
 .system-card {
-  background: var(--glass-fill);
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 60%),
+    var(--glass-fill);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   position: relative;
@@ -252,8 +254,8 @@ body::after {
   container-type: inline-size;
   container-name: card;
   transition:
-    transform  var(--duration-normal) var(--ease-spring),
-    box-shadow var(--duration-normal) var(--ease-spring),
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.4s ease,
     border-color var(--duration-fast);
 }
 /* Gradient rim-light border */
@@ -279,8 +281,8 @@ body::after {
 }
 .system-card:hover {
   border-color: rgba(108,99,255,0.45);
-  box-shadow: var(--elev-3);
-  transform: translateY(-2px);
+  box-shadow: var(--elev-float);
+  transform: translateY(-4px) scale(1.02);
 }
 
 /* Opt-in interactive 3D tilt/lift */
@@ -634,6 +636,69 @@ body.native-platform .btn-confirm.pulse {   /* confirm clean day pulse */
   transition: transform 0.1s ease-out;
 }
 
+/* ── Premium System Buttons ── */
+.sys-btn {
+  padding: 10px 20px; border-radius: 8px; 
+  border: 1px solid rgba(255,255,255,0.08); 
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); 
+  color: var(--text-primary); font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem; letter-spacing: 2px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.sys-btn:hover:not([disabled]) { 
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%); 
+  border-color: rgba(255,255,255,0.2); 
+  transform: translateY(-2px); 
+  box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+.sys-btn:active:not([disabled]) { transform: translateY(1px); box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
+.sys-btn[disabled] { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+
+.card-glow {
+  position: absolute; top: 0; left: 0; right: 0; height: 100%;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ── Premium Form Controls ── */
+.fin, .custom-input {
+  width: 100%; padding: 12px 16px; 
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+  color: var(--text-primary); font-size: 0.9rem;
+  transition: all 0.3s;
+  outline: none;
+  box-sizing: border-box;
+}
+.fin::placeholder, .custom-input::placeholder { color: rgba(255,255,255,0.3); }
+.fin:focus, .custom-input:focus { background: rgba(0,0,0,0.6); border-color: var(--accent-purple); }
+
+.input-wrapper { position: relative; }
+.input-focus-border {
+  position: absolute; bottom: -1px; left: 10%; right: 10%; height: 2px;
+  background: var(--accent-purple); opacity: 0; transition: all 0.3s;
+  box-shadow: 0 0 10px var(--accent-purple);
+}
+.fin:focus + .input-focus-border, .custom-input:focus + .input-focus-border { left: 0; right: 0; opacity: 1; }
+
+.custom-checkbox {
+  display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none;
+  font-size: 0.85rem; color: var(--text-secondary); transition: color 0.2s;
+}
+.custom-checkbox:hover { color: var(--text-primary); }
+.custom-checkbox input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+.checkmark {
+  height: 20px; width: 20px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.custom-checkbox input:checked ~ .checkmark { background: var(--accent-purple); border-color: var(--accent-purple); }
+.checkmark:after {
+  content: ""; display: none; width: 5px; height: 10px;
+  border: solid white; border-width: 0 2px 2px 0;
+  transform: rotate(45deg); margin-bottom: 2px;
+}
+.custom-checkbox input:checked ~ .checkmark:after { display: block; }
+
 /* ── Critical HP Glitch Effect ── */
 .hp-critical-glitch {
   position: relative;
@@ -677,3 +742,37 @@ body.native-platform .btn-confirm.pulse {   /* confirm clean day pulse */
   100% { text-shadow: 2px 0 0 red, -2px 0 0 blue; }
 }
 
+/* ============================================================
+   NATIVE (ANDROID/CAPACITOR) PERFORMANCE OVERRIDES
+   ============================================================
+   Mobile GPUs can overheat when rendering multiple layers of 
+   backdrop-filter: blur() alongside complex gradients and 
+   continuous animations.
+   The NativeService automatically adds the .native-platform 
+   class to the body when running on device.
+   ============================================================ */
+body.native-platform {
+  .system-card {
+    /* Disable expensive blur effects */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    /* Fallback to a solid, slightly lighter background 
+       to simulate the glass effect without the render cost */
+    background: #0f111a !important; 
+    
+    /* Simplify border to avoid complex composite masking */
+    border: 1px solid rgba(108, 99, 255, 0.2) !important;
+  }
+  
+  .system-card::after,
+  .system-card::before {
+    /* Hide the complex gradient rim-lights and specular highlights */
+    display: none !important;
+  }
+  
+  .card-glow {
+    /* Hide extra glows */
+    display: none !important;
+  }
+}

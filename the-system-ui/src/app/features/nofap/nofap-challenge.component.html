@@ -54,7 +54,8 @@
          FLATLINE WARNING SYSTEM
          ════════════════════════════════════════════════════════════ -->
     @if (isFlatline()) {
-      <section class="nf-section flatline-warning system-card">
+      <section class="nf-section flatline-warning system-card spring-hover" style="overflow: hidden;">
+        <div class="card-glow"></div>
         <div class="fl-header">
           <span class="fl-icon">⚠️</span>
           <div>
@@ -81,7 +82,8 @@
          START DATE ONBOARDING — shown when no logs exist yet
          ════════════════════════════════════════════════════════════ -->
     @if (showOnboarding()) {
-      <section class="nf-section nf-onboarding system-card">
+      <section class="nf-section nf-onboarding system-card spring-hover" style="overflow: hidden;">
+        <div class="card-glow"></div>
         <div class="ob-icon">🔥</div>
         <h2 class="ob-title mono">ALREADY STARTED YOUR CHALLENGE?</h2>
         <p class="ob-desc">You began before using this app. Set your actual start date and the System will recognize every day of discipline you've already completed.</p>
@@ -137,7 +139,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 1 — STREAK COUNTER
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section nf-hero system-card">
+    <section class="nf-section nf-hero system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <div class="hero-layout">
 
         <!-- Circular streak ring -->
@@ -219,7 +222,8 @@
     <!-- ════════════════════════════════════════════════════════════
          BREATHING WIDGET — Inline 4-7-8 Technique
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card nf-breathing">
+    <section class="nf-section system-card nf-breathing spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <div class="breathing-header">
         <div>
           <h2 class="section-title mono">◈ 4-7-8 BREATHING TECHNIQUE</h2>
@@ -269,7 +273,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 2 — TODAY'S BRAIN SCIENCE CARD
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <h2 class="section-title mono">◈ YOUR BRAIN RIGHT NOW — DAY {{ s.currentStreak }}</h2>
       <div class="science-today-card" [attr.data-category]="s.scienceCategory">
         <div class="stc-icon">{{ getCategoryIcon(s.scienceCategory) }}</div>
@@ -375,7 +380,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 4 — STATUS BOARD
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <h2 class="section-title mono">◈ STATUS BOARD</h2>
 
       <!-- Stat cards -->
@@ -456,7 +462,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 5 — REWARDS SHOWCASE
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <h2 class="section-title mono">◈ MILESTONE REWARDS</h2>
       <p class="section-sub tech">XP awarded automatically on unlock</p>
 
@@ -480,7 +487,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 6 — PORN ADDICTION INSIGHTS
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <h2 class="section-title mono">◈ WHAT PORN DOES TO YOUR BRAIN</h2>
       <p class="section-sub tech">Science-backed evidence — know your enemy</p>
 
@@ -521,7 +529,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 7 — DAILY MOOD JOURNAL
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <h2 class="section-title mono">◈ DAILY MOOD JOURNAL</h2>
       <p class="section-sub tech">Track your emotional state — patterns reveal your recovery arc</p>
 
@@ -586,7 +595,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 8 — TRIGGER TRACKER
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
       <h2 class="section-title mono">◈ TRIGGER TRACKER</h2>
       <p class="section-sub tech">Know your enemy — log what caused the urge so you can defeat it next time</p>
 
@@ -644,7 +654,8 @@
     <!-- ════════════════════════════════════════════════════════════
          NIGHT EMISSION GUIDE — "Nightfall / Wet Dream" FAQ
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card ne-section">
+    <section class="nf-section system-card ne-section spring-hover" style="overflow: hidden;">
+      <div class="card-glow"></div>
 
       <div class="ne-header">
         <span class="ne-icon">🌙</span>

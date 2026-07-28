@@ -157,11 +157,11 @@
         <ng-template #noMission><span>🎯 ALL QUESTS</span></ng-template>
 
         <div style="display: flex; gap: 8px;">
-          <button class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem; background: rgba(55,138,221,0.2); border-color: #378ADD; color: #378ADD;" 
+          <button class="sys-btn spring-hover" style="padding: 6px 12px; font-size: 0.75rem; background: rgba(55,138,221,0.15); border-color: rgba(55,138,221,0.4); color: #4fc3f7;" 
                   (click)="generateAiQuests()" [disabled]="isGeneratingAi()">
             {{ isGeneratingAi() ? 'GENERATING...' : '⚡ AI QUEST SYNC' }}
           </button>
-          <button class="sys-btn" style="padding: 4px 12px; font-size: 0.75rem;" 
+          <button class="sys-btn spring-hover" style="padding: 6px 12px; font-size: 0.75rem;" 
                   (click)="showAllQuests.set(!showAllQuests())">
             {{ showAllQuests() ? 'SHOW MISSIONS' : 'SHOW ALL QUESTS' }}
           </button>
@@ -194,7 +194,7 @@
       <app-dungeon-card></app-dungeon-card>
       
       <div style="margin: 16px 0;">
-        <button class="sys-btn full" (click)="showBossBattle = !showBossBattle" style="border-color: #E24B4A; color: #E24B4A;">
+        <button class="sys-btn full spring-hover" (click)="showBossBattle = !showBossBattle" style="border-color: rgba(226,75,74,0.5); color: #fca5a5; background: rgba(226,75,74,0.1);">
           {{ showBossBattle ? 'FLEE BATTLE' : '⚔ ENTER BOSS BATTLE' }}
         </button>
       </div>
@@ -204,7 +204,8 @@
 
       <!-- ── NoFap Discipline Mini-Widget ─────────────────────── -->
       @if (noFap(); as nf) {
-        <div class="system-card block nofap-widget spring-hover" style="margin-top: 16px;">
+        <div class="system-card block nofap-widget spring-hover" style="margin-top: 16px; overflow: hidden;">
+          <div class="card-glow"></div>
           <div class="nfw-header">
             <div class="nfw-left">
               <span class="mono nfw-title">🔥 DISCIPLINE PROTOCOL</span>
@@ -246,7 +247,8 @@
 
       
       <!-- Career: LeetCode stats -->
-      <div class="system-card block spring-hover" style="margin-top: 16px;">
+      <div class="system-card block spring-hover" style="margin-top: 16px; overflow: hidden;">
+        <div class="card-glow"></div>
         <h3 class="mono head">◈ DSA GRIND</h3>
         <div class="leet-stats" *ngIf="leetStats() as ls" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
           <div class="stat-pill"><span class="v mono">{{ ls.total }}</span><span class="k tech">TOTAL</span></div>
@@ -255,12 +257,15 @@
           <div class="stat-pill hard"><span class="v mono">{{ ls.hard }}</span><span class="k tech">HARD</span></div>
           <div class="stat-pill streak"><span class="v mono">{{ ls.streak }}🔥</span><span class="k tech">STREAK</span></div>
         </div>
-        <div class="form-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <input class="fin" placeholder="Problem name" [(ngModel)]="newLeet.problemName" style="flex: 1;" />
-          <select class="fin" [(ngModel)]="newLeet.difficulty">
+        <div class="form-row" style="display: flex; gap: 8px; margin-bottom: 12px; position: relative; z-index: 2;">
+          <div class="input-wrapper" style="flex: 1;">
+            <input class="custom-input" placeholder="Problem name" [(ngModel)]="newLeet.problemName" />
+            <div class="input-focus-border"></div>
+          </div>
+          <select class="custom-input" [(ngModel)]="newLeet.difficulty" style="width: auto;">
             <option value="EASY">Easy</option><option value="MEDIUM">Medium</option><option value="HARD">Hard</option>
           </select>
-          <button class="sys-btn" (click)="addLeet()" style="padding: 0 12px;">+ LOG</button>
+          <button class="sys-btn spring-hover" (click)="addLeet()" style="padding: 0 16px;">+ LOG</button>
         </div>
         <ul class="mini-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
           <li *ngFor="let l of leetHistory()" style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; font-size: 0.85rem;">
@@ -273,24 +278,31 @@
       </div>
 
       <!-- Career: Job applications -->
-      <div class="system-card block spring-hover" style="margin-top: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="system-card block spring-hover" style="margin-top: 16px; overflow: hidden;">
+        <div class="card-glow"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
           <h3 class="mono head">◈ JOB APPLICATIONS</h3>
-          <button class="sys-btn" (click)="triggerJobAgent()" [disabled]="isAgentRunning()" style="padding: 4px 12px; font-size: 0.75rem; border-color: #BA7517; color: #BA7517;">
+          <button class="sys-btn spring-hover" (click)="triggerJobAgent()" [disabled]="isAgentRunning()" style="padding: 6px 12px; font-size: 0.75rem; border-color: rgba(186,117,23,0.5); color: #BA7517; background: rgba(186,117,23,0.1);">
             {{ isAgentRunning() ? 'AGENT DEPLOYED...' : '⚡ AUTO-APPLY AGENT' }}
           </button>
         </div>
 
-        <div *ngIf="agentLogs().length > 0" style="background: rgba(0,0,0,0.5); border: 1px solid #BA7517; padding: 12px; margin-bottom: 12px; max-height: 150px; overflow-y: auto; border-radius: 4px;">
+        <div *ngIf="agentLogs().length > 0" style="background: rgba(0,0,0,0.5); border: 1px solid #BA7517; padding: 12px; margin-bottom: 12px; max-height: 150px; overflow-y: auto; border-radius: 4px; position: relative; z-index: 2;">
           <div *ngFor="let log of agentLogs()" class="tech" style="color: #BA7517; font-size: 0.75rem; margin-bottom: 4px; line-height: 1.4;">
             {{ log }}
           </div>
         </div>
 
-        <div class="form-row" style="display: flex; gap: 8px; margin-bottom: 12px; margin-top: 12px;">
-          <input class="fin" placeholder="Company" [(ngModel)]="newJob.company" style="flex: 1;" />
-          <input class="fin" placeholder="Role" [(ngModel)]="newJob.role" style="width: 80px;" />
-          <button class="sys-btn" (click)="addJob()" style="padding: 0 12px;">+ APPLY</button>
+        <div class="form-row" style="display: flex; gap: 8px; margin-bottom: 12px; margin-top: 12px; position: relative; z-index: 2;">
+          <div class="input-wrapper" style="flex: 1;">
+            <input class="custom-input" placeholder="Company" [(ngModel)]="newJob.company" />
+            <div class="input-focus-border"></div>
+          </div>
+          <div class="input-wrapper" style="width: 100px;">
+            <input class="custom-input" placeholder="Role" [(ngModel)]="newJob.role" />
+            <div class="input-focus-border"></div>
+          </div>
+          <button class="sys-btn spring-hover" (click)="addJob()" style="padding: 0 16px;">+ APPLY</button>
         </div>
         <ul class="mini-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
           <li *ngFor="let j of jobs()" class="job" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; font-size: 0.85rem;">

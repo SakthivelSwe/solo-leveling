@@ -47,8 +47,8 @@
 
     <!-- ═══ ACTION BUTTONS ══════════════════════════════════════ -->
     <div class="hb-actions">
-      <button class="hb-btn-add tech" (click)="openCreate()">+ ADD HABIT</button>
-      <button class="hb-btn-templates tech" (click)="openTemplates()">📋 STARTER TEMPLATES</button>
+      <button class="hb-btn-add tech spring-hover" (click)="openCreate()">+ ADD HABIT</button>
+      <button class="hb-btn-templates tech spring-hover" (click)="openTemplates()">📋 STARTER TEMPLATES</button>
     </div>
 
     <!-- ═══ EMPTY STATE ═════════════════════════════════════════ -->
@@ -66,11 +66,13 @@
       <section class="hb-list">
 
         @for (h of overview()!.habits; track h.id; let i = $index) {
-          <div class="hb-card"
+          <div class="hb-card spring-hover"
                [class.hb-card-done]="h.completedToday"
                [style.--tag-color]="identityColor(h.identityTag)"
-               [style.animation-delay.ms]="i * 50">
-
+               [style.animation-delay.ms]="i * 50"
+               style="position: relative; overflow: hidden;">
+            
+            <div class="card-glow"></div>
             <div class="hb-card-bar"></div>
 
             <div class="hb-card-body">
