@@ -1,4 +1,4 @@
-﻿<div class="habits-shell">
+<div class="habits-shell">
 
   <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
   <header class="hb-topbar">
@@ -234,7 +234,7 @@
         <div class="hb-field">
           <span class="tech hb-flabel">Active days</span>
           <div class="hb-day-chips">
-            @for (lbl of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; track $index; let i = $index) {
+            @for (lbl of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; track lbl; let i = $index) {
               <button type="button" class="hb-day-chip tech"
                       [class.hb-day-on]="dayOn(i)"
                       (click)="toggleDay(i)">{{ lbl }}</button>
