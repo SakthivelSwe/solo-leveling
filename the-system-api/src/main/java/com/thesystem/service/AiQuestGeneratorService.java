@@ -32,17 +32,20 @@ public class AiQuestGeneratorService {
     private final PlayerStatsRepository statsRepository;
     private final PlayerSkillRepository skillRepository;
     private final QuestRepository questRepository;
+    private final com.thesystem.repository.QuestSkipRepository skipRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public AiQuestGeneratorService(AiProviderService aiProviderService,
                                    PlayerRepository playerRepository,
                                    PlayerStatsRepository statsRepository,
                                    PlayerSkillRepository skillRepository,
+                                   com.thesystem.repository.QuestSkipRepository skipRepository,
                                    QuestRepository questRepository) {
         this.aiProviderService = aiProviderService;
         this.playerRepository = playerRepository;
         this.statsRepository = statsRepository;
         this.skillRepository = skillRepository;
+        this.skipRepository = skipRepository;
         this.questRepository = questRepository;
     }
 
@@ -119,7 +122,20 @@ public class AiQuestGeneratorService {
                         formatSkills(skills)
                 );
 
-        String userPrompt = "Generate today's 4 quests based on my profile and current stats. Focus on my weakest areas.";
+        List<com.thesystem.entity.QuestSkip> recentSkips = skipRepository.findByPlayerIdAndSkippedAt(playerId, java.time.LocalDate.now().minusDays(1));
+        recentSkips.addAll(skipRepository.findByPlayerIdAndSkippedAt(playerId, java.time.LocalDate.now()));
+
+        StringBuilder skipContext = new StringBuilder();
+        if (!recentSkips.isEmpty()) {
+            skipContext.append("\nRECENT SKIPS (Take these reasons into account):\n");
+            for (com.thesystem.entity.QuestSkip skip : recentSkips) {
+                String questLabel = questRepository.findById(skip.getQuestId()).map(q -> q.getLabel()).orElse("Unknown Quest");
+                skipContext.append("- Skipped '").append(questLabel).append("' because: ").append(skip.getReason()).append("\n");
+            }
+            skipContext.append("If a reason implies injury or illness, DO NOT assign heavy physical tasks today. If they were busy/overworked, give lighter tasks.\n");
+        }
+
+        String userPrompt = "Generate today's 4 quests based on my profile and current stats. Focus on my weakest areas." + skipContext.toString();
 
         try {
             // Use Gemini for structured JSON

@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class QuestService {
 
+    private final QuestSkipRepository skipRepository;
+
     private final QuestRepository questRepository;
     private final QuestCompletionRepository completionRepository;
     private final PlayerRepository playerRepository;
@@ -31,7 +33,8 @@ public class QuestService {
     private final DopamineService dopamineService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public QuestService(QuestRepository questRepository,
+    public QuestService(QuestSkipRepository skipRepository,
+                        QuestRepository questRepository,
                         QuestCompletionRepository completionRepository,
                         PlayerRepository playerRepository,
                         PlayerStatsRepository statsRepository,
@@ -41,6 +44,7 @@ public class QuestService {
                         SelfDoubtEvidenceRepository evidenceRepository,
                         SseService sseService,
                         DopamineService dopamineService) {
+        this.skipRepository = skipRepository;
         this.questRepository = questRepository;
         this.completionRepository = completionRepository;
         this.playerRepository = playerRepository;
@@ -68,15 +72,17 @@ public class QuestService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
         Set<Long> completedIds = getCompletedQuestIds(playerId, date);
+        List<QuestSkip> skips = skipRepository.findByPlayerIdAndSkippedAt(playerId, date);
+        Map<Long, String> skipMap = skips.stream().collect(Collectors.toMap(QuestSkip::getQuestId, QuestSkip::getReason));
 
         List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel()).stream()
-                .map(q -> toDto(q, completedIds.contains(q.getId()), player))
+                .map(q -> toDto(q, completedIds.contains(q.getId()), skipMap.containsKey(q.getId()), skipMap.get(q.getId()), player))
                 .collect(Collectors.toList());
 
         if (player.isInPenaltyZone()) {
             dtos.add(0, new QuestDTO(-1L, "PENALTY_SURVIVAL",
                     "[PENALTY] Survival: 20 Burpees or No Screen Time for 1 Hour",
-                    "DAILY", 0, null, null, false, 999, true, 0, false, "DAILY", false, 0, 0, null, null, null));
+                    "DAILY", 0, null, null, false, 999, true, 0, false, "DAILY", false, 0, 0, null, null, null, false, null));
         }
 
         return dtos;
@@ -103,7 +109,8 @@ public class QuestService {
                             dto.xpReward(), dto.statBoosts(), dto.skillBoosts(), isCompleted,
                             dto.priority(), dto.isCritical(), dto.bossDamage(), dto.isRecoveryQuest(),
                             dto.timeType(), dto.isCustom(), (int) doneCount, 0,
-                            dto.latitude(), dto.longitude(), dto.radiusMeters());
+                            dto.latitude(), dto.longitude(), dto.radiusMeters(),
+                            false, null);
                 })
                 .collect(Collectors.toList());
     }
@@ -129,7 +136,8 @@ public class QuestService {
                             dto.xpReward(), dto.statBoosts(), dto.skillBoosts(), isCompleted,
                             dto.priority(), dto.isCritical(), dto.bossDamage(), dto.isRecoveryQuest(),
                             dto.timeType(), dto.isCustom(), 0, (int) doneCount,
-                            dto.latitude(), dto.longitude(), dto.radiusMeters());
+                            dto.latitude(), dto.longitude(), dto.radiusMeters(),
+                            false, null);
                 })
                 .collect(Collectors.toList());
     }
@@ -342,6 +350,26 @@ public class QuestService {
         questRepository.delete(quest);
     }
 
+    
+    @Transactional
+    public void skipQuest(Long playerId, String questKey, String reason) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
+        Quest quest = questRepository.findByQuestKey(questKey)
+                .orElseThrow(() -> new ApiException("Quest not found", HttpStatus.NOT_FOUND));
+
+        LocalDate today = LocalDate.now();
+        if (skipRepository.existsByPlayerIdAndQuestIdAndSkippedAt(playerId, quest.getId(), today)) {
+            throw new ApiException("Quest already skipped today", HttpStatus.CONFLICT);
+        }
+        if (completionRepository.existsByPlayerIdAndQuestIdAndCompletedAt(playerId, quest.getId(), today)) {
+            throw new ApiException("Quest already completed today. Cannot skip.", HttpStatus.CONFLICT);
+        }
+
+        QuestSkip skip = new QuestSkip(playerId, quest.getId(), today, reason);
+        skipRepository.save(skip);
+    }
+
     // ── DTO Mapping ────────────────────────────────────────────────────────────
 
     public QuestDTO toDto(Quest q, boolean completed) {
@@ -349,6 +377,10 @@ public class QuestService {
     }
 
     public QuestDTO toDto(Quest q, boolean completed, Player player) {
+        return toDto(q, completed, false, null, player);
+    }
+
+    public QuestDTO toDto(Quest q, boolean completed, boolean isSkipped, String skipReason, Player player) {
         String label = q.getLabel();
         int xpReward = getDynamicXp(q, player);
 
@@ -371,7 +403,8 @@ public class QuestService {
                 xpReward, q.getStatBoosts(), q.getSkillBoosts(), completed,
                 q.getPriority(), q.isCritical(), q.getBossDamage(), q.isRecoveryQuest(),
                 timeType, q.isCustom(), 0, 0,
-                q.getLatitude(), q.getLongitude(), q.getRadiusMeters());
+                q.getLatitude(), q.getLongitude(), q.getRadiusMeters(),
+                isSkipped, skipReason);
     }
 
     // ── Private Helpers ────────────────────────────────────────────────────────

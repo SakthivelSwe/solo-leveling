@@ -113,8 +113,9 @@
          (click)="onComplete(q)">
       <div class="checkbox">
         <span *ngIf="q.isCompleted" class="check">✓</span>
+        <span *ngIf="q.isSkipped" class="check" style="color: var(--text-dim);">⊘</span>
         <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
-        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+        <span *ngIf="!q.isCompleted && !q.isSkipped && pendingKey !== q.questKey" class="empty-box"></span>
       </div>
       <div class="quest-body">
         <div class="quest-tags">
@@ -124,13 +125,15 @@
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
-        <span class="label">{{ q.label }}</span>
+        <span class="label" [class.strikethrough]="q.isSkipped">{{ q.label }}</span>
+        <span class="skip-reason tech" *ngIf="q.isSkipped" style="color: var(--text-dim); font-size: 0.75rem; margin-top: 2px; display: block; text-transform: uppercase;">[SKIPPED: {{ q.skipReason }}]</span>
         <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
           {{ formatBoosts(q.statBoosts) }}
         </span>
       </div>
       <div class="right-col">
-        <button class="verify-btn tech spring-hover" *ngIf="!q.isCompleted && aiVisionEnabled" (click)="onVerify(q, $event)" title="Verify with AI Vision" style="background: none; border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">📸</button>
+        <button class="skip-btn tech spring-hover" *ngIf="!q.isCompleted && !q.isSkipped" (click)="onSkip(q, $event)" title="Skip with Reason" style="background: none; border: 1px solid var(--text-dim); color: var(--text-dim); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">⊘</button>
+        <button class="verify-btn tech spring-hover" *ngIf="!q.isCompleted && !q.isSkipped && aiVisionEnabled" (click)="onVerify(q, $event)" title="Verify with AI Vision" style="background: none; border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">📸</button>
         <div class="xp-badge mono">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
         <button class="delete-btn tech" *ngIf="q.isCustom"
                 (click)="onDeleteCustom(q, $event)"
@@ -159,8 +162,9 @@
          (click)="onComplete(q)">
       <div class="checkbox">
         <span *ngIf="q.isCompleted" class="check">✓</span>
+        <span *ngIf="q.isSkipped" class="check" style="color: var(--text-dim);">⊘</span>
         <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
-        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+        <span *ngIf="!q.isCompleted && !q.isSkipped && pendingKey !== q.questKey" class="empty-box"></span>
       </div>
       <div class="quest-body">
         <div class="quest-tags">
@@ -170,7 +174,8 @@
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">WEEKLY</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
-        <span class="label">{{ q.label }}</span>
+        <span class="label" [class.strikethrough]="q.isSkipped">{{ q.label }}</span>
+        <span class="skip-reason tech" *ngIf="q.isSkipped" style="color: var(--text-dim); font-size: 0.75rem; margin-top: 2px; display: block; text-transform: uppercase;">[SKIPPED: {{ q.skipReason }}]</span>
         <!-- Progress counter (BOTH: checkbox + counter) -->
         <div class="progress-line tech" *ngIf="!q.isCompleted">
           <span class="progress-text">{{ weeklyProgress(q) }}</span>
@@ -185,7 +190,8 @@
         </span>
       </div>
       <div class="right-col">
-        <button class="verify-btn tech spring-hover" *ngIf="!q.isCompleted && aiVisionEnabled" (click)="onVerify(q, $event)" title="Verify with AI Vision" style="background: none; border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">📸</button>
+        <button class="skip-btn tech spring-hover" *ngIf="!q.isCompleted && !q.isSkipped" (click)="onSkip(q, $event)" title="Skip with Reason" style="background: none; border: 1px solid var(--text-dim); color: var(--text-dim); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">⊘</button>
+        <button class="verify-btn tech spring-hover" *ngIf="!q.isCompleted && !q.isSkipped && aiVisionEnabled" (click)="onVerify(q, $event)" title="Verify with AI Vision" style="background: none; border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">📸</button>
         <div class="xp-badge mono weekly-xp">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
         <button class="delete-btn tech" *ngIf="q.isCustom"
                 (click)="onDeleteCustom(q, $event)"
@@ -214,8 +220,9 @@
          (click)="onComplete(q)">
       <div class="checkbox">
         <span *ngIf="q.isCompleted" class="check">✓</span>
+        <span *ngIf="q.isSkipped" class="check" style="color: var(--text-dim);">⊘</span>
         <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
-        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+        <span *ngIf="!q.isCompleted && !q.isSkipped && pendingKey !== q.questKey" class="empty-box"></span>
       </div>
       <div class="quest-body">
         <div class="quest-tags">
@@ -225,7 +232,8 @@
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">MONTHLY</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
-        <span class="label">{{ q.label }}</span>
+        <span class="label" [class.strikethrough]="q.isSkipped">{{ q.label }}</span>
+        <span class="skip-reason tech" *ngIf="q.isSkipped" style="color: var(--text-dim); font-size: 0.75rem; margin-top: 2px; display: block; text-transform: uppercase;">[SKIPPED: {{ q.skipReason }}]</span>
         <div class="progress-line tech" *ngIf="!q.isCompleted">
           <span class="progress-text">{{ monthlyProgress(q) }}</span>
         </div>
@@ -234,7 +242,8 @@
         </span>
       </div>
       <div class="right-col">
-        <button class="verify-btn tech spring-hover" *ngIf="!q.isCompleted && aiVisionEnabled" (click)="onVerify(q, $event)" title="Verify with AI Vision" style="background: none; border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">📸</button>
+        <button class="skip-btn tech spring-hover" *ngIf="!q.isCompleted && !q.isSkipped" (click)="onSkip(q, $event)" title="Skip with Reason" style="background: none; border: 1px solid var(--text-dim); color: var(--text-dim); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">⊘</button>
+        <button class="verify-btn tech spring-hover" *ngIf="!q.isCompleted && !q.isSkipped && aiVisionEnabled" (click)="onVerify(q, $event)" title="Verify with AI Vision" style="background: none; border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 4px; padding: 2px 6px; cursor: pointer; margin-right: 8px;">📸</button>
         <div class="xp-badge mono monthly-xp">+{{ q.xpReward }}<span class="xp-unit">XP</span></div>
         <button class="delete-btn tech" *ngIf="q.isCustom"
                 (click)="onDeleteCustom(q, $event)"
@@ -263,7 +272,7 @@
       <div class="checkbox">
         <span *ngIf="q.isCompleted" class="check achieved">★</span>
         <span *ngIf="pendingKey === q.questKey" class="spinner"></span>
-        <span *ngIf="!q.isCompleted && pendingKey !== q.questKey" class="empty-box"></span>
+        <span *ngIf="!q.isCompleted && !q.isSkipped && pendingKey !== q.questKey" class="empty-box"></span>
       </div>
       <div class="quest-body">
         <div class="quest-tags">
@@ -272,7 +281,8 @@
           </span>
           <span class="cat-tag mono milestone-tag" [style.color]="categoryColor('MILESTONE')">MILESTONE</span>
         </div>
-        <span class="label">{{ q.label }}</span>
+        <span class="label" [class.strikethrough]="q.isSkipped">{{ q.label }}</span>
+        <span class="skip-reason tech" *ngIf="q.isSkipped" style="color: var(--text-dim); font-size: 0.75rem; margin-top: 2px; display: block; text-transform: uppercase;">[SKIPPED: {{ q.skipReason }}]</span>
         <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
           {{ formatBoosts(q.statBoosts) }}
         </span>

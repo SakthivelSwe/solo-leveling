@@ -36,15 +36,18 @@ public class AiMemoryService {
 
     private final AiMemoryRepository memoryRepository;
     private final QuestCompletionRepository completionRepository;
+    private final com.thesystem.repository.QuestSkipRepository skipRepository;
     private final QuestRepository questRepository;
     private final PlayerRepository playerRepository;
 
     public AiMemoryService(AiMemoryRepository memoryRepository,
                            QuestCompletionRepository completionRepository,
+                           com.thesystem.repository.QuestSkipRepository skipRepository,
                            QuestRepository questRepository,
                            PlayerRepository playerRepository) {
         this.memoryRepository = memoryRepository;
         this.completionRepository = completionRepository;
+        this.skipRepository = skipRepository;
         this.questRepository = questRepository;
         this.playerRepository = playerRepository;
     }
@@ -87,15 +90,17 @@ public class AiMemoryService {
         // Check all active quests for skip/streak patterns
         questRepository.findByActiveTrueOrderByCategoryAscXpRewardDesc().forEach(quest -> {
             long count = countByKey.getOrDefault(quest.getQuestKey(), 0L);
+            long skipCount = skipRepository.countByPlayerIdAndQuestIdAndSkippedAtBetween(playerId, quest.getId(), weekStart, weekEnd);
+            long effectiveCount = count + skipCount;
 
-            if (count == 0 && quest.isCritical()) {
+            if (effectiveCount == 0 && quest.isCritical()) {
                 // Critical quest skipped all week — highest priority memory
                 entries.add(entry(playerId, "SKIP", quest.getQuestKey(), weekStart,
                         "Skipped " + quest.getLabel() + " ALL WEEK. This is your critical quest."));
-            } else if (count > 0 && count < 3 && quest.isCritical()) {
+            } else if (effectiveCount > 0 && effectiveCount < 3 && quest.isCritical()) {
                 entries.add(entry(playerId, "SKIP", quest.getQuestKey(), weekStart,
                         "Only completed " + quest.getLabel() + " " + count + " time(s) this week."));
-            } else if (count >= daysInWeek) {
+            } else if (effectiveCount >= daysInWeek) {
                 entries.add(entry(playerId, "STREAK", quest.getQuestKey(), weekStart,
                         "Perfect week on " + quest.getLabel() + ". Streak unbroken."));
             }

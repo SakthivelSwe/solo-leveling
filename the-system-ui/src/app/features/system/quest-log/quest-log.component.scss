@@ -153,6 +153,9 @@
   background: color-mix(in srgb, var(--cat) 6%, rgba(6,6,16,0.5));
 }
 .quest-item.done { opacity: .52; }
+.quest-item.completed { opacity: .52; }
+.quest-item.skipped { opacity: .45; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.05); }
+.strikethrough { text-decoration: line-through; opacity: 0.7; }
 .quest-item.pending { opacity: .75; pointer-events: none; }
 .quest-item.custom-quest { border-left: 2px solid rgba(83,74,183,0.5); }
 

@@ -46,6 +46,16 @@ public class QuestController {
         return Map.of("status", "success", "message", "AI quests generated");
     }
 
+    public static class SkipRequest {
+        public String reason;
+    }
+
+    @PostMapping("/{questKey}/skip")
+    public Map<String, String> skipQuest(Principal principal, @PathVariable String questKey, @RequestBody SkipRequest req) {
+        questService.skipQuest(playerId(principal), questKey, req.reason);
+        return Map.of("status", "success", "message", "Quest skipped successfully");
+    }
+
     public static class CodeSubmission {
         public String code;
     }

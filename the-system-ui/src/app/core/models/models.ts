@@ -64,6 +64,8 @@ export interface Quest {
   latitude?: number;
   longitude?: number;
   radiusMeters?: number;
+  isSkipped?: boolean;
+  skipReason?: string;
 }
 
 export interface CustomQuestRequest {

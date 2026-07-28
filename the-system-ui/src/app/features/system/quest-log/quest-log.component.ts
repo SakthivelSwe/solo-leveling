@@ -43,6 +43,7 @@ export class QuestLogComponent {
   @Input() pendingKey: string | null = null;
   @Input() pressureLevel = 'STANDARD';
   @Output() complete = new EventEmitter<Quest>();
+  @Output() skip = new EventEmitter<{ quest: Quest; reason: string }>();
   @Output() verify = new EventEmitter<{ quest: Quest; imageBase64: string; mimeType: string }>();
   @Output() questAdded = new EventEmitter<Quest>();
   @Output() questDeleted = new EventEmitter<string>();
@@ -156,9 +157,18 @@ export class QuestLogComponent {
   // ── Quest actions ────────────────────────────────────────────────────────────
 
   onComplete(q: Quest): void {
-    if (q.isCompleted || this.pendingKey) return;
+    if (q.isCompleted || this.pendingKey || q.isSkipped) return;
     this.complete.emit(q);
     this.skipWarningKey = null;
+  }
+
+  onSkip(q: Quest, event: Event): void {
+    event.stopPropagation();
+    if (q.isCompleted || this.pendingKey || q.isSkipped) return;
+    const reason = prompt(`State your valid reason for skipping '${q.label}':\n(This prevents the AI from punishing you for breaking your streak)`);
+    if (reason && reason.trim().length > 0) {
+      this.skip.emit({ quest: q, reason: reason.trim() });
+    }
   }
 
   onVerify(q: Quest, event: Event): void {

@@ -23,6 +23,8 @@ public record QuestDTO(
         int monthlyDoneCount,
         Double latitude,
         Double longitude,
-        Integer radiusMeters
+        Integer radiusMeters,
+        boolean isSkipped,
+        String skipReason
 ) {}
 

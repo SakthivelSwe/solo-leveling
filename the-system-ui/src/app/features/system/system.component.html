@@ -176,6 +176,7 @@
         [pendingKey]="pendingKey()"
         [pressureLevel]="pressureLevel()"
         (complete)="onComplete($event)"
+        (skip)="onSkipQuest($event)"
         (verify)="onVerifyQuest($event)"
         (questAdded)="onQuestAdded($event)"
         (questDeleted)="onQuestDeleted($event)">

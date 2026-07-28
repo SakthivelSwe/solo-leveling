@@ -459,6 +459,22 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSkipQuest(event: { quest: Quest; reason: string }): void {
+    if (this.pendingKey()) return;
+    this.pendingKey.set(event.quest.questKey);
+    this.playerService.skipQuest(event.quest.questKey, event.reason).subscribe({
+      next: () => {
+        this.pendingKey.set(null);
+        this.toast(`◈ Quest skipped: ${event.quest.label}`);
+        this.loadFull(); // reload data
+      },
+      error: (err) => {
+        this.pendingKey.set(null);
+        this.toast(`⚠ ${err.error?.message || 'Failed to skip quest.'}`);
+      }
+    });
+  }
+
   private handleQuestCompletionSuccess(res: QuestCompletionResult): void {
     this.pendingKey.set(null);
     // Native haptic — success buzz on level-up, light tap on plain XP.

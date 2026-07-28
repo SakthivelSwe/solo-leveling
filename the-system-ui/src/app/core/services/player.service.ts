@@ -124,4 +124,8 @@ export class PlayerService {
   getDungeon(): Observable<Dungeon> {
     return this.http.get<Dungeon>(`${this.api}/dungeon`);
   }
+
+  skipQuest(questKey: string, reason: string): Observable<{status: string, message: string}> {
+    return this.http.post<{status: string, message: string}>(`${this.api}/quests/${questKey}/skip`, { reason });
+  }
 }

@@ -440,6 +440,14 @@ export class SettingsPanelComponent implements OnInit {
   deleteErr = signal<string | null>(null);
   deleteConfirmText = '';
 
+  get aiVisionEnabled(): boolean {
+    return localStorage.getItem('ai_vision_enabled') === 'true';
+  }
+
+  set aiVisionEnabled(val: boolean) {
+    localStorage.setItem('ai_vision_enabled', String(val));
+  }
+
   private readonly players = inject(PlayerService);
   private readonly auth = inject(AuthService);
   private readonly localNotifs = inject(LocalNotificationsService);
