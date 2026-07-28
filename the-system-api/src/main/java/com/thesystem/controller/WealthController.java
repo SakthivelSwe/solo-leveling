@@ -46,5 +46,13 @@ public class WealthController {
     public SavingsGoal updateGoal(Principal p, @PathVariable Long id, @RequestBody Map<String, Integer> body) {
         return wealthService.updateGoalProgress(currentPlayer.id(p), id, body.getOrDefault("current", 0));
     }
-}
+    @GetMapping("/net-worth")
+    public List<com.thesystem.entity.NetWorthLog> getNetWorthHistory(Principal p) {
+        return wealthService.getNetWorthHistory(currentPlayer.id(p));
+    }
 
+    @PostMapping("/net-worth")
+    public com.thesystem.entity.NetWorthLog logNetWorth(Principal p, @RequestBody com.thesystem.entity.NetWorthLog body) {
+        return wealthService.logNetWorth(currentPlayer.id(p), body);
+    }
+}

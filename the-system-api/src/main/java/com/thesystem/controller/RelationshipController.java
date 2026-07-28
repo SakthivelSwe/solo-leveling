@@ -34,5 +34,19 @@ public class RelationshipController {
     public List<RelationshipLog> history(Principal p) {
         return relationshipService.history(currentPlayer.id(p));
     }
+    @GetMapping("/connections")
+    public List<com.thesystem.entity.SocialConnection> getConnections(Principal p) {
+        return relationshipService.getConnections(currentPlayer.id(p));
+    }
+
+    @PostMapping("/connections")
+    public com.thesystem.entity.SocialConnection addConnection(Principal p, @RequestBody com.thesystem.entity.SocialConnection body) {
+        return relationshipService.addConnection(currentPlayer.id(p), body);
+    }
+
+    @PutMapping("/connections/{id}/contact")
+    public com.thesystem.entity.SocialConnection updateContact(Principal p, @PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        return relationshipService.updateContact(currentPlayer.id(p), id, java.time.LocalDate.parse(body.get("date")));
+    }
 }
 

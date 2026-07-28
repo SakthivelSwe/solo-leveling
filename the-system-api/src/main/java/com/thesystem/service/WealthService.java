@@ -5,6 +5,10 @@ import com.thesystem.entity.SavingsGoal;
 import com.thesystem.exception.ApiException;
 import com.thesystem.repository.BudgetEntryRepository;
 import com.thesystem.repository.SavingsGoalRepository;
+import com.thesystem.entity.NetWorthLog;
+import com.thesystem.repository.NetWorthLogRepository;
+import com.thesystem.entity.PlayerConfig;
+import com.thesystem.repository.PlayerConfigRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +24,14 @@ public class WealthService {
 
     private final BudgetEntryRepository budgetRepo;
     private final SavingsGoalRepository goalRepo;
+    private final NetWorthLogRepository netWorthRepo;
+    private final PlayerConfigRepository configRepo;
 
-    public WealthService(BudgetEntryRepository budgetRepo, SavingsGoalRepository goalRepo) {
+    public WealthService(BudgetEntryRepository budgetRepo, SavingsGoalRepository goalRepo, NetWorthLogRepository netWorthRepo, PlayerConfigRepository configRepo) {
         this.budgetRepo = budgetRepo;
         this.goalRepo = goalRepo;
+        this.netWorthRepo = netWorthRepo;
+        this.configRepo = configRepo;
     }
 
     // ---- Budget ----
@@ -80,6 +88,27 @@ public class WealthService {
         goalRepo.save(new SavingsGoal(playerId, "Emergency Fund (Full)", 15000, now.plusMonths(3)));
         goalRepo.save(new SavingsGoal(playerId, "First SIP Investment", 500, now.plusWeeks(2)));
         goalRepo.save(new SavingsGoal(playerId, "New Tech Setup Fund", 10000, now.plusMonths(4)));
+    }
+
+    // ---- Net Worth & Runway ----
+    public NetWorthLog logNetWorth(Long playerId, NetWorthLog body) {
+        body.setId(null);
+        body.setPlayerId(playerId);
+        body.setLogDate(LocalDate.now());
+        body.setNetWorth(body.getTotalAssets() - body.getTotalLiabilities());
+        
+        PlayerConfig config = configRepo.findByPlayerId(playerId).orElse(null);
+        if (config != null && config.getMonthlyBaselineExpenses() > 0) {
+            body.setCashRunwayMonths(body.getTotalAssets() / config.getMonthlyBaselineExpenses());
+        } else {
+            body.setCashRunwayMonths(body.getTotalAssets() / 50000.0); // Default 50k
+        }
+        
+        return netWorthRepo.save(body);
+    }
+
+    public List<NetWorthLog> getNetWorthHistory(Long playerId) {
+        return netWorthRepo.findAllByPlayerIdOrderByLogDateDesc(playerId);
     }
 }
 
