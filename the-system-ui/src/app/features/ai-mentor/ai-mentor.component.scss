@@ -18,6 +18,13 @@
   letter-spacing: 2px; font-weight: 600; transition: color .2s; }
 .nav a:hover,.nav a.active { color: var(--text-primary); }
 
+@media (max-width: 768px) {
+  .topbar { flex-wrap: wrap; gap: 8px; }
+  .nav { display: none; }
+  .brand { flex-wrap: wrap; }
+}
+
+
 /* View tabs */
 .view-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
 .vt { cursor: pointer; padding: 10px 18px; border-radius: 10px; font-size: .72rem;
