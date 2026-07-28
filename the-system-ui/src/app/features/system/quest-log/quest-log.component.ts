@@ -172,8 +172,9 @@ export class QuestLogComponent {
     
     const dialogRef = this.dialog.open(SkipPromptModalComponent, {
       data: { questName: q.label },
-      panelClass: 'system-modal-panel',
-      backdropClass: 'system-backdrop',
+      panelClass: 'dark-dialog',
+      width: '400px',
+      maxWidth: '90vw',
       disableClose: false,
     });
 
