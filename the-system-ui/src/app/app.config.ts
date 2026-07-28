@@ -4,6 +4,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -27,5 +28,9 @@ export const appConfig: ApplicationConfig = {
       enabled: environment.production && !environment.native,
       registrationStrategy: 'registerWhenStable:30000',
     }),
+    { 
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, 
+      useValue: { horizontalPosition: 'right', verticalPosition: 'top', duration: 3000 } 
+    }
   ]
 };
