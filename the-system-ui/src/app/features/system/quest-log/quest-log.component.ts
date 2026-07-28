@@ -68,6 +68,13 @@ export class QuestLogComponent {
     return '50 (default)';
   }
 
+  showBossBattle = false;
+
+  get aiVisionEnabled(): boolean {
+    return localStorage.getItem('ai_vision_enabled') === 'true';
+  }
+
+  readonly cats = CATEGORY_META;
   readonly dailyCategories = [
     { key: 'ALL',          label: 'All Quests',      color: '#4fc3f7' },
     { key: 'DAILY',        label: 'Daily Habits',    color: CATEGORY_META['DAILY'].color },

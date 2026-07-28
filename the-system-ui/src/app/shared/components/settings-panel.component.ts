@@ -211,6 +211,16 @@ interface QuestItem {
       </div>
     </section>
 
+    <!-- System Features -->
+    <section class="section">
+      <h3 class="mono sh">◈ SYSTEM FEATURES</h3>
+      <p class="tech hint">Toggle experimental or advanced features of the system.</p>
+      <label class="chk tech">
+        <input type="checkbox" [(ngModel)]="aiVisionEnabled" />
+        AI VISION (Photo Verification)
+      </label>
+    </section>
+
     <!-- Data Export -->
     <section class="section">
       <h3 class="mono sh">◈ DATA EXPORT</h3>
