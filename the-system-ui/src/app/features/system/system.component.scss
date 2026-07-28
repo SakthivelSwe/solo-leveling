@@ -607,3 +607,21 @@
   to { box-shadow: 0 0 15px rgba(186,117,23,0.5); }
 }
 
+/* ── Stat Pills (DSA & Career) ───────────────────────────── */
+.stat-pill {
+  display: flex; align-items: baseline; gap: 4px;
+  background: rgba(255,255,255,0.05);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.stat-pill .v { font-size: 1.1rem; font-weight: bold; color: #fff; }
+.stat-pill .k { font-size: 0.65rem; color: #8a8a9a; letter-spacing: 1px; }
+.stat-pill.easy { border-color: rgba(31,190,142,0.3); background: rgba(31,190,142,0.1); }
+.stat-pill.easy .v { color: #1FBE8E; }
+.stat-pill.medium { border-color: rgba(250,199,117,0.3); background: rgba(250,199,117,0.1); }
+.stat-pill.medium .v { color: #FAC775; }
+.stat-pill.hard { border-color: rgba(226,75,74,0.3); background: rgba(226,75,74,0.1); }
+.stat-pill.hard .v { color: #E24B4A; }
+.stat-pill.streak { border-color: rgba(255,87,34,0.3); background: rgba(255,87,34,0.1); }
+.stat-pill.streak .v { color: #FF5722; }
