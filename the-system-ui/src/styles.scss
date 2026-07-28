@@ -374,6 +374,15 @@ $sys-theme: mat.define-dark-theme((
   font-family: 'Orbitron', sans-serif;
 }
 
+/* Force ALL snackbars to the top-right across the whole application */
+.cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
+  justify-content: flex-end !important;
+  align-items: flex-start !important;
+  padding-top: 24px !important;
+  padding-right: 24px !important;
+  box-sizing: border-box;
+}
+
 /* ── Overlay backdrop ─────────────────────────────────────── */
 .cdk-overlay-dark-backdrop {
   background: rgba(3,3,10,0.92);
@@ -389,10 +398,6 @@ $sys-theme: mat.define-dark-theme((
   width: 100vw;
   height: 100vh;
 }
-.cdk-global-overlay-wrapper {
-  position: fixed !important;
-}
-
 /* ── Holographic flicker animation ──────────────────────────── */
 @keyframes holoBlink {
   0%,100% { opacity: 1; }
