@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Quest, CustomQuestRequest } from '../../../core/models/models';
 import { PlayerService } from '../../../core/services/player.service';
 import { CATEGORY_META } from '../../../shared/system.constants';
 import { listStagger } from '../../../shared/animations';
+import { SkipPromptModalComponent } from '../../../shared/components/skip-prompt-modal.component';
 
 /** Active tab in the quest log */
 type QuestTab = 'today' | 'weekly' | 'monthly' | 'milestones';
@@ -162,13 +164,24 @@ export class QuestLogComponent {
     this.skipWarningKey = null;
   }
 
+  private readonly dialog = inject(MatDialog);
+
   onSkip(q: Quest, event: Event): void {
     event.stopPropagation();
     if (q.isCompleted || this.pendingKey || q.isSkipped) return;
-    const reason = prompt(`State your valid reason for skipping '${q.label}':\n(This prevents the AI from punishing you for breaking your streak)`);
-    if (reason && reason.trim().length > 0) {
-      this.skip.emit({ quest: q, reason: reason.trim() });
-    }
+    
+    const dialogRef = this.dialog.open(SkipPromptModalComponent, {
+      data: { questName: q.label },
+      panelClass: 'system-modal-panel',
+      backdropClass: 'system-backdrop',
+      disableClose: false,
+    });
+
+    dialogRef.afterClosed().subscribe((reason: string | null) => {
+      if (reason && reason.trim().length > 0) {
+        this.skip.emit({ quest: q, reason: reason.trim() });
+      }
+    });
   }
 
   onVerify(q: Quest, event: Event): void {
