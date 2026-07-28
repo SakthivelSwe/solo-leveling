@@ -1,7 +1,6 @@
-import { Component, OnInit, signal, effect } from '@angular/core';
+import { Component, OnInit, signal, effect, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { SseService } from '../../../core/services/sse.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -18,7 +17,7 @@ interface BossChallenge {
 @Component({
   selector: 'app-boss-battle',
   standalone: true,
-  imports: [CommonModule, FormsModule, MonacoEditorModule],
+  imports: [CommonModule, FormsModule],
   animations: [fadeInUp, listStagger],
   templateUrl: './boss-battle.component.html',
   styleUrls: ['./boss-battle.component.scss']
@@ -30,7 +29,6 @@ export class BossBattleComponent implements OnInit {
     initialCode: 'class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Defeat the boss\n        return new int[]{};\n    }\n}'
   };
 
-  editorOptions = { theme: 'vs-dark', language: 'java', minimap: { enabled: false }, automaticLayout: true };
   code = this.challenge.initialCode;
   
   aiFeedback = signal<string[]>([]);

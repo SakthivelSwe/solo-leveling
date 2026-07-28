@@ -21,8 +21,14 @@
 
   <div class="battle-arena">
     <!-- Code Editor -->
-    <div class="editor-container" style="border: 1px solid rgba(226,75,74,0.3); border-radius: 8px; overflow: hidden; height: 350px;">
-      <ngx-monaco-editor style="height: 100%;" [options]="editorOptions" [ngModel]="code" (ngModelChange)="onCodeChange($event)"></ngx-monaco-editor>
+    <div class="editor-container">
+      <textarea 
+        class="native-code-editor mono" 
+        [(ngModel)]="code" 
+        (ngModelChange)="onCodeChange($event)"
+        placeholder="// Write your code here..."
+        spellcheck="false"
+      ></textarea>
     </div>
 
     <!-- AI Mentor Terminal / Live Feedback -->
