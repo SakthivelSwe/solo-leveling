@@ -36,17 +36,6 @@
     </header>
 
     <!-- ═══════════════════════════════════════════════════════════
-         PANIC BUTTON (DISCIPLINE PROTOCOL)
-         ═══════════════════════════════════════════════════════════ -->
-    <section class="nf-section panic-section">
-      <button class="panic-btn" (click)="triggerPanicLockdown()">
-        <span class="panic-icon">🚨</span>
-        <span class="panic-text mono">INITIATE PANIC LOCKDOWN</span>
-      </button>
-      <p class="panic-desc tech">Blocks all distracting apps for 15 minutes. Use only in emergencies.</p>
-    </section>
-
-    <!-- ═══════════════════════════════════════════════════════════
          DAILY QUOTE BANNER
          ═══════════════════════════════════════════════════════════ -->
     <section class="nf-section nf-quote-banner" [class.quote-pulse]="showQuotePulse()">

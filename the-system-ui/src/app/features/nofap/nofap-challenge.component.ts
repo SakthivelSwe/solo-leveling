@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LifeOsService } from '../../core/services/life-os.service';
-import { ScreenTimeService } from '../../core/services/screen-time.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { NoFapStatus, ScienceDayCard, AddictionInsight } from '../../core/models/models';
@@ -118,28 +117,8 @@ export class NoFapChallengeComponent implements OnInit {
   constructor(
     private lifeOs: LifeOsService,
     private snack: MatSnackBar,
-    private dialog: MatDialog,
-    private screenTime: ScreenTimeService
+    private dialog: MatDialog
   ) {}
-
-  async triggerPanicLockdown(): Promise<void> {
-    this.toast('🚨 INITIATING PANIC LOCKDOWN 🚨');
-    
-    // Play intense AI voice line
-    const utterance = new SpeechSynthesisUtterance("Do not falter. The shadow army watches.");
-    utterance.voice = speechSynthesis.getVoices().find(v => v.name.includes('Google UK English Male')) || null;
-    utterance.pitch = 0.5; // Deep, system-like voice
-    utterance.rate = 0.8;
-    speechSynthesis.speak(utterance);
-
-    // Vibrate intensely
-    if (navigator.vibrate) {
-      navigator.vibrate([200, 100, 200, 100, 500, 100, 500]);
-    }
-
-    // Trigger Android lock
-    await this.screenTime.initiateLockdown();
-  }
 
   ngOnInit(): void {
     this.load();
