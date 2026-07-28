@@ -374,6 +374,12 @@ $sys-theme: mat.define-dark-theme((
   font-family: 'Orbitron', sans-serif;
 }
 
+/* Fallback for environments where :has() is not supported */
+.cdk-global-overlay-wrapper {
+  display: flex !important;
+  pointer-events: none;
+}
+
 /* Force ALL snackbars to the top-right across the whole application */
 .cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
   justify-content: flex-end !important;
@@ -381,6 +387,9 @@ $sys-theme: mat.define-dark-theme((
   padding-top: 24px !important;
   padding-right: 24px !important;
   box-sizing: border-box;
+}
+.mat-mdc-snack-bar-container {
+  pointer-events: auto; /* Re-enable clicks on the snackbar itself */
 }
 
 /* ── Overlay backdrop ─────────────────────────────────────── */
