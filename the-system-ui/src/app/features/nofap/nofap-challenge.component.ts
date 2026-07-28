@@ -26,7 +26,7 @@ export class NoFapChallengeComponent implements OnInit {
   settingStartDate = signal(false);
   showStartDatePicker = signal(false);
   selectedStartDate = '';
-  activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS'>('BRAIN');
+  activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS' | 'DOPAMINE'>('BRAIN');
   activeScienceDay = signal<ScienceDayCard | null>(null);
   showMilestoneAnimation = signal(false);
 
@@ -284,7 +284,7 @@ export class NoFapChallengeComponent implements OnInit {
     return Math.max(0, Math.round((today.getTime() - start.getTime()) / 86400000));
   }
 
-  setInsightTab(tab: 'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS'): void {
+  setInsightTab(tab: 'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS' | 'DOPAMINE'): void {
     this.activeInsightTab.set(tab);
   }
 

@@ -1,4 +1,4 @@
-﻿import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -9,7 +9,7 @@ export const fallbackInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>
       if (err.status === 0 || err.status === 502 || err.status === 503 || err.status === 504) {
         // If the request was made to the primary API URL and we have a secondary API URL configured
         if (environment.apiUrl && environment.secondaryApiUrl && req.url.startsWith(environment.apiUrl)) {
-          console.warn(Primary API failed with status  for , falling back to secondary API...);
+          console.warn(`Primary API failed with status ${err.status} for ${req.url}, falling back to secondary API...`);
           
           const fallbackUrl = req.url.replace(environment.apiUrl, environment.secondaryApiUrl);
           const retriedReq = req.clone({ url: fallbackUrl });
