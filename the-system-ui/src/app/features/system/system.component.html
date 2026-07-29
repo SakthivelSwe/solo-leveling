@@ -98,7 +98,10 @@
     </button>
     <button class="mtab" [class.active]="mobileTab() === 'schedule'"
             (click)="mobileTab.set('schedule')" id="tab-schedule">
-      <span class="mtab-icon">📅</span>
+      <span class="mtab-icon css-cal">
+        <span class="css-cal-top"></span>
+        <span class="css-cal-num">{{ todayDateNum }}</span>
+      </span>
       <span class="mtab-label">SCHEDULE</span>
     </button>
   </div>

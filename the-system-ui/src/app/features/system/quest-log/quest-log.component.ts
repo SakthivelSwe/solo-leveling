@@ -38,6 +38,7 @@ const SKIP_MSGS: Record<string, string[]> = {
   animations: [listStagger],
 })
 export class QuestLogComponent {
+  todayDateNum = new Date().getDate();
   @Input({ required: true }) quests: Quest[] = [];      // daily quests
   @Input() weeklyQuests: Quest[] = [];
   @Input() monthlyQuests: Quest[] = [];

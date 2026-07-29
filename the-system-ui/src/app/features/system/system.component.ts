@@ -56,6 +56,8 @@ export class SystemComponent implements OnInit, OnDestroy {
   /** Mobile section tabs: 'status' | 'quests' | 'schedule' */
   mobileTab = signal<'status' | 'quests' | 'schedule'>('status');
 
+  todayDateNum = new Date().getDate();
+
   showBossBattle = false;
 
   dailyMission = signal<DailyMissionDTO | null>(null);
