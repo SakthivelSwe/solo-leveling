@@ -79,6 +79,11 @@ public class NoFapController {
         }
     }
 
+    @PostMapping("/nightfall")
+    public ResponseEntity<Map<String, Object>> logNightfall(HttpServletRequest request) {
+        return ResponseEntity.ok(noFapService.logNightfall(playerId(request)));
+    }
+
     @PostMapping("/urge-survived")
     public ResponseEntity<Map<String, Object>> urgeSurvived(HttpServletRequest request) {
         return ResponseEntity.ok(noFapService.urgeSurvived(playerId(request)));

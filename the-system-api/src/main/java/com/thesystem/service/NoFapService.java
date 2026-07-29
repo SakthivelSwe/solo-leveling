@@ -208,6 +208,19 @@ public class NoFapService {
     }
 
     @Transactional
+    public Map<String, Object> logNightfall(Long playerId) {
+        // Award a small amount of XP for tracking health
+        playerRepo.findById(playerId).ifPresent(p -> {
+            levelService.addXp(p, 10, "Logged health data (Nightfall)");
+            playerRepo.save(p);
+        });
+        return Map.of(
+            "message", "Nightfall logged. This is a natural healing process. Your streak remains intact. Keep going, Hunter.",
+            "xpAwarded", 10
+        );
+    }
+
+    @Transactional
     public NoFapStatusDTO reportRelapse(Long playerId) {
         upsertPornViewed(playerId, true);
         aiMemoryService.addImmediateMemory(playerId, "DECLINE", "Relapsed on NoFap Challenge today. Lost streak.");

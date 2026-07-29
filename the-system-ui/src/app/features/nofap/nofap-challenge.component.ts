@@ -229,6 +229,36 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     });
   }
 
+  logNightfall(): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const raw = localStorage.getItem(this.nightfallStorageKey());
+    const entries: string[] = raw ? JSON.parse(raw) : [];
+    
+    if (entries.includes(todayStr)) {
+      this.toast(`⚠ Nightfall already logged for today.`);
+      return;
+    }
+
+    if (this.reporting()) return; // reuse reporting lock
+    this.reporting.set(true);
+    this.lifeOs.logNightfall().subscribe({
+      next: (res: any) => {
+        this.reporting.set(false);
+        entries.push(todayStr);
+        localStorage.setItem(this.nightfallStorageKey(), JSON.stringify(entries));
+        this.nightfallDates.set(entries);
+        this.toast(`◈ ${res.message} (+${res.xpAwarded} XP)`);
+      },
+      error: () => {
+        this.reporting.set(false);
+        this.toast('⚠ Failed to log nightfall on server, but logged locally.');
+        entries.push(todayStr);
+        localStorage.setItem(this.nightfallStorageKey(), JSON.stringify(entries));
+        this.nightfallDates.set(entries);
+      }
+    });
+  }
+
   // ── Live Elapsed Timer Helpers ─────────────────────────────────
 
   private startElapsedTimer(): void {
@@ -710,24 +740,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     }
   }
 
-  logNightfall(): void {
-    const todayStr = new Date().toISOString().split('T')[0];
-    try {
-      const raw = localStorage.getItem(this.nightfallStorageKey());
-      const entries: string[] = raw ? JSON.parse(raw) : [];
-      
-      if (!entries.includes(todayStr)) {
-        entries.push(todayStr);
-        localStorage.setItem(this.nightfallStorageKey(), JSON.stringify(entries));
-        this.nightfallDates.set(entries);
-        this.toast(`◈ Nightfall logged. This is a natural release. Your streak remains pure.`);
-      } else {
-        this.toast(`⚠ Nightfall already logged for today.`);
-      }
-    } catch { 
-      this.toast('⚠ Could not log nightfall'); 
-    }
-  }
+  // logNightfall implementation is at the top with other actions
 
   isNightfall(dateStr: string): boolean {
     return this.nightfallDates().includes(dateStr);
