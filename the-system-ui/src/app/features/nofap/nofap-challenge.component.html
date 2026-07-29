@@ -191,6 +191,14 @@
             <div class="s-badge percentile">{{ percentileLabel(s.currentStreak) }}</div>
           </div>
 
+          <!-- Start date display -->
+          @if (s.startDate && s.currentStreak > 0) {
+            <div class="start-date-row tech" style="margin-top: 10px; font-size: 0.65rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+              <span style="color: var(--system-green);">📅</span>
+              <span>STARTED: <strong style="color: var(--text-primary);">{{ s.startDate | date:'mediumDate' | uppercase }}</strong></span>
+            </div>
+          }
+
           <!-- Action buttons -->
           <div class="action-buttons">
             <button class="btn-urge tech" (click)="openUrgeProtocol()">

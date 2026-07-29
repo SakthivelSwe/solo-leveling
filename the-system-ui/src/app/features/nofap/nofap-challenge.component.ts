@@ -169,9 +169,11 @@ export class NoFapChallengeComponent implements OnInit {
 
   reportRelapse(): void {
     const dialogRef = this.dialog.open(RelapseDialogComponent, {
-      width: '500px',
-      disableClose: true,
-      panelClass: 'dark-dialog'
+      panelClass: 'transparent-panel',
+      hasBackdrop: false,
+      maxWidth: '100vw',
+      width: '100vw',
+      height: '100vh'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -191,8 +193,11 @@ export class NoFapChallengeComponent implements OnInit {
 
   viewPastAutopsies(): void {
     this.dialog.open(PastAutopsiesComponent, {
-      width: '600px',
-      panelClass: 'dark-dialog'
+      panelClass: 'transparent-panel',
+      hasBackdrop: false,
+      maxWidth: '100vw',
+      width: '100vw',
+      height: '100vh'
     });
   }
 

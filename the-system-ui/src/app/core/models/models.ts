@@ -629,6 +629,8 @@ export interface NoFapStatus {
   recoveryVelocity: number;
   /** Phase-based unlockable title, e.g. "Week Warrior", "Shadow Monarch" */
   phaseTitle: string;
+  /** ISO date string (YYYY-MM-DD) of the first clean day in the current streak */
+  startDate?: string;
 }
 
 export interface NetWorthLog {

@@ -15,9 +15,9 @@ interface Quote {
   template: `
     <div class="quote-container tech" *ngIf="currentQuote()" [class.fade-out]="isAnimating()">
       <div class="quote-content">
-        <span class="quote-mark">“</span>
+        <span class="quote-mark">"</span>
         <span class="quote-text">{{ currentQuote()?.text }}</span>
-        <span class="quote-mark">”</span>
+        <span class="quote-mark">"</span>
       </div>
       <div class="quote-author mono">
         ◈ {{ currentQuote()?.author }} <span class="quote-source">[{{ currentQuote()?.source }}]</span>
@@ -76,8 +76,10 @@ export class RotatingQuoteComponent implements OnInit, OnDestroy {
   isAnimating = signal<boolean>(false);
   private intervalId: any;
 
-  // 2 minutes in milliseconds
-  private readonly ROTATION_INTERVAL = 120000;
+  // 1 minute in milliseconds (sequential display)
+  private readonly ROTATION_INTERVAL = 60000;
+  // localStorage key to persist position across page reloads
+  private readonly INDEX_KEY = 'rq_quote_index';
 
   constructor(private http: HttpClient) {}
 
@@ -86,7 +88,7 @@ export class RotatingQuoteComponent implements OnInit, OnDestroy {
       next: (data) => {
         if (data && data.length > 0) {
           this.quotes.set(data);
-          this.pickRandomQuote();
+          this.showCurrentQuote();
           this.startRotation();
         }
       },
@@ -100,32 +102,42 @@ export class RotatingQuoteComponent implements OnInit, OnDestroy {
     }
   }
 
-  private pickRandomQuote() {
+  /** Returns the current sequential index from localStorage (0-based, wraps around) */
+  private getCurrentIndex(): number {
+    const stored = localStorage.getItem(this.INDEX_KEY);
+    const idx = stored ? parseInt(stored, 10) : 0;
+    return isNaN(idx) ? 0 : idx;
+  }
+
+  /** Display the quote at the current persisted index */
+  private showCurrentQuote(): void {
     const quotesList = this.quotes();
     if (quotesList.length === 0) return;
-    
-    // Pick a random quote that isn't the current one (if possible)
-    let randomIndex = Math.floor(Math.random() * quotesList.length);
-    if (quotesList.length > 1 && this.currentQuote()) {
-      while (quotesList[randomIndex].text === this.currentQuote()?.text) {
-        randomIndex = Math.floor(Math.random() * quotesList.length);
-      }
-    }
-    
-    this.currentQuote.set(quotesList[randomIndex]);
+    const idx = this.getCurrentIndex() % quotesList.length;
+    this.currentQuote.set(quotesList[idx]);
+  }
+
+  /** Advance to the next quote in sequence and persist the index */
+  private advanceToNext(): void {
+    const quotesList = this.quotes();
+    if (quotesList.length === 0) return;
+    const nextIdx = (this.getCurrentIndex() + 1) % quotesList.length;
+    localStorage.setItem(this.INDEX_KEY, String(nextIdx));
+    this.currentQuote.set(quotesList[nextIdx]);
   }
 
   private startRotation() {
     this.intervalId = setInterval(() => {
       // Trigger fade out
       this.isAnimating.set(true);
-      
-      // Wait for fade out to complete before changing text and fading in
+
+      // Wait for fade out animation (800ms) then advance quote and fade in
       setTimeout(() => {
-        this.pickRandomQuote();
+        this.advanceToNext();
         this.isAnimating.set(false);
-      }, 800); // 800ms matches the CSS transition duration
-      
+      }, 800);
+
     }, this.ROTATION_INTERVAL);
   }
 }
+

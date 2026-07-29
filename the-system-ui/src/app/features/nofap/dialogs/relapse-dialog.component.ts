@@ -2,66 +2,94 @@ import { Component, Inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-relapse-dialog',
   standalone: true,
   imports: [CommonModule, FormsModule, MatDialogModule],
+  animations: [
+    trigger('dialogOpen', [
+      transition(':enter', [
+        style({ transform: 'scale(0.95)', opacity: 0 }),
+        animate('180ms cubic-bezier(0, 0, 0.2, 1)', style({ transform: 'scale(1)', opacity: 1 }))
+      ])
+    ])
+  ],
   template: `
-    <div class="relapse-modal system-card">
-      <div class="modal-header">
-        <h2 class="mono danger-glow">☠ POST-RELAPSE AUTOPSY</h2>
-      </div>
-
-      <div class="modal-body">
-        <p class="desc tech">
-          The System requires absolute honesty. You are about to reset your progress to Day 0.
-          Identify the weakness that caused this failure.
-        </p>
-
-        <label class="tech label">PRIMARY TRIGGER:</label>
-        <div class="trigger-grid">
-          @for (t of triggers; track t) {
-            <button class="trigger-btn tech" 
-                    [class.selected]="selectedTrigger() === t"
-                    (click)="selectedTrigger.set(t)">
-              {{ t }}
-            </button>
-          }
+    <!-- Full-screen overlay (same pattern as SkipPromptModal which works correctly) -->
+    <div class="relapse-overlay" (click)="dialogRef.close(false)">
+      <div class="relapse-modal system-card" @dialogOpen (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="mono danger-glow">☠ POST-RELAPSE AUTOPSY</h2>
         </div>
 
-        <label class="tech label mt-4">REFLECTION (MIN 50 WORDS):</label>
-        <p class="desc tech" style="font-size: 0.65rem; color: #ff5252;">
-          Write down exactly how this happened. What was the sequence of events? How do you feel now? How will you prevent this exact scenario next time?
-        </p>
-        <textarea class="tech-input textarea" 
-                  [(ngModel)]="reflectionText" 
-                  (ngModelChange)="onReflectionChange($event)"
-                  placeholder="I failed because... Next time I will..." 
-                  rows="5"></textarea>
-                  
-        <div class="word-counter tech" [class.valid]="wordCount() >= 50">
-          WORDS: {{ wordCount() }} / 50
-        </div>
-      </div>
+        <div class="modal-body">
+          <p class="desc tech">
+            The System requires absolute honesty. You are about to reset your progress to Day 0.
+            Identify the weakness that caused this failure.
+          </p>
 
-      <div class="modal-footer">
-        <button class="btn-cancel tech" (click)="dialogRef.close(false)">ABORT</button>
-        <button class="btn-confirm tech" 
-                [disabled]="!isValid()" 
-                (click)="confirmFailure()">
-          CONFIRM FAILURE
-        </button>
+          <label class="tech label">PRIMARY TRIGGER:</label>
+          <div class="trigger-grid">
+            @for (t of triggers; track t) {
+              <button class="trigger-btn tech" 
+                      [class.selected]="selectedTrigger() === t"
+                      (click)="selectedTrigger.set(t)">
+                {{ t }}
+              </button>
+            }
+          </div>
+
+          <label class="tech label mt-4">REFLECTION (MIN 50 WORDS):</label>
+          <p class="desc tech" style="font-size: 0.65rem; color: #ff5252;">
+            Write down exactly how this happened. What was the sequence of events? How do you feel now? How will you prevent this exact scenario next time?
+          </p>
+          <textarea class="tech-input textarea" 
+                    [(ngModel)]="reflectionText" 
+                    (ngModelChange)="onReflectionChange($event)"
+                    placeholder="I failed because... Next time I will..." 
+                    rows="5"></textarea>
+                    
+          <div class="word-counter tech" [class.valid]="wordCount() >= 50">
+            WORDS: {{ wordCount() }} / 50
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel tech" (click)="dialogRef.close(false)">ABORT</button>
+          <button class="btn-confirm tech" 
+                  [disabled]="!isValid()" 
+                  (click)="confirmFailure()">
+            CONFIRM FAILURE
+          </button>
+        </div>
       </div>
     </div>
   `,
   styles: [`
+    .relapse-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+    }
     .relapse-modal {
       background: #0f1115;
       border: 1px solid #ff5252;
       color: #e2e8f0;
       padding: 24px;
+      width: 90vw;
       max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 12px;
       box-shadow: 0 0 40px rgba(255, 82, 82, 0.15);
     }
     .modal-header { margin-bottom: 20px; border-bottom: 1px solid rgba(255,82,82,0.3); padding-bottom: 12px; }
@@ -184,4 +212,3 @@ export class RelapseDialogComponent {
     });
   }
 }
-

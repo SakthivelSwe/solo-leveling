@@ -76,6 +76,10 @@ public class NoFapStatusDTO {
     /** Unlockable title based on current phase milestone, e.g. "Awakening Hunter" */
     private String phaseTitle;
 
+    // ── Start date ────────────────────────────────────────────────────────────
+    /** ISO date string (YYYY-MM-DD) of the first clean day in the current streak */
+    private String startDate;
+
     // ────────────────────────────────────────────────────────────────────────
     // Nested types
     // ────────────────────────────────────────────────────────────────────────
