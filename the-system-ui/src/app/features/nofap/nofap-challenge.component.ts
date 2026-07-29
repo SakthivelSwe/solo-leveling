@@ -25,6 +25,10 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   settingStartDate = signal(false);
   showStartDatePicker = signal(false);
   selectedStartDate = '';
+  selectedStartTime = (() => {
+    const d = new Date();
+    return d.toTimeString().slice(0, 5); // "HH:MM"
+  })();
   activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS' | 'DOPAMINE'>('BRAIN');
   activeScienceDay = signal<ScienceDayCard | null>(null);
   showMilestoneAnimation = signal(false);
@@ -335,6 +339,16 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
         this.status.set(s);
         this.settingStartDate.set(false);
         this.showStartDatePicker.set(false);
+        
+        // Save the specific combined date and time so the live timer works accurately
+        const dtStr = `${this.selectedStartDate}T${this.selectedStartTime}:00`;
+        const startDt = new Date(dtStr);
+        if (!isNaN(startDt.getTime())) {
+          localStorage.setItem(this.CONFIRM_TIME_KEY, startDt.toISOString());
+          this.updateTimerDisplays(startDt);
+          this.startElapsedTimer();
+        }
+
         this.triggerMilestone();
         this.toast(`◈ Streak backfilled! ${s.currentStreak} days of discipline recognized. Welcome back, Hunter.`);
       },
@@ -355,6 +369,8 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
 
   selectDaysAgo(days: number): void {
     this.selectedStartDate = this.dateForDaysAgo(days);
+    const d = new Date();
+    this.selectedStartTime = d.toTimeString().slice(0, 5);
   }
 
   /** Days from a date string (YYYY-MM-DD) to today */

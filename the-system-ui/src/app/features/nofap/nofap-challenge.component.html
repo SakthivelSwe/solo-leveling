@@ -102,14 +102,19 @@
           </div>
         </div>
 
-        <!-- Date picker -->
+        <!-- Date & Time picker -->
         <div class="ob-picker">
-          <label class="tech ob-picker-lbl">OR PICK EXACT DATE:</label>
-          <input class="ob-date-input"
-                 type="date"
-                 [(ngModel)]="selectedStartDate"
-                 [max]="todayDateString"
-                 [min]="earliestDateString" />
+          <label class="tech ob-picker-lbl">OR PICK EXACT DATE & TIME:</label>
+          <div style="display: flex; gap: 8px; justify-content: center;">
+            <input class="ob-date-input"
+                   type="date"
+                   [(ngModel)]="selectedStartDate"
+                   [max]="todayDateString"
+                   [min]="earliestDateString" />
+            <input class="ob-date-input"
+                   type="time"
+                   [(ngModel)]="selectedStartTime" />
+          </div>
         </div>
 
         <!-- Preview -->
