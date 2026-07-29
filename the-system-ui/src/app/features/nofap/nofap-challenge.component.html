@@ -191,11 +191,30 @@
             <div class="s-badge percentile">{{ percentileLabel(s.currentStreak) }}</div>
           </div>
 
-          <!-- Start date display -->
-          @if (s.startDate && s.currentStreak > 0) {
-            <div class="start-date-row tech" style="margin-top: 10px; font-size: 0.65rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
-              <span style="color: var(--system-green);">📅</span>
-              <span>STARTED: <strong style="color: var(--text-primary);">{{ s.startDate | date:'mediumDate' | uppercase }}</strong></span>
+          <!-- ── LIVE ELAPSED TIMER ─────────────────────────────────────── -->
+          @if (confirmTimeDisplay()) {
+            <div class="elapsed-timer-card">
+              <!-- Header row -->
+              <div class="et-header">
+                <span class="et-label tech">⚡ TIME CLEAN</span>
+                <span class="et-confirm-time tech">Since {{ confirmTimeDisplay() }}</span>
+              </div>
+
+              <!-- Big ticking counter -->
+              <div class="et-counter mono">{{ elapsedDisplay() }}</div>
+
+              <!-- Next day unlock info -->
+              @if (nextDayTimeDisplay()) {
+                <div class="et-next-row tech">
+                  <span class="et-next-label">📅 DAY {{ (s.currentStreak) + 1 }} UNLOCKS AT:</span>
+                  <span class="et-next-time">{{ nextDayTimeDisplay() }}</span>
+                </div>
+              }
+            </div>
+          } @else if (!s.todayConfirmed) {
+            <!-- Not yet confirmed — show a prompt -->
+            <div class="et-no-confirm tech" style="margin-top: 10px; font-size: 0.65rem; color: var(--text-secondary); padding: 8px 10px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px;">
+              ⏱ Click <strong style="color: var(--system-green);">CONFIRM CLEAN DAY</strong> to start your live timer
             </div>
           }
 

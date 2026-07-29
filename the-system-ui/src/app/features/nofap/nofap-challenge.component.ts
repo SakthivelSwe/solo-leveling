@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,7 @@ import { PastAutopsiesComponent } from './dialogs/past-autopsies.component';
   templateUrl: './nofap-challenge.component.html',
   styleUrls: ['./nofap-challenge.component.scss'],
 })
-export class NoFapChallengeComponent implements OnInit {
+export class NoFapChallengeComponent implements OnInit, OnDestroy {
   status = signal<NoFapStatus | null>(null);
   loading = signal(true);
   confirming = signal(false);
@@ -28,6 +28,17 @@ export class NoFapChallengeComponent implements OnInit {
   activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS' | 'DOPAMINE'>('BRAIN');
   activeScienceDay = signal<ScienceDayCard | null>(null);
   showMilestoneAnimation = signal(false);
+
+  // ── Live Elapsed Timer ───────────────────────────────────────────
+  /** ISO timestamp saved in localStorage when user confirms clean for the current day */
+  private readonly CONFIRM_TIME_KEY = 'nf_confirm_time';
+  /** Displayed elapsed time string, updated every second */
+  elapsedDisplay = signal<string>('0d 00h 00m 00s');
+  /** Formatted datetime string of when clean day was confirmed e.g. "29 Jul 2026, 11:00 AM" */
+  confirmTimeDisplay = signal<string | null>(null);
+  /** Next milestone datetime string e.g. "30 Jul 2026, 11:00 AM" */
+  nextDayTimeDisplay = signal<string | null>(null);
+  private timerInterval: any = null;
 
   // Breathing widget
   breathingActive = signal(false);
@@ -125,6 +136,12 @@ export class NoFapChallengeComponent implements OnInit {
     this.loadMoodJournal();
     this.loadTriggerLog();
     this.loadNightfalls();
+    this.startElapsedTimer();
+  }
+
+  ngOnDestroy(): void {
+    this.stopElapsedTimer();
+    if (this.breathingInterval) clearInterval(this.breathingInterval);
   }
 
   load(): void {
@@ -157,6 +174,11 @@ export class NoFapChallengeComponent implements OnInit {
         const prev = this.status()?.currentStreak ?? 0;
         this.status.set(s);
         this.confirming.set(false);
+        // Save confirmation timestamp to localStorage for the live timer
+        const now = new Date();
+        localStorage.setItem(this.CONFIRM_TIME_KEY, now.toISOString());
+        this.updateTimerDisplays(now);
+        this.startElapsedTimer();
         // Trigger milestone animation if a milestone was just crossed
         if ([7, 30, 90, 365].includes(s.currentStreak) && s.currentStreak > prev) {
           this.triggerMilestone();
@@ -183,12 +205,89 @@ export class NoFapChallengeComponent implements OnInit {
           next: (s: NoFapStatus) => {
             this.status.set(s);
             this.reporting.set(false);
+            // Clear the confirm timer on relapse
+            localStorage.removeItem(this.CONFIRM_TIME_KEY);
+            this.confirmTimeDisplay.set(null);
+            this.nextDayTimeDisplay.set(null);
+            this.elapsedDisplay.set('0d 00h 00m 00s');
+            this.stopElapsedTimer();
             this.toast(`◈ Relapse logged (Trigger: ${result.trigger}). Day 0. The System respects your honesty. Begin again.`);
           },
           error: () => { this.reporting.set(false); this.toast('⚠ Failed to log relapse'); },
         });
       }
     });
+  }
+
+  // ── Live Elapsed Timer Helpers ─────────────────────────────────
+
+  private startElapsedTimer(): void {
+    this.stopElapsedTimer(); // clear any existing interval
+
+    const stored = localStorage.getItem(this.CONFIRM_TIME_KEY);
+    if (!stored) return;
+
+    const confirmDate = new Date(stored);
+    if (isNaN(confirmDate.getTime())) return;
+
+    // Check if stored timestamp is from a previous day's streak (relapse happened)
+    const s = this.status();
+    if (s && !s.todayConfirmed && s.currentStreak === 0) {
+      // Don't show timer if not confirmed today
+      return;
+    }
+
+    this.updateTimerDisplays(confirmDate);
+    this.timerInterval = setInterval(() => this.updateTimerDisplays(confirmDate), 1000);
+  }
+
+  private stopElapsedTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private updateTimerDisplays(confirmDate: Date): void {
+    // Format the confirmation time: "29 Jul 2026, 11:00 AM"
+    this.confirmTimeDisplay.set(
+      confirmDate.toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      }).toUpperCase()
+    );
+
+    // Next day = 24h after confirmation
+    const nextDay = new Date(confirmDate.getTime() + 24 * 60 * 60 * 1000);
+    this.nextDayTimeDisplay.set(
+      nextDay.toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      }).toUpperCase()
+    );
+
+    // Compute elapsed
+    const elapsed = this.computeElapsed(confirmDate);
+    this.elapsedDisplay.set(elapsed);
+  }
+
+  private computeElapsed(from: Date): string {
+    const now = new Date();
+    let diff = Math.max(0, now.getTime() - from.getTime());
+
+    const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff -= days * 1000 * 60 * 60 * 24;
+    const hours   = Math.floor(diff / (1000 * 60 * 60));
+    diff -= hours * 1000 * 60 * 60;
+    const minutes = Math.floor(diff / (1000 * 60));
+    diff -= minutes * 1000 * 60;
+    const seconds = Math.floor(diff / 1000);
+
+    return `${days}d ${this.pad(hours)}h ${this.pad(minutes)}m ${this.pad(seconds)}s`;
+  }
+
+  private pad(n: number): string {
+    return n.toString().padStart(2, '0');
   }
 
   viewPastAutopsies(): void {
