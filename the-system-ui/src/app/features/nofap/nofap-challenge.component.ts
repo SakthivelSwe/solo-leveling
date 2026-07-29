@@ -34,14 +34,16 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   showMilestoneAnimation = signal(false);
 
   // ── Live Elapsed Timer ───────────────────────────────────────────
-  /** ISO timestamp saved in localStorage when user confirms clean for the current day */
-  private readonly CONFIRM_TIME_KEY = 'nf_confirm_time';
+  /** ISO timestamp saved in localStorage representing the very start of the entire streak */
+  private readonly STREAK_START_TIME_KEY = 'nf_streak_start_time';
   /** Displayed elapsed time string, updated every second */
   elapsedDisplay = signal<string>('0d 00h 00m 00s');
-  /** Formatted datetime string of when clean day was confirmed e.g. "29 Jul 2026, 11:00 AM" */
+  /** Formatted datetime string of when the streak started e.g. "29 Jul 2026, 11:00 AM" */
   confirmTimeDisplay = signal<string | null>(null);
   /** Next milestone datetime string e.g. "30 Jul 2026, 11:00 AM" */
   nextDayTimeDisplay = signal<string | null>(null);
+  /** The integer number of the next day that is unlocking (e.g. 5) */
+  nextDayNumber = signal<number>(1);
   private timerInterval: any = null;
 
   // Breathing widget
@@ -178,11 +180,15 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
         const prev = this.status()?.currentStreak ?? 0;
         this.status.set(s);
         this.confirming.set(false);
-        // Save confirmation timestamp to localStorage for the live timer
-        const now = new Date();
-        localStorage.setItem(this.CONFIRM_TIME_KEY, now.toISOString());
-        this.updateTimerDisplays(now);
+
+        // If this is the very first day of the streak, the start time was 24 hours ago
+        if (prev === 0) {
+          const startTime = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+          localStorage.setItem(this.STREAK_START_TIME_KEY, startTime.toISOString());
+        }
+        // Restart the display loop
         this.startElapsedTimer();
+
         // Trigger milestone animation if a milestone was just crossed
         if ([7, 30, 90, 365].includes(s.currentStreak) && s.currentStreak > prev) {
           this.triggerMilestone();
@@ -210,7 +216,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
             this.status.set(s);
             this.reporting.set(false);
             // Clear the confirm timer on relapse
-            localStorage.removeItem(this.CONFIRM_TIME_KEY);
+            localStorage.removeItem(this.STREAK_START_TIME_KEY);
             this.confirmTimeDisplay.set(null);
             this.nextDayTimeDisplay.set(null);
             this.elapsedDisplay.set('0d 00h 00m 00s');
@@ -228,21 +234,32 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   private startElapsedTimer(): void {
     this.stopElapsedTimer(); // clear any existing interval
 
-    const stored = localStorage.getItem(this.CONFIRM_TIME_KEY);
-    if (!stored) return;
-
-    const confirmDate = new Date(stored);
-    if (isNaN(confirmDate.getTime())) return;
-
-    // Check if stored timestamp is from a previous day's streak (relapse happened)
     const s = this.status();
-    if (s && !s.todayConfirmed && s.currentStreak === 0) {
-      // Don't show timer if not confirmed today
+    if (!s) return;
+
+    // If they have no streak and haven't confirmed today, there is no timer
+    if (s.currentStreak === 0 && !s.todayConfirmed) {
       return;
     }
 
-    this.updateTimerDisplays(confirmDate);
-    this.timerInterval = setInterval(() => this.updateTimerDisplays(confirmDate), 1000);
+    let stored = localStorage.getItem(this.STREAK_START_TIME_KEY);
+    
+    // If no stored time but backend has a startDate, fallback to 00:00 of that date
+    if (!stored && s.startDate) {
+      const fallbackStart = new Date(`${s.startDate}T00:00:00`);
+      if (!isNaN(fallbackStart.getTime())) {
+        stored = fallbackStart.toISOString();
+        localStorage.setItem(this.STREAK_START_TIME_KEY, stored);
+      }
+    }
+
+    if (!stored) return;
+
+    const startDate = new Date(stored);
+    if (isNaN(startDate.getTime())) return;
+
+    this.updateTimerDisplays(startDate);
+    this.timerInterval = setInterval(() => this.updateTimerDisplays(startDate), 1000);
   }
 
   private stopElapsedTimer(): void {
@@ -252,17 +269,25 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateTimerDisplays(confirmDate: Date): void {
+  private updateTimerDisplays(startDate: Date): void {
     // Format the confirmation time: "29 Jul 2026, 11:00 AM"
     this.confirmTimeDisplay.set(
-      confirmDate.toLocaleString('en-IN', {
+      startDate.toLocaleString('en-IN', {
         day: '2-digit', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit', hour12: true
       }).toUpperCase()
     );
 
-    // Next day = 24h after confirmation
-    const nextDay = new Date(confirmDate.getTime() + 24 * 60 * 60 * 1000);
+    // Next day unlocks at exact 24h intervals from start time.
+    // Calculate how many full 24h periods have passed.
+    const now = new Date();
+    const diffMs = Math.max(0, now.getTime() - startDate.getTime());
+    const fullDaysPassed = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // The next milestone is the current full days + 1
+    const nextDay = new Date(startDate.getTime() + ((fullDaysPassed + 1) * 24 * 60 * 60 * 1000));
+    
+    this.nextDayNumber.set(fullDaysPassed + 1);
     this.nextDayTimeDisplay.set(
       nextDay.toLocaleString('en-IN', {
         day: '2-digit', month: 'short', year: 'numeric',
@@ -271,7 +296,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     );
 
     // Compute elapsed
-    const elapsed = this.computeElapsed(confirmDate);
+    const elapsed = this.computeElapsed(startDate);
     this.elapsedDisplay.set(elapsed);
   }
 
@@ -344,8 +369,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
         const dtStr = `${this.selectedStartDate}T${this.selectedStartTime}:00`;
         const startDt = new Date(dtStr);
         if (!isNaN(startDt.getTime())) {
-          localStorage.setItem(this.CONFIRM_TIME_KEY, startDt.toISOString());
-          this.updateTimerDisplays(startDt);
+          localStorage.setItem(this.STREAK_START_TIME_KEY, startDt.toISOString());
           this.startElapsedTimer();
         }
 
