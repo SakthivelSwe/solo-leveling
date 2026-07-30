@@ -31,85 +31,99 @@
            role="tabpanel" id="panel-CAREER" aria-labelledby="tab-CAREER">
     <div class="cards">
       <!-- Dev Mastery Integration -->
-      <div class="system-card block" style="grid-column: 1 / -1;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="mono head" style="color: #BA7517;">◈ DEV-MASTERY LEARNING PATHS</h3>
-          <button class="btn sm" (click)="syncDevMastery()">SYNC PROGRESS</button>
+      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(186, 117, 23, 0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.4);">◈ DEV-MASTERY LEARNING PATHS</h3>
+          <button class="sys-btn-secondary" (click)="syncDevMastery()">SYNC PROGRESS</button>
         </div>
-        <ul class="mini-list" @listStagger style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px;">
-          <li *ngFor="let dm of devMastery()" style="background: rgba(186, 117, 23, 0.1); border: 1px solid rgba(186, 117, 23, 0.3); border-radius: 4px; padding: 12px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-              <span class="badge" style="background: #BA7517;">{{ dm.pathSlug | uppercase }}</span>
-              <span class="tech dt" style="color: #FAC775;">+{{ dm.xpEarned }} XP</span>
+        <ul class="mini-list" @listStagger style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; list-style: none; padding: 0; margin: 0;">
+          <li *ngFor="let dm of devMastery()" style="background: rgba(186, 117, 23, 0.1); border: 1px solid rgba(186, 117, 23, 0.3); border-radius: 12px; padding: 16px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span class="status-badge" style="background: rgba(186, 117, 23, 0.2); color: #FAC775; border: 1px solid rgba(186, 117, 23, 0.4);">{{ dm.pathSlug | uppercase }}</span>
+              <span class="mono" style="color: #FAC775; text-shadow: 0 0 8px rgba(250, 199, 117, 0.5);">+{{ dm.xpEarned }} XP</span>
             </div>
-            <div class="pn" style="font-size: 0.9rem; line-height: 1.3;">{{ dm.topicTitle }}</div>
-            <div class="tech dt" style="margin-top: 8px;">{{ dm.completedAt | date:'mediumDate' }}</div>
+            <div class="pn" style="font-size: 1rem; line-height: 1.4; color: #fff;">{{ dm.topicTitle }}</div>
+            <div class="tech" style="margin-top: 12px; color: #8a8a9a; font-size: 0.8rem;">{{ dm.completedAt | date:'mediumDate' }}</div>
           </li>
-          <li *ngIf="!devMastery().length" class="empty tech">No learning progress synced yet.</li>
+          <li *ngIf="!devMastery().length" class="empty tech" style="grid-column: 1 / -1; text-align: center; color: #8a8a9a; padding: 24px; background: rgba(0,0,0,0.3); border-radius: 12px;">No learning progress synced yet.</li>
         </ul>
       </div>
 
       <!-- Skills gap -->
-      <div class="system-card block" *ngIf="gap() as g">
-        <h3 class="mono head">◈ SKILLS GAP — TARGET ROLE</h3>
-        <div class="gap-row" *ngFor="let it of g.items">
-          <div class="gap-head">
-            <span class="sn">{{ it.skillName }}</span>
-            <span class="urg" [style.color]="urgencyColor(it.urgency)">{{ it.urgency }}</span>
+      <div class="glass-card" *ngIf="gap() as g" style="border-color: rgba(226, 75, 74, 0.3);">
+        <h3 class="mono head" style="color: #E24B4A; text-shadow: 0 0 10px rgba(226, 75, 74, 0.3);">◈ SKILLS GAP — TARGET ROLE</h3>
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+          <div class="gap-row" *ngFor="let it of g.items">
+            <div class="gap-head" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span class="pn" style="font-size: 0.95rem;">{{ it.skillName }}</span>
+              <span class="tech" [style.color]="urgencyColor(it.urgency)" [style.textShadow]="'0 0 8px ' + urgencyColor(it.urgency)" style="font-weight: 600; font-size: 0.8rem; letter-spacing: 1px;">{{ it.urgency }}</span>
+            </div>
+            <div class="bar-bg">
+              <div class="bar-fill" [style.width.%]="(it.current/it.target)*100" [style.background]="urgencyColor(it.urgency)"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+              <span class="tech" style="color: #8a8a9a; font-size: 0.75rem;">Current: {{ it.current }} / Target: {{ it.target }}</span>
+              <span class="tech" style="color: #fff; font-size: 0.8rem;">Gap: {{ it.gap }}</span>
+            </div>
           </div>
-          <div class="gap-track">
-            <div class="gap-fill" [style.width.%]="(it.current/it.target)*100" [style.background]="urgencyColor(it.urgency)"></div>
-            <div class="gap-target" [style.left.%]="98"></div>
-          </div>
-          <span class="tech gv">{{ it.current }} / {{ it.target }} · gap {{ it.gap }}</span>
         </div>
       </div>
 
       <!-- Interview Readiness -->
-      <div class="system-card block" *ngIf="readiness() as ir">
-        <h3 class="mono head">◈ INTERVIEW READINESS</h3>
-        <div class="readiness-box" style="text-align: center; margin: 16px 0;">
-          <div class="readiness-pct mono" style="font-size: 2.5rem; color: #1D9E75;">{{ ir.overallPct }}%</div>
-          <div class="readiness-verdict tech" style="color: #FAC775; margin-top: 8px;">{{ ir.verdict }}</div>
+      <div class="glass-card" *ngIf="readiness() as ir" style="border-color: rgba(29, 158, 117, 0.3);">
+        <h3 class="mono head" style="color: #1D9E75; text-shadow: 0 0 10px rgba(29, 158, 117, 0.3);">◈ INTERVIEW READINESS</h3>
+        <div style="text-align: center; margin: 24px 0; background: rgba(0,0,0,0.3); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+          <div class="mono" style="font-size: 3.5rem; color: #1D9E75; text-shadow: 0 0 20px rgba(29, 158, 117, 0.5); line-height: 1;">{{ ir.overallPct }}%</div>
+          <div class="tech" style="color: #FAC775; margin-top: 12px; font-size: 1rem; letter-spacing: 0.5px;">{{ ir.verdict }}</div>
         </div>
-        <div class="gap-row" *ngFor="let skill of ir.perSkill | keyvalue">
-          <div class="gap-head">
-            <span class="sn">{{ skill.key }}</span>
-            <span class="tech gv">{{ skill.value }}%</span>
-          </div>
-          <div class="gap-track">
-            <div class="gap-fill" [style.width.%]="skill.value" style="background: #378ADD"></div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <div class="gap-row" *ngFor="let skill of ir.perSkill | keyvalue">
+            <div class="gap-head" style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span class="tech" style="color: #a0aabf; font-size: 0.85rem;">{{ skill.key }}</span>
+              <span class="mono" style="color: #fff; font-size: 0.9rem;">{{ skill.value }}%</span>
+            </div>
+            <div class="bar-bg">
+              <div class="bar-fill" [style.width.%]="skill.value" style="background: linear-gradient(90deg, #378ADD, #4fc3f7);"></div>
+            </div>
           </div>
         </div>
-        <div class="tech" style="margin-top: 12px; font-size: 0.8rem; color: #8a8a9a;">
-          Strong: <span style="color: #1D9E75">{{ ir.strongAreas.join(', ') || 'None' }}</span><br/>
-          Weak: <span style="color: #E24B4A">{{ ir.weakAreas.join(', ') || 'None' }}</span>
+        
+        <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+          <div class="tech" style="font-size: 0.85rem; color: #8a8a9a; margin-bottom: 8px;">
+            <strong style="color: #1D9E75; margin-right: 8px;">STRONG:</strong> {{ ir.strongAreas.join(', ') || 'None' }}
+          </div>
+          <div class="tech" style="font-size: 0.85rem; color: #8a8a9a;">
+            <strong style="color: #E24B4A; margin-right: 8px;">WEAK:</strong> {{ ir.weakAreas.join(', ') || 'None' }}
+          </div>
         </div>
       </div>
 
       <!-- Deep Work -->
-      <div class="system-card block">
-        <h3 class="mono head">◈ DEEP WORK LOG</h3>
-        <div class="tech" style="font-size: 0.8rem; color: #8a8a9a; margin-bottom: 12px;">Track raw coding hours without distractions. Minimum XP penalty applies for mobile pickups.</div>
-        <div class="form-row">
-          <input class="fin sm" type="number" placeholder="Mins" [(ngModel)]="newDeepWork.codingMinutes" />
-          <input class="fin sm" type="number" placeholder="Intrs" [(ngModel)]="newDeepWork.interruptions" title="Interruptions" />
-          <input class="fin sm" type="number" placeholder="Mobile" [(ngModel)]="newDeepWork.mobilePickups" title="Mobile Pickups" />
-          <button class="btn" (click)="addDeepWork()">+ LOG</button>
+      <div class="glass-card" style="border-color: rgba(83, 74, 183, 0.4);">
+        <h3 class="mono head" style="color: #b3aef0; text-shadow: 0 0 10px rgba(83, 74, 183, 0.4);">◈ DEEP WORK LOG</h3>
+        <div class="tech" style="font-size: 0.85rem; color: #8a8a9a; margin-bottom: 20px; line-height: 1.5;">Track raw coding hours without distractions. Minimum XP penalty applies for mobile pickups.</div>
+        
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+          <input class="premium-input" style="flex: 1; min-width: 80px;" type="number" placeholder="Mins" [(ngModel)]="newDeepWork.codingMinutes" />
+          <input class="premium-input" style="flex: 1; min-width: 80px;" type="number" placeholder="Intrs" [(ngModel)]="newDeepWork.interruptions" title="Interruptions" />
+          <input class="premium-input" style="flex: 1; min-width: 80px;" type="number" placeholder="Mobile" [(ngModel)]="newDeepWork.mobilePickups" title="Mobile Pickups" />
+          <button class="sys-btn-primary" (click)="addDeepWork()">+ LOG</button>
         </div>
-        <ul class="mini-list" @listStagger>
-          <li *ngFor="let dw of deepWork()" class="dw-item">
-            <div class="jinfo">
-              <span class="pn mono">{{ dw.codingMinutes }}m</span>
-              <span class="tech role">Focus: {{ dw.focusScore }}%</span>
+        
+        <ul class="mini-list" @listStagger style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li *ngFor="let dw of deepWork()" class="log-item" style="align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="mono" style="font-size: 1.1rem; color: #fff;">{{ dw.codingMinutes }}m</span>
+              <span class="tech" style="color: #8a8a9a; letter-spacing: 1px;">Focus: <span [style.color]="(dw.focusScore || 0) >= 80 ? '#1D9E75' : ((dw.focusScore || 0) >= 50 ? '#FAC775' : '#E24B4A')">{{ dw.focusScore }}%</span></span>
             </div>
-            <span class="badge" [class.easy]="dw.focusScore && dw.focusScore >= 80" 
+            <span class="diff-tag" [class.easy]="dw.focusScore && dw.focusScore >= 80" 
                                [class.medium]="dw.focusScore && dw.focusScore >= 50 && dw.focusScore < 80"
                                [class.hard]="dw.focusScore && dw.focusScore < 50">
               +{{ dw.focusXpEarned }} XP
             </span>
           </li>
-          <li *ngIf="!deepWork().length" class="empty tech">No deep work logged this week.</li>
+          <li *ngIf="!deepWork().length" class="empty tech" style="text-align: center; padding: 24px; color: #8a8a9a; background: rgba(0,0,0,0.3); border-radius: 8px;">No deep work logged this week.</li>
         </ul>
       </div>
 
@@ -229,39 +243,55 @@
     <div class="cards">
       
       <!-- Stoic Wisdom Carousel -->
-      <div class="system-card block" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: #378ADD; background: linear-gradient(90deg, rgba(55, 138, 221, 0.05), transparent);">
+      <div class="glass-card" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: rgba(55, 138, 221, 0.4); background: linear-gradient(160deg, rgba(55, 138, 221, 0.1), rgba(10, 10, 20, 0.8));">
         <div style="text-align: center; max-width: 800px; padding: 24px;">
-          <h3 class="mono tech" style="color: #378ADD; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.8rem;">◈ PSYCHOLOGICAL PILLAR</h3>
-          <p style="font-size: 1.2rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 8px;">
+          <h3 class="mono tech" style="color: #4fc3f7; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.85rem; text-shadow: 0 0 10px rgba(79, 195, 247, 0.4);">◈ PSYCHOLOGICAL PILLAR</h3>
+          <p style="font-size: 1.3rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);">
             "{{ stoicQuotes[stoicQuoteIndex()].quote }}"
           </p>
-          <span class="tech" style="color: #8a8a9a;">— {{ stoicQuotes[stoicQuoteIndex()].author }}</span>
+          <span class="tech" style="color: #a0aabf; font-weight: 500; letter-spacing: 1px;">— {{ stoicQuotes[stoicQuoteIndex()].author }}</span>
         </div>
       </div>
 
       <!-- Daily Reflection -->
-      <div class="system-card block wide">
-        <h3 class="mono head" style="color: #378ADD;">◈ DAILY REFLECTION</h3>
-        <div class="slider-row"><span class="tech">Mood</span>
-          <input type="range" min="1" max="10" [(ngModel)]="mind.moodEvening" /><span class="mono">{{ mind.moodEvening || 5 }}</span></div>
-        <div class="slider-row"><span class="tech">Anxiety</span>
-          <input type="range" min="1" max="10" [(ngModel)]="mind.anxietyLevel" /><span class="mono">{{ mind.anxietyLevel || 1 }}</span></div>
-        <textarea class="fin ta" placeholder="Today's win — one good thing that happened" [(ngModel)]="mind.todayWin"></textarea>
-        <textarea class="fin ta" placeholder="Grateful for..." [(ngModel)]="mind.gratitude"></textarea>
-        <textarea class="fin ta" placeholder="Evening reflection" [(ngModel)]="mind.eveningReflection"></textarea>
-        <button class="btn full" style="border-color: #378ADD; color: #378ADD;" (click)="saveMind()">SAVE REFLECTION</button>
+      <div class="glass-card wide" style="border-color: rgba(108, 99, 255, 0.3);">
+        <h3 class="mono head" style="color: #b3aef0; text-shadow: 0 0 10px rgba(108, 99, 255, 0.4);">◈ DAILY REFLECTION</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+          <div class="slider-row" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span class="tech" style="color: #8a8a9a;">Mood</span>
+              <span class="mono" style="color: #fff; font-size: 1.1rem;" [style.color]="mind.moodEvening && mind.moodEvening >= 7 ? '#1D9E75' : (mind.moodEvening && mind.moodEvening >= 4 ? '#FAC775' : '#E24B4A')">{{ mind.moodEvening || 5 }}</span>
+            </div>
+            <input type="range" min="1" max="10" [(ngModel)]="mind.moodEvening" style="width: 100%; accent-color: #6C63FF;" />
+          </div>
+          
+          <div class="slider-row" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span class="tech" style="color: #8a8a9a;">Anxiety</span>
+              <span class="mono" style="color: #fff; font-size: 1.1rem;" [style.color]="mind.anxietyLevel && mind.anxietyLevel <= 3 ? '#1D9E75' : (mind.anxietyLevel && mind.anxietyLevel <= 7 ? '#FAC775' : '#E24B4A')">{{ mind.anxietyLevel || 1 }}</span>
+            </div>
+            <input type="range" min="1" max="10" [(ngModel)]="mind.anxietyLevel" style="width: 100%; accent-color: #6C63FF;" />
+          </div>
+          
+          <textarea class="premium-input" style="min-height: 80px; resize: vertical;" placeholder="Today's win — one good thing that happened" [(ngModel)]="mind.todayWin"></textarea>
+          <textarea class="premium-input" style="min-height: 80px; resize: vertical;" placeholder="Grateful for..." [(ngModel)]="mind.gratitude"></textarea>
+          <textarea class="premium-input" style="min-height: 80px; resize: vertical;" placeholder="Evening reflection" [(ngModel)]="mind.eveningReflection"></textarea>
+          
+          <button class="sys-btn-primary" style="margin-top: 8px;" (click)="saveMind()">SAVE REFLECTION</button>
+        </div>
       </div>
 
       <!-- Evidence vs Doubt -->
-      <div class="system-card block">
-        <h3 class="mono head" style="color: #378ADD;">◈ EVIDENCE vs SELF-DOUBT</h3>
+      <div class="glass-card" style="border-color: rgba(29, 158, 117, 0.3);">
+        <h3 class="mono head" style="color: #5DCAA5; text-shadow: 0 0 10px rgba(29, 158, 117, 0.4);">◈ EVIDENCE vs SELF-DOUBT</h3>
         <p class="tech hint">When the mind says "you can't" — the record says otherwise.</p>
-        <ul class="mini-list" @listStagger>
-          <li *ngFor="let e of evidence()" class="ev">
-            <span class="ev-cat" [attr.data-cat]="e.category">{{ e.category }}</span>
-            <span class="pn">{{ e.evidence }}</span>
+        <ul class="mini-list" @listStagger style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+          <li *ngFor="let e of evidence()" class="log-item" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); border-left: 3px solid #1D9E75;">
+            <span class="ev-cat" [attr.data-cat]="e.category" style="margin-bottom: 4px;">{{ e.category }}</span>
+            <span class="pn" style="font-size: 0.95rem; line-height: 1.4; color: #fff;">{{ e.evidence }}</span>
           </li>
-          <li *ngIf="!evidence().length" class="empty tech">Complete skill quests to build undeniable evidence.</li>
+          <li *ngIf="!evidence().length" class="empty tech" style="text-align: center; padding: 24px; color: #8a8a9a; background: rgba(0,0,0,0.3); border-radius: 12px;">Complete skill quests to build undeniable evidence.</li>
         </ul>
       </div>
     </div>
@@ -273,198 +303,199 @@
     <div class="cards">
       
       <!-- 1. Wisdom Engine Carousel -->
-      <div class="system-card block" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: #FAC775; background: linear-gradient(90deg, rgba(250, 199, 117, 0.05), transparent);">
+      <div class="glass-card" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: rgba(250, 199, 117, 0.4); background: linear-gradient(160deg, rgba(250, 199, 117, 0.1), rgba(10, 10, 20, 0.8));">
         <div style="text-align: center; max-width: 800px; padding: 24px;">
-          <h3 class="mono tech" style="color: #FAC775; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.8rem;">◈ WISDOM ENGINE</h3>
-          <p style="font-size: 1.2rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 8px;">
+          <h3 class="mono tech" style="color: #FAC775; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.85rem; text-shadow: 0 0 10px rgba(250, 199, 117, 0.4);">◈ WISDOM ENGINE</h3>
+          <p style="font-size: 1.3rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);">
             "{{ wisdomTips[wisdomIndex()].text }}"
           </p>
-          <span class="tech" style="color: #8a8a9a;">— {{ wisdomTips[wisdomIndex()].author }}</span>
+          <span class="tech" style="color: #a0aabf; font-weight: 500; letter-spacing: 1px;">— {{ wisdomTips[wisdomIndex()].author }}</span>
         </div>
       </div>
 
       <!-- 2. Monthly Overview Dashboard -->
-      <div class="system-card block" style="grid-column: 1 / -1; display: flex; flex-direction: column; border-color: #FAC775;">
-        <h3 class="mono head" style="color: #FAC775; display: flex; justify-content: space-between;">
+      <div class="glass-card" style="grid-column: 1 / -1; display: flex; flex-direction: column; border-color: rgba(250, 199, 117, 0.3);">
+        <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.3); display: flex; justify-content: space-between;">
           <span>◈ MONTHLY OVERVIEW</span>
-          <span class="tech" *ngIf="monthlySummary()" [style.color]="monthlySummary()!.savingsRate >= 20 ? '#1D9E75' : '#E24B4A'">
+          <span class="tech" *ngIf="monthlySummary()" [style.color]="monthlySummary()!.savingsRate >= 20 ? '#5DCAA5' : '#ff6b6b'">
             SAVINGS RATE: {{ monthlySummary()!.savingsRate | number:'1.0-1' }}%
           </span>
         </h3>
         
         <div *ngIf="monthlySummary()" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-           <div style="background: rgba(29, 158, 117, 0.1); border-left: 3px solid #1D9E75; padding: 16px;">
-             <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">INCOME</div>
-             <div class="mono" style="color: #1D9E75; font-size: 1.8rem;">₹{{ monthlySummary()!.totalIncome }}</div>
+           <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #1D9E75; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+             <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px;">INCOME</div>
+             <div class="mono" style="color: #5DCAA5; font-size: 2rem; text-shadow: 0 0 10px rgba(93, 202, 165, 0.4);">₹{{ monthlySummary()!.totalIncome }}</div>
            </div>
-           <div style="background: rgba(226, 75, 74, 0.1); border-left: 3px solid #E24B4A; padding: 16px;">
-             <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">EXPENSES</div>
-             <div class="mono" style="color: #E24B4A; font-size: 1.8rem;">₹{{ monthlySummary()!.totalExpenses + monthlySummary()!.emiTotal + monthlySummary()!.subscriptionTotal }}</div>
+           <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #E24B4A; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+             <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px;">EXPENSES</div>
+             <div class="mono" style="color: #ff6b6b; font-size: 2rem; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);">₹{{ monthlySummary()!.totalExpenses + monthlySummary()!.emiTotal + monthlySummary()!.subscriptionTotal }}</div>
            </div>
-           <div style="background: rgba(55, 138, 221, 0.1); border-left: 3px solid #378ADD; padding: 16px;">
-             <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SAVED</div>
-             <div class="mono" style="color: #378ADD; font-size: 1.8rem;">₹{{ monthlySummary()!.totalSaved }}</div>
+           <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #378ADD; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+             <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px;">SAVED</div>
+             <div class="mono" style="color: #64b5f6; font-size: 2rem; text-shadow: 0 0 10px rgba(100, 181, 246, 0.4);">₹{{ monthlySummary()!.totalSaved }}</div>
            </div>
         </div>
 
-        <div *ngIf="monthlySummary()">
-          <div class="tech" style="margin-bottom: 8px; color: #8a8a9a;">50-30-20 BUDGET HEALTH</div>
-          <div style="display: flex; height: 16px; border-radius: 8px; overflow: hidden;">
-            <div [style.width.%]="monthlySummary()!.needsPercent" style="background: #E24B4A; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="Needs (Target 50%)">{{ monthlySummary()!.needsPercent | number:'1.0-0' }}%</div>
-            <div [style.width.%]="monthlySummary()!.wantsPercent" style="background: #FAC775; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="Wants (Target 30%)">{{ monthlySummary()!.wantsPercent | number:'1.0-0' }}%</div>
-            <div [style.width.%]="monthlySummary()!.savingsPercent" style="background: #1D9E75; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="Savings (Target 20%)">{{ monthlySummary()!.savingsPercent | number:'1.0-0' }}%</div>
+        <div *ngIf="monthlySummary()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px;">
+          <div class="tech" style="margin-bottom: 12px; color: #a0aabf; font-size: 0.85rem; letter-spacing: 1px;">50-30-20 BUDGET HEALTH</div>
+          <div style="display: flex; height: 24px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);">
+            <div [style.width.%]="monthlySummary()!.needsPercent" style="background: linear-gradient(90deg, #E24B4A, #ff6b6b); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" title="Needs (Target 50%)">{{ monthlySummary()!.needsPercent | number:'1.0-0' }}%</div>
+            <div [style.width.%]="monthlySummary()!.wantsPercent" style="background: linear-gradient(90deg, #BA7517, #FAC775); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" title="Wants (Target 30%)">{{ monthlySummary()!.wantsPercent | number:'1.0-0' }}%</div>
+            <div [style.width.%]="monthlySummary()!.savingsPercent" style="background: linear-gradient(90deg, #1D9E75, #5DCAA5); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" title="Savings (Target 20%)">{{ monthlySummary()!.savingsPercent | number:'1.0-0' }}%</div>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.8rem;" class="tech">
-            <span style="color: #E24B4A">NEEDS (50%)</span>
-            <span style="color: #FAC775">WANTS (30%)</span>
-            <span style="color: #1D9E75">SAVINGS (20%)</span>
+          <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.8rem;" class="tech">
+            <span style="color: #ff6b6b; font-weight: 600;">NEEDS (50%)</span>
+            <span style="color: #FAC775; font-weight: 600;">WANTS (30%)</span>
+            <span style="color: #5DCAA5; font-weight: 600;">SAVINGS (20%)</span>
           </div>
         </div>
       </div>
 
       <!-- 3. Quick Expense Logger -->
-      <div class="system-card block" style="grid-column: 1 / -1; border-color: #378ADD;">
-        <h3 class="mono head" style="color: #378ADD;">◈ QUICK EXPENSE LOGGER</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-bottom: 24px;">
+      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(55, 138, 221, 0.4);">
+        <h3 class="mono head" style="color: #4fc3f7; text-shadow: 0 0 10px rgba(79, 195, 247, 0.3);">◈ QUICK EXPENSE LOGGER</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 16px; margin-bottom: 24px;">
           <button *ngFor="let cat of quickExpenseCategories" 
                   class="btn" 
                   [class.active]="newExpense.category === cat.cat"
                   (click)="setQuickCategory(cat.cat)"
-                  style="display: flex; flex-direction: column; align-items: center; padding: 12px 8px; gap: 8px;">
-            <span style="font-size: 1.5rem;">{{ cat.icon }}</span>
-            <span class="tech" style="font-size: 0.7rem;">{{ cat.label }}</span>
+                  style="display: flex; flex-direction: column; align-items: center; padding: 16px 12px; gap: 12px; border-radius: 12px;">
+            <span style="font-size: 1.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">{{ cat.icon }}</span>
+            <span class="tech" style="font-size: 0.75rem; letter-spacing: 0.5px;">{{ cat.label }}</span>
           </button>
         </div>
         
-        <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-          <input type="number" class="sys-input" placeholder="Amount (₹)" [(ngModel)]="newExpense.amount" style="flex: 1; min-width: 150px; font-size: 1.2rem; font-family: monospace;" />
-          <input type="text" class="sys-input" placeholder="Description (Optional)" [(ngModel)]="newExpense.description" style="flex: 2; min-width: 200px;" />
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <label class="tech" style="color: #8a8a9a;">Type:</label>
-            <select class="sys-input" [(ngModel)]="newExpense.isEssential" style="width: auto;">
+        <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+          <input type="number" class="premium-input" placeholder="Amount (₹)" [(ngModel)]="newExpense.amount" style="flex: 1; min-width: 150px; font-size: 1.2rem; font-family: monospace;" />
+          <input type="text" class="premium-input" placeholder="Description (Optional)" [(ngModel)]="newExpense.description" style="flex: 2; min-width: 200px;" />
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <label class="tech" style="color: #a0aabf;">Type:</label>
+            <select class="premium-input" [(ngModel)]="newExpense.isEssential" style="width: auto; padding: 12px;">
               <option [ngValue]="true">NEED</option>
               <option [ngValue]="false">WANT</option>
             </select>
           </div>
-          <button class="btn full" (click)="logExpense()" style="background: rgba(55, 138, 221, 0.1); border-color: #378ADD; color: #378ADD; white-space: nowrap; padding: 0 32px;">LOG IT</button>
+          <button class="sys-btn-primary" (click)="logExpense()" style="white-space: nowrap; padding: 0 32px; min-width: 140px;">LOG IT</button>
         </div>
 
         <div *ngIf="expenses().length > 0">
-          <h4 class="tech" style="color: #8a8a9a; margin-bottom: 12px;">RECENT LOGS</h4>
-          <div *ngFor="let e of expenses().slice(0, 5)" style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="font-size: 1.2rem;">{{ getCategoryIcon(e.category) }}</span>
+          <h4 class="tech" style="color: #a0aabf; margin-bottom: 16px; letter-spacing: 1px;">RECENT LOGS</h4>
+          <div *ngFor="let e of expenses().slice(0, 5)" class="log-item" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 1.5rem; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">{{ getCategoryIcon(e.category) }}</span>
               <div>
-                <div class="pn" style="font-size: 1rem;">{{ e.description || e.category }}</div>
-                <div class="tech" style="font-size: 0.7rem;" [style.color]="e.isEssential ? '#1D9E75' : '#FAC775'">{{ e.isEssential ? 'NEED' : 'WANT' }} • {{ e.expenseDate }}</div>
+                <div class="pn" style="font-size: 1.1rem; color: #fff; margin-bottom: 4px;">{{ e.description || e.category }}</div>
+                <div class="tech" style="font-size: 0.8rem;" [style.color]="e.isEssential ? '#5DCAA5' : '#FAC775'">{{ e.isEssential ? 'NEED' : 'WANT' }} • {{ e.expenseDate }}</div>
               </div>
             </div>
-            <div class="mono" style="color: #fff; font-size: 1.1rem;">₹{{ e.amount }}</div>
+            <div class="mono" style="color: #fff; font-size: 1.3rem;">₹{{ e.amount }}</div>
           </div>
         </div>
       </div>
 
       <!-- 4. Weekly Summary -->
-      <div class="system-card block" style="border-color: #FAC775;" *ngIf="weeklySummary()">
-        <h3 class="mono head" style="color: #FAC775;">◈ WEEKLY PACING</h3>
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SPENT THIS WEEK</div>
-          <div class="mono" style="font-size: 2.5rem; color: #fff;">₹{{ weeklySummary()!.totalSpent }}</div>
+      <div class="glass-card" style="border-color: rgba(250, 199, 117, 0.4);" *ngIf="weeklySummary()">
+        <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.3);">◈ WEEKLY PACING</h3>
+        <div style="text-align: center; margin-bottom: 24px; background: rgba(0,0,0,0.3); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+          <div class="tech" style="color: #a0aabf; margin-bottom: 12px; font-size: 0.85rem; letter-spacing: 1px;">SPENT THIS WEEK</div>
+          <div class="mono" style="font-size: 3rem; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.2); line-height: 1;">₹{{ weeklySummary()!.totalSpent }}</div>
           
-          <div class="tech" style="margin-top: 12px; padding: 8px; border-radius: 4px; display: inline-block;"
-               [style.background]="weeklySummary()!.changePercent > 0 ? 'rgba(226, 75, 74, 0.1)' : 'rgba(29, 158, 117, 0.1)'"
-               [style.color]="weeklySummary()!.changePercent > 0 ? '#E24B4A' : '#1D9E75'">
+          <div class="tech" style="margin-top: 16px; padding: 8px 16px; border-radius: 8px; display: inline-block; font-weight: 600;"
+               [style.background]="weeklySummary()!.changePercent > 0 ? 'rgba(226, 75, 74, 0.15)' : 'rgba(29, 158, 117, 0.15)'"
+               [style.color]="weeklySummary()!.changePercent > 0 ? '#ff6b6b' : '#5DCAA5'"
+               [style.border]="'1px solid ' + (weeklySummary()!.changePercent > 0 ? 'rgba(226, 75, 74, 0.3)' : 'rgba(29, 158, 117, 0.3)')">
             {{ weeklySummary()!.changePercent > 0 ? '↑' : '↓' }} {{ weeklySummary()!.changePercent | number:'1.0-1' }}% vs last week (₹{{ weeklySummary()!.lastWeekTotal }})
           </div>
         </div>
         
-        <div class="tech" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #8a8a9a;">
-          <span>Daily Avg: <span class="mono" style="color: #fff">₹{{ weeklySummary()!.dailyAverage | number:'1.0-0' }}</span></span>
-          <span>Top Cat: <span style="color: #FAC775">{{ weeklySummary()!.topCategory }}</span></span>
+        <div class="tech" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #a0aabf; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+          <span>Daily Avg: <span class="mono" style="color: #fff; font-size: 1.1rem; margin-left: 8px;">₹{{ weeklySummary()!.dailyAverage | number:'1.0-0' }}</span></span>
+          <span>Top Cat: <span style="color: #FAC775; font-size: 1.1rem; margin-left: 8px;">{{ weeklySummary()!.topCategory }}</span></span>
         </div>
       </div>
 
       <!-- 5. Monthly Breakdown Chart -->
-      <div class="system-card block" style="border-color: #378ADD;" *ngIf="monthlySummary()">
-        <h3 class="mono head" style="color: #378ADD;">◈ MONTHLY BREAKDOWN</h3>
-        <div style="width: 100%; max-width: 250px; margin: 0 auto 24px; position: relative;">
+      <div class="glass-card" style="border-color: rgba(55, 138, 221, 0.3);" *ngIf="monthlySummary()">
+        <h3 class="mono head" style="color: #4fc3f7; text-shadow: 0 0 10px rgba(79, 195, 247, 0.3);">◈ MONTHLY BREAKDOWN</h3>
+        <div style="width: 100%; max-width: 250px; margin: 20px auto 32px; position: relative;">
           <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions" [type]="doughnutChartType"></canvas>
         </div>
         
-        <div class="tech" style="color: #8a8a9a; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">CATEGORY TOTALS</div>
-        <div style="max-height: 200px; overflow-y: auto;">
-          <div *ngFor="let kv of monthlySummary()!.categoryBreakdown | keyvalue" style="display: flex; justify-content: space-between; padding: 6px 0;">
-            <span class="tech" style="font-size: 0.8rem;">{{ kv.key }}</span>
-            <span class="mono" style="color: #FAC775;">₹{{ kv.value }}</span>
+        <div class="tech" style="color: #a0aabf; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; font-weight: 600; letter-spacing: 1px;">CATEGORY TOTALS</div>
+        <div style="max-height: 250px; overflow-y: auto; padding-right: 8px;" class="custom-scrollbar">
+          <div *ngFor="let kv of monthlySummary()!.categoryBreakdown | keyvalue" style="display: flex; justify-content: space-between; padding: 12px 16px; background: rgba(0,0,0,0.3); margin-bottom: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <span class="tech" style="font-size: 0.9rem; color: #fff;">{{ kv.key }}</span>
+            <span class="mono" style="color: #FAC775; font-size: 1.1rem;">₹{{ kv.value }}</span>
           </div>
         </div>
       </div>
 
       <!-- 6. EMI & Loan Tracker -->
-      <div class="system-card block" style="grid-column: 1 / -1; border-color: #E24B4A;">
-        <h3 class="mono head" style="color: #E24B4A; display: flex; justify-content: space-between;">
+      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(226, 75, 74, 0.4);">
+        <h3 class="mono head" style="color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4); display: flex; justify-content: space-between;">
           <span>◈ LIABILITIES & EMI</span>
-          <button class="btn sm" (click)="showEmiForm = !showEmiForm" style="border-color: #E24B4A; color: #E24B4A;">+ ADD LOAN</button>
+          <button class="sys-btn-secondary" (click)="showEmiForm = !showEmiForm" style="color: #ff6b6b; border-color: rgba(226, 75, 74, 0.5);">+ ADD LOAN</button>
         </h3>
         
-        <div *ngIf="showEmiForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 12px;">
-            <input type="text" class="sys-input" placeholder="Loan Name" [(ngModel)]="newEmi.loanName" />
-            <input type="number" class="sys-input" placeholder="Principal (₹)" [(ngModel)]="newEmi.principalAmount" (change)="calculateEmiAmount()" />
-            <input type="number" class="sys-input" placeholder="Interest Rate (%)" [(ngModel)]="newEmi.interestRate" (change)="calculateEmiAmount()" />
-            <input type="number" class="sys-input" placeholder="Tenure (Months)" [(ngModel)]="newEmi.tenureMonths" (change)="calculateEmiAmount()" />
-            <input type="number" class="sys-input" placeholder="Monthly EMI (₹)" [(ngModel)]="newEmi.emiAmount" />
+        <div *ngIf="showEmiForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
+            <input type="text" class="premium-input" placeholder="Loan Name" [(ngModel)]="newEmi.loanName" />
+            <input type="number" class="premium-input" placeholder="Principal (₹)" [(ngModel)]="newEmi.principalAmount" (change)="calculateEmiAmount()" />
+            <input type="number" class="premium-input" placeholder="Interest Rate (%)" [(ngModel)]="newEmi.interestRate" (change)="calculateEmiAmount()" />
+            <input type="number" class="premium-input" placeholder="Tenure (Months)" [(ngModel)]="newEmi.tenureMonths" (change)="calculateEmiAmount()" />
+            <input type="number" class="premium-input" placeholder="Monthly EMI (₹)" [(ngModel)]="newEmi.emiAmount" />
           </div>
-          <button class="btn full" (click)="addEmi()" style="background: rgba(226, 75, 74, 0.1); border-color: #E24B4A; color: #E24B4A;">SAVE LIABILITY</button>
+          <button class="sys-btn-primary" (click)="addEmi()" style="background: linear-gradient(180deg, #E24B4A, #b73232); border-color: #ff6b6b; box-shadow: 0 4px 15px rgba(226, 75, 74, 0.4);">SAVE LIABILITY</button>
         </div>
 
-        <div *ngIf="emis().length === 0 && !showEmiForm" class="tech empty">No active liabilities. Freedom!</div>
+        <div *ngIf="emis().length === 0 && !showEmiForm" class="tech empty" style="text-align: center; padding: 32px; background: rgba(0,0,0,0.2); border-radius: 12px; color: #a0aabf;">No active liabilities. Freedom!</div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
-          <div *ngFor="let emi of emis()" style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; border: 1px solid rgba(226, 75, 74, 0.3);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <span class="pn" style="font-size: 1.1rem; color: #fff;">{{ emi.loanName }}</span>
-              <span class="mono" style="color: #E24B4A;">₹{{ emi.emiAmount }}/mo</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+          <div *ngFor="let emi of emis()" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid rgba(226, 75, 74, 0.3); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
+              <span class="pn" style="font-size: 1.2rem; color: #fff;">{{ emi.loanName }}</span>
+              <span class="mono" style="color: #ff6b6b; font-size: 1.3rem;">₹{{ emi.emiAmount }}/mo</span>
             </div>
             
-            <div class="tech" style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #8a8a9a; margin-bottom: 4px;">
-              <span>Remaining: ₹{{ emi.remainingAmount }}</span>
-              <span>Paid: ₹{{ emi.totalPaid }}</span>
+            <div class="tech" style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #a0aabf; margin-bottom: 8px;">
+              <span>Remaining: <span style="color: #fff">₹{{ emi.remainingAmount }}</span></span>
+              <span>Paid: <span style="color: #fff">₹{{ emi.totalPaid }}</span></span>
             </div>
             
-            <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 12px;">
-              <div class="gap-fill" [style.width.%]="(emi.totalPaid / emi.principalAmount) * 100" style="background: #E24B4A; height: 100%;"></div>
+            <div class="bar-bg" style="margin-bottom: 16px;">
+              <div class="bar-fill" [style.width.%]="(emi.totalPaid / emi.principalAmount) * 100" style="background: linear-gradient(90deg, #E24B4A, #ff6b6b); box-shadow: 0 0 10px rgba(226, 75, 74, 0.4);"></div>
             </div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span class="tech dl" style="color: #FAC775; font-size: 0.8rem;">Due: {{ emi.nextDueDate || 'TBD' }}</span>
-              <button class="btn sm" (click)="payEmi(emi.id)" style="border-color: #1D9E75; color: #1D9E75;">PAY EMI</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+              <span class="tech dl" style="color: #FAC775; font-size: 0.85rem; background: rgba(250, 199, 117, 0.1); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(250, 199, 117, 0.3);">Due: {{ emi.nextDueDate || 'TBD' }}</span>
+              <button class="sys-btn-secondary" (click)="payEmi(emi.id)" style="color: #5DCAA5; border-color: rgba(93, 202, 165, 0.5);">PAY EMI</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 7. Subscriptions -->
-      <div class="system-card block" style="border-color: #BA7517;">
-        <h3 class="mono head" style="color: #BA7517; display: flex; justify-content: space-between;">
+      <div class="glass-card" style="border-color: rgba(186, 117, 23, 0.4);">
+        <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.4); display: flex; justify-content: space-between;">
           <span>◈ SUBSCRIPTIONS</span>
-          <button class="btn sm" (click)="showSubForm = !showSubForm" style="border-color: #BA7517; color: #BA7517;">+ ADD</button>
+          <button class="sys-btn-secondary" (click)="showSubForm = !showSubForm" style="color: #FAC775; border-color: rgba(250, 199, 117, 0.5);">+ ADD</button>
         </h3>
         
-        <div *ngIf="showSubForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-          <input type="text" class="sys-input" placeholder="Name (e.g. Netflix)" [(ngModel)]="newSub.name" style="width: 100%; margin-bottom: 12px;" />
-          <input type="number" class="sys-input" placeholder="Amount (₹)" [(ngModel)]="newSub.amount" style="width: 100%; margin-bottom: 12px;" />
-          <button class="btn full" (click)="addSubscription()" style="background: rgba(186, 117, 23, 0.1); border-color: #BA7517; color: #BA7517;">ADD SUB</button>
+        <div *ngIf="showSubForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
+          <input type="text" class="premium-input" placeholder="Name (e.g. Netflix)" [(ngModel)]="newSub.name" style="width: 100%; margin-bottom: 12px;" />
+          <input type="number" class="premium-input" placeholder="Amount (₹)" [(ngModel)]="newSub.amount" style="width: 100%; margin-bottom: 16px;" />
+          <button class="sys-btn-primary" (click)="addSubscription()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; box-shadow: 0 4px 15px rgba(186, 117, 23, 0.4);">ADD SUB</button>
         </div>
 
-        <div *ngFor="let s of subscriptions()" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 8px;" [style.opacity]="s.isActive ? '1' : '0.5'">
+        <div *ngFor="let s of subscriptions()" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;" [style.opacity]="s.isActive ? '1' : '0.5'">
           <div>
-            <div class="pn">{{ s.name }}</div>
-            <div class="tech" style="font-size: 0.7rem; color: #8a8a9a;">{{ s.frequency }}</div>
+            <div class="pn" style="font-size: 1.1rem; color: #fff; margin-bottom: 4px;">{{ s.name }}</div>
+            <div class="tech" style="font-size: 0.8rem; color: #a0aabf; letter-spacing: 1px;">{{ s.frequency }}</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <span class="mono">₹{{ s.amount }}</span>
-            <button class="btn sm" (click)="toggleSub(s.id)" [style.border-color]="s.isActive ? '#E24B4A' : '#1D9E75'" [style.color]="s.isActive ? '#E24B4A' : '#1D9E75'">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <span class="mono" style="font-size: 1.2rem; color: #fff;">₹{{ s.amount }}</span>
+            <button class="sys-btn-secondary" (click)="toggleSub(s.id)" [style.border-color]="s.isActive ? 'rgba(226, 75, 74, 0.5)' : 'rgba(93, 202, 165, 0.5)'" [style.color]="s.isActive ? '#ff6b6b' : '#5DCAA5'">
               {{ s.isActive ? 'CANCEL' : 'ACTIVATE' }}
             </button>
           </div>
@@ -472,50 +503,50 @@
       </div>
 
       <!-- 8. AI Spending Analyst -->
-      <div class="system-card block" style="border-color: #534AB7;">
-        <h3 class="mono head" style="color: #534AB7;">◈ AI ANALYST</h3>
-        <div style="text-align: center; padding: 16px 0;">
-          <div class="tech" style="color: #8a8a9a; margin-bottom: 16px;">Detect leaks, unwanted spending, and optimize your wealth.</div>
-          <button class="btn" (click)="analyzeWealth()" [disabled]="isAnalyzingWealth()" style="border-color: #534AB7; color: #534AB7; padding: 12px 24px;">
+      <div class="glass-card" style="border-color: rgba(108, 99, 255, 0.4);">
+        <h3 class="mono head" style="color: #b3aef0; text-shadow: 0 0 10px rgba(108, 99, 255, 0.4);">◈ AI ANALYST</h3>
+        <div style="text-align: center; padding: 24px 0;">
+          <div class="tech" style="color: #a0aabf; margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Detect leaks, unwanted spending, and optimize your wealth.</div>
+          <button class="sys-btn-primary" (click)="analyzeWealth()" [disabled]="isAnalyzingWealth()" style="padding: 16px 32px; font-size: 1.1rem;">
             {{ isAnalyzingWealth() ? 'ANALYZING...' : 'RUN DEEP ANALYSIS' }}
           </button>
         </div>
         
-        <div *ngIf="aiAnalysis()" @fadeInUp style="margin-top: 16px; padding: 16px; background: rgba(83, 74, 183, 0.1); border-left: 3px solid #534AB7; border-radius: 4px;">
-          <p class="pn" style="line-height: 1.6; font-size: 0.95rem; white-space: pre-wrap;">{{ aiAnalysis() }}</p>
+        <div *ngIf="aiAnalysis()" @fadeInUp style="margin-top: 24px; padding: 24px; background: linear-gradient(160deg, rgba(83, 74, 183, 0.15), rgba(10, 10, 20, 0.5)); border: 1px solid rgba(108, 99, 255, 0.3); border-left: 4px solid #6C63FF; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+          <p class="pn" style="line-height: 1.8; font-size: 1rem; white-space: pre-wrap; color: #EEF3FA;">{{ aiAnalysis() }}</p>
         </div>
       </div>
 
       <!-- 9. Savings Goals -->
-      <div class="system-card block" style="grid-column: 1 / -1;">
-        <h3 class="mono head" style="color: #1D9E75; display: flex; justify-content: space-between;">
+      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(29, 158, 117, 0.4);">
+        <h3 class="mono head" style="color: #5DCAA5; text-shadow: 0 0 10px rgba(29, 158, 117, 0.4); display: flex; justify-content: space-between;">
           <span>◈ SAVINGS GOALS</span>
-          <button class="btn sm" (click)="showGoalForm = !showGoalForm" style="border-color: #1D9E75; color: #1D9E75;">+ NEW GOAL</button>
+          <button class="sys-btn-secondary" (click)="showGoalForm = !showGoalForm" style="color: #5DCAA5; border-color: rgba(29, 158, 117, 0.5);">+ NEW GOAL</button>
         </h3>
         
-        <div *ngIf="showGoalForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-          <input type="text" class="sys-input" placeholder="Goal Name (e.g. Emergency Fund)" [(ngModel)]="newGoal.goalName" style="width: 100%; margin-bottom: 12px;" />
-          <input type="number" class="sys-input" placeholder="Target Amount (₹)" [(ngModel)]="newGoal.target" style="width: 100%; margin-bottom: 12px;" />
-          <button class="btn full" (click)="addGoal()" style="background: rgba(29, 158, 117, 0.1); border-color: #1D9E75; color: #1D9E75;">START SAVING</button>
+        <div *ngIf="showGoalForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05);">
+          <input type="text" class="premium-input" placeholder="Goal Name (e.g. Emergency Fund)" [(ngModel)]="newGoal.goalName" style="width: 100%; margin-bottom: 16px;" />
+          <input type="number" class="premium-input" placeholder="Target Amount (₹)" [(ngModel)]="newGoal.target" style="width: 100%; margin-bottom: 20px;" />
+          <button class="sys-btn-primary" (click)="addGoal()" style="background: linear-gradient(180deg, #1D9E75, #147354); border-color: #5DCAA5; box-shadow: 0 4px 15px rgba(29, 158, 117, 0.4);">START SAVING</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-          <div class="goal" *ngFor="let g of goals()" style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px;">
-            <div class="goal-head" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-              <span class="pn" style="font-size: 1.1rem;">{{ g.goalName }}</span>
-              <span class="mono gv" style="color: #1D9E75;">₹{{ g.current }} / ₹{{ g.target }}</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+          <div class="goal" *ngFor="let g of goals()" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid rgba(29, 158, 117, 0.3); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+            <div class="goal-head" style="display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center;">
+              <span class="pn" style="font-size: 1.2rem; color: #fff;">{{ g.goalName }}</span>
+              <span class="mono gv" style="color: #5DCAA5; font-size: 1.1rem;">₹{{ g.current }} / ₹{{ g.target }}</span>
             </div>
-            <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
-              <div class="gap-fill" [style.width.%]="goalPct(g)" style="background: linear-gradient(90deg, #1D9E75, #378ADD); height: 100%;"></div>
+            <div class="bar-bg" style="margin-bottom: 16px; height: 10px;">
+              <div class="bar-fill" [style.width.%]="goalPct(g)" style="background: linear-gradient(90deg, #1D9E75, #4fc3f7); box-shadow: 0 0 10px rgba(29, 158, 117, 0.4);"></div>
             </div>
-            <div class="goal-actions" style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="goal-actions" style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px;">
               <div>
-                <span class="tech dl" *ngIf="g.deadline" style="color: #8a8a9a; font-size: 0.8rem; margin-right: 12px;">due {{ g.deadline }}</span>
-                <span class="done tech" *ngIf="g.achieved" style="color: #1D9E75; font-size: 0.8rem; letter-spacing: 1px;">✓ ACHIEVED</span>
+                <span class="tech dl" *ngIf="g.deadline" style="color: #a0aabf; font-size: 0.85rem; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px;">due {{ g.deadline }}</span>
+                <span class="done tech" *ngIf="g.achieved" style="color: #5DCAA5; font-size: 0.9rem; letter-spacing: 1px; font-weight: 700; text-shadow: 0 0 10px rgba(93, 202, 165, 0.5);">✓ ACHIEVED</span>
               </div>
-              <div style="display: flex; gap: 8px;">
-                <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="bumpGoal(g, 500)">+₹500</button>
-                <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="bumpGoal(g, 100)">+₹100</button>
+              <div style="display: flex; gap: 12px;">
+                <button class="sys-btn-secondary" style="border-color: rgba(29, 158, 117, 0.5); color: #5DCAA5;" (click)="bumpGoal(g, 500)">+₹500</button>
+                <button class="sys-btn-secondary" style="border-color: rgba(29, 158, 117, 0.5); color: #5DCAA5;" (click)="bumpGoal(g, 100)">+₹100</button>
               </div>
             </div>
           </div>
