@@ -8,7 +8,8 @@ import {
   EnglishLog, VocabularyLog, BodyLog, RelationshipLog,
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
   SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player, NoFapStatus,
-  NetWorthLog, SocialConnection, PlayerConfig
+  NetWorthLog, SocialConnection, PlayerConfig,
+  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -54,6 +55,33 @@ export class LifeOsService {
 
   getNetWorthHistory(): Observable<NetWorthLog[]> { return this.http.get<NetWorthLog[]>(`${this.api}/wealth/net-worth`); }
   logNetWorth(b: NetWorthLog): Observable<NetWorthLog> { return this.http.post<NetWorthLog>(`${this.api}/wealth/net-worth`, b); }
+
+  // Expenses
+  logExpense(b: ExpenseLog): Observable<ExpenseLog> { return this.http.post<ExpenseLog>(`${this.api}/wealth/expenses`, b); }
+  getExpenses(start?: string, end?: string): Observable<ExpenseLog[]> { 
+    let query = '';
+    if (start && end) query = `?start=${start}&end=${end}`;
+    return this.http.get<ExpenseLog[]>(`${this.api}/wealth/expenses${query}`); 
+  }
+  
+  // Summaries
+  getWeeklySummary(): Observable<WeeklySummary> { return this.http.get<WeeklySummary>(`${this.api}/wealth/summary/weekly`); }
+  getMonthlySummary(): Observable<MonthlySummary> { return this.http.get<MonthlySummary>(`${this.api}/wealth/summary/monthly`); }
+  
+  // Analysis
+  getExpenseAnalysis(): Observable<any> { return this.http.get<any>(`${this.api}/wealth/analysis`); }
+  getAiSpendingAnalysis(): Observable<string> { return this.http.get(`${this.api}/wealth/analysis/ai`, { responseType: 'text' }); }
+  
+  // EMI
+  addEmi(b: EmiEntry): Observable<EmiEntry> { return this.http.post<EmiEntry>(`${this.api}/wealth/emi`, b); }
+  getEmis(): Observable<EmiEntry[]> { return this.http.get<EmiEntry[]>(`${this.api}/wealth/emi`); }
+  payEmi(id: number): Observable<EmiEntry> { return this.http.put<EmiEntry>(`${this.api}/wealth/emi/${id}/pay`, {}); }
+  deleteEmi(id: number): Observable<void> { return this.http.delete<void>(`${this.api}/wealth/emi/${id}`); }
+  
+  // Subscriptions
+  addSubscription(b: SubscriptionEntry): Observable<SubscriptionEntry> { return this.http.post<SubscriptionEntry>(`${this.api}/wealth/subscriptions`, b); }
+  getSubscriptions(): Observable<SubscriptionEntry[]> { return this.http.get<SubscriptionEntry[]>(`${this.api}/wealth/subscriptions`); }
+  toggleSubscription(id: number): Observable<SubscriptionEntry> { return this.http.put<SubscriptionEntry>(`${this.api}/wealth/subscriptions/${id}/toggle`, {}); }
 
   /* ===== Health OS ===== */
   getHealthToday(): Observable<HealthLog> { return this.http.get<HealthLog>(`${this.api}/health/today`); }

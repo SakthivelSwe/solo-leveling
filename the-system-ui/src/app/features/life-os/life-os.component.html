@@ -272,7 +272,7 @@
            role="tabpanel" id="panel-WEALTH" aria-labelledby="tab-WEALTH">
     <div class="cards">
       
-      <!-- Wisdom Engine Carousel -->
+      <!-- 1. Wisdom Engine Carousel -->
       <div class="system-card block" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: #FAC775; background: linear-gradient(90deg, rgba(250, 199, 117, 0.05), transparent);">
         <div style="text-align: center; max-width: 800px; padding: 24px;">
           <h3 class="mono tech" style="color: #FAC775; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.8rem;">◈ WISDOM ENGINE</h3>
@@ -283,106 +283,283 @@
         </div>
       </div>
 
-      <!-- Cash Flow Ledger & Chart -->
-      <div class="system-card block" style="display: flex; flex-direction: column; align-items: center;">
-        <h3 class="mono head" style="width: 100%; color: #FAC775; display: flex; justify-content: space-between;">
-          <span>◈ CASH FLOW (LATEST)</span>
-          <button class="btn sm" (click)="showBudgetForm = !showBudgetForm" style="border-color: #FAC775; color: #FAC775;">+ UPDATE BUDGET</button>
-        </h3>
-        
-        <div *ngIf="showBudgetForm" class="form-panel" style="width: 100%; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-top: 16px;">
-          <h4 class="tech" style="color: #FAC775; margin-bottom: 12px;">NEW BUDGET LOG</h4>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <input type="number" class="sys-input" placeholder="Salary (₹)" [(ngModel)]="newBudget.salary" />
-            <input type="number" class="sys-input" placeholder="PG / Rent (₹)" [(ngModel)]="newBudget.pgRent" />
-            <input type="number" class="sys-input" placeholder="Food (Outside) (₹)" [(ngModel)]="newBudget.foodSpend" />
-            <input type="number" class="sys-input" placeholder="Transport (₹)" [(ngModel)]="newBudget.transport" />
-            <input type="number" class="sys-input" placeholder="Online Orders (₹)" [(ngModel)]="newBudget.onlineOrders" />
-            <input type="number" class="sys-input" placeholder="Misc (₹)" [(ngModel)]="newBudget.misc" />
-            <input type="number" class="sys-input" placeholder="Invested in SIP (₹)" [(ngModel)]="newBudget.sipAmount" />
-            <input type="number" class="sys-input" placeholder="Cash Saved (₹)" [(ngModel)]="newBudget.saved" />
-          </div>
-          <button class="btn full" (click)="saveBudget()" style="background: rgba(250, 199, 117, 0.1); border-color: #FAC775; color: #FAC775;">SAVE BUDGET</button>
-        </div>
-
-        <div *ngIf="budgets().length === 0 && !showBudgetForm" class="tech empty" style="margin-top: 24px;">No budget data found for this month.</div>
-        <div *ngIf="budgets().length > 0" style="width: 100%; max-width: 300px; margin-top: 24px; position: relative;">
-          <canvas baseChart
-            [data]="doughnutChartData"
-            [options]="doughnutChartOptions"
-            [type]="doughnutChartType">
-          </canvas>
-          <!-- Central Overlay Data -->
-          <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-            <div class="tech" style="font-size: 0.8rem; color: #8a8a9a;">SALARY</div>
-            <div class="mono" style="font-size: 1.5rem; color: #FAC775;">₹{{ budgets()[0].salary }}</div>
-          </div>
-        </div>
-        
-        <div *ngIf="budgets().length > 0" class="mobile-stack" style="width: 100%; margin-top: 32px; display: grid; grid-template-columns: 1fr; gap: 16px;">
-           <div style="background: rgba(226, 75, 74, 0.1); border-left: 3px solid #E24B4A; padding: 12px;">
-             <div class="tech" style="font-size: 0.7rem; color: #8a8a9a; margin-bottom: 4px;">FIXED + VARIABLE EXPENSES</div>
-             <div class="mono" style="color: #E24B4A; font-size: 1.2rem;">₹{{ budgets()[0].pgRent + budgets()[0].foodSpend + budgets()[0].transport + budgets()[0].onlineOrders + budgets()[0].misc }}</div>
-           </div>
-           <div style="background: rgba(29, 158, 117, 0.1); border-left: 3px solid #1D9E75; padding: 12px;">
-             <div class="tech" style="font-size: 0.7rem; color: #8a8a9a; margin-bottom: 4px;">SAVINGS + SIP</div>
-             <div class="mono" style="color: #1D9E75; font-size: 1.2rem;">₹{{ budgets()[0].saved + budgets()[0].sipAmount }}</div>
-           </div>
-        </div>
-      </div>
-
-      <!-- Net Worth -->
-      <div class="system-card block" style="border-color: #1D9E75;">
-        <h3 class="mono head" style="color: #1D9E75; display: flex; justify-content: space-between;">
-          <span>◈ NET WORTH</span>
-          <button class="btn sm" (click)="showNetWorthForm = !showNetWorthForm" style="border-color: #1D9E75; color: #1D9E75;">+ LOG</button>
-        </h3>
-        
-        <div *ngIf="showNetWorthForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-          <input type="number" class="sys-input" placeholder="Total Assets (₹)" [(ngModel)]="newNetWorth.totalAssets" style="width: 100%; margin-bottom: 12px;" />
-          <input type="number" class="sys-input" placeholder="Total Liabilities (₹)" [(ngModel)]="newNetWorth.totalLiabilities" style="width: 100%; margin-bottom: 12px;" />
-          <button class="btn full" (click)="saveNetWorth()" style="background: rgba(29, 158, 117, 0.1); border-color: #1D9E75; color: #1D9E75;">SAVE NET WORTH</button>
-        </div>
-        
-        <div *ngIf="netWorthHistory().length > 0" style="margin-bottom: 24px;">
-          <div style="background: rgba(29, 158, 117, 0.1); padding: 16px; border-radius: 8px; text-align: center;">
-            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">CURRENT NET WORTH</div>
-            <div class="mono" style="color: #1D9E75; font-size: 2rem;">₹{{ netWorthHistory()[0].netWorth }}</div>
-            <div class="tech" style="color: #FAC775; margin-top: 8px;">RUNWAY: {{ netWorthHistory()[0].cashRunwayMonths | number:'1.1-1' }} MONTHS</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Savings Goals -->
-      <div class="system-card block">
+      <!-- 2. Monthly Overview Dashboard -->
+      <div class="system-card block" style="grid-column: 1 / -1; display: flex; flex-direction: column; border-color: #FAC775;">
         <h3 class="mono head" style="color: #FAC775; display: flex; justify-content: space-between;">
+          <span>◈ MONTHLY OVERVIEW</span>
+          <span class="tech" *ngIf="monthlySummary()" [style.color]="monthlySummary()!.savingsRate >= 20 ? '#1D9E75' : '#E24B4A'">
+            SAVINGS RATE: {{ monthlySummary()!.savingsRate | number:'1.0-1' }}%
+          </span>
+        </h3>
+        
+        <div *ngIf="monthlySummary()" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+           <div style="background: rgba(29, 158, 117, 0.1); border-left: 3px solid #1D9E75; padding: 16px;">
+             <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">INCOME</div>
+             <div class="mono" style="color: #1D9E75; font-size: 1.8rem;">₹{{ monthlySummary()!.totalIncome }}</div>
+           </div>
+           <div style="background: rgba(226, 75, 74, 0.1); border-left: 3px solid #E24B4A; padding: 16px;">
+             <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">EXPENSES</div>
+             <div class="mono" style="color: #E24B4A; font-size: 1.8rem;">₹{{ monthlySummary()!.totalExpenses + monthlySummary()!.emiTotal + monthlySummary()!.subscriptionTotal }}</div>
+           </div>
+           <div style="background: rgba(55, 138, 221, 0.1); border-left: 3px solid #378ADD; padding: 16px;">
+             <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SAVED</div>
+             <div class="mono" style="color: #378ADD; font-size: 1.8rem;">₹{{ monthlySummary()!.totalSaved }}</div>
+           </div>
+        </div>
+
+        <div *ngIf="monthlySummary()">
+          <div class="tech" style="margin-bottom: 8px; color: #8a8a9a;">50-30-20 BUDGET HEALTH</div>
+          <div style="display: flex; height: 16px; border-radius: 8px; overflow: hidden;">
+            <div [style.width.%]="monthlySummary()!.needsPercent" style="background: #E24B4A; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="Needs (Target 50%)">{{ monthlySummary()!.needsPercent | number:'1.0-0' }}%</div>
+            <div [style.width.%]="monthlySummary()!.wantsPercent" style="background: #FAC775; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="Wants (Target 30%)">{{ monthlySummary()!.wantsPercent | number:'1.0-0' }}%</div>
+            <div [style.width.%]="monthlySummary()!.savingsPercent" style="background: #1D9E75; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="Savings (Target 20%)">{{ monthlySummary()!.savingsPercent | number:'1.0-0' }}%</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.8rem;" class="tech">
+            <span style="color: #E24B4A">NEEDS (50%)</span>
+            <span style="color: #FAC775">WANTS (30%)</span>
+            <span style="color: #1D9E75">SAVINGS (20%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Quick Expense Logger -->
+      <div class="system-card block" style="grid-column: 1 / -1; border-color: #378ADD;">
+        <h3 class="mono head" style="color: #378ADD;">◈ QUICK EXPENSE LOGGER</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-bottom: 24px;">
+          <button *ngFor="let cat of quickExpenseCategories" 
+                  class="btn" 
+                  [class.active]="newExpense.category === cat.cat"
+                  (click)="setQuickCategory(cat.cat)"
+                  style="display: flex; flex-direction: column; align-items: center; padding: 12px 8px; gap: 8px;">
+            <span style="font-size: 1.5rem;">{{ cat.icon }}</span>
+            <span class="tech" style="font-size: 0.7rem;">{{ cat.label }}</span>
+          </button>
+        </div>
+        
+        <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+          <input type="number" class="sys-input" placeholder="Amount (₹)" [(ngModel)]="newExpense.amount" style="flex: 1; min-width: 150px; font-size: 1.2rem; font-family: monospace;" />
+          <input type="text" class="sys-input" placeholder="Description (Optional)" [(ngModel)]="newExpense.description" style="flex: 2; min-width: 200px;" />
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <label class="tech" style="color: #8a8a9a;">Type:</label>
+            <select class="sys-input" [(ngModel)]="newExpense.isEssential" style="width: auto;">
+              <option [ngValue]="true">NEED</option>
+              <option [ngValue]="false">WANT</option>
+            </select>
+          </div>
+          <button class="btn full" (click)="logExpense()" style="background: rgba(55, 138, 221, 0.1); border-color: #378ADD; color: #378ADD; white-space: nowrap; padding: 0 32px;">LOG IT</button>
+        </div>
+
+        <div *ngIf="expenses().length > 0">
+          <h4 class="tech" style="color: #8a8a9a; margin-bottom: 12px;">RECENT LOGS</h4>
+          <div *ngFor="let e of expenses().slice(0, 5)" style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 1.2rem;">{{ getCategoryIcon(e.category) }}</span>
+              <div>
+                <div class="pn" style="font-size: 1rem;">{{ e.description || e.category }}</div>
+                <div class="tech" style="font-size: 0.7rem;" [style.color]="e.isEssential ? '#1D9E75' : '#FAC775'">{{ e.isEssential ? 'NEED' : 'WANT' }} • {{ e.expenseDate }}</div>
+              </div>
+            </div>
+            <div class="mono" style="color: #fff; font-size: 1.1rem;">₹{{ e.amount }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Weekly Summary -->
+      <div class="system-card block" style="border-color: #FAC775;" *ngIf="weeklySummary()">
+        <h3 class="mono head" style="color: #FAC775;">◈ WEEKLY PACING</h3>
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SPENT THIS WEEK</div>
+          <div class="mono" style="font-size: 2.5rem; color: #fff;">₹{{ weeklySummary()!.totalSpent }}</div>
+          
+          <div class="tech" style="margin-top: 12px; padding: 8px; border-radius: 4px; display: inline-block;"
+               [style.background]="weeklySummary()!.changePercent > 0 ? 'rgba(226, 75, 74, 0.1)' : 'rgba(29, 158, 117, 0.1)'"
+               [style.color]="weeklySummary()!.changePercent > 0 ? '#E24B4A' : '#1D9E75'">
+            {{ weeklySummary()!.changePercent > 0 ? '↑' : '↓' }} {{ weeklySummary()!.changePercent | number:'1.0-1' }}% vs last week (₹{{ weeklySummary()!.lastWeekTotal }})
+          </div>
+        </div>
+        
+        <div class="tech" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #8a8a9a;">
+          <span>Daily Avg: <span class="mono" style="color: #fff">₹{{ weeklySummary()!.dailyAverage | number:'1.0-0' }}</span></span>
+          <span>Top Cat: <span style="color: #FAC775">{{ weeklySummary()!.topCategory }}</span></span>
+        </div>
+      </div>
+
+      <!-- 5. Monthly Breakdown Chart -->
+      <div class="system-card block" style="border-color: #378ADD;" *ngIf="monthlySummary()">
+        <h3 class="mono head" style="color: #378ADD;">◈ MONTHLY BREAKDOWN</h3>
+        <div style="width: 100%; max-width: 250px; margin: 0 auto 24px; position: relative;">
+          <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions" [type]="doughnutChartType"></canvas>
+        </div>
+        
+        <div class="tech" style="color: #8a8a9a; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">CATEGORY TOTALS</div>
+        <div style="max-height: 200px; overflow-y: auto;">
+          <div *ngFor="let kv of monthlySummary()!.categoryBreakdown | keyvalue" style="display: flex; justify-content: space-between; padding: 6px 0;">
+            <span class="tech" style="font-size: 0.8rem;">{{ kv.key }}</span>
+            <span class="mono" style="color: #FAC775;">₹{{ kv.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. EMI & Loan Tracker -->
+      <div class="system-card block" style="grid-column: 1 / -1; border-color: #E24B4A;">
+        <h3 class="mono head" style="color: #E24B4A; display: flex; justify-content: space-between;">
+          <span>◈ LIABILITIES & EMI</span>
+          <button class="btn sm" (click)="showEmiForm = !showEmiForm" style="border-color: #E24B4A; color: #E24B4A;">+ ADD LOAN</button>
+        </h3>
+        
+        <div *ngIf="showEmiForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <input type="text" class="sys-input" placeholder="Loan Name" [(ngModel)]="newEmi.loanName" />
+            <input type="number" class="sys-input" placeholder="Principal (₹)" [(ngModel)]="newEmi.principalAmount" (change)="calculateEmiAmount()" />
+            <input type="number" class="sys-input" placeholder="Interest Rate (%)" [(ngModel)]="newEmi.interestRate" (change)="calculateEmiAmount()" />
+            <input type="number" class="sys-input" placeholder="Tenure (Months)" [(ngModel)]="newEmi.tenureMonths" (change)="calculateEmiAmount()" />
+            <input type="number" class="sys-input" placeholder="Monthly EMI (₹)" [(ngModel)]="newEmi.emiAmount" />
+          </div>
+          <button class="btn full" (click)="addEmi()" style="background: rgba(226, 75, 74, 0.1); border-color: #E24B4A; color: #E24B4A;">SAVE LIABILITY</button>
+        </div>
+
+        <div *ngIf="emis().length === 0 && !showEmiForm" class="tech empty">No active liabilities. Freedom!</div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+          <div *ngFor="let emi of emis()" style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; border: 1px solid rgba(226, 75, 74, 0.3);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span class="pn" style="font-size: 1.1rem; color: #fff;">{{ emi.loanName }}</span>
+              <span class="mono" style="color: #E24B4A;">₹{{ emi.emiAmount }}/mo</span>
+            </div>
+            
+            <div class="tech" style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #8a8a9a; margin-bottom: 4px;">
+              <span>Remaining: ₹{{ emi.remainingAmount }}</span>
+              <span>Paid: ₹{{ emi.totalPaid }}</span>
+            </div>
+            
+            <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 12px;">
+              <div class="gap-fill" [style.width.%]="(emi.totalPaid / emi.principalAmount) * 100" style="background: #E24B4A; height: 100%;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="tech dl" style="color: #FAC775; font-size: 0.8rem;">Due: {{ emi.nextDueDate || 'TBD' }}</span>
+              <button class="btn sm" (click)="payEmi(emi.id)" style="border-color: #1D9E75; color: #1D9E75;">PAY EMI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Subscriptions -->
+      <div class="system-card block" style="border-color: #BA7517;">
+        <h3 class="mono head" style="color: #BA7517; display: flex; justify-content: space-between;">
+          <span>◈ SUBSCRIPTIONS</span>
+          <button class="btn sm" (click)="showSubForm = !showSubForm" style="border-color: #BA7517; color: #BA7517;">+ ADD</button>
+        </h3>
+        
+        <div *ngIf="showSubForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+          <input type="text" class="sys-input" placeholder="Name (e.g. Netflix)" [(ngModel)]="newSub.name" style="width: 100%; margin-bottom: 12px;" />
+          <input type="number" class="sys-input" placeholder="Amount (₹)" [(ngModel)]="newSub.amount" style="width: 100%; margin-bottom: 12px;" />
+          <button class="btn full" (click)="addSubscription()" style="background: rgba(186, 117, 23, 0.1); border-color: #BA7517; color: #BA7517;">ADD SUB</button>
+        </div>
+
+        <div *ngFor="let s of subscriptions()" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 8px;" [style.opacity]="s.isActive ? '1' : '0.5'">
+          <div>
+            <div class="pn">{{ s.name }}</div>
+            <div class="tech" style="font-size: 0.7rem; color: #8a8a9a;">{{ s.frequency }}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <span class="mono">₹{{ s.amount }}</span>
+            <button class="btn sm" (click)="toggleSub(s.id)" [style.border-color]="s.isActive ? '#E24B4A' : '#1D9E75'" [style.color]="s.isActive ? '#E24B4A' : '#1D9E75'">
+              {{ s.isActive ? 'CANCEL' : 'ACTIVATE' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. AI Spending Analyst -->
+      <div class="system-card block" style="border-color: #534AB7;">
+        <h3 class="mono head" style="color: #534AB7;">◈ AI ANALYST</h3>
+        <div style="text-align: center; padding: 16px 0;">
+          <div class="tech" style="color: #8a8a9a; margin-bottom: 16px;">Detect leaks, unwanted spending, and optimize your wealth.</div>
+          <button class="btn" (click)="analyzeWealth()" [disabled]="isAnalyzingWealth()" style="border-color: #534AB7; color: #534AB7; padding: 12px 24px;">
+            {{ isAnalyzingWealth() ? 'ANALYZING...' : 'RUN DEEP ANALYSIS' }}
+          </button>
+        </div>
+        
+        <div *ngIf="aiAnalysis()" @fadeInUp style="margin-top: 16px; padding: 16px; background: rgba(83, 74, 183, 0.1); border-left: 3px solid #534AB7; border-radius: 4px;">
+          <p class="pn" style="line-height: 1.6; font-size: 0.95rem; white-space: pre-wrap;">{{ aiAnalysis() }}</p>
+        </div>
+      </div>
+
+      <!-- 9. Savings Goals -->
+      <div class="system-card block" style="grid-column: 1 / -1;">
+        <h3 class="mono head" style="color: #1D9E75; display: flex; justify-content: space-between;">
           <span>◈ SAVINGS GOALS</span>
-          <button class="btn sm" (click)="showGoalForm = !showGoalForm" style="border-color: #FAC775; color: #FAC775;">+ NEW GOAL</button>
+          <button class="btn sm" (click)="showGoalForm = !showGoalForm" style="border-color: #1D9E75; color: #1D9E75;">+ NEW GOAL</button>
         </h3>
         
         <div *ngIf="showGoalForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-          <h4 class="tech" style="color: #FAC775; margin-bottom: 12px;">CREATE NEW GOAL</h4>
           <input type="text" class="sys-input" placeholder="Goal Name (e.g. Emergency Fund)" [(ngModel)]="newGoal.goalName" style="width: 100%; margin-bottom: 12px;" />
           <input type="number" class="sys-input" placeholder="Target Amount (₹)" [(ngModel)]="newGoal.target" style="width: 100%; margin-bottom: 12px;" />
-          <button class="btn full" (click)="addGoal()" style="background: rgba(250, 199, 117, 0.1); border-color: #FAC775; color: #FAC775;">START SAVING</button>
+          <button class="btn full" (click)="addGoal()" style="background: rgba(29, 158, 117, 0.1); border-color: #1D9E75; color: #1D9E75;">START SAVING</button>
         </div>
-        <div class="goal" *ngFor="let g of goals()" style="margin-bottom: 24px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px;">
-          <div class="goal-head" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span class="pn" style="font-size: 1.1rem;">{{ g.goalName }}</span>
-            <span class="mono gv" style="color: #FAC775;">₹{{ g.current }} / ₹{{ g.target }}</span>
-          </div>
-          <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
-            <div class="gap-fill" [style.width.%]="goalPct(g)" style="background: linear-gradient(90deg, #BA7517, #FAC775); height: 100%;"></div>
-          </div>
-          <div class="goal-actions" style="display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <span class="tech dl" *ngIf="g.deadline" style="color: #8a8a9a; font-size: 0.8rem; margin-right: 12px;">due {{ g.deadline }}</span>
-              <span class="done tech" *ngIf="g.achieved" style="color: #1D9E75; font-size: 0.8rem; letter-spacing: 1px;">✓ ACHIEVED</span>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+          <div class="goal" *ngFor="let g of goals()" style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px;">
+            <div class="goal-head" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span class="pn" style="font-size: 1.1rem;">{{ g.goalName }}</span>
+              <span class="mono gv" style="color: #1D9E75;">₹{{ g.current }} / ₹{{ g.target }}</span>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn sm" style="border-color: #FAC775; color: #FAC775;" (click)="bumpGoal(g, 500)">+₹500</button>
-              <button class="btn sm" style="border-color: #FAC775; color: #FAC775;" (click)="bumpGoal(g, 100)">+₹100</button>
+            <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+              <div class="gap-fill" [style.width.%]="goalPct(g)" style="background: linear-gradient(90deg, #1D9E75, #378ADD); height: 100%;"></div>
             </div>
+            <div class="goal-actions" style="display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span class="tech dl" *ngIf="g.deadline" style="color: #8a8a9a; font-size: 0.8rem; margin-right: 12px;">due {{ g.deadline }}</span>
+                <span class="done tech" *ngIf="g.achieved" style="color: #1D9E75; font-size: 0.8rem; letter-spacing: 1px;">✓ ACHIEVED</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="bumpGoal(g, 500)">+₹500</button>
+                <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="bumpGoal(g, 100)">+₹100</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. Net Worth & Budget Entry -->
+      <div class="system-card block" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; padding: 0; border: none; background: transparent;">
+        
+        <div style="background: #0a0a0f; border: 1px solid #1D9E75; border-radius: 8px; padding: 24px;">
+          <h3 class="mono head" style="color: #1D9E75; display: flex; justify-content: space-between;">
+            <span>◈ NET WORTH</span>
+            <button class="btn sm" (click)="showNetWorthForm = !showNetWorthForm" style="border-color: #1D9E75; color: #1D9E75;">+ LOG</button>
+          </h3>
+          <div *ngIf="showNetWorthForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+            <input type="number" class="sys-input" placeholder="Total Assets (₹)" [(ngModel)]="newNetWorth.totalAssets" style="width: 100%; margin-bottom: 12px;" />
+            <input type="number" class="sys-input" placeholder="Total Liabilities (₹)" [(ngModel)]="newNetWorth.totalLiabilities" style="width: 100%; margin-bottom: 12px;" />
+            <button class="btn full" (click)="saveNetWorth()" style="background: rgba(29, 158, 117, 0.1); border-color: #1D9E75; color: #1D9E75;">SAVE NET WORTH</button>
+          </div>
+          <div *ngIf="netWorthHistory().length > 0">
+            <div style="background: rgba(29, 158, 117, 0.1); padding: 16px; border-radius: 8px; text-align: center;">
+              <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">CURRENT NET WORTH</div>
+              <div class="mono" style="color: #1D9E75; font-size: 2rem;">₹{{ netWorthHistory()[0].netWorth }}</div>
+              <div class="tech" style="color: #FAC775; margin-top: 8px;">RUNWAY: {{ netWorthHistory()[0].cashRunwayMonths | number:'1.1-1' }} MONTHS</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: #0a0a0f; border: 1px solid #FAC775; border-radius: 8px; padding: 24px;">
+          <h3 class="mono head" style="width: 100%; color: #FAC775; display: flex; justify-content: space-between;">
+            <span>◈ BUDGET SETTINGS</span>
+            <button class="btn sm" (click)="showBudgetForm = !showBudgetForm" style="border-color: #FAC775; color: #FAC775;">+ UPDATE</button>
+          </h3>
+          <div *ngIf="showBudgetForm" class="form-panel" style="width: 100%; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-top: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <input type="number" class="sys-input" placeholder="Salary (₹)" [(ngModel)]="newBudget.salary" />
+              <input type="number" class="sys-input" placeholder="PG / Rent (₹)" [(ngModel)]="newBudget.pgRent" />
+              <input type="number" class="sys-input" placeholder="Invested in SIP (₹)" [(ngModel)]="newBudget.sipAmount" />
+              <input type="number" class="sys-input" placeholder="Cash Saved (₹)" [(ngModel)]="newBudget.saved" />
+            </div>
+            <button class="btn full" (click)="saveBudget()" style="background: rgba(250, 199, 117, 0.1); border-color: #FAC775; color: #FAC775;">SAVE BUDGET</button>
+          </div>
+          <div *ngIf="!showBudgetForm" class="tech" style="color: #8a8a9a; line-height: 1.6;">
+            Set your expected monthly salary and target savings here. The Monthly Overview dashboard uses this to calculate your 50-30-20 splits.
           </div>
         </div>
       </div>

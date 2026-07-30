@@ -343,6 +343,64 @@ export interface BudgetEntry {
   notes?: string;
 }
 
+export interface ExpenseLog {
+  id?: number;
+  expenseDate?: string;
+  amount: number;
+  category: string;
+  description: string;
+  isEssential: boolean;
+  paymentMethod: string;
+  isRecurring: boolean;
+}
+
+export interface EmiEntry {
+  id?: number;
+  loanName: string;
+  principalAmount: number;
+  interestRate: number;
+  tenureMonths: number;
+  emiAmount: number;
+  startDate?: string;
+  totalPaid: number;
+  remainingAmount: number;
+  nextDueDate?: string;
+  status: string;
+  notes?: string;
+}
+
+export interface SubscriptionEntry {
+  id?: number;
+  name: string;
+  amount: number;
+  frequency: string;
+  category: string;
+  isActive: boolean;
+  nextBillingDate?: string;
+}
+
+export interface WeeklySummary {
+  totalSpent: number;
+  categoryBreakdown: { [key: string]: number };
+  lastWeekTotal: number;
+  changePercent: number;
+  dailyAverage: number;
+  topCategory: string;
+}
+
+export interface MonthlySummary {
+  totalIncome: number;
+  totalExpenses: number;
+  totalSaved: number;
+  savingsRate: number;
+  categoryBreakdown: { [key: string]: number };
+  needsPercent: number;
+  wantsPercent: number;
+  savingsPercent: number;
+  emiTotal: number;
+  subscriptionTotal: number;
+}
+
 /* ============ Module 2 — Health OS ============ */
 export interface HealthLog {
   id?: number;

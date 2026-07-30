@@ -11,7 +11,8 @@ import {
   JobApplication, LeetcodeLog, LeetcodeStats, SkillsGap, SavingsGoal,
   HealthLog, MindLog, SelfDoubtEvidence, EnglishLog, BodyLog, RelationshipLog,
   InterviewReadinessDTO, DeepWorkSession, DevMasteryProgress, BudgetEntry,
-  DietEntry, FoodItem, NetWorthLog, SocialConnection, PlayerConfig
+  DietEntry, FoodItem, NetWorthLog, SocialConnection, PlayerConfig,
+  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary
 } from '../../core/models/models';
 import { fadeInUp, listStagger } from '../../shared/animations';
 
@@ -59,6 +60,33 @@ export class LifeOsComponent implements OnInit {
   showNetWorthForm = false;
   newGoal: SavingsGoal = { goalName: '', target: 0, current: 0 };
   showGoalForm = false;
+
+  expenses = signal<ExpenseLog[]>([]);
+  weeklySummary = signal<WeeklySummary | null>(null);
+  monthlySummary = signal<MonthlySummary | null>(null);
+  emis = signal<EmiEntry[]>([]);
+  subscriptions = signal<SubscriptionEntry[]>([]);
+  aiAnalysis = signal<string | null>(null);
+  isAnalyzingWealth = signal<boolean>(false);
+
+  newExpense: ExpenseLog = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
+  newEmi: EmiEntry = { loanName: '', principalAmount: 0, interestRate: 0, tenureMonths: 0, emiAmount: 0, totalPaid: 0, remainingAmount: 0, status: 'ACTIVE' };
+  newSub: SubscriptionEntry = { name: '', amount: 0, frequency: 'MONTHLY', category: 'ENTERTAINMENT', isActive: true };
+
+  showEmiForm = false;
+  showSubForm = false;
+
+  quickExpenseCategories = [
+    { cat: 'FOOD', icon: '🍕', label: 'Food' },
+    { cat: 'TRANSPORT', icon: '🚗', label: 'Transport' },
+    { cat: 'SHOPPING', icon: '🛒', label: 'Shopping' },
+    { cat: 'ONLINE_ORDER', icon: '📦', label: 'Online' },
+    { cat: 'ENTERTAINMENT', icon: '🎬', label: 'Ent.' },
+    { cat: 'BILLS', icon: '📋', label: 'Bills' },
+    { cat: 'HEALTH', icon: '💊', label: 'Health' },
+    { cat: 'EDUCATION', icon: '📚', label: 'Edu.' },
+    { cat: 'MISC', icon: '❓', label: 'Misc' }
+  ];
 
   // Wisdom Engine Carousel
   wisdomIndex = signal<number>(0);
@@ -148,6 +176,14 @@ export class LifeOsComponent implements OnInit {
           this.updateWealthChart(v);
         });
         this.life.getNetWorthHistory().subscribe(v => this.netWorthHistory.set(v));
+        this.life.getExpenses().subscribe(v => this.expenses.set(v));
+        this.life.getWeeklySummary().subscribe(v => this.weeklySummary.set(v));
+        this.life.getMonthlySummary().subscribe(v => {
+          this.monthlySummary.set(v);
+          this.updateAdvancedWealthChart(v);
+        });
+        this.life.getEmis().subscribe(v => this.emis.set(v));
+        this.life.getSubscriptions().subscribe(v => this.subscriptions.set(v));
         this.startWisdomEngine();
         break;
       case 'HEALTH':
@@ -286,6 +322,106 @@ export class LifeOsComponent implements OnInit {
     });
   }
   goalPct(g: SavingsGoal): number { return Math.min(100, Math.round((g.current / g.target) * 100)); }
+
+  updateAdvancedWealthChart(summary: MonthlySummary): void {
+    const expenses = summary.totalExpenses;
+    const savings = summary.totalSaved;
+    const emis = summary.emiTotal;
+    
+    this.doughnutChartData = {
+      labels: [ 'Expenses', 'Savings', 'EMIs' ],
+      datasets: [ {
+        data: [expenses, savings, emis],
+        backgroundColor: ['#E24B4A', '#1D9E75', '#BA7517'],
+        borderColor: '#0a0a0f',
+        hoverOffset: 4
+      } ]
+    };
+  }
+
+  setQuickCategory(cat: string): void {
+    this.newExpense.category = cat;
+  }
+
+  getCategoryIcon(cat: string): string {
+    return this.quickExpenseCategories.find(c => c.cat === cat)?.icon || '❓';
+  }
+
+  logExpense(): void {
+    if (this.newExpense.amount <= 0) { this.toast('⚠ Enter a valid amount'); return; }
+    if (!this.newExpense.description) this.newExpense.description = this.newExpense.category;
+    
+    this.life.logExpense(this.newExpense).subscribe(e => {
+      this.toast(`◈ Expense logged: ₹${e.amount}`);
+      this.expenses.update(list => [e, ...list]);
+      this.life.getWeeklySummary().subscribe(v => this.weeklySummary.set(v));
+      this.life.getMonthlySummary().subscribe(v => this.monthlySummary.set(v));
+      
+      this.newExpense = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
+    });
+  }
+
+  calculateEmiAmount(): void {
+    if (this.newEmi.principalAmount > 0 && this.newEmi.interestRate > 0 && this.newEmi.tenureMonths > 0) {
+      const p = this.newEmi.principalAmount;
+      const r = this.newEmi.interestRate / (12 * 100); // monthly interest rate
+      const n = this.newEmi.tenureMonths;
+      const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      this.newEmi.emiAmount = Math.round(emi);
+    }
+  }
+
+  addEmi(): void {
+    if (this.newEmi.principalAmount <= 0) return;
+    this.calculateEmiAmount(); // ensure it's calculated
+    this.life.addEmi(this.newEmi).subscribe(e => {
+      this.toast('◈ EMI Added');
+      this.emis.update(list => [...list, e]);
+      this.showEmiForm = false;
+      this.newEmi = { loanName: '', principalAmount: 0, interestRate: 0, tenureMonths: 0, emiAmount: 0, totalPaid: 0, remainingAmount: 0, status: 'ACTIVE' };
+    });
+  }
+
+  payEmi(emiId: number | undefined): void {
+    if (!emiId) return;
+    this.life.payEmi(emiId).subscribe(e => {
+      this.toast('◈ EMI Payment Recorded');
+      this.emis.update(list => list.map(x => x.id === e.id ? e : x));
+      this.life.getMonthlySummary().subscribe(v => this.monthlySummary.set(v));
+    });
+  }
+
+  addSubscription(): void {
+    if (this.newSub.amount <= 0 || !this.newSub.name) return;
+    this.life.addSubscription(this.newSub).subscribe(s => {
+      this.toast('◈ Subscription Added');
+      this.subscriptions.update(list => [...list, s]);
+      this.showSubForm = false;
+      this.newSub = { name: '', amount: 0, frequency: 'MONTHLY', category: 'ENTERTAINMENT', isActive: true };
+    });
+  }
+
+  toggleSub(subId: number | undefined): void {
+    if (!subId) return;
+    this.life.toggleSubscription(subId).subscribe(s => {
+      this.subscriptions.update(list => list.map(x => x.id === s.id ? s : x));
+      this.life.getMonthlySummary().subscribe(v => this.monthlySummary.set(v));
+    });
+  }
+
+  analyzeWealth(): void {
+    this.isAnalyzingWealth.set(true);
+    this.life.getAiSpendingAnalysis().subscribe({
+      next: (analysis) => {
+        this.aiAnalysis.set(analysis);
+        this.isAnalyzingWealth.set(false);
+      },
+      error: () => {
+        this.toast('⚠ Analysis failed');
+        this.isAnalyzingWealth.set(false);
+      }
+    });
+  }
 
   /* ===== Health actions ===== */
   logFood(food: FoodItem): void {
