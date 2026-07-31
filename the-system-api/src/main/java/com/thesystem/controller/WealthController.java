@@ -141,4 +141,27 @@ public class WealthController {
     public com.thesystem.entity.NetWorthLog logNetWorth(Principal p, @RequestBody com.thesystem.entity.NetWorthLog body) {
         return wealthService.logNetWorth(currentPlayer.id(p), body);
     }
+    // ---- Financial Assets ----
+    @GetMapping("/assets")
+    public List<com.thesystem.entity.FinancialAsset> getAssets(Principal p) {
+        return wealthService.getAssets(currentPlayer.id(p));
+    }
+
+    @PostMapping("/assets/buy")
+    public com.thesystem.entity.FinancialAsset buyAsset(Principal p, @RequestBody Map<String, Object> req) {
+        String name = (String) req.getOrDefault("name", "Unknown Asset");
+        String type = (String) req.getOrDefault("type", "INDEX_FUND");
+        int shares = req.containsKey("shares") ? ((Number) req.get("shares")).intValue() : 1;
+        int cost = req.containsKey("cost") ? ((Number) req.get("cost")).intValue() : 0;
+        int yield = req.containsKey("yield") ? ((Number) req.get("yield")).intValue() : 0;
+        
+        return wealthService.buyAsset(
+            currentPlayer.id(p),
+            name,
+            type,
+            shares,
+            cost,
+            yield
+        );
+    }
 }

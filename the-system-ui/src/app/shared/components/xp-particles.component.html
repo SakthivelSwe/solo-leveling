@@ -1,0 +1,20 @@
+<!-- xp-particles.component.html -->
+<div class="xp-overlay">
+  @if (uiState.comboCount() > 1) {
+    <div class="combo-container" style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); text-align: center; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <div style="font-size: 3rem; font-weight: 900; color: #ff3366; text-shadow: 0 0 20px #ff3366, 0 0 40px #ff3366; font-family: 'Rajdhani', sans-serif;">{{ uiState.comboCount() }}x COMBO!</div>
+      <div style="color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 1rem; opacity: 0.8;">MOMENTUM MULTIPLIER ACTIVE</div>
+    </div>
+  }
+
+  @for (particle of uiState.xpParticles(); track particle.id) {
+    <div class="xp-particle-container" 
+         [style.left.px]="particle.x" 
+         [style.top.px]="particle.y">
+      <div class="xp-particle">+{{ particle.xp }} XP</div>
+      @if (particle.gold) {
+        <div class="gold-particle" style="color: #FAC775; font-size: 0.9em; text-shadow: 0 0 10px #FAC775;">+{{ particle.gold }} GOLD</div>
+      }
+    </div>
+  }
+</div>

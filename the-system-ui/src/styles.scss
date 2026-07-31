@@ -239,7 +239,7 @@ body::after {
    child components so they adapt to the card's own width, not
    the viewport — this is the key to rock-solid responsive UX.
    ============================================================ */
-.system-card {
+.glass-panel {
   background: 
     radial-gradient(circle at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 60%),
     var(--glass-fill);
@@ -259,7 +259,7 @@ body::after {
     border-color var(--duration-fast);
 }
 /* Gradient rim-light border */
-.system-card::after {
+.glass-panel::after {
   content: '';
   position: absolute; inset: 0;
   border-radius: var(--r-xl);
@@ -271,7 +271,7 @@ body::after {
   pointer-events: none;
 }
 /* Top specular highlight */
-.system-card::before {
+.glass-panel::before {
   content: '';
   position: absolute; inset: 0 0 auto 0;
   height: 42%;
@@ -279,7 +279,7 @@ body::after {
   background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
   pointer-events: none;
 }
-.system-card:hover {
+.glass-panel:hover {
   border-color: rgba(108,99,255,0.45);
   box-shadow: var(--elev-float);
   transform: translateY(-4px) scale(1.02);
@@ -555,7 +555,7 @@ body.native-platform::after {
   /* Stop the never-ending particle-drift repaint. */
   animation: none !important;
 }
-body.native-platform .system-card {
+body.native-platform .glass-panel {
   /* backdrop-filter is the single most expensive WebView operation; having it
      on every card forces a full-screen GPU composite constantly. Replace it
      with an opaque gradient that looks nearly identical but costs nothing. */
@@ -773,7 +773,7 @@ body.native-platform .btn-confirm.pulse {   /* confirm clean day pulse */
    class to the body when running on device.
    ============================================================ */
 body.native-platform {
-  .system-card {
+  .glass-panel {
     /* Disable expensive blur effects */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -786,8 +786,8 @@ body.native-platform {
     border: 1px solid rgba(108, 99, 255, 0.2) !important;
   }
   
-  .system-card::after,
-  .system-card::before {
+  .glass-panel::after,
+  .glass-panel::before {
     /* Hide the complex gradient rim-lights and specular highlights */
     display: none !important;
   }
@@ -795,5 +795,114 @@ body.native-platform {
   .card-glow {
     /* Hide extra glows */
     display: none !important;
+  }
+}
+
+/* %% System Message Toasts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+.system-snack {
+  --mdc-snackbar-container-color: transparent !important;
+  --mdc-snackbar-supporting-text-color: #EEF3FA !important;
+  margin-top: 16px;
+}
+.system-snack .mdc-snackbar__surface {
+  background: linear-gradient(160deg, rgba(24,24,44,0.85), rgba(12,12,26,0.95)) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(108, 99, 255, 0.4);
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 10px rgba(108, 99, 255, 0.2);
+  padding: 4px;
+}
+.system-snack .mdc-snackbar__label {
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+.system-snack.msg-success .mdc-snackbar__surface {
+  border-color: rgba(31, 190, 142, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(31, 190, 142, 0.3);
+}
+.system-snack.msg-warning .mdc-snackbar__surface {
+  border-color: rgba(250, 199, 117, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(250, 199, 117, 0.3);
+}
+.system-snack.msg-critical .mdc-snackbar__surface {
+  border-color: rgba(226, 75, 74, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(226, 75, 74, 0.3);
+}
+
+/* -- Toast Animation -------------------------------------------------- */
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.system-snack {
+  animation: toastSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* -- Glassmorphism & Bento Grid ------------------------------------------ */
+:root {
+  /* Glass Variables */
+  --glass-bg-primary: rgba(16, 16, 30, 0.45);
+  --glass-bg-secondary: rgba(20, 20, 42, 0.6);
+  --glass-bg-highlight: rgba(108, 99, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-border-glow: rgba(108, 99, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glass-blur: blur(12px);
+}
+
+.glass-panel {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+  border-color: var(--glass-border-glow);
+  box-shadow: 0 12px 40px 0 rgba(108, 99, 255, 0.15);
+}
+
+/* Glass panel inner glow */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  pointer-events: none;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.bento-grid-dense {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.bento-span-2 {
+  grid-column: span 2;
+}
+
+.bento-span-3 {
+  grid-column: span 3;
+}
+
+@media (max-width: 768px) {
+  .bento-span-2, .bento-span-3 {
+    grid-column: span 1;
   }
 }

@@ -20,12 +20,36 @@ public class MindService {
 
     private final MindLogRepository mindRepo;
     private final SelfDoubtEvidenceRepository evidenceRepo;
-    private final AiMemoryService aiMemoryService;
+        private final AiMemoryService aiMemoryService;
+    private final com.thesystem.repository.PlayerRepository playerRepo;
 
-    public MindService(MindLogRepository mindRepo, SelfDoubtEvidenceRepository evidenceRepo, AiMemoryService aiMemoryService) {
+    public MindService(MindLogRepository mindRepo, SelfDoubtEvidenceRepository evidenceRepo, AiMemoryService aiMemoryService, com.thesystem.repository.PlayerRepository playerRepo) {
         this.mindRepo = mindRepo;
         this.evidenceRepo = evidenceRepo;
         this.aiMemoryService = aiMemoryService;
+        this.playerRepo = playerRepo;
+    }
+
+        public List<String> getMentalDebuffs(Long playerId) {
+        MindLog latestLog = mindRepo.findFirstByPlayerIdOrderByLogDateDesc(playerId).orElse(null);
+        List<String> debuffs = new ArrayList<>();
+        if (latestLog != null) {
+            if (latestLog.getAnxietyLevel() >= 7) debuffs.add("High Anxiety (XP penalty)");
+            if (latestLog.getMoodMorning() <= 3) debuffs.add("Low Morning Mood (Energy drain)");
+            if (latestLog.getDarkThought() != null && !latestLog.getDarkThought().isBlank()) debuffs.add("Lingering Dark Thoughts (Focus penalty)");
+        }
+        return debuffs;
+    }
+
+    public void cleanseDebuffs(Long playerId) {
+        MindLog latestLog = mindRepo.findFirstByPlayerIdOrderByLogDateDesc(playerId).orElse(null);
+        if (latestLog != null) {
+            latestLog.setAnxietyLevel(Math.max(1, latestLog.getAnxietyLevel() - 3));
+            latestLog.setMoodMorning(Math.max(5, latestLog.getMoodMorning()));
+            latestLog.setDarkThought("");
+            mindRepo.save(latestLog);
+            aiMemoryService.addImmediateMemory(playerId, "BEHAVIORAL", "Completed a mindfulness cleansing session.");
+        }
     }
 
     public MindLog upsert(Long playerId, MindLog body) {
@@ -93,5 +117,27 @@ public class MindService {
         java.util.Collections.reverse(out); // oldest → newest for the chart
         return out;
     }
+    public java.util.Map<String, Object> startMeditation(Long playerId) {
+        return java.util.Map.of("message", "Meditation session started.", "timestamp", java.time.LocalDateTime.now());
+    }
+
+    public java.util.Map<String, Object> completeMeditation(Long playerId, int minutes) {
+        com.thesystem.entity.Player p = playerRepo.findById(playerId).orElseThrow();
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        java.time.LocalDateTime currentBuff = p.getClarityBuffEnd();
+        
+        if (currentBuff == null || currentBuff.isBefore(now)) {
+            p.setClarityBuffEnd(now.plusHours(2));
+        } else {
+            p.setClarityBuffEnd(currentBuff.plusHours(2));
+        }
+        playerRepo.save(p);
+        
+        return java.util.Map.of(
+            "message", "Meditation complete. CLARITY BUFF active for 2 hours (+50% XP).",
+            "clarityBuffEnd", p.getClarityBuffEnd()
+        );
+    }
 }
+
 

@@ -6,6 +6,36 @@
   padding: 0 clamp(12px, 4vw, 20px) clamp(24px, 4vw, 80px);
 }
 
+/* ── Particle Background ───────────────────────────────────── */
+.particle-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+.particle-bg::before, .particle-bg::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 200%;
+  background-image: 
+    radial-gradient(circle, rgba(108, 99, 255, 0.15) 2px, transparent 2.5px),
+    radial-gradient(circle, rgba(79, 195, 247, 0.08) 1.5px, transparent 2px);
+  background-size: 140px 140px, 90px 90px;
+  background-position: 0 0, 45px 45px;
+  animation: floatAsh 40s linear infinite;
+}
+.particle-bg::after {
+  background-image: radial-gradient(circle, rgba(31, 190, 142, 0.1) 1.5px, transparent 2px);
+  background-size: 110px 110px;
+  animation: floatAsh 30s linear infinite;
+  opacity: 0.7;
+}
+@keyframes floatAsh {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
 /* ════════════════════════════════════════════════════════════
    TOPBAR
    Safe-area-inset-top keeps content below the phone status bar.
@@ -653,3 +683,54 @@
 .stat-pill.hard .v { color: #E24B4A; }
 .stat-pill.streak { border-color: rgba(255,87,34,0.3); background: rgba(255,87,34,0.1); }
 .stat-pill.streak .v { color: #FF5722; }
+
+.dungeon-break-banner {
+  margin: 16px 24px;
+  background: rgba(226, 75, 74, 0.1);
+  border: 1px solid rgba(226, 75, 74, 0.5);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 0 20px rgba(226, 75, 74, 0.3);
+  animation: pulse-border 2s infinite;
+
+  .break-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .break-icon {
+    color: #E24B4A;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(226, 75, 74, 0.8);
+  }
+
+  .break-details {
+    flex: 1;
+    h4 { color: #fff; margin: 0 0 4px 0; font-size: 1.1rem; }
+    p { color: #a0aabf; margin: 0; font-size: 0.9rem; }
+  }
+
+  .danger-btn {
+    background: rgba(226, 75, 74, 0.2);
+    color: #E24B4A;
+    border: 1px solid #E24B4A;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    &:hover {
+      background: #E24B4A;
+      color: #fff;
+      box-shadow: 0 0 15px #E24B4A;
+    }
+  }
+}
+
+@keyframes pulse-border {
+  0% { border-color: rgba(226, 75, 74, 0.2); }
+  50% { border-color: rgba(226, 75, 74, 0.8); }
+  100% { border-color: rgba(226, 75, 74, 0.2); }
+}

@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Input, Output, signal, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-import { Quest, CustomQuestRequest } from '../../../core/models/models';
+import { environment } from '../../../../environments/environment';
+import { Quest, CustomQuestRequest, JobChangeQuest } from '../../../core/models/models';
+import { UiStateService } from '../../../core/services/ui-state.service';
 import { PlayerService } from '../../../core/services/player.service';
 import { CATEGORY_META } from '../../../shared/system.constants';
 import { listStagger } from '../../../shared/animations';
@@ -37,7 +40,7 @@ const SKIP_MSGS: Record<string, string[]> = {
   styleUrls: ['./quest-log.component.scss'],
   animations: [listStagger],
 })
-export class QuestLogComponent {
+export class QuestLogComponent implements OnInit {
   todayDateNum = new Date().getDate();
   @Input({ required: true }) quests: Quest[] = [];      // daily quests
   @Input() weeklyQuests: Quest[] = [];
@@ -87,7 +90,23 @@ export class QuestLogComponent {
     { key: 'TESTOSTERONE', label: 'Testosterone',    color: '#D85A30' },
   ];
 
-  constructor(private playerService: PlayerService) {}
+
+  jobChangeQuest = signal<JobChangeQuest | null>(null);
+  private http = inject(HttpClient);
+  private api = environment.apiUrl;
+
+  ngOnInit() {
+    this.http.get<JobChangeQuest>(`${this.api}/job-change`).subscribe({
+      next: (q) => this.jobChangeQuest.set(q),
+      error: () => {}
+    });
+  }
+
+  constructor(
+    private playerService: PlayerService,
+    private uiState: UiStateService
+  ) {}
+
 
   /** Expose Math to template for progress calculations. */
   readonly Math = Math;
@@ -159,8 +178,14 @@ export class QuestLogComponent {
 
   // ── Quest actions ────────────────────────────────────────────────────────────
 
-  onComplete(q: Quest): void {
+  onComplete(q: Quest, event?: MouseEvent): void {
     if (q.isCompleted || this.pendingKey || q.isSkipped) return;
+    
+    // Trigger XP particle effect if we have mouse coordinates
+    if (event) {
+      this.uiState.spawnXpParticle(q.xpReward || 50, 0, event.clientX, event.clientY);
+    }
+    
     this.complete.emit(q);
     this.skipWarningKey = null;
   }
@@ -241,11 +266,21 @@ export class QuestLogComponent {
     this.addLoading.set(true);
     this.addError.set(null);
 
+    let parsedStats: Record<string, number> | undefined;
+    if (this.newQuestStatBoosts.trim()) {
+      parsedStats = {};
+      for (const p of this.newQuestStatBoosts.split(',')) {
+        const parts = p.split(':');
+        if (parts.length === 2 && !isNaN(Number(parts[1]))) {
+          parsedStats[parts[0].trim().toUpperCase()] = Number(parts[1]);
+        }
+      }
+    }
     const req: CustomQuestRequest = {
       label: this.newQuestLabel.trim(),
       category: this.newQuestCategory,
       xpReward: this.newQuestXp ?? undefined,
-      statBoosts: this.newQuestStatBoosts.trim() || undefined,
+      statBoosts: parsedStats,
     };
 
     this.playerService.addCustomQuest(req).subscribe({

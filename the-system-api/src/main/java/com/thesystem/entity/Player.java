@@ -51,14 +51,14 @@ public class Player {
     private boolean restDayActive = false;
 
     /**
-     * Day-of-week (1=Mon … 7=Sun, ISO-8601) treated as rest day.
+     * Day-of-week (1=Mon â€¦ 7=Sun, ISO-8601) treated as rest day.
      * Default 6 = Saturday, matching the player's regular work schedule.
      */
     @jakarta.persistence.Transient
     private int restDayDayOfWeek = 6;
 
     /**
-     * Cached morning energy score (0–100) updated when today's health log is saved.
+     * Cached morning energy score (0â€“100) updated when today's health log is saved.
      * Drives the XP multiplier in QuestService: low energy reduces XP earned.
      */
     @jakarta.persistence.Transient
@@ -115,4 +115,37 @@ public class Player {
     public void setPenaltyZoneEndTime(LocalDateTime penaltyZoneEndTime) { this.penaltyZoneEndTime = penaltyZoneEndTime; }
     public int getConsecutiveDaysBelowThreshold() { return consecutiveDaysBelowThreshold; }
     public void setConsecutiveDaysBelowThreshold(int consecutiveDaysBelowThreshold) { this.consecutiveDaysBelowThreshold = consecutiveDaysBelowThreshold; }
+
+    @Column(name = "clarity_buff_end")
+    private java.time.LocalDateTime clarityBuffEnd;
+
+    public java.time.LocalDateTime getClarityBuffEnd() {
+        return clarityBuffEnd;
+    }
+
+    public void setClarityBuffEnd(java.time.LocalDateTime clarityBuffEnd) {
+        this.clarityBuffEnd = clarityBuffEnd;
+    }
+
+    @Column(name = "system_gold", nullable = false)
+    private int systemGold = 0;
+
+    public int getSystemGold() {
+        return systemGold;
+    }
+
+    public void setSystemGold(int systemGold) {
+        this.systemGold = systemGold;
+    }
+
+    @Column(name = "archetype")
+    private String archetype;
+
+    public String getArchetype() {
+        return archetype;
+    }
+
+    public void setArchetype(String archetype) {
+        this.archetype = archetype;
+    }
 }

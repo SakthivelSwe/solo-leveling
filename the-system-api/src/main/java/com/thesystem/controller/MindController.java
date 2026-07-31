@@ -49,11 +49,31 @@ public class MindController {
         return mindService.evidence(currentPlayer.id(p));
     }
 
-    /* ===== Phase 2 — Mood Trend Graph ===== */
+    /* ===== Phase 2 - Mood Trend Graph ===== */
 
     @GetMapping("/mood-trend")
     public List<MoodPointDTO> moodTrend(Principal p, @RequestParam(defaultValue = "30") int days) {
         return mindService.moodTrend(currentPlayer.id(p), days);
+    }
+
+    @GetMapping("/debuffs")
+    public List<String> getMentalDebuffs(Principal p) {
+        return mindService.getMentalDebuffs(currentPlayer.id(p));
+    }
+
+    @PostMapping("/cleanse")
+    public void cleanseDebuffs(Principal p) {
+        mindService.cleanseDebuffs(currentPlayer.id(p));
+    }
+
+    @PostMapping("/meditate/start")
+    public Map<String, Object> startMeditation(Principal p) {
+        return mindService.startMeditation(currentPlayer.id(p));
+    }
+
+    @PostMapping("/meditate/complete")
+    public Map<String, Object> completeMeditation(Principal p, @RequestBody Map<String, Integer> body) {
+        return mindService.completeMeditation(currentPlayer.id(p), body.getOrDefault("minutes", 10));
     }
 }
 

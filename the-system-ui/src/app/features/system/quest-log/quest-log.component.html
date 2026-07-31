@@ -1,4 +1,4 @@
-<div class="quest-log system-card spring-hover" style="position: relative; overflow: hidden;">
+<div class="quest-log glass-panel spring-hover" style="position: relative; overflow: hidden;">
   <div class="card-glow"></div>
   <!-- ══ HEADER ══════════════════════════════════════════════ -->
   <div class="header">
@@ -114,7 +114,7 @@
          [class.custom-quest]="q.isCustom"
          [class]="getDifficultyClass(q.xpReward)"
          [style.--cat]="categoryColor(q.category)"
-         (click)="onComplete(q)">
+         (click)="onComplete(q, $event)">
       <div class="checkbox">
         <span *ngIf="q.isCompleted" class="check">✓</span>
         <span *ngIf="q.isSkipped" class="check" style="color: var(--text-dim);">⊘</span>
@@ -127,7 +127,10 @@
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>
-        <span class="label" [class.strikethrough]="q.isSkipped">{{ q.label }}</span>
+        <span class="label" [class.strikethrough]="q.isSkipped">
+          {{ q.label }}
+          <span *ngIf="q.critical" class="streak-shield" title="Streak Protected Quest" style="margin-left: 6px; font-size: 0.9em;">🛡️</span>
+        </span>
         <span class="skip-reason tech" *ngIf="q.isSkipped" style="color: var(--text-dim); font-size: 0.75rem; margin-top: 2px; display: block; text-transform: uppercase;">[SKIPPED: {{ q.skipReason }}]</span>
         <span class="stat-hints tech" *ngIf="q.statBoosts && !q.isCompleted">
           {{ formatBoosts(q.statBoosts) }}

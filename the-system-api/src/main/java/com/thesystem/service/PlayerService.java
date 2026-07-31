@@ -67,7 +67,8 @@ public class PlayerService {
                 p.getRankLevel(), p.getLevel(), p.getCurrentXp(), p.getTotalXp(),
                 levelService.xpToNextLevel(p.getLevel()), p.getHp(), p.getMaxHp(), p.getEquippedTitle(),
                 p.isInPenaltyZone(), p.getPenaltyZoneEndTime() != null ? p.getPenaltyZoneEndTime().toString() : "",
-                p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : "");
+                p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : "",
+                p.getSystemGold());
     }
 
 

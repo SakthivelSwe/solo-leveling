@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface MindLogRepository extends JpaRepository<MindLog, Long> {
     List<MindLog> findByPlayerIdOrderByLogDateDesc(Long playerId);
     Optional<MindLog> findByPlayerIdAndLogDate(Long playerId, LocalDate logDate);
+    Optional<MindLog> findFirstByPlayerIdOrderByLogDateDesc(Long playerId);
 }
 

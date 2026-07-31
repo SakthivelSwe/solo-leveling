@@ -12,7 +12,7 @@
   </header>
 
   <ul class="feed" @listStagger>
-    <li *ngFor="let n of notifications.items()" class="note system-card" [class.unread]="!n.read"
+    <li *ngFor="let n of notifications.items()" class="note glass-panel" [class.unread]="!n.read"
         (click)="notifications.markRead(n.id)" @fadeInUp>
       <span class="ic">{{ icon(n.type) }}</span>
       <div class="body">

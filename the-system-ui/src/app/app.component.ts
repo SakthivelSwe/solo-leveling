@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -9,8 +10,12 @@ import { BiometricService } from './core/services/biometric.service';
 import { BiometricLockComponent } from './features/auth/biometric-lock.component';
 import { LevelUpModalComponent } from './shared/components/level-up-modal.component';
 import { EveningReviewComponent } from './shared/components/evening-review.component';
+import { XpParticlesComponent } from './shared/components/xp-particles.component';
+import { SystemBroadcastComponent } from './shared/components/system-broadcast/system-broadcast.component';
 import { UiStateService } from './core/services/ui-state.service';
 import { AuthService } from './core/services/auth.service';
+import { LifeOsService } from './core/services/life-os.service';
+import { PlayerService } from './core/services/player.service';
 import { routeFade } from './shared/animations';
 
 /** Routes where the bottom nav should NOT be shown (auth screens). */
@@ -19,7 +24,17 @@ const AUTH_ROUTES = new Set(['/login', '/register', '/']);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, BiometricLockComponent, LevelUpModalComponent, EveningReviewComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    LevelUpModalComponent,
+    EveningReviewComponent,
+    BiometricLockComponent,
+    XpParticlesComponent,
+    SystemBroadcastComponent
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [routeFade],
@@ -49,16 +64,30 @@ export class AppComponent {
     ),
   );
 
-  // Injecting the SSE service boots the real-time link (auto-connects when authenticated).
   constructor(
     private sse: SseService,
     private pwaUpdate: PwaUpdateService,
     private native: NativeService,
+    private lifeOs: LifeOsService,
+    private playerService: PlayerService,
   ) {
     this.pwaUpdate.init();
     // Native glue (status bar, hardware back button, splash hide, biometric init). No-ops on web.
     this.native.init();
     this.maybePromptEveningReview();
+    this.initBadgePolling();
+  }
+
+  private initBadgePolling(): void {
+    const poll = () => {
+      if (!this.auth.isAuthenticated()) return;
+      this.lifeOs.getDueFlashcards().subscribe(cards => this.uiState.dueFlashcardsCount.set(cards.length));
+      this.playerService.getTodayQuests().subscribe(quests => this.uiState.dueQuestsCount.set(quests.filter(q => !q.isCompleted).length));
+    };
+    // Initial fetch after a short delay
+    setTimeout(poll, 2000);
+    // Poll every 2 minutes
+    setInterval(poll, 120000);
   }
 
   /**

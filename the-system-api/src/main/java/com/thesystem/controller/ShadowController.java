@@ -32,4 +32,13 @@ public class ShadowController {
         Shadow s = shadowService.extractDisciplineShadow(currentPlayer.id(principal));
         return ResponseEntity.ok(s);
     }
+
+    @PostMapping("/{shadowId}/dispatch")
+    public ResponseEntity<?> dispatchShadow(java.security.Principal principal, @org.springframework.web.bind.annotation.PathVariable Long shadowId, @org.springframework.web.bind.annotation.RequestParam int hours) {
+        try {
+            return ResponseEntity.ok(shadowService.dispatchShadow(currentPlayer.id(principal), shadowId, hours));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }

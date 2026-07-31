@@ -1,0 +1,50 @@
+.skill-tree-container {
+  overflow-x: auto;
+  padding: 24px 0;
+  display: flex;
+  justify-content: center;
+  min-width: 100%;
+}
+
+.skill-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.5;
+  filter: grayscale(1);
+  transition: all 0.3s ease;
+
+  &.unlocked {
+    opacity: 1;
+    filter: grayscale(0);
+    
+    .connector-down, .connector-horiz, .connector-up {
+      background: var(--system-blue) !important;
+      box-shadow: 0 0 5px var(--system-blue);
+    }
+    
+    .node-content {
+      border-color: var(--system-blue) !important;
+      box-shadow: 0 0 15px rgba(83, 74, 183, 0.2);
+    }
+  }
+  
+  &.maxed {
+    .node-content {
+      border-color: #FAC775 !important;
+      box-shadow: 0 0 15px rgba(250, 199, 117, 0.3);
+    }
+    .node-fill {
+      background: #FAC775 !important;
+      box-shadow: 0 0 8px #FAC775 !important;
+    }
+    .node-level {
+      color: #FAC775 !important;
+      text-shadow: 0 0 5px #FAC775;
+    }
+    .connector-down, .connector-horiz, .connector-up {
+      background: #FAC775 !important;
+      box-shadow: 0 0 5px #FAC775 !important;
+    }
+  }
+}

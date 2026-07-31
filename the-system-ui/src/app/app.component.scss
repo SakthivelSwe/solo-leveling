@@ -73,9 +73,27 @@
 }
 
 .bnav-icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
   line-height: 1;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative; /* For badge */
+}
+
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: var(--accent-red, #E24B4A);
+  color: white;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.5);
+  box-shadow: 0 0 8px rgba(226,75,74,0.6);
+  min-width: 14px;
+  text-align: center;
 }
 
 .bnav-label {

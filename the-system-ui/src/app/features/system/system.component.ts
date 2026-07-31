@@ -18,6 +18,7 @@ import {
 import { LifeOsService } from '../../core/services/life-os.service';
 import { UiStateService } from '../../core/services/ui-state.service';
 import { ScreenTimeService } from '../../core/services/screen-time.service';
+import { DungeonBreakService, DungeonBreak } from '../../core/services/dungeon-break.service';
 
 import { StatusWindowComponent } from './status-window/status-window.component';
 import { QuestLogComponent } from './quest-log/quest-log.component';
@@ -47,6 +48,12 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./system.component.scss'],
 })
 export class SystemComponent implements OnInit, OnDestroy {
+  private rankDialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+  private dungeonBreakService = inject(DungeonBreakService);
+
+  activeDungeonBreaks = signal<DungeonBreak[]>([]);
+
   status = signal<StatusWindow | null>(this.playerService.getCachedStatus());
   loading = signal(!this.status());
   pendingKey = signal<string | null>(null);
@@ -580,5 +587,16 @@ export class SystemComponent implements OnInit, OnDestroy {
     if (pct < 0.3) return '#E24B4A';
     if (pct < 0.6) return '#FAC775';
     return '#1D9E75';
+  }
+
+  clearBreak(id: number) {
+    this.dungeonBreakService.clearBreak(id).subscribe({
+      next: () => {
+        this.snackBar.open("Dungeon Break Cleared! Rewards Added.", "OK", { duration: 3000 });
+        this.activeDungeonBreaks.update(arr => arr.filter(b => b.id !== id));
+        this.playerService.getStatus().subscribe(s => this.status.set(s));
+      },
+      error: (e) => this.snackBar.open(e.error?.error || 'Failed to clear', 'OK', { duration: 3000 })
+    });
   }
 }

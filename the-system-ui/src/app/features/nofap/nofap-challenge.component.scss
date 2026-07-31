@@ -2235,3 +2235,34 @@
   .pi-sci-title { font-size: .7rem; }
 }
 
+
+/* MONARCH AURA */
+.nf-hero.monarch-aura {
+  position: relative;
+}
+.nf-hero.monarch-aura::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  box-shadow: inset 0 0 50px rgba(138, 43, 226, 0.5);
+  pointer-events: none;
+  animation: pulse-aura 3s infinite alternate;
+}
+@keyframes pulse-aura {
+  0% { box-shadow: inset 0 0 30px rgba(138, 43, 226, 0.3); }
+  100% { box-shadow: inset 0 0 80px rgba(138, 43, 226, 0.8), 0 0 20px rgba(138, 43, 226, 0.4); }
+}
+
+.monarch-particles {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(138,43,226,0.8) 2px, transparent 2px);
+  background-size: 20px 20px;
+  animation: particle-rise 10s linear infinite;
+  opacity: 0.3;
+}
+@keyframes particle-rise {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100px); }
+}

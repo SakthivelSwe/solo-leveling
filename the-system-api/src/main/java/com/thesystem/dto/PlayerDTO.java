@@ -15,6 +15,8 @@ public record PlayerDTO(
         String equippedTitle,
         boolean inPenaltyZone,
         String penaltyZoneEndTime,
-        String createdAt
+        String createdAt,
+        int systemGold
 ) {}
+
 

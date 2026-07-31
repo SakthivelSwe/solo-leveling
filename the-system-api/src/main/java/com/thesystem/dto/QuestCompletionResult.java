@@ -6,6 +6,7 @@ public record QuestCompletionResult(
         String questKey,
         String questLabel,
         int xpGained,
+        int goldEarned,
         boolean leveledUp,
         int newLevel,
         String newRank,
@@ -14,4 +15,5 @@ public record QuestCompletionResult(
         List<String> statsGained,
         List<AchievementDTO> newAchievements
 ) {}
+
 

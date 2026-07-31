@@ -26,6 +26,8 @@ public class WealthService {
     private final SubscriptionEntryRepository subRepo;
     private final AiProviderService aiProviderService;
     private final IncomeLogRepository incomeRepo;
+    private final FinancialAssetRepository assetRepo;
+    private final PlayerRepository playerRepo;
 
     public WealthService(BudgetEntryRepository budgetRepo, 
                          SavingsGoalRepository goalRepo, 
@@ -35,7 +37,9 @@ public class WealthService {
                          EmiEntryRepository emiRepo,
                          SubscriptionEntryRepository subRepo,
                          AiProviderService aiProviderService,
-                         IncomeLogRepository incomeRepo) {
+                         IncomeLogRepository incomeRepo,
+                         FinancialAssetRepository assetRepo,
+                         PlayerRepository playerRepo) {
         this.budgetRepo = budgetRepo;
         this.goalRepo = goalRepo;
         this.netWorthRepo = netWorthRepo;
@@ -45,6 +49,8 @@ public class WealthService {
         this.subRepo = subRepo;
         this.aiProviderService = aiProviderService;
         this.incomeRepo = incomeRepo;
+        this.assetRepo = assetRepo;
+        this.playerRepo = playerRepo;
     }
 
     // ---- Income ----
@@ -322,5 +328,27 @@ public class WealthService {
 
     public List<NetWorthLog> getNetWorthHistory(Long playerId) {
         return netWorthRepo.findAllByPlayerIdOrderByLogDateDesc(playerId);
+    }
+
+    public List<FinancialAsset> getAssets(Long playerId) {
+        return assetRepo.findByPlayerId(playerId);
+    }
+
+    public FinancialAsset buyAsset(Long playerId, String name, String type, int shares, int costPerShare, int yieldPerShare) {
+        Player p = playerRepo.findById(playerId).orElseThrow();
+        int totalCost = shares * costPerShare;
+        if (p.getSystemGold() < totalCost) throw new ApiException("Not enough System Gold", HttpStatus.BAD_REQUEST);
+        
+        p.setSystemGold(p.getSystemGold() - totalCost);
+        playerRepo.save(p);
+
+        FinancialAsset a = new FinancialAsset();
+        a.setPlayerId(playerId);
+        a.setName(name);
+        a.setType(type);
+        a.setShares(shares);
+        a.setCost(costPerShare);
+        a.setDailyGoldYield(yieldPerShare);
+        return assetRepo.save(a);
     }
 }

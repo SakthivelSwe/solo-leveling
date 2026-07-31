@@ -27,6 +27,7 @@ public class CareerService {
     private final CourseProgressRepository courseRepo;
     private final PlayerSkillRepository skillRepo;
     private final DeepWorkSessionRepository deepWorkRepo;
+    private final AiProviderService ai;
 
     private static final Map<String, Integer> TARGETS = Map.of(
             "Java + Spring Boot", 80,
@@ -41,13 +42,15 @@ public class CareerService {
                          LeetcodeLogRepository leetcodeRepo,
                          CourseProgressRepository courseRepo,
                          PlayerSkillRepository skillRepo,
-                         DeepWorkSessionRepository deepWorkRepo) {
+                         DeepWorkSessionRepository deepWorkRepo,
+                         AiProviderService ai) {
         this.jobRepo = jobRepo;
         this.roundRepo = roundRepo;
         this.leetcodeRepo = leetcodeRepo;
         this.courseRepo = courseRepo;
         this.skillRepo = skillRepo;
         this.deepWorkRepo = deepWorkRepo;
+        this.ai = ai;
     }
 
     // ---- Job applications ----
@@ -213,6 +216,41 @@ public class CareerService {
 
         return new InterviewReadinessDTO(perSkill, overall, verdict, weakAreas, strongAreas,
                 codingMinutes / 60);
+    }
+
+    // ---- AI Interview Simulator ----
+    public Map<String, String> startInterview(Long playerId, String targetRole) {
+        String sysPrompt = "You are a strict, senior technical interviewer hiring for a " + targetRole + " position. " +
+                "Start the interview by asking the very first technical question. Do not provide pleasantries.";
+        String aiResponse = ai.generate(AiProviderService.Scenario.COACHING, sysPrompt, "Start the interview.");
+        return Map.of("reply", aiResponse);
+    }
+
+    public Map<String, String> interviewChat(Long playerId, String targetRole, String history, String userMessage) {
+        String sysPrompt = "You are a strict technical interviewer for a " + targetRole + " role. " +
+                "Evaluate the user's response, then either ask a follow-up question or move to a new technical topic. " +
+                "If this is the 3rd or 4th question, conclude the interview and provide a harsh rating out of 100 with feedback.";
+        String userContext = "Conversation History so far:\n" + history + "\n\nCandidate's new answer:\n" + userMessage;
+        String aiResponse = ai.generate(AiProviderService.Scenario.COACHING, sysPrompt, userContext);
+        return Map.of("reply", aiResponse);
+    }
+
+    // ---- Resume Score Analyzer ----
+    public Map<String, Object> analyzeResume(Long playerId, String resumeText) {
+        String sysPrompt = "You are a top-tier FAANG recruiter. Analyze the provided resume text. " +
+                "Output strictly valid JSON with no markdown blocks containing: " +
+                "1) 'score' (number 0-100), 2) 'feedback' (array of strings with harsh critiques), " +
+                "3) 'strongPoints' (array of strings with positive notes).";
+        try {
+            String aiJson = ai.generate(AiProviderService.Scenario.EVALUATION, sysPrompt, resumeText);
+            // Clean markdown if AI included it
+            aiJson = aiJson.replace("```json", "").replace("```", "").trim();
+            // We use Jackson ObjectMapper internally in real app, but returning raw JSON string for controller to pass is fine.
+            // For simplicity, we just return it as a string under "rawJson" to be parsed by UI.
+            return Map.of("rawJson", aiJson);
+        } catch (Exception e) {
+            return Map.of("score", 0, "feedback", List.of("Failed to analyze: " + e.getMessage()));
+        }
     }
 }
 

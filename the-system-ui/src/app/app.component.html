@@ -3,6 +3,8 @@
   <router-outlet #outlet="outlet"></router-outlet>
 </div>
 
+<app-xp-particles></app-xp-particles>
+
 <!-- ═══ BOTTOM NAVIGATION BAR (mobile) ════════════════════════ -->
 @if (showBottomNav()) {
   <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
@@ -15,7 +17,12 @@
 
     <a routerLink="/habits" routerLinkActive="active" id="nav-habits"
        class="bnav-item" aria-label="Quests">
-      <span class="bnav-icon">⚔</span>
+      <span class="bnav-icon">
+        ⚔
+        @if (uiState.dueQuestsCount() > 0) {
+          <span class="nav-badge">{{ uiState.dueQuestsCount() }}</span>
+        }
+      </span>
       <span class="bnav-label">QUESTS</span>
     </a>
 
@@ -39,7 +46,12 @@
 
     <a routerLink="/learning" routerLinkActive="active" id="nav-learning"
        class="bnav-item" aria-label="Learning Log">
-      <span class="bnav-icon">📚</span>
+      <span class="bnav-icon">
+        📚
+        @if (uiState.dueFlashcardsCount() > 0) {
+          <span class="nav-badge">{{ uiState.dueFlashcardsCount() }}</span>
+        }
+      </span>
       <span class="bnav-label">LEARN</span>
     </a>
 
@@ -57,6 +69,8 @@
 
   </nav>
 }
+
+<app-system-broadcast></app-system-broadcast>
 
 <!-- Fullscreen System Lock (Biometric) -->
 @if (isLocked()) {

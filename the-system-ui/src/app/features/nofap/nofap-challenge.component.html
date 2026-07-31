@@ -54,7 +54,7 @@
          FLATLINE WARNING SYSTEM
          ════════════════════════════════════════════════════════════ -->
     @if (isFlatline()) {
-      <section class="nf-section flatline-warning system-card spring-hover" style="overflow: hidden;">
+      <section class="nf-section flatline-warning glass-panel spring-hover" style="overflow: hidden;">
         <div class="card-glow"></div>
         <div class="fl-header">
           <span class="fl-icon">⚠️</span>
@@ -82,7 +82,7 @@
          START DATE ONBOARDING — shown when no logs exist yet
          ════════════════════════════════════════════════════════════ -->
     @if (showOnboarding()) {
-      <section class="nf-section nf-onboarding system-card spring-hover" style="overflow: hidden;">
+      <section class="nf-section nf-onboarding glass-panel spring-hover" style="overflow: hidden;">
         <div class="card-glow"></div>
         <div class="ob-icon">🔥</div>
         <h2 class="ob-title mono">ALREADY STARTED YOUR CHALLENGE?</h2>
@@ -144,7 +144,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 1 — STREAK COUNTER
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section nf-hero system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section nf-hero glass-panel spring-hover" style="overflow: hidden;" [class.monarch-aura]="s.currentStreak >= 30">
+      <div class="monarch-particles" *ngIf="s.currentStreak >= 30"></div>
       <div class="card-glow"></div>
       <div class="hero-layout">
 
@@ -249,7 +250,7 @@
     <!-- ════════════════════════════════════════════════════════════
          BREATHING WIDGET — Inline 4-7-8 Technique
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card nf-breathing spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel nf-breathing spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <div class="breathing-header">
         <div>
@@ -300,7 +301,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 2 — TODAY'S BRAIN SCIENCE CARD
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <h2 class="section-title mono">◈ YOUR BRAIN RIGHT NOW — DAY {{ s.currentStreak }}</h2>
       <div class="science-today-card" [attr.data-category]="s.scienceCategory">
@@ -317,7 +318,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 3 — FULL 90-DAY BRAIN JOURNEY (Every Day)
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card">
+    <section class="nf-section glass-panel">
       <div class="timeline-header">
         <div>
           <h2 class="section-title mono">◈ 90-DAY BRAIN JOURNEY</h2>
@@ -387,7 +388,7 @@
 
       <!-- Expanded card detail -->
       @if (activeScienceDay(); as sc) {
-        <div class="tl-detail system-card">
+        <div class="tl-detail glass-panel">
           <div class="tld-header">
             <span class="tld-icon">{{ sc.icon }}</span>
             <div>
@@ -407,7 +408,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 4 — STATUS BOARD
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <h2 class="section-title mono">◈ STATUS BOARD</h2>
 
@@ -489,7 +490,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 5 — REWARDS SHOWCASE
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <h2 class="section-title mono">◈ MILESTONE REWARDS</h2>
       <p class="section-sub tech">XP awarded automatically on unlock</p>
@@ -514,7 +515,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 6 — PORN ADDICTION INSIGHTS
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <h2 class="section-title mono">◈ WHAT PORN DOES TO YOUR BRAIN</h2>
       <p class="section-sub tech">Science-backed evidence — know your enemy</p>
@@ -556,7 +557,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 7 — DAILY MOOD JOURNAL
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <h2 class="section-title mono">◈ DAILY MOOD JOURNAL</h2>
       <p class="section-sub tech">Track your emotional state — patterns reveal your recovery arc</p>
@@ -622,7 +623,7 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 8 — TRIGGER TRACKER
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
       <h2 class="section-title mono">◈ TRIGGER TRACKER</h2>
       <p class="section-sub tech">Know your enemy — log what caused the urge so you can defeat it next time</p>
@@ -681,7 +682,7 @@
     <!-- ════════════════════════════════════════════════════════════
          NIGHT EMISSION GUIDE — "Nightfall / Wet Dream" FAQ
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card ne-section spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel ne-section spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
 
       <div class="ne-header">
@@ -804,7 +805,7 @@
     <!-- ════════════════════════════════════════════════════════════
          PARTNER INTIMACY GUIDE — "Is it a relapse?" FAQ + Research
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section system-card pi-section spring-hover" style="overflow: hidden;">
+    <section class="nf-section glass-panel pi-section spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
 
       <div class="pi-header">

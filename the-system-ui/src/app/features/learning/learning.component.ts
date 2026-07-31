@@ -9,11 +9,12 @@ import {
 } from '../../core/services/learning.service';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
+import { SecondBrainComponent } from './components/second-brain/second-brain.component';
 
 @Component({
   selector: 'app-learning',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SecondBrainComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('fadeInUp', [
@@ -85,6 +86,10 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
     <button class="tab" [class.active]="activeTab() === 'devmastery'"
             (click)="activeTab.set('devmastery')">
       🔗 DEVMASTERY
+    </button>
+    <button class="tab" [class.active]="activeTab() === 'secondbrain'"
+            (click)="activeTab.set('secondbrain')">
+      🧠 SECOND BRAIN
     </button>
   </div>
 
@@ -1097,7 +1102,7 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
 export class LearningComponent implements OnInit {
 
   // ── Signals ──────────────────────────────────────────────────────────────
-  activeTab = signal<'log' | 'history' | 'stats' | 'flashcards' | 'devmastery'>('log');
+  activeTab = signal<'log' | 'history' | 'stats' | 'flashcards' | 'devmastery' | 'secondbrain'>('log');
   stats = signal<LearningStats | null>(null);
   
   // Flashcards (Phase 8)

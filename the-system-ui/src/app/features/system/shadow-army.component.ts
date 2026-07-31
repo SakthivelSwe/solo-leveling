@@ -22,7 +22,7 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
       </header>
 
       <div class="shadow-grid" [@listStagger]="shadows().length">
-        <div class="shadow-card" *ngFor="let s of shadows()">
+        <div class="shadow-card" *ngFor="let s of shadows()" [class.deployed]="s.isDeployed">
           <div class="shadow-avatar"></div>
           <div class="shadow-info">
             <h3 class="mono">{{ s.shadowName }}</h3>
@@ -31,6 +31,13 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
               <span>LVL {{ s.shadowLevel }}</span>
               <span>PWR {{ s.powerLevel }}</span>
             </div>
+          </div>
+          <div class="deploy-overlay" *ngIf="s.isDeployed">
+            <span class="mono">DEPLOYED</span>
+            <span class="tech time">{{ getRemainingTime(s.expeditionEndTime) }}</span>
+          </div>
+          <div class="deploy-action" *ngIf="!s.isDeployed">
+            <button class="btn secondary mono" (click)="dispatchShadow(s.id!, 8)">[ DISPATCH (8H) ]</button>
           </div>
         </div>
         
@@ -64,6 +71,10 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
       transition: all 0.3s ease;
       cursor: pointer;
     }
+    .shadow-card.deployed { opacity: 0.7; pointer-events: none; }
+    .deploy-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: var(--accent-gold); font-weight: bold; }
+    .deploy-overlay .time { font-size: 1.2rem; color: #fff; margin-top: 5px; }
+    .deploy-action { margin-top: 10px; text-align: center; }
     .shadow-card:hover {
       border-color: rgba(114,9,183,0.8); box-shadow: 0 0 20px rgba(114,9,183,0.4);
       transform: translateY(-5px);
@@ -104,6 +115,15 @@ import { trigger, transition, style, animate, stagger, query } from '@angular/an
   ]
 })
 export class ShadowArmyComponent implements OnInit {
+  getShadowIcon(type: string): string {
+    const t = type.toUpperCase();
+    if (t.includes('KNIGHT')) return '??';
+    if (t.includes('MAGE')) return '??';
+    if (t.includes('ASSASSIN')) return '??';
+    if (t.includes('TANK')) return '???';
+    if (t.includes('HEALER')) return '?';
+    return '??';
+  }
   shadows = signal<Shadow[]>([]);
   loading = signal(true);
   extracting = signal(false);
@@ -136,4 +156,24 @@ export class ShadowArmyComponent implements OnInit {
       }
     });
   }
+
+  dispatchShadow(id: number, hours: number) {
+    this.http.post<Shadow>(`${this.api}/shadows/${id}/dispatch?hours=${hours}`, {}).subscribe({
+      next: (s) => {
+        this.shadows.update(arr => arr.map(x => x.id === id ? s : x));
+        this.snack.open(`Shadow deployed for ${hours} hours!`, 'OK', { duration: 3000 });
+      },
+      error: (e) => this.snack.open(e.error?.error || 'Failed to dispatch.', 'OK', { duration: 3000 })
+    });
+  }
+
+  getRemainingTime(endTime?: string): string {
+    if (!endTime) return '';
+    const diff = new Date(endTime).getTime() - new Date().getTime();
+    if (diff <= 0) return 'READY FOR RETURN';
+    const h = Math.floor(diff / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${h}h ${m}m`;
+  }
 }
+

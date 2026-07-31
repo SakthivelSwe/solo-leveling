@@ -168,7 +168,7 @@
   transform: translateY(1px);
 }
 
-/* Base card styling is handled globally by .system-card, .block, etc.
+/* Base card styling is handled globally by .glass-panel, .block, etc.
    Here we override or add layout specifics */
 .form-panel {
   display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;

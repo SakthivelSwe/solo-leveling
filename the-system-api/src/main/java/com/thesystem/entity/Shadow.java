@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  * A Shadow is a mastered habit that has transcended into a permanent power.
  * Activated when a habit reaches a 25-day streak.
  *
- * Shadow Level = floor(currentStreak / 7) — levels up every week of consistency.
- * Power Level  = streak × difficulty — the raw strength of this Shadow.
+ * Shadow Level = floor(currentStreak / 7) â€” levels up every week of consistency.
+ * Power Level  = streak Ã— difficulty â€” the raw strength of this Shadow.
  *
  * Each active Shadow adds +1% XP bonus for quests in its category.
  * This is THE SYSTEM's most powerful long-term motivation mechanic:
@@ -50,7 +50,7 @@ public class Shadow {
     @Column(name = "shadow_level", nullable = false)
     private int shadowLevel = 1;
 
-    /** Raw power = streak × difficulty. Higher = stronger XP bonus. */
+    /** Raw power = streak Ã— difficulty. Higher = stronger XP bonus. */
     @Column(name = "power_level", nullable = false)
     private int powerLevel = 0;
 
@@ -63,4 +63,26 @@ public class Shadow {
 
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated = LocalDateTime.now();
+
+    @Column(name = "deployed", nullable = false)
+    private boolean deployed = false;
+
+    public boolean isDeployed() {
+        return deployed;
+    }
+
+    public void setDeployed(boolean deployed) {
+        this.deployed = deployed;
+    }
+
+    @Column(name = "expedition_end_time")
+    private java.time.LocalDateTime expeditionEndTime;
+
+    public java.time.LocalDateTime getExpeditionEndTime() {
+        return expeditionEndTime;
+    }
+
+    public void setExpeditionEndTime(java.time.LocalDateTime expeditionEndTime) {
+        this.expeditionEndTime = expeditionEndTime;
+    }
 }

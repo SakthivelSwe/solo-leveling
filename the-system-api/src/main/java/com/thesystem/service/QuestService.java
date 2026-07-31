@@ -31,6 +31,8 @@ public class QuestService {
     private final SelfDoubtEvidenceRepository evidenceRepository;
     private final SseService sseService;
     private final DopamineService dopamineService;
+    private final HealthService healthService;
+    private final JobChangeService jobChangeService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public QuestService(QuestSkipRepository skipRepository,
@@ -43,7 +45,9 @@ public class QuestService {
                         AchievementService achievementService,
                         SelfDoubtEvidenceRepository evidenceRepository,
                         SseService sseService,
-                        DopamineService dopamineService) {
+                        DopamineService dopamineService,
+                        HealthService healthService,
+                        JobChangeService jobChangeService) {
         this.skipRepository = skipRepository;
         this.questRepository = questRepository;
         this.completionRepository = completionRepository;
@@ -55,6 +59,8 @@ public class QuestService {
         this.evidenceRepository = evidenceRepository;
         this.sseService = sseService;
         this.dopamineService = dopamineService;
+        this.healthService = healthService;
+        this.jobChangeService = jobChangeService;
     }
 
     // ── Quest Lists ────────────────────────────────────────────────────────────
@@ -195,15 +201,25 @@ public class QuestService {
         // Duplicate completion check — window depends on quest timeType
         checkAlreadyCompleted(playerId, quest, today);
 
-        // XP with energy × dopamine multipliers
+        // XP with energy, dopamine, and clarity multipliers
         int baseXp = getDynamicXp(quest, player);
         int energy = player.getCurrentEnergy();
         double energyMultiplier = energy < 40 ? 0.80 : energy < 60 ? 0.90 : energy >= 80 ? 1.10 : 1.0;
         double focusMultiplier = dopamineService.getTodayFocusMultiplier(playerId);
-        int xp = (int) Math.round(baseXp * energyMultiplier * focusMultiplier);
+        
+        double clarityMultiplier = 1.0;
+        java.time.LocalDateTime clarityEnd = player.getClarityBuffEnd();
+        if (clarityEnd != null && clarityEnd.isAfter(java.time.LocalDateTime.now())) {
+            clarityMultiplier = 1.5;
+        }
+
+        int xp = (int) Math.round(baseXp * energyMultiplier * focusMultiplier * clarityMultiplier);
         
         // Add XP, handle level-up, and send SSE notification
         LevelUpDTO levelUp = levelService.addXp(player, xp, quest.getQuestKey());
+
+        // Process Job Change Quest progression
+        jobChangeService.progressQuest(playerId);
 
         // Stat boosts
         PlayerStats stats = statsRepository.findByPlayerId(playerId)
@@ -226,11 +242,15 @@ public class QuestService {
                     playerId, "Completed discipline quest: " + quest.getLabel(), "CHARACTER"));
         }
 
+        int goldEarned = xp / 5;
+        player.setSystemGold(player.getSystemGold() + goldEarned);
+        playerRepository.save(player);
+
         StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
                 stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getDis());
 
         return new QuestCompletionResult(
-                quest.getQuestKey(), quest.getLabel(), xp,
+                quest.getQuestKey(), quest.getLabel(), xp, goldEarned,
                 levelUp.leveledUp(), levelUp.newLevel(), levelUp.newRank(), levelUp.rankChanged(),
                 statsDto, statsGained, newAchievements);
     }
@@ -428,7 +448,7 @@ public class QuestService {
         StatsDTO statsDto = new StatsDTO(stats.getStrength(), stats.getIntelligence(),
                 stats.getVitality(), stats.getAgility(), stats.getPerception(), stats.getDis());
 
-        return new QuestCompletionResult("PENALTY_SURVIVAL", "Penalty Survival", 0,
+        return new QuestCompletionResult("PENALTY_SURVIVAL", "Penalty Survival", 0, 0,
                 false, player.getLevel(), player.getRankLevel(), false, statsDto, List.of(), List.of());
     }
 
@@ -510,4 +530,6 @@ public class QuestService {
         return distance;
     }
 }
+
+
 

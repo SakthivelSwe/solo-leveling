@@ -9,4 +9,5 @@ public interface ShadowRepository extends JpaRepository<Shadow, Long> {
     List<Shadow> findByPlayerIdOrderByShadowLevelDesc(Long playerId);
     Optional<Shadow> findByPlayerIdAndHabitId(Long playerId, Long habitId);
     boolean existsByPlayerIdAndHabitId(Long playerId, Long habitId);
+    List<Shadow> findByPlayerIdAndIsDeployedTrue(Long playerId);
 }

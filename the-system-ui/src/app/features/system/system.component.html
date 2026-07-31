@@ -68,6 +68,20 @@
     </div>
   </header>
 
+  <!-- DUNGEON BREAK BANNER -->
+  <div class="dungeon-break-banner" *ngIf="activeDungeonBreaks().length > 0">
+    <div class="break-content" *ngFor="let db of activeDungeonBreaks()">
+      <div class="break-icon pulse-red">⚠️ DUNGEON BREAK</div>
+      <div class="break-details">
+        <h4 class="mono">{{ db.title }}</h4>
+        <p class="tech">{{ db.description }}</p>
+      </div>
+      <div class="break-actions">
+        <button class="btn danger-btn mono" (click)="clearBreak(db.id)">[ CLEAR BREAK ]</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ LOADING ══════════════════════════════════════════════ -->
   <div class="loader" *ngIf="loading()">
     <div class="loader-ring"></div>

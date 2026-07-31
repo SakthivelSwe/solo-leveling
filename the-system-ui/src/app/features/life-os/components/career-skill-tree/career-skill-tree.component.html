@@ -1,0 +1,31 @@
+<div class="skill-tree-container">
+  <div class="tree-wrapper">
+    <ng-template #nodeTemplate let-node="node">
+      <div class="skill-node" [class.unlocked]="node.unlocked" [class.maxed]="node.level === node.maxLevel">
+        <div class="node-content glass-panel" style="padding: 12px; border-radius: 8px; width: 140px; text-align: center; border: 1px solid rgba(83, 74, 183, 0.3);">
+          <div class="tech node-label" style="font-size: 0.85rem; color: #fff; margin-bottom: 8px;">{{ node.label }}</div>
+          <div class="node-progress" style="height: 4px; background: rgba(0,0,0,0.5); border-radius: 2px; overflow: hidden; position: relative;">
+            <div class="node-fill" [style.width.%]="(node.level / node.maxLevel) * 100" style="background: var(--system-blue); height: 100%; box-shadow: 0 0 8px var(--system-blue);"></div>
+          </div>
+          <div class="mono node-level" style="font-size: 0.75rem; color: #534AB7; margin-top: 4px;">LV.{{ node.level }}/{{ node.maxLevel }}</div>
+        </div>
+        
+        <div class="children" *ngIf="node.children?.length" style="display: flex; gap: 24px; padding-top: 24px; position: relative; justify-content: center;">
+          <div class="connector-down" style="position: absolute; top: 0; left: 50%; width: 2px; height: 12px; background: rgba(83,74,183,0.3); transform: translateX(-50%);"></div>
+          <div class="connector-horiz" style="position: absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: rgba(83,74,183,0.3);" *ngIf="node.children.length > 1"></div>
+          
+          <div class="child-wrapper" *ngFor="let child of node.children" style="position: relative;">
+            <div class="connector-up" style="position: absolute; top: -12px; left: 50%; width: 2px; height: 12px; background: rgba(83,74,183,0.3); transform: translateX(-50%);"></div>
+            <ng-container *ngTemplateOutlet="nodeTemplate; context:{node: child}"></ng-container>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="root-nodes" style="display: flex; gap: 48px; justify-content: center;">
+      <div *ngFor="let root of rootNodes">
+        <ng-container *ngTemplateOutlet="nodeTemplate; context:{node: root}"></ng-container>
+      </div>
+    </div>
+  </div>
+</div>

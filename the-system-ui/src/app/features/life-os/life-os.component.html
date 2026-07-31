@@ -253,6 +253,51 @@
         </div>
       </div>
 
+      <!-- Meditation & Clarity -->
+      <div class="glass-card wide" style="border-color: rgba(31, 190, 142, 0.3);">
+        <h3 class="mono head" style="color: #5DCAA5; text-shadow: 0 0 10px rgba(31, 190, 142, 0.4);">◈ MEDITATION & CLARITY</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+          <!-- Active Buff Banner -->
+          <div *ngIf="clarityRemaining()" class="buff-active" style="background: rgba(31, 190, 142, 0.15); border: 1px solid #1FBE8E; padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="mono" style="color: #1FBE8E; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px;">CLARITY BUFF ACTIVE</div>
+              <div class="tech" style="color: #fff; font-size: 0.9rem;">+50% XP from all quests</div>
+            </div>
+            <div class="mono text-primary" style="font-size: 1.5rem; text-shadow: 0 0 8px rgba(31, 190, 142, 0.6);">
+              {{ clarityRemaining() }}
+            </div>
+          </div>
+
+          <!-- Meditation Controls -->
+          <div *ngIf="!clarityRemaining() && !isMeditating()" style="background: rgba(0,0,0,0.3); padding: 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+            <div class="tech" style="color: #8a8a9a; margin-bottom: 16px;">Meditate to clear mental debuffs and gain the Clarity Buff (2 hours).</div>
+            
+            <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px;">
+              <span class="tech" style="color: #fff;">Duration:</span>
+              <select [(ngModel)]="meditationMinutes" class="tech-input" style="width: auto;">
+                <option [value]="5">5 Minutes (Minor Buff)</option>
+                <option [value]="10">10 Minutes (Standard Buff)</option>
+                <option [value]="20">20 Minutes (Deep Clarity)</option>
+              </select>
+            </div>
+            
+            <button class="sys-btn-primary" style="background: rgba(31, 190, 142, 0.2); border-color: #1FBE8E; color: #1FBE8E;" (click)="startMeditation()">BEGIN MEDITATION</button>
+          </div>
+
+          <!-- Active Meditation Timer -->
+          <div *ngIf="isMeditating()" style="background: rgba(0,0,0,0.3); padding: 32px; border-radius: 12px; border: 1px solid rgba(31, 190, 142, 0.4); text-align: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(31, 190, 142, 0.15) 0%, transparent 70%); animation: pulse 4s infinite;"></div>
+            <div class="mono" style="color: #1FBE8E; font-size: 3rem; font-weight: bold; text-shadow: 0 0 20px rgba(31, 190, 142, 0.8); margin-bottom: 16px; position: relative; z-index: 1;">
+              {{ formatTime(meditationSeconds) }}
+            </div>
+            <div class="tech" style="color: #a0aabf; position: relative; z-index: 1;">Focus on your breath. Let thoughts pass like clouds.</div>
+            
+            <button class="sys-btn-secondary" style="margin-top: 24px; position: relative; z-index: 1;" (click)="cancelMeditation()">CANCEL</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Daily Reflection -->
       <div class="glass-card wide" style="border-color: rgba(108, 99, 255, 0.3);">
         <h3 class="mono head" style="color: #b3aef0; text-shadow: 0 0 10px rgba(108, 99, 255, 0.4);">◈ DAILY REFLECTION</h3>

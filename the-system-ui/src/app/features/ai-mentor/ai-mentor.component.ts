@@ -18,15 +18,19 @@ const BOSS_TOPICS = [
   { label: 'English — HR Round', difficulty: 'MEDIUM', icon: '💬' },
 ];
 
-type View = 'CHAT' | 'BOSS' | 'HISTORY';
+type View = 'CHAT' | 'BOSS' | 'HISTORY' | 'JOURNAL' | 'REPORT' | 'DIRECTIVE';
 
 const CHAT_CONTEXTS = [
-  { label: 'General System', value: 'general', icon: '◈' },
-  { label: 'Omni-Context Analysis', value: 'system_status', icon: '🧠' },
-  { label: 'Code Reviewer', value: 'code review', icon: '💻' },
-  { label: 'System Architect', value: 'system design', icon: '🏗️' },
-  { label: 'Career Strategist', value: 'career advice', icon: '📈' },
-  { label: 'HR Recruiter', value: 'hr interview', icon: '👔' }
+  { label: 'General System',         value: 'general',         icon: '◈', description: 'General assistant' },
+  { label: 'Omni-Context Analysis',  value: 'system_status',   icon: '🧠', description: 'Analyze full life data' },
+  { label: '🔥 Drill Sergeant',       value: 'drill_sergeant',  icon: '🔥', description: 'Brutal accountability. No excuses.' },
+  { label: '🏋️ The Coach',           value: 'coach',           icon: '🏋️', description: 'Motivational, supportive, growth-focused' },
+  { label: '📊 The Analyst',          value: 'analyst',         icon: '📊', description: 'Data-driven insights on your patterns' },
+  { label: '💰 Financial Advisor',    value: 'financial',       icon: '💰', description: 'Wealth building and money strategy' },
+  { label: 'Code Reviewer',          value: 'code review',     icon: '💻', description: 'Code quality and architecture review' },
+  { label: 'System Architect',       value: 'system design',   icon: '🏗️', description: 'System design coaching' },
+  { label: 'Career Strategist',      value: 'career advice',   icon: '📈', description: 'Job search and career planning' },
+  { label: 'HR Recruiter',           value: 'hr interview',    icon: '👔', description: 'Interview preparation' }
 ];
 
 @Component({
@@ -38,6 +42,35 @@ const CHAT_CONTEXTS = [
   animations: [fadeInUp, listStagger],
 })
 export class AiMentorComponent implements OnInit {
+  // Course Correction Protocol
+  triggerCourseCorrection() {
+    this.view.set('CHAT');
+    this.selectedContext.set(CHAT_CONTEXTS[2]); // Drill Sergeant
+    const msg = "SYSTEM ALERT: Disciplinary dip detected. You have missed your morning workout for 2 consecutive days. The Course Correction Protocol has been initiated. What is your excuse, Hunter? Respond immediately.";
+    this.chatMessages.update(msgs => [
+      ...msgs, 
+      { id: Date.now().toString(), role: 'system', text: msg, ts: new Date() }
+    ]);
+  }
+  // Morning Directive
+  directiveText = signal<string | null>(null);
+  directiveLoading = signal(false);
+
+  generateDirective() {
+    this.directiveLoading.set(true);
+    setTimeout(() => {
+      // Mocked AI directive generation based on sleep/performance
+      const text = `SYSTEM SCAN COMPLETE.
+SLEEP QUALITY: 65% (SUB-OPTIMAL).
+PERFORMANCE: 82% (STABLE).
+
+DIRECTIVE: Your physical vessel is fatigued, but your mind remains sharp. Focus on low-intensity, high-leverage tasks today. Prioritize hydration and a 20-minute restorative nap. Do not engage in heavy lifting or strenuous physical quests today. 
+
+"The obstacle is the way, but only if you have the energy to climb it."`;
+      this.directiveText.set(text);
+      this.directiveLoading.set(false);
+    }, 1500);
+  }
   @ViewChild('chatEnd') chatEnd!: ElementRef;
 
   view = signal<View>('CHAT');
@@ -61,6 +94,24 @@ export class AiMentorComponent implements OnInit {
   evaluations = signal<Evaluation[]>([]);
   battleLoading = signal(false);
   battleHistory = signal<BossBattle[]>([]);
+
+  // Journal Prompts
+  journalPrompts = signal<string[]>([
+    'What did you accomplish today that your past self would be proud of?',
+    'What is one thing you avoided today? Why? What will you do differently?',
+    'Rate your focus today from 1-10 and explain why.',
+    'What is the one area of your life that needs the most attention right now?',
+    'If you could redo today, what would you change?'
+  ]);
+  journalAnswers = signal<string[]>(['', '', '', '', '']);
+  journalLoading = signal(false);
+  journalFeedback = signal('');
+
+  // Weekly Report Card
+  weeklyReport = signal<string>('');
+  weeklyReportLoading = signal(false);
+  weeklyGrade = signal<string>('');
+
 
   // Web Speech API
   isVoiceMode = signal(false);
@@ -143,6 +194,51 @@ export class AiMentorComponent implements OnInit {
   setView(v: View): void {
     this.view.set(v);
     if (v === 'HISTORY') this.ai.getBattleHistory().subscribe(h => this.battleHistory.set(h));
+    if (v === 'REPORT') this.generateWeeklyReport();
+  }
+
+  // ── JOURNAL ───────────────────────────────────────────────────────────────
+  submitJournal(): void {
+    const answers = this.journalAnswers().filter(a => a.trim() !== '');
+    if (answers.length < 3) {
+      this.pushSystem('◈ SYSTEM REQUIRES AT LEAST 3 MEANINGFUL ANSWERS FOR ANALYSIS.');
+      this.view.set('CHAT');
+      return;
+    }
+    
+    this.journalLoading.set(true);
+    const payload = this.journalPrompts().map((p, i) => `Q: ${p}\nA: ${this.journalAnswers()[i]}`).join('\n\n');
+    
+    this.ai.chat(payload, 'coach').subscribe({
+      next: r => {
+        this.journalFeedback.set(r.reply);
+        this.journalLoading.set(false);
+      },
+      error: () => {
+        this.journalFeedback.set('◈ ERROR ANALYZING JOURNAL.');
+        this.journalLoading.set(false);
+      }
+    });
+  }
+
+  // ── WEEKLY REPORT ─────────────────────────────────────────────────────────
+  generateWeeklyReport(): void {
+    if (this.weeklyReport()) return; // Already loaded
+    this.weeklyReportLoading.set(true);
+    
+    // In a real implementation this would fetch aggregated stats from the backend
+    // For now we ask the AI to generate a report based on the Omni-Context
+    this.ai.chat('Generate my weekly AI Report Card based on my current stats. Grade me from S to E, and give me brutal feedback.', 'system_status').subscribe({
+      next: r => {
+        this.weeklyReport.set(r.reply);
+        this.weeklyGrade.set(r.reply.match(/[SABCDE]-RANK/)?.[0] || 'A-RANK');
+        this.weeklyReportLoading.set(false);
+      },
+      error: () => {
+        this.weeklyReport.set('◈ ERROR GENERATING REPORT.');
+        this.weeklyReportLoading.set(false);
+      }
+    });
   }
 
   // ── CHAT ──────────────────────────────────────────────────────────────────

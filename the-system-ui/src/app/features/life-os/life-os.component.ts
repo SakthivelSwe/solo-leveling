@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -27,7 +27,7 @@ type Tab = 'CAREER' | 'HEALTH' | 'MIND' | 'WEALTH' | 'ENGLISH' | 'BODY' | 'RELAT
   styleUrls: ['./life-os.component.scss'],
   animations: [fadeInUp, listStagger],
 })
-export class LifeOsComponent implements OnInit {
+export class LifeOsComponent implements OnInit, OnDestroy {
   readonly tabs: { key: Tab; label: string; icon: string; color: string }[] = [
     { key: 'CAREER', label: 'Career', icon: '💼', color: '#534AB7' },
     { key: 'HEALTH', label: 'Health', icon: '🩺', color: '#1D9E75' },
@@ -162,6 +162,15 @@ export class LifeOsComponent implements OnInit {
     { quote: "First say to yourself what you would be; and then do what you have to do.", author: "Epictetus" },
     { quote: "The obstacle in the path becomes the path. Never forget, within every obstacle is an opportunity to improve our condition.", author: "Ryan Holiday" }
   ];
+
+
+  // Meditation
+  isMeditating = signal(false);
+  meditationMinutes = signal(10);
+  meditationInterval: any;
+  clarityBuffEnd = signal<string | null>(null);
+  clarityRemaining = signal<string>('');
+  clarityInterval: any;
 
   // English
   english: EnglishLog = { speakingMin: 0, newWords: 0, mockInterview: false };
@@ -669,6 +678,98 @@ export class LifeOsComponent implements OnInit {
   }
   private blankRel(): RelationshipLog {
     return { gfCalled: false, callDurationMin: 0, familyContact: false, friendMessage: false };
+  }
+
+  // --- Meditation Logic ---
+  meditationSeconds = 0;
+  
+  startMeditation() {
+    this.life.startMeditation().subscribe({
+      next: () => console.log('Meditation started on backend'),
+      error: () => console.log('Error starting meditation on backend')
+    });
+    this.isMeditating.set(true);
+    this.meditationSeconds = this.meditationMinutes() * 60;
+    
+    if (this.meditationInterval) {
+      clearInterval(this.meditationInterval);
+    }
+    
+    this.meditationInterval = setInterval(() => {
+      this.meditationSeconds--;
+      if (this.meditationSeconds <= 0) {
+        this.completeMeditation();
+      }
+    }, 1000);
+  }
+
+  cancelMeditation() {
+    this.isMeditating.set(false);
+    if (this.meditationInterval) {
+      clearInterval(this.meditationInterval);
+      this.meditationInterval = null;
+    }
+  }
+
+  completeMeditation() {
+    this.cancelMeditation();
+    this.toast('◈ Meditation Complete! Clarity Buff Applied (2h)');
+    
+    // Set buff for 2 hours
+    const end = new Date();
+    end.setHours(end.getHours() + 2);
+    this.clarityBuffEnd.set(end.toISOString());
+    
+    if (this.clarityInterval) {
+      clearInterval(this.clarityInterval);
+    }
+    
+    this.clarityInterval = setInterval(() => {
+      this.updateClarityTimer();
+    }, 1000);
+    this.updateClarityTimer();
+    
+    // Call backend
+    this.life.completeMeditation(this.meditationMinutes()).subscribe({
+      next: () => console.log('Meditation synced to backend'),
+      error: () => console.log('Could not sync meditation to backend')
+    });
+  }
+
+  updateClarityTimer() {
+    const end = this.clarityBuffEnd();
+    if (!end) return;
+    
+    const diff = new Date(end).getTime() - new Date().getTime();
+    if (diff <= 0) {
+      this.clarityRemaining.set('');
+      this.clarityBuffEnd.set(null);
+      if (this.clarityInterval) {
+        clearInterval(this.clarityInterval);
+        this.clarityInterval = null;
+      }
+      return;
+    }
+    
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    this.clarityRemaining.set(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+  }
+
+  formatTime(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  ngOnDestroy() {
+    if (this.meditationInterval) {
+      clearInterval(this.meditationInterval);
+    }
+    if (this.clarityInterval) {
+      clearInterval(this.clarityInterval);
+    }
   }
 }
 

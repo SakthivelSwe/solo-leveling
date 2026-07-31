@@ -1,6 +1,6 @@
-﻿/* ═══════════════════════════════════════════════════════════
-   DAILY HABITS — Clean Redesign
-   ═══════════════════════════════════════════════════════════ */
+/* -----------------------------------------------------------
+   DAILY HABITS � Clean Redesign
+   ----------------------------------------------------------- */
 
 .habits-shell {
   min-height: 100vh;
@@ -9,7 +9,7 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* ── HEADER ─────────────────────────────────────────────── */
+/* -- HEADER ----------------------------------------------- */
 .hb-topbar {
   display: flex;
   align-items: center;
@@ -44,7 +44,7 @@
   width: 100%;
 }
 
-/* ── LOADER ──────────────────────────────────────────────── */
+/* -- LOADER ------------------------------------------------ */
 .hb-loader {
   display: flex;
   flex-direction: column;
@@ -65,7 +65,7 @@
   animation: spin 1s linear infinite;
 }
 
-/* ── PROGRESS BANNER ─────────────────────────────────────── */
+/* -- PROGRESS BANNER --------------------------------------- */
 .hb-progress-banner {
   margin: 16px;
   padding: 20px;
@@ -159,7 +159,7 @@
   text-align: center;
 }
 
-/* ── ACTION BUTTONS ──────────────────────────────────────── */
+/* -- ACTION BUTTONS ---------------------------------------- */
 .hb-actions {
   display: flex;
   gap: 10px;
@@ -198,7 +198,7 @@
   &:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
 }
 
-/* ── EMPTY STATE ─────────────────────────────────────────── */
+/* -- EMPTY STATE ------------------------------------------- */
 .hb-empty {
   display: flex;
   flex-direction: column;
@@ -228,7 +228,7 @@
   margin: 0;
 }
 
-/* ── HABITS LIST ─────────────────────────────────────────── */
+/* -- HABITS LIST ------------------------------------------- */
 .hb-list {
   padding: 0 16px;
   display: flex;
@@ -236,7 +236,7 @@
   gap: 12px;
 }
 
-/* ── HABIT CARD ──────────────────────────────────────────── */
+/* -- HABIT CARD -------------------------------------------- */
 .hb-card {
   display: flex;
   align-items: stretch;
@@ -394,7 +394,7 @@
   margin: 0;
 }
 
-/* ── CARD ACTIONS (right side) ───────────────────────────── */
+/* -- CARD ACTIONS (right side) ----------------------------- */
 .hb-card-actions {
   display: flex;
   flex-direction: column;
@@ -467,9 +467,9 @@
   &.hb-delete:hover { background: rgba(220,50,50,0.15); color: #ff6b6b; border-color: rgba(220,50,50,0.3); }
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    MODALS
-   ══════════════════════════════════════════════════════════ */
+   ---------------------------------------------------------- */
 .hb-backdrop {
   position: fixed;
   inset: 0;
@@ -761,7 +761,7 @@ select.hb-input { cursor: pointer; }
   &:hover { background: rgba(250,199,117,0.22); }
 }
 
-/* ── Animations ──────────────────────────────────────────── */
+/* -- Animations -------------------------------------------- */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }

@@ -7,10 +7,12 @@ export interface Player {
   level: number;
   currentXp: number;
   totalXp: number;
+  systemGold: number;
   xpToNextLevel: number;
   hp: number;
   maxHp: number;
   equippedTitle?: string | null;
+  archetype?: string | null;
   currentEnergy?: number;
   inPenaltyZone?: boolean;
   penaltyZoneEndTime?: string;
@@ -39,6 +41,16 @@ export interface PlayerSkill {
   level: number;
   skillXp?: number;
   skillRank?: string;
+}
+
+export interface JobChangeQuest {
+  playerId: number;
+  isActive: boolean;
+  isCompleted: boolean;
+  requiredQuests: number;
+  completedQuests: number;
+  startedAt: string;
+  deadline: string;
 }
 
 export interface Quest {
@@ -73,7 +85,7 @@ export interface CustomQuestRequest {
   /** DAILY | SKILL | TESTOSTERONE | WEEKLY | MONTHLY */
   category: string;
   xpReward?: number;
-  statBoosts?: string;
+  statBoosts?: Record<string, number>;
 }
 
 
@@ -82,6 +94,7 @@ export interface DayProgress {
   dayLabel: string;
   questsCompleted: number;
   xpEarned: number;
+  goldEarned: number;
   isToday: boolean;
 }
 
@@ -184,6 +197,8 @@ export interface Shadow {
   powerLevel: number;
   streakAtActivation: number;
   activeSince: string;
+  isDeployed?: boolean;
+  expeditionEndTime?: string;
 }
 
 export interface QuestCompletionResult {
@@ -221,6 +236,7 @@ export interface MonthlyReport {
   rankLevel: string;
   level: number;
   totalXp: number;
+  systemGold: number;
   rankTarget: string;
   systemVerdict: string;
 }
@@ -603,6 +619,9 @@ export interface BodyMetric {
   logDate?: string;
   weightKg?: number | null;
   bodyFatPct?: number | null;
+  chestCm?: number | null;
+  waistCm?: number | null;
+  armCm?: number | null;
   note?: string;
 }
 
@@ -642,6 +661,7 @@ export interface DevMasteryProgress {
   topicTitle: string;
   pathSlug: string;
   xpEarned: number;
+  goldEarned: number;
   completedAt: string;
 }
 

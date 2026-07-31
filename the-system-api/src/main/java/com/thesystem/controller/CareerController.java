@@ -101,4 +101,20 @@ public class CareerController {
     public List<com.thesystem.entity.DevMasteryProgress> syncDevMastery(Principal p) {
         return devMasterySyncService.syncProgress(currentPlayer.id(p));
     }
+
+    // ---- AI Interview & Resume (Phase 3) ----
+    @PostMapping("/interview/start")
+    public Map<String, String> startInterview(Principal p, @RequestBody Map<String, String> body) {
+        return careerService.startInterview(currentPlayer.id(p), body.get("targetRole"));
+    }
+
+    @PostMapping("/interview/chat")
+    public Map<String, String> interviewChat(Principal p, @RequestBody Map<String, String> body) {
+        return careerService.interviewChat(currentPlayer.id(p), body.get("targetRole"), body.get("history"), body.get("userMessage"));
+    }
+
+    @PostMapping("/resume/analyze")
+    public Map<String, Object> analyzeResume(Principal p, @RequestBody Map<String, String> body) {
+        return careerService.analyzeResume(currentPlayer.id(p), body.get("resumeText"));
+    }
 }

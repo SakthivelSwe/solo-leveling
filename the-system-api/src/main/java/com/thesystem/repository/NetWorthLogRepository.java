@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface NetWorthLogRepository extends JpaRepository<NetWorthLog, Long> {
     List<NetWorthLog> findAllByPlayerIdOrderByLogDateDesc(Long playerId);
     Optional<NetWorthLog> findByPlayerIdAndLogDate(Long playerId, LocalDate date);
+    Optional<NetWorthLog> findFirstByPlayerIdOrderByLogDateDesc(Long playerId);
 }

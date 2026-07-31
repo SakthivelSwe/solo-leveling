@@ -12,6 +12,7 @@
       <a routerLink="/life">LIFE OS</a>
       <a routerLink="/ai">AI MENTOR</a>
       <a routerLink="/achievements">RANKS</a>
+      <a routerLink="/shop">SYSTEM SHOP</a>
     </nav>
   </header>
 
@@ -24,7 +25,7 @@
   <main *ngIf="!loading()" class="content">
 
     <!-- MONTHLY REPORT CARD -->
-    <section class="report-card system-card" *ngIf="report() as r" @fadeInUp>
+    <section class="report-card glass-panel" *ngIf="report() as r" @fadeInUp>
       <div class="report-head">
         <div>
           <h2 class="mono">◈ MONTHLY REPORT — {{ r.monthLabel }}</h2>
@@ -49,6 +50,10 @@
         <div class="stat-tile" @fadeInUp>
           <span class="val mono">{{ r.daysActive }}/{{ r.daysElapsed }}</span>
           <span class="lbl tech">ACTIVE DAYS</span>
+        </div>
+        <div class="stat-tile" @fadeInUp style="border-color: #6C63FF; background: rgba(108, 99, 255, 0.1);">
+          <span class="val mono" style="color: #6C63FF; text-shadow: 0 0 10px rgba(108,99,255,0.5);">{{ syncRate() }}%</span>
+          <span class="lbl tech" style="color: #b3aef0;">SYNC RATE</span>
         </div>
         <div class="stat-tile" @fadeInUp>
           <span class="val mono">{{ r.totalQuestsMonth }}</span>
@@ -80,7 +85,7 @@
     </section>
 
     <!-- AI WEEKLY REVIEW -->
-    <section class="ai-card system-card" @fadeInUp>
+    <section class="ai-card glass-panel" @fadeInUp>
       <div class="ai-head">
         <h3 class="mono">◈ SYSTEM AI REVIEW</h3>
         <button class="ai-btn tech" (click)="generateReview()" [disabled]="aiLoading()">
@@ -99,7 +104,7 @@
     </section>
 
     <!-- TITLES -->
-    <section class="titles-card system-card" @fadeInUp>
+    <section class="titles-card glass-panel" @fadeInUp>
       <div class="hm-head">
         <h3 class="mono">◈ TITLES</h3>
         <span class="tech dim">Tap an unlocked title to equip it</span>
@@ -120,7 +125,7 @@
     </section>
 
     <!-- CONSISTENCY HEATMAP -->
-    <section class="heatmap-card system-card" @fadeInUp>
+    <section class="heatmap-card glass-panel" @fadeInUp>
       <div class="hm-head">
         <h3 class="mono">◈ CONSISTENCY MAP</h3>
         <span class="tech dim">{{ totalDays() }} active days · last 18 weeks</span>

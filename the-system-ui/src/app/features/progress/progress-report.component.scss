@@ -32,7 +32,7 @@
 
 .content { display: flex; flex-direction: column; gap: 20px; }
 
-.system-card {
+.glass-panel {
   background: var(--card-bg, #10101e); border: 1px solid var(--border);
   border-radius: 14px; padding: 20px;
 }
@@ -164,4 +164,97 @@
   .heatmap .cell { width: 11px; height: 11px; }
 }
 
+/* ── Unified Dashboard & Rank Roadmap ──────────────────────── */
+.unified-dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-4);
+  margin-bottom: var(--s-6);
+}
+@media (min-width: 900px) {
+  .unified-dashboard {
+    grid-template-columns: 350px 1fr;
+  }
+}
+.radar-container {
+  padding: var(--s-5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 280px;
+}
+.stat-grid-6 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--s-3);
+}
+.stat-card {
+  padding: var(--s-4);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  border-radius: var(--r-md);
+}
+.stat-icon {
+  font-size: 1.8rem;
+}
+.stat-info {
+  display: flex; flex-direction: column;
+}
+.stat-info .lbl {
+  font-size: 0.65rem; color: var(--text-secondary); letter-spacing: 1px;
+}
+.stat-info .val {
+  font-size: 1.2rem; font-weight: 700; color: var(--text-primary);
+}
+.val.positive { color: var(--accent-teal); }
+.val.negative { color: var(--accent-red); }
 
+/* Rank Roadmap */
+.roadmap-visual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--s-6);
+  padding: var(--s-4) 0;
+  position: relative;
+  overflow-x: auto;
+}
+.rank-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  z-index: 2;
+  opacity: 0.4;
+  transition: all 0.3s ease;
+}
+.rank-node.achieved { opacity: 1; }
+.rank-node.current .r-letter {
+  box-shadow: 0 0 20px rgba(108, 99, 255, 0.6);
+  border-color: var(--system-blue);
+  transform: scale(1.1);
+}
+.r-letter {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 700;
+}
+.r-xp {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+.rank-line {
+  flex: 1; height: 4px; background: var(--border);
+  margin: 0 8px; border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.rank-line.active {
+  background: var(--accent-purple);
+  box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
+}
+.glow {
+  text-shadow: 0 0 10px var(--accent-gold);
+  color: var(--accent-gold);
+}

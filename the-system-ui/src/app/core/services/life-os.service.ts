@@ -97,6 +97,8 @@ export class LifeOsService {
   generateHealthReport(): Observable<string> { return this.http.get(`${this.api}/health/diet/ai-report`, { responseType: 'text' }); }
 
   /* ===== Mind OS ===== */
+  startMeditation(): Observable<any> { return this.http.post(`/api/v1/mind/meditate/start`, {}); }
+  completeMeditation(minutes: number): Observable<any> { return this.http.post(`/api/v1/mind/meditate/complete`, { minutes }); }
   getMindToday(): Observable<MindLog> { return this.http.get<MindLog>(`${this.api}/mind/today`); }
   upsertMind(b: MindLog): Observable<MindLog> { return this.http.post<MindLog>(`${this.api}/mind/log`, b); }
   getEvidence(): Observable<SelfDoubtEvidence[]> { return this.http.get<SelfDoubtEvidence[]>(`${this.api}/mind/evidence`); }
@@ -198,4 +200,5 @@ export class LifeOsService {
   /* ===== Penalty Zone ===== */
   survivePenalty(): Observable<Player> { return this.http.post<Player>(`${this.api}/player/survive-penalty`, {}); }
 }
+
 

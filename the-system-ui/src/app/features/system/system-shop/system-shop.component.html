@@ -1,0 +1,169 @@
+<div class="shop-container">
+  <div class="shop-header">
+    <div class="title-wrap">
+      <h2 class="mono head">🛒 SYSTEM SHOP / WEALTH</h2>
+      <p class="tech hint">Manage real-life rewards and financial assets.</p>
+    </div>
+    
+    <div class="gold-balance mono">
+      <span class="gold-icon">💰</span>
+      <span class="gold-amount">{{ systemGold() | number:'1.0-0' }}</span>
+      <span class="gold-label">GOLD</span>
+    </div>
+  </div>
+
+  <div class="tabs tech">
+    <button class="tab-btn" [class.active]="activeTab() === 'REWARDS'" (click)="setTab('REWARDS')">REWARDS</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'ASSETS'" (click)="setTab('ASSETS')">FINANCIAL ASSETS</button>
+  </div>
+
+  <!-- REWARDS TAB -->
+  <ng-container *ngIf="activeTab() === 'REWARDS'">
+    <div class="controls mt-4">
+      <button class="btn primary add-btn mono" (click)="openAddModal()">+ ADD REWARD</button>
+    </div>
+
+    <div class="items-grid">
+      <div class="shop-item glass-card" *ngFor="let item of items()" [class.purchased]="item.isOneTime && item.isPurchased">
+        <div class="item-main">
+          <div class="item-icon">{{ item.icon }}</div>
+          <div class="item-details">
+            <div class="item-name mono">{{ item.name }}</div>
+            <div class="item-desc tech">{{ item.description }}</div>
+          </div>
+        </div>
+        <div class="item-footer">
+          <div class="item-cost mono" [class.affordable]="systemGold() >= item.cost">
+            💰 {{ item.cost | number }}
+          </div>
+          <div class="item-actions">
+            <button class="btn buy-btn tech" 
+                    [disabled]="(item.isOneTime && item.isPurchased) || systemGold() < item.cost"
+                    (click)="buy(item)">
+              {{ (item.isOneTime && item.isPurchased) ? 'ACQUIRED' : 'PURCHASE' }}
+            </button>
+            <button class="btn danger-icon" (click)="deleteItem(item.id!)" title="Delete Reward">🗑️</button>
+          </div>
+        </div>
+        <div class="purchased-overlay" *ngIf="item.isOneTime && item.isPurchased">
+          <span class="mono">PURCHASED</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ASSETS TAB -->
+  <ng-container *ngIf="activeTab() === 'ASSETS'">
+    <div class="asset-summary glass-card mt-4 p-4">
+      <div class="summary-item">
+        <span class="label tech">TOTAL ASSETS:</span>
+        <span class="value mono">{{ assets().length }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label tech">DAILY YIELD:</span>
+        <span class="value mono text-primary">+{{ totalDailyYield() | number:'1.0-0' }} GOLD</span>
+      </div>
+    </div>
+
+    <div class="controls mt-4">
+      <button class="btn primary add-btn mono" (click)="openBuyAssetModal()">+ ACQUIRE ASSET</button>
+    </div>
+
+    <div class="items-grid">
+      <div class="shop-item glass-card" *ngFor="let asset of assets()">
+        <div class="item-main">
+          <div class="item-icon">📈</div>
+          <div class="item-details">
+            <div class="item-name mono">{{ asset.name }}</div>
+            <div class="item-desc tech">{{ asset.type }} • {{ asset.shares }} Shares</div>
+          </div>
+        </div>
+        <div class="item-footer">
+          <div class="item-cost mono text-primary">
+            +{{ asset.shares * asset.yield | number }} / Day
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Add Reward Modal -->
+<div class="modal-overlay" *ngIf="showAddModal()">
+  <div class="modal glass-card">
+    <h3 class="mono">ADD SYSTEM REWARD</h3>
+    <div class="form-group">
+      <label class="tech">Reward Name</label>
+      <input type="text" [(ngModel)]="newItem.name" class="tech-input">
+    </div>
+    <div class="form-group">
+      <label class="tech">Description</label>
+      <input type="text" [(ngModel)]="newItem.description" class="tech-input">
+    </div>
+    <div class="form-group row">
+      <div class="col">
+        <label class="tech">Cost (Gold)</label>
+        <input type="number" [(ngModel)]="newItem.cost" class="tech-input">
+      </div>
+      <div class="col">
+        <label class="tech">Icon (Emoji)</label>
+        <input type="text" [(ngModel)]="newItem.icon" class="tech-input">
+      </div>
+    </div>
+    <div class="form-group checkbox-group">
+      <label class="tech">
+        <input type="checkbox" [(ngModel)]="newItem.isOneTime">
+        One-Time Purchase (Non-consumable)
+      </label>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn tech" (click)="closeAddModal()">CANCEL</button>
+      <button class="btn primary mono" (click)="saveNewItem()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Acquire Asset Modal -->
+<div class="modal-overlay" *ngIf="showBuyAssetModal()">
+  <div class="modal glass-card">
+    <h3 class="mono">ACQUIRE FINANCIAL ASSET</h3>
+    <div class="form-group">
+      <label class="tech">Asset Name (e.g. S&P 500)</label>
+      <input type="text" [(ngModel)]="newAsset.name" class="tech-input">
+    </div>
+    <div class="form-group row">
+      <div class="col">
+        <label class="tech">Type</label>
+        <select [(ngModel)]="newAsset.type" class="tech-input">
+          <option value="INDEX_FUND">Index Fund</option>
+          <option value="STOCK">Individual Stock</option>
+          <option value="BOND">Bond</option>
+          <option value="REAL_ESTATE">Real Estate</option>
+          <option value="CRYPTO">Crypto</option>
+        </select>
+      </div>
+      <div class="col">
+        <label class="tech">Shares</label>
+        <input type="number" [(ngModel)]="newAsset.shares" class="tech-input">
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col">
+        <label class="tech">Cost Per Share (Gold)</label>
+        <input type="number" [(ngModel)]="newAsset.cost" class="tech-input">
+      </div>
+      <div class="col">
+        <label class="tech">Daily Yield Per Share</label>
+        <input type="number" [(ngModel)]="newAsset.yield" class="tech-input">
+      </div>
+    </div>
+    <div class="total-cost tech mt-4 text-center">
+      Total Cost: <span class="mono text-primary">{{ newAsset.shares * newAsset.cost | number }} GOLD</span>
+    </div>
+    <div class="modal-actions mt-4">
+      <button class="btn tech" (click)="closeBuyAssetModal()">CANCEL</button>
+      <button class="btn primary mono" (click)="buyAsset()" [disabled]="systemGold() < (newAsset.shares * newAsset.cost)">ACQUIRE</button>
+    </div>
+  </div>
+</div>

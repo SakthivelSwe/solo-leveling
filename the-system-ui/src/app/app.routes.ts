@@ -96,5 +96,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/system/shadow-army.component').then(m => m.ShadowArmyComponent),
   },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/profile/profile.component').then(m => m.ProfileComponent),
+  },
+  {
+    path: 'shop',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/system/system-shop/system-shop.component').then(m => m.SystemShopComponent),
+  },
   { path: '**', redirectTo: 'system' },
 ];
