@@ -36,9 +36,11 @@
 /* Brand */
 .brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .brand-logo {
-  width: 30px; height: 30px;
-  filter: drop-shadow(0 0 10px var(--system-blue)) drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  width: 34px; height: 34px;
+  filter: drop-shadow(0 0 8px var(--system-blue)) drop-shadow(0 4px 6px rgba(0,0,0,0.5));
   animation: floatLogo 5s ease-in-out infinite;
+  mix-blend-mode: screen;
+  border-radius: 50%;
 }
 @keyframes floatLogo {
   0%,100% { transform: translateY(0) rotateY(0deg); }
