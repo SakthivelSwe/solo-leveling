@@ -692,7 +692,7 @@
 .sub-total { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); color: #6a6a7a; font-size: 0.85rem; }
 
 /* ── Goals Grid ── */
-.goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 .goal-card {
   display: flex;
   align-items: flex-start;
@@ -706,10 +706,10 @@
 }
 .goal-ring-wrap { flex-shrink: 0; }
 .goal-ring { width: 80px; height: 80px; }
-.goal-info { flex: 1; }
-.goal-name { font-size: 0.9rem; color: #fff; font-weight: 600; margin-bottom: 6px; }
-.goal-vals { font-size: 0.85rem; margin-bottom: 4px; }
-.goal-btns { display: flex; gap: 6px; margin-top: 10px; }
+.goal-info { flex: 1; min-width: 0; }
+.goal-name { font-size: 0.9rem; color: #fff; font-weight: 600; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.goal-vals { font-size: 0.85rem; margin-bottom: 4px; word-break: break-word; }
+.goal-btns { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 
 /* ── Net Worth Display ── */
 .nw-display { display: flex; align-items: center; gap: 24px; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; flex-wrap: wrap; }
