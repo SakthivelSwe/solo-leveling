@@ -2,7 +2,7 @@
 
 .life-shell {
   max-width: 1180px; margin: 0 auto;
-  padding: 0 20px clamp(24px, 4vw, 60px);
+  padding: 0 20px 90px;
 }
 
 .topbar {
@@ -23,6 +23,7 @@
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .name { font-size: 1rem; letter-spacing: 4px; color: var(--text); }
@@ -234,8 +235,9 @@
 }
 
 @media (max-width: 480px) {
-  .life-shell { padding: 0 12px 24px; }
-  .topbar { margin-bottom: 12px; }
+  .life-shell { padding: 0 12px 90px; }
+  .topbar { margin-bottom: 12px; flex-wrap: wrap; justify-content: center; gap: 8px; padding-top: max(env(safe-area-inset-top, 12px), 24px); }
+  .topbar .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
   .name { font-size: .9rem; letter-spacing: 3px; }
   .tab { padding: 10px 14px; font-size: .7rem; }
 }
