@@ -25,6 +25,7 @@ public class WealthService {
     private final EmiEntryRepository emiRepo;
     private final SubscriptionEntryRepository subRepo;
     private final AiProviderService aiProviderService;
+    private final IncomeLogRepository incomeRepo;
 
     public WealthService(BudgetEntryRepository budgetRepo, 
                          SavingsGoalRepository goalRepo, 
@@ -33,7 +34,8 @@ public class WealthService {
                          ExpenseLogRepository expenseRepo,
                          EmiEntryRepository emiRepo,
                          SubscriptionEntryRepository subRepo,
-                         AiProviderService aiProviderService) {
+                         AiProviderService aiProviderService,
+                         IncomeLogRepository incomeRepo) {
         this.budgetRepo = budgetRepo;
         this.goalRepo = goalRepo;
         this.netWorthRepo = netWorthRepo;
@@ -42,6 +44,22 @@ public class WealthService {
         this.emiRepo = emiRepo;
         this.subRepo = subRepo;
         this.aiProviderService = aiProviderService;
+        this.incomeRepo = incomeRepo;
+    }
+
+    // ---- Income ----
+    public IncomeLog logIncome(Long playerId, IncomeLog body) {
+        body.setId(null);
+        body.setPlayerId(playerId);
+        if (body.getIncomeDate() == null) body.setIncomeDate(LocalDate.now());
+        return incomeRepo.save(body);
+    }
+
+    public List<IncomeLog> getIncomeHistory(Long playerId, String start, String end) {
+        if (start != null && end != null) {
+            return incomeRepo.findByPlayerIdAndIncomeDateBetweenOrderByIncomeDateDesc(playerId, LocalDate.parse(start), LocalDate.parse(end));
+        }
+        return incomeRepo.findTop20ByPlayerIdOrderByIncomeDateDesc(playerId);
     }
 
     // ---- Expenses ----

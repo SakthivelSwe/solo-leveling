@@ -21,6 +21,19 @@ public class WealthController {
         this.currentPlayer = currentPlayer;
     }
 
+    // ---- Income ----
+    @PostMapping("/income")
+    public IncomeLog logIncome(Principal p, @RequestBody IncomeLog body) {
+        return wealthService.logIncome(currentPlayer.id(p), body);
+    }
+
+    @GetMapping("/income")
+    public List<IncomeLog> getIncomeHistory(Principal p, 
+                                            @RequestParam(required = false) String start, 
+                                            @RequestParam(required = false) String end) {
+        return wealthService.getIncomeHistory(currentPlayer.id(p), start, end);
+    }
+
     // ---- Expenses ----
     @PostMapping("/expenses")
     public ExpenseLog logExpense(Principal p, @RequestBody ExpenseLog body) {
