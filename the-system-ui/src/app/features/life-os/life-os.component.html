@@ -300,302 +300,510 @@
   <!-- ===================== WEALTH ===================== -->
   <section class="panel" *ngIf="active() === 'WEALTH'" @fadeInUp
            role="tabpanel" id="panel-WEALTH" aria-labelledby="tab-WEALTH">
-    <div class="cards">
-      
-      <!-- 1. Wisdom Engine Carousel -->
-      <div class="glass-card" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 100px; border-color: rgba(250, 199, 117, 0.4); background: linear-gradient(160deg, rgba(250, 199, 117, 0.1), rgba(10, 10, 20, 0.8));">
-        <div style="text-align: center; max-width: 800px; padding: 24px;">
-          <h3 class="mono tech" style="color: #FAC775; letter-spacing: 2px; margin-bottom: 12px; font-size: 0.85rem; text-shadow: 0 0 10px rgba(250, 199, 117, 0.4);">◈ WISDOM ENGINE</h3>
-          <p style="font-size: 1.3rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);">
-            "{{ wisdomTips[wisdomIndex()].text }}"
-          </p>
-          <span class="tech" style="color: #a0aabf; font-weight: 500; letter-spacing: 1px;">— {{ wisdomTips[wisdomIndex()].author }}</span>
-        </div>
-      </div>
 
-      <!-- 2. Monthly Overview Dashboard -->
-      <div class="glass-card" style="grid-column: 1 / -1; display: flex; flex-direction: column; border-color: rgba(250, 199, 117, 0.3);">
-        <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.3); display: flex; justify-content: space-between;">
-          <span>◈ MONTHLY OVERVIEW</span>
-          <span class="tech" *ngIf="monthlySummary()" [style.color]="monthlySummary()!.savingsRate >= 20 ? '#5DCAA5' : '#ff6b6b'">
-            SAVINGS RATE: {{ monthlySummary()!.savingsRate | number:'1.0-1' }}%
-          </span>
-        </h3>
-        
-        <div *ngIf="monthlySummary()" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-           <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #1D9E75; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-             <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px;">INCOME</div>
-             <div class="mono" style="color: #5DCAA5; font-size: 2rem; text-shadow: 0 0 10px rgba(93, 202, 165, 0.4);">₹{{ monthlySummary()!.totalIncome }}</div>
-           </div>
-           <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #E24B4A; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-             <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px;">EXPENSES</div>
-             <div class="mono" style="color: #ff6b6b; font-size: 2rem; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);">₹{{ monthlySummary()!.totalExpenses + monthlySummary()!.emiTotal + monthlySummary()!.subscriptionTotal }}</div>
-           </div>
-           <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-left: 4px solid #378ADD; border-radius: 12px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-             <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px;">SAVED</div>
-             <div class="mono" style="color: #64b5f6; font-size: 2rem; text-shadow: 0 0 10px rgba(100, 181, 246, 0.4);">₹{{ monthlySummary()!.totalSaved }}</div>
-           </div>
+    <!-- ─── Transaction Entry Modal ─── -->
+    <div class="tx-modal-backdrop" *ngIf="showTxModal()" (click)="closeTxModal()">
+      <div class="tx-modal glass-card" (click)="$event.stopPropagation()" @fadeInUp>
+        <div class="tx-modal-tabs">
+          <button class="tx-tab" [class.income]="txModalType() === 'INCOME'" (click)="txModalType.set('INCOME')">💵 INCOME</button>
+          <button class="tx-tab" [class.expense]="txModalType() === 'EXPENSE'" (click)="txModalType.set('EXPENSE')">💸 EXPENSE</button>
+          <button class="tx-tab" [class.transfer]="txModalType() === 'TRANSFER'" (click)="txModalType.set('TRANSFER')">🔄 TRANSFER</button>
+          <button class="tx-modal-close" (click)="closeTxModal()">✕</button>
         </div>
 
-        <div *ngIf="monthlySummary()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px;">
-          <div class="tech" style="margin-bottom: 12px; color: #a0aabf; font-size: 0.85rem; letter-spacing: 1px;">50-30-20 BUDGET HEALTH</div>
-          <div style="display: flex; height: 24px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);">
-            <div [style.width.%]="monthlySummary()!.needsPercent" style="background: linear-gradient(90deg, #E24B4A, #ff6b6b); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" title="Needs (Target 50%)">{{ monthlySummary()!.needsPercent | number:'1.0-0' }}%</div>
-            <div [style.width.%]="monthlySummary()!.wantsPercent" style="background: linear-gradient(90deg, #BA7517, #FAC775); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" title="Wants (Target 30%)">{{ monthlySummary()!.wantsPercent | number:'1.0-0' }}%</div>
-            <div [style.width.%]="monthlySummary()!.savingsPercent" style="background: linear-gradient(90deg, #1D9E75, #5DCAA5); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" title="Savings (Target 20%)">{{ monthlySummary()!.savingsPercent | number:'1.0-0' }}%</div>
+        <!-- Income Form -->
+        <div *ngIf="txModalType() === 'INCOME'" class="tx-form">
+          <div class="cat-grid">
+            <button *ngFor="let c of incomeCategories" class="cat-btn" [class.active]="newIncome.category === c.cat" (click)="newIncome.category = c.cat">
+              <span>{{ c.icon }}</span><span class="cat-label">{{ c.label }}</span>
+            </button>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.8rem;" class="tech">
-            <span style="color: #ff6b6b; font-weight: 600;">NEEDS (50%)</span>
-            <span style="color: #FAC775; font-weight: 600;">WANTS (30%)</span>
-            <span style="color: #5DCAA5; font-weight: 600;">SAVINGS (20%)</span>
-          </div>
+          <input type="number" class="premium-input tx-amount-input" placeholder="Amount (₹)" [(ngModel)]="newIncome.amount" />
+          <input type="text" class="premium-input" placeholder="Description (e.g. July Salary)" [(ngModel)]="newIncome.description" />
+          <select class="premium-input" [(ngModel)]="newExpense.paymentMethod">
+            <option value="UPI">UPI / Bank Transfer</option>
+            <option value="CASH">Cash</option>
+          </select>
+          <button class="sys-btn-primary income-btn" (click)="submitTransaction()">+ ADD INCOME</button>
         </div>
-      </div>
 
-      <!-- 3. Quick Expense Logger -->
-      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(55, 138, 221, 0.4);">
-        <h3 class="mono head" style="color: #4fc3f7; text-shadow: 0 0 10px rgba(79, 195, 247, 0.3);">◈ QUICK EXPENSE LOGGER</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 16px; margin-bottom: 24px;">
-          <button *ngFor="let cat of quickExpenseCategories" 
-                  class="btn" 
-                  [class.active]="newExpense.category === cat.cat"
-                  (click)="setQuickCategory(cat.cat)"
-                  style="display: flex; flex-direction: column; align-items: center; padding: 16px 12px; gap: 12px; border-radius: 12px;">
-            <span style="font-size: 1.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">{{ cat.icon }}</span>
-            <span class="tech" style="font-size: 0.75rem; letter-spacing: 0.5px;">{{ cat.label }}</span>
-          </button>
-        </div>
-        
-        <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-          <input type="number" class="premium-input" placeholder="Amount (₹)" [(ngModel)]="newExpense.amount" style="flex: 1; min-width: 150px; font-size: 1.2rem; font-family: monospace;" />
-          <input type="text" class="premium-input" placeholder="Description (Optional)" [(ngModel)]="newExpense.description" style="flex: 2; min-width: 200px;" />
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <label class="tech" style="color: #a0aabf;">Type:</label>
-            <select class="premium-input" [(ngModel)]="newExpense.isEssential" style="width: auto; padding: 12px;">
+        <!-- Expense Form -->
+        <div *ngIf="txModalType() === 'EXPENSE'" class="tx-form">
+          <div class="cat-grid">
+            <button *ngFor="let c of quickExpenseCategories" class="cat-btn" [class.active]="newExpense.category === c.cat" (click)="newExpense.category = c.cat">
+              <span>{{ c.icon }}</span><span class="cat-label">{{ c.label }}</span>
+            </button>
+          </div>
+          <input type="number" class="premium-input tx-amount-input" placeholder="Amount (₹)" [(ngModel)]="newExpense.amount" />
+          <input type="text" class="premium-input" placeholder="Description / Shop name" [(ngModel)]="newExpense.description" />
+          <div style="display: flex; gap: 12px;">
+            <select class="premium-input" [(ngModel)]="newExpense.paymentMethod" style="flex: 1;">
+              <option value="UPI">UPI</option>
+              <option value="CASH">Cash</option>
+              <option value="CARD">Credit Card</option>
+              <option value="DEBIT">Debit Card</option>
+            </select>
+            <select class="premium-input" [(ngModel)]="newExpense.isEssential" style="flex: 1; width: auto;">
               <option [ngValue]="true">NEED</option>
               <option [ngValue]="false">WANT</option>
             </select>
           </div>
-          <button class="sys-btn-primary" (click)="logExpense()" style="white-space: nowrap; padding: 0 32px; min-width: 140px;">LOG IT</button>
+          <button class="sys-btn-primary expense-btn" (click)="submitTransaction()">+ ADD EXPENSE</button>
         </div>
 
-        <div *ngIf="expenses().length > 0">
-          <h4 class="tech" style="color: #a0aabf; margin-bottom: 16px; letter-spacing: 1px;">RECENT LOGS</h4>
-          <div *ngFor="let e of expenses().slice(0, 5)" class="log-item" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05);">
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <span style="font-size: 1.5rem; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">{{ getCategoryIcon(e.category) }}</span>
-              <div>
-                <div class="pn" style="font-size: 1.1rem; color: #fff; margin-bottom: 4px;">{{ e.description || e.category }}</div>
-                <div class="tech" style="font-size: 0.8rem;" [style.color]="e.isEssential ? '#5DCAA5' : '#FAC775'">{{ e.isEssential ? 'NEED' : 'WANT' }} • {{ e.expenseDate }}</div>
-              </div>
+        <!-- Transfer placeholder -->
+        <div *ngIf="txModalType() === 'TRANSFER'" class="tx-form" style="text-align: center; padding: 40px 0; color: #8a8a9a;">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">🔄</div>
+          <div class="tech">Transfer logging coming soon.</div>
+          <div class="tech" style="font-size: 0.8rem; margin-top: 8px;">Track money moved between your accounts.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Wealth Nav Bar ─── -->
+    <div class="wealth-nav">
+      <button class="w-nav-btn" [class.active]="wealthView() === 'LEDGER'" (click)="switchWealthView('LEDGER')">📋 LEDGER</button>
+      <button class="w-nav-btn" [class.active]="wealthView() === 'ANALYTICS'" (click)="switchWealthView('ANALYTICS')">📊 ANALYTICS</button>
+      <button class="w-nav-btn" [class.active]="wealthView() === 'ACCOUNTS'" (click)="switchWealthView('ACCOUNTS')">🏦 ACCOUNTS</button>
+      <button class="w-nav-btn" [class.active]="wealthView() === 'GOALS'" (click)="switchWealthView('GOALS')">🎯 GOALS</button>
+      <button class="w-nav-btn" [class.active]="wealthView() === 'AI'" (click)="switchWealthView('AI')">🤖 AI</button>
+    </div>
+
+    <!-- ════════════════════ LEDGER VIEW ════════════════════ -->
+    <div *ngIf="wealthView() === 'LEDGER'" @fadeInUp>
+
+      <!-- Summary Header -->
+      <div class="wealth-header glass-card">
+        <div class="wealth-month-nav">
+          <div class="mono" style="font-size: 0.85rem; color: #FAC775; letter-spacing: 2px;">{{ 'July 2026' }}</div>
+        </div>
+        <div class="wealth-header-stats">
+          <div class="wh-stat income">
+            <div class="wh-label">INCOME</div>
+            <div class="wh-val mono">₹{{ (monthlySummary()?.totalIncome || getMonthlyIncomeTotal()) | number:'1.0-0' }}</div>
+          </div>
+          <div class="wh-divider"></div>
+          <div class="wh-stat expense">
+            <div class="wh-label">EXPENSES</div>
+            <div class="wh-val mono">₹{{ ((monthlySummary()?.totalExpenses || 0) + (monthlySummary()?.emiTotal || 0) + (monthlySummary()?.subscriptionTotal || 0)) | number:'1.0-0' }}</div>
+          </div>
+          <div class="wh-divider"></div>
+          <div class="wh-stat" [class.balance-pos]="getTotalBalance() >= 0" [class.balance-neg]="getTotalBalance() < 0">
+            <div class="wh-label">BALANCE</div>
+            <div class="wh-val mono">₹{{ getTotalBalance() | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Period Filter -->
+      <div class="period-filter">
+        <button class="period-btn" [class.active]="selectedPeriod() === 'DAILY'" (click)="selectedPeriod.set('DAILY')">DAILY</button>
+        <button class="period-btn" [class.active]="selectedPeriod() === 'WEEKLY'" (click)="selectedPeriod.set('WEEKLY')">WEEKLY</button>
+        <button class="period-btn" [class.active]="selectedPeriod() === 'MONTHLY'" (click)="selectedPeriod.set('MONTHLY')">MONTHLY</button>
+        <button class="period-btn" [class.active]="selectedPeriod() === 'TOTAL'" (click)="selectedPeriod.set('TOTAL')">TOTAL</button>
+      </div>
+
+      <!-- Transaction List -->
+      <div class="tx-list glass-card">
+        <div class="tx-list-header">
+          <span class="tech" style="color: #a0aabf; letter-spacing: 1px;">TRANSACTIONS</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="sys-btn-secondary" style="padding: 6px 14px; font-size: 0.75rem;" (click)="openTxModal('INCOME')">+ Income</button>
+            <button class="sys-btn-primary" style="padding: 6px 14px; font-size: 0.75rem;" (click)="openTxModal('EXPENSE')">+ Expense</button>
+          </div>
+        </div>
+
+        <div class="tx-empty" *ngIf="getFilteredTransactions().length === 0">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">🌿</div>
+          <div class="tech" style="color: #8a8a9a;">No transactions this period.</div>
+          <div class="tech" style="font-size: 0.8rem; color: #6a6a7a; margin-top: 6px;">Tap + Income or + Expense to log.</div>
+        </div>
+
+        <div class="tx-row" *ngFor="let tx of getFilteredTransactions()" [class.tx-income]="tx.type === 'INCOME'" [class.tx-expense]="tx.type === 'EXPENSE'">
+          <div class="tx-icon-wrap" [style.background]="tx.type === 'INCOME' ? 'rgba(29,158,117,0.15)' : 'rgba(226,75,74,0.12)'">
+            <span class="tx-icon">{{ tx.icon }}</span>
+          </div>
+          <div class="tx-details">
+            <div class="tx-desc">{{ tx.description || tx.category }}</div>
+            <div class="tx-meta">
+              <span class="tx-cat-badge" [style.background]="tx.type === 'INCOME' ? 'rgba(29,158,117,0.2)' : 'rgba(108,99,255,0.15)'" [style.color]="tx.type === 'INCOME' ? '#5DCAA5' : '#b3aef0'">{{ tx.category }}</span>
+              <span class="tx-date tech">{{ tx.date | date:'d MMM' }}</span>
+              <span class="tx-need-tag" *ngIf="tx.type === 'EXPENSE'" [style.color]="tx.isEssential ? '#5DCAA5' : '#FAC775'">{{ tx.isEssential ? 'NEED' : 'WANT' }}</span>
             </div>
-            <div class="mono" style="color: #fff; font-size: 1.3rem;">₹{{ e.amount }}</div>
+          </div>
+          <div class="tx-amount" [class.amount-income]="tx.type === 'INCOME'" [class.amount-expense]="tx.type === 'EXPENSE'">
+            {{ tx.type === 'INCOME' ? '+' : '-' }}₹{{ tx.amount | number:'1.0-0' }}
           </div>
         </div>
       </div>
 
-      <!-- 4. Weekly Summary -->
-      <div class="glass-card" style="border-color: rgba(250, 199, 117, 0.4);" *ngIf="weeklySummary()">
-        <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.3);">◈ WEEKLY PACING</h3>
-        <div style="text-align: center; margin-bottom: 24px; background: rgba(0,0,0,0.3); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
-          <div class="tech" style="color: #a0aabf; margin-bottom: 12px; font-size: 0.85rem; letter-spacing: 1px;">SPENT THIS WEEK</div>
-          <div class="mono" style="font-size: 3rem; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.2); line-height: 1;">₹{{ weeklySummary()!.totalSpent }}</div>
-          
-          <div class="tech" style="margin-top: 16px; padding: 8px 16px; border-radius: 8px; display: inline-block; font-weight: 600;"
-               [style.background]="weeklySummary()!.changePercent > 0 ? 'rgba(226, 75, 74, 0.15)' : 'rgba(29, 158, 117, 0.15)'"
-               [style.color]="weeklySummary()!.changePercent > 0 ? '#ff6b6b' : '#5DCAA5'"
-               [style.border]="'1px solid ' + (weeklySummary()!.changePercent > 0 ? 'rgba(226, 75, 74, 0.3)' : 'rgba(29, 158, 117, 0.3)')">
-            {{ weeklySummary()!.changePercent > 0 ? '↑' : '↓' }} {{ weeklySummary()!.changePercent | number:'1.0-1' }}% vs last week (₹{{ weeklySummary()!.lastWeekTotal }})
+      <!-- Wisdom Engine -->
+      <div class="glass-card wisdom-card">
+        <div class="tech wisdom-label">◈ WISDOM ENGINE</div>
+        <p class="wisdom-text">"{{ wisdomTips[wisdomIndex()].text }}"</p>
+        <span class="tech wisdom-author">— {{ wisdomTips[wisdomIndex()].author }}</span>
+      </div>
+    </div>
+
+    <!-- ════════════════════ ANALYTICS VIEW ════════════════════ -->
+    <div *ngIf="wealthView() === 'ANALYTICS'" @fadeInUp>
+
+      <!-- Monthly Overview Metrics -->
+      <div class="glass-card" *ngIf="monthlySummary()">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="mono head" style="color: #FAC775;">◈ MONTHLY OVERVIEW</h3>
+          <span class="tech" [style.color]="monthlySummary()!.savingsRate >= 20 ? '#5DCAA5' : '#ff6b6b'" style="font-weight: 700; font-size: 0.85rem;">
+            SAVINGS RATE: {{ monthlySummary()!.savingsRate | number:'1.0-1' }}%
+          </span>
+        </div>
+        <div class="overview-grid">
+          <div class="ov-card" style="border-left-color: #1D9E75;">
+            <div class="ov-label">INCOME</div>
+            <div class="ov-val" style="color: #5DCAA5;">₹{{ monthlySummary()!.totalIncome | number:'1.0-0' }}</div>
+          </div>
+          <div class="ov-card" style="border-left-color: #E24B4A;">
+            <div class="ov-label">EXPENSES</div>
+            <div class="ov-val" style="color: #ff6b6b;">₹{{ (monthlySummary()!.totalExpenses + monthlySummary()!.emiTotal + monthlySummary()!.subscriptionTotal) | number:'1.0-0' }}</div>
+          </div>
+          <div class="ov-card" style="border-left-color: #378ADD;">
+            <div class="ov-label">SAVED</div>
+            <div class="ov-val" style="color: #64b5f6;">₹{{ monthlySummary()!.totalSaved | number:'1.0-0' }}</div>
+          </div>
+          <div class="ov-card" style="border-left-color: #FAC775;">
+            <div class="ov-label">EMI LOAD</div>
+            <div class="ov-val" style="color: #FAC775;">₹{{ monthlySummary()!.emiTotal | number:'1.0-0' }}</div>
           </div>
         </div>
-        
-        <div class="tech" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #a0aabf; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-          <span>Daily Avg: <span class="mono" style="color: #fff; font-size: 1.1rem; margin-left: 8px;">₹{{ weeklySummary()!.dailyAverage | number:'1.0-0' }}</span></span>
-          <span>Top Cat: <span style="color: #FAC775; font-size: 1.1rem; margin-left: 8px;">{{ weeklySummary()!.topCategory }}</span></span>
+
+        <!-- 50-30-20 Budget Health Bar -->
+        <div class="budget-health-wrap">
+          <div class="tech" style="color: #a0aabf; margin-bottom: 10px; font-size: 0.8rem; letter-spacing: 1px;">50-30-20 BUDGET HEALTH</div>
+          <div class="budget-bar">
+            <div class="budget-segment needs" [style.width.%]="monthlySummary()!.needsPercent" title="Needs">{{ monthlySummary()!.needsPercent | number:'1.0-0' }}%</div>
+            <div class="budget-segment wants" [style.width.%]="monthlySummary()!.wantsPercent" title="Wants">{{ monthlySummary()!.wantsPercent | number:'1.0-0' }}%</div>
+            <div class="budget-segment savings" [style.width.%]="monthlySummary()!.savingsPercent" title="Savings">{{ monthlySummary()!.savingsPercent | number:'1.0-0' }}%</div>
+          </div>
+          <div class="budget-labels tech">
+            <span style="color: #ff6b6b;">NEEDS (50%)</span>
+            <span style="color: #FAC775;">WANTS (30%)</span>
+            <span style="color: #5DCAA5;">SAVINGS (20%)</span>
+          </div>
         </div>
       </div>
 
-      <!-- 5. Monthly Breakdown Chart -->
-      <div class="glass-card" style="border-color: rgba(55, 138, 221, 0.3);" *ngIf="monthlySummary()">
-        <h3 class="mono head" style="color: #4fc3f7; text-shadow: 0 0 10px rgba(79, 195, 247, 0.3);">◈ MONTHLY BREAKDOWN</h3>
-        <div style="width: 100%; max-width: 250px; margin: 20px auto 32px; position: relative;">
+      <!-- Category Donut Chart -->
+      <div class="glass-card" style="border-color: rgba(55,138,221,0.3);">
+        <h3 class="mono head" style="color: #4fc3f7;">◈ CATEGORY BREAKDOWN</h3>
+        <div style="max-width: 260px; margin: 20px auto 28px;">
           <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions" [type]="doughnutChartType"></canvas>
         </div>
-        
-        <div class="tech" style="color: #a0aabf; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; font-weight: 600; letter-spacing: 1px;">CATEGORY TOTALS</div>
-        <div style="max-height: 250px; overflow-y: auto; padding-right: 8px;" class="custom-scrollbar">
-          <div *ngFor="let kv of monthlySummary()!.categoryBreakdown | keyvalue" style="display: flex; justify-content: space-between; padding: 12px 16px; background: rgba(0,0,0,0.3); margin-bottom: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-            <span class="tech" style="font-size: 0.9rem; color: #fff;">{{ kv.key }}</span>
-            <span class="mono" style="color: #FAC775; font-size: 1.1rem;">₹{{ kv.value }}</span>
+        <div class="category-table" *ngIf="monthlySummary()">
+          <div class="cat-row" *ngFor="let kv of monthlySummary()!.categoryBreakdown | keyvalue">
+            <div class="cat-row-left">
+              <span class="cat-dot" style="background: #6C63FF;"></span>
+              <span class="tech" style="color: #fff; font-size: 0.9rem;">{{ kv.key }}</span>
+            </div>
+            <div class="cat-row-right">
+              <div class="cat-bar-bg">
+                <div class="cat-bar-fill" [style.width.%]="(kv.value / (monthlySummary()!.totalExpenses || 1)) * 100"></div>
+              </div>
+              <span class="mono" style="color: #FAC775; min-width: 80px; text-align: right;">₹{{ kv.value | number:'1.0-0' }}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 6. EMI & Loan Tracker -->
-      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(226, 75, 74, 0.4);">
-        <h3 class="mono head" style="color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.4); display: flex; justify-content: space-between;">
-          <span>◈ LIABILITIES & EMI</span>
-          <button class="sys-btn-secondary" (click)="showEmiForm = !showEmiForm" style="color: #ff6b6b; border-color: rgba(226, 75, 74, 0.5);">+ ADD LOAN</button>
-        </h3>
-        
-        <div *ngIf="showEmiForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05);">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
-            <input type="text" class="premium-input" placeholder="Loan Name" [(ngModel)]="newEmi.loanName" />
-            <input type="number" class="premium-input" placeholder="Principal (₹)" [(ngModel)]="newEmi.principalAmount" (change)="calculateEmiAmount()" />
-            <input type="number" class="premium-input" placeholder="Interest Rate (%)" [(ngModel)]="newEmi.interestRate" (change)="calculateEmiAmount()" />
-            <input type="number" class="premium-input" placeholder="Tenure (Months)" [(ngModel)]="newEmi.tenureMonths" (change)="calculateEmiAmount()" />
-            <input type="number" class="premium-input" placeholder="Monthly EMI (₹)" [(ngModel)]="newEmi.emiAmount" />
+      <!-- Weekly Pacing -->
+      <div class="glass-card" *ngIf="weeklySummary()" style="border-color: rgba(250,199,117,0.3);">
+        <h3 class="mono head" style="color: #FAC775;">◈ WEEKLY PACING</h3>
+        <div class="weekly-hero">
+          <div class="tech" style="color: #a0aabf; margin-bottom: 8px; font-size: 0.8rem; letter-spacing: 1px;">SPENT THIS WEEK</div>
+          <div class="mono" style="font-size: 2.5rem; color: #fff; line-height: 1;">₹{{ weeklySummary()!.totalSpent | number:'1.0-0' }}</div>
+          <div class="week-change-badge" [class.up]="weeklySummary()!.changePercent > 0" [class.down]="weeklySummary()!.changePercent <= 0">
+            {{ weeklySummary()!.changePercent > 0 ? '↑' : '↓' }} {{ weeklySummary()!.changePercent | number:'1.0-1' }}% vs last week
           </div>
-          <button class="sys-btn-primary" (click)="addEmi()" style="background: linear-gradient(180deg, #E24B4A, #b73232); border-color: #ff6b6b; box-shadow: 0 4px 15px rgba(226, 75, 74, 0.4);">SAVE LIABILITY</button>
+        </div>
+        <div class="weekly-stats">
+          <div class="w-stat">
+            <div class="w-stat-label tech">DAILY AVG</div>
+            <div class="mono w-stat-val">₹{{ weeklySummary()!.dailyAverage | number:'1.0-0' }}</div>
+          </div>
+          <div class="w-stat">
+            <div class="w-stat-label tech">TOP CATEGORY</div>
+            <div class="w-stat-val" style="color: #FAC775;">{{ weeklySummary()!.topCategory }}</div>
+          </div>
+          <div class="w-stat">
+            <div class="w-stat-label tech">LAST WEEK</div>
+            <div class="mono w-stat-val">₹{{ weeklySummary()!.lastWeekTotal | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ ACCOUNTS VIEW ════════════════════ -->
+    <div *ngIf="wealthView() === 'ACCOUNTS'" @fadeInUp>
+
+      <!-- Account Cards -->
+      <div class="accounts-grid">
+        <div class="account-card glass-card" *ngFor="let acc of accounts" [style.border-color]="acc.color + '66'">
+          <div class="acc-header">
+            <span class="acc-icon">{{ acc.icon }}</span>
+            <div>
+              <div class="acc-name tech">{{ acc.name }}</div>
+              <div class="acc-type tech" style="color: #6a6a7a; font-size: 0.65rem;">{{ acc.type }}</div>
+            </div>
+          </div>
+          <div class="acc-balance mono" [style.color]="acc.color">
+            ₹{{ acc.balance | number:'1.0-0' }}
+          </div>
+          <div class="acc-label tech">BALANCE</div>
+        </div>
+      </div>
+
+      <!-- EMI & Loan Tracker -->
+      <div class="glass-card" style="border-color: rgba(226, 75, 74, 0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="mono head" style="color: #ff6b6b;">◈ LIABILITIES & EMI</h3>
+          <button class="sys-btn-secondary" (click)="showEmiForm = !showEmiForm" style="color: #ff6b6b; border-color: rgba(226, 75, 74, 0.5);">+ ADD LOAN</button>
         </div>
 
-        <div *ngIf="emis().length === 0 && !showEmiForm" class="tech empty" style="text-align: center; padding: 32px; background: rgba(0,0,0,0.2); border-radius: 12px; color: #a0aabf;">No active liabilities. Freedom!</div>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
-          <div *ngFor="let emi of emis()" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid rgba(226, 75, 74, 0.3); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-              <span class="pn" style="font-size: 1.2rem; color: #fff;">{{ emi.loanName }}</span>
-              <span class="mono" style="color: #ff6b6b; font-size: 1.3rem;">₹{{ emi.emiAmount }}/mo</span>
+        <div *ngIf="showEmiForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <input type="text" class="premium-input" placeholder="Loan Name" [(ngModel)]="newEmi.loanName" />
+            <input type="number" class="premium-input" placeholder="Principal (₹)" [(ngModel)]="newEmi.principalAmount" (change)="calculateEmiAmount()" />
+            <input type="number" class="premium-input" placeholder="Interest (%)" [(ngModel)]="newEmi.interestRate" (change)="calculateEmiAmount()" />
+            <input type="number" class="premium-input" placeholder="Tenure (Months)" [(ngModel)]="newEmi.tenureMonths" (change)="calculateEmiAmount()" />
+            <div class="premium-input" style="display: flex; align-items: center; gap: 8px; background: rgba(226,75,74,0.1); border-color: rgba(226,75,74,0.3);">
+              <span class="tech" style="color: #a0aabf; font-size: 0.8rem;">EMI:</span>
+              <span class="mono" style="color: #ff6b6b;">₹{{ newEmi.emiAmount | number:'1.0-0' }}</span>
             </div>
-            
-            <div class="tech" style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #a0aabf; margin-bottom: 8px;">
-              <span>Remaining: <span style="color: #fff">₹{{ emi.remainingAmount }}</span></span>
-              <span>Paid: <span style="color: #fff">₹{{ emi.totalPaid }}</span></span>
+          </div>
+          <button class="sys-btn-primary" (click)="addEmi()" style="background: linear-gradient(180deg, #E24B4A, #b73232); border-color: #ff6b6b;">SAVE LIABILITY</button>
+        </div>
+
+        <div class="empty-state" *ngIf="emis().length === 0 && !showEmiForm">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🎉</div>
+          <div class="tech" style="color: #5DCAA5;">No active liabilities. Financial freedom!</div>
+        </div>
+
+        <div class="emi-grid">
+          <div class="emi-card" *ngFor="let emi of emis()">
+            <div class="emi-header">
+              <span class="emi-name">{{ emi.loanName }}</span>
+              <span class="mono emi-monthly" style="color: #ff6b6b;">₹{{ emi.emiAmount | number:'1.0-0' }}/mo</span>
             </div>
-            
-            <div class="bar-bg" style="margin-bottom: 16px;">
-              <div class="bar-fill" [style.width.%]="(emi.totalPaid / emi.principalAmount) * 100" style="background: linear-gradient(90deg, #E24B4A, #ff6b6b); box-shadow: 0 0 10px rgba(226, 75, 74, 0.4);"></div>
+            <div class="emi-progress-wrap">
+              <div class="bar-bg">
+                <div class="bar-fill" [style.width.%]="(emi.totalPaid / emi.principalAmount) * 100" style="background: linear-gradient(90deg, #E24B4A, #ff8a8a);"></div>
+              </div>
+              <div class="emi-stats tech">
+                <span>Paid: <span class="mono" style="color: #fff;">₹{{ emi.totalPaid | number:'1.0-0' }}</span></span>
+                <span>Left: <span class="mono" style="color: #ff6b6b;">₹{{ emi.remainingAmount | number:'1.0-0' }}</span></span>
+              </div>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-              <span class="tech dl" style="color: #FAC775; font-size: 0.85rem; background: rgba(250, 199, 117, 0.1); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(250, 199, 117, 0.3);">Due: {{ emi.nextDueDate || 'TBD' }}</span>
+            <div class="emi-footer">
+              <span class="tech emi-due" style="color: #FAC775; background: rgba(250,199,117,0.1); border: 1px solid rgba(250,199,117,0.3); padding: 4px 10px; border-radius: 6px;">Due: {{ emi.nextDueDate || 'TBD' }}</span>
               <button class="sys-btn-secondary" (click)="payEmi(emi.id)" style="color: #5DCAA5; border-color: rgba(93, 202, 165, 0.5);">PAY EMI</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 7. Subscriptions -->
+      <!-- Subscriptions -->
       <div class="glass-card" style="border-color: rgba(186, 117, 23, 0.4);">
-        <h3 class="mono head" style="color: #FAC775; text-shadow: 0 0 10px rgba(250, 199, 117, 0.4); display: flex; justify-content: space-between;">
-          <span>◈ SUBSCRIPTIONS</span>
-          <button class="sys-btn-secondary" (click)="showSubForm = !showSubForm" style="color: #FAC775; border-color: rgba(250, 199, 117, 0.5);">+ ADD</button>
-        </h3>
-        
-        <div *ngIf="showSubForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
-          <input type="text" class="premium-input" placeholder="Name (e.g. Netflix)" [(ngModel)]="newSub.name" style="width: 100%; margin-bottom: 12px;" />
-          <input type="number" class="premium-input" placeholder="Amount (₹)" [(ngModel)]="newSub.amount" style="width: 100%; margin-bottom: 16px;" />
-          <button class="sys-btn-primary" (click)="addSubscription()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; box-shadow: 0 4px 15px rgba(186, 117, 23, 0.4);">ADD SUB</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="mono head" style="color: #FAC775;">◈ SUBSCRIPTIONS</h3>
+          <button class="sys-btn-secondary" (click)="showSubForm = !showSubForm" style="color: #FAC775; border-color: rgba(250,199,117,0.5);">+ ADD</button>
         </div>
 
-        <div *ngFor="let s of subscriptions()" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;" [style.opacity]="s.isActive ? '1' : '0.5'">
-          <div>
-            <div class="pn" style="font-size: 1.1rem; color: #fff; margin-bottom: 4px;">{{ s.name }}</div>
-            <div class="tech" style="font-size: 0.8rem; color: #a0aabf; letter-spacing: 1px;">{{ s.frequency }}</div>
+        <div *ngIf="showSubForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+          <input type="text" class="premium-input" placeholder="Service (e.g. Netflix)" [(ngModel)]="newSub.name" style="margin-bottom: 12px;" />
+          <input type="number" class="premium-input" placeholder="Amount (₹)" [(ngModel)]="newSub.amount" style="margin-bottom: 16px;" />
+          <button class="sys-btn-primary" (click)="addSubscription()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775;">ADD SUBSCRIPTION</button>
+        </div>
+
+        <div class="sub-list">
+          <div class="sub-row" *ngFor="let s of subscriptions()" [style.opacity]="s.isActive ? '1' : '0.5'">
+            <div class="sub-left">
+              <div class="sub-name">{{ s.name }}</div>
+              <div class="sub-freq tech">{{ s.frequency }} · {{ s.category }}</div>
+            </div>
+            <div class="sub-right">
+              <span class="mono sub-amt">₹{{ s.amount | number:'1.0-0' }}</span>
+              <button class="sys-btn-secondary sub-toggle" (click)="toggleSub(s.id)" [style.color]="s.isActive ? '#ff6b6b' : '#5DCAA5'" [style.border-color]="s.isActive ? 'rgba(226,75,74,0.4)' : 'rgba(93,202,165,0.4)'">
+                {{ s.isActive ? 'CANCEL' : 'ACTIVATE' }}
+              </button>
+            </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 20px;">
-            <span class="mono" style="font-size: 1.2rem; color: #fff;">₹{{ s.amount }}</span>
-            <button class="sys-btn-secondary" (click)="toggleSub(s.id)" [style.border-color]="s.isActive ? 'rgba(226, 75, 74, 0.5)' : 'rgba(93, 202, 165, 0.5)'" [style.color]="s.isActive ? '#ff6b6b' : '#5DCAA5'">
-              {{ s.isActive ? 'CANCEL' : 'ACTIVATE' }}
-            </button>
-          </div>
+        </div>
+
+        <div class="tech sub-total" *ngIf="subscriptions().length > 0 && monthlySummary()">
+          Total monthly: <span class="mono" style="color: #FAC775;">₹{{ monthlySummary()!.subscriptionTotal | number:'1.0-0' }}</span>
         </div>
       </div>
 
-      <!-- 8. AI Spending Analyst -->
-      <div class="glass-card" style="border-color: rgba(108, 99, 255, 0.4);">
-        <h3 class="mono head" style="color: #b3aef0; text-shadow: 0 0 10px rgba(108, 99, 255, 0.4);">◈ AI ANALYST</h3>
-        <div style="text-align: center; padding: 24px 0;">
-          <div class="tech" style="color: #a0aabf; margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5;">Detect leaks, unwanted spending, and optimize your wealth.</div>
-          <button class="sys-btn-primary" (click)="analyzeWealth()" [disabled]="isAnalyzingWealth()" style="padding: 16px 32px; font-size: 1.1rem;">
-            {{ isAnalyzingWealth() ? 'ANALYZING...' : 'RUN DEEP ANALYSIS' }}
-          </button>
+      <!-- Budget Settings -->
+      <div class="glass-card" style="border-color: rgba(250,199,117,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="mono head" style="color: #FAC775;">◈ BUDGET SETTINGS</h3>
+          <button class="sys-btn-secondary" (click)="showBudgetForm = !showBudgetForm" style="color: #FAC775; border-color: rgba(250,199,117,0.4);">+ UPDATE</button>
         </div>
-        
-        <div *ngIf="aiAnalysis()" @fadeInUp style="margin-top: 24px; padding: 24px; background: linear-gradient(160deg, rgba(83, 74, 183, 0.15), rgba(10, 10, 20, 0.5)); border: 1px solid rgba(108, 99, 255, 0.3); border-left: 4px solid #6C63FF; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-          <p class="pn" style="line-height: 1.8; font-size: 1rem; white-space: pre-wrap; color: #EEF3FA;">{{ aiAnalysis() }}</p>
+        <div *ngIf="showBudgetForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; margin-top: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <input type="number" class="premium-input" placeholder="Salary (₹)" [(ngModel)]="newBudget.salary" />
+            <input type="number" class="premium-input" placeholder="PG / Rent (₹)" [(ngModel)]="newBudget.pgRent" />
+            <input type="number" class="premium-input" placeholder="Invested in SIP (₹)" [(ngModel)]="newBudget.sipAmount" />
+            <input type="number" class="premium-input" placeholder="Cash Saved (₹)" [(ngModel)]="newBudget.saved" />
+          </div>
+          <button class="sys-btn-primary" (click)="saveBudget()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775;">SAVE BUDGET</button>
         </div>
-      </div>
-
-      <!-- 9. Savings Goals -->
-      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(29, 158, 117, 0.4);">
-        <h3 class="mono head" style="color: #5DCAA5; text-shadow: 0 0 10px rgba(29, 158, 117, 0.4); display: flex; justify-content: space-between;">
-          <span>◈ SAVINGS GOALS</span>
-          <button class="sys-btn-secondary" (click)="showGoalForm = !showGoalForm" style="color: #5DCAA5; border-color: rgba(29, 158, 117, 0.5);">+ NEW GOAL</button>
-        </h3>
-        
-        <div *ngIf="showGoalForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05);">
-          <input type="text" class="premium-input" placeholder="Goal Name (e.g. Emergency Fund)" [(ngModel)]="newGoal.goalName" style="width: 100%; margin-bottom: 16px;" />
-          <input type="number" class="premium-input" placeholder="Target Amount (₹)" [(ngModel)]="newGoal.target" style="width: 100%; margin-bottom: 20px;" />
-          <button class="sys-btn-primary" (click)="addGoal()" style="background: linear-gradient(180deg, #1D9E75, #147354); border-color: #5DCAA5; box-shadow: 0 4px 15px rgba(29, 158, 117, 0.4);">START SAVING</button>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-          <div class="goal" *ngFor="let g of goals()" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid rgba(29, 158, 117, 0.3); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-            <div class="goal-head" style="display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center;">
-              <span class="pn" style="font-size: 1.2rem; color: #fff;">{{ g.goalName }}</span>
-              <span class="mono gv" style="color: #5DCAA5; font-size: 1.1rem;">₹{{ g.current }} / ₹{{ g.target }}</span>
-            </div>
-            <div class="bar-bg" style="margin-bottom: 16px; height: 10px;">
-              <div class="bar-fill" [style.width.%]="goalPct(g)" style="background: linear-gradient(90deg, #1D9E75, #4fc3f7); box-shadow: 0 0 10px rgba(29, 158, 117, 0.4);"></div>
-            </div>
-            <div class="goal-actions" style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px;">
-              <div>
-                <span class="tech dl" *ngIf="g.deadline" style="color: #a0aabf; font-size: 0.85rem; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px;">due {{ g.deadline }}</span>
-                <span class="done tech" *ngIf="g.achieved" style="color: #5DCAA5; font-size: 0.9rem; letter-spacing: 1px; font-weight: 700; text-shadow: 0 0 10px rgba(93, 202, 165, 0.5);">✓ ACHIEVED</span>
-              </div>
-              <div style="display: flex; gap: 12px;">
-                <button class="sys-btn-secondary" style="border-color: rgba(29, 158, 117, 0.5); color: #5DCAA5;" (click)="bumpGoal(g, 500)">+₹500</button>
-                <button class="sys-btn-secondary" style="border-color: rgba(29, 158, 117, 0.5); color: #5DCAA5;" (click)="bumpGoal(g, 100)">+₹100</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 10. Net Worth & Budget Entry -->
-      <div class="system-card block" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; padding: 0; border: none; background: transparent;">
-        
-        <div style="background: #0a0a0f; border: 1px solid #1D9E75; border-radius: 8px; padding: 24px;">
-          <h3 class="mono head" style="color: #1D9E75; display: flex; justify-content: space-between;">
-            <span>◈ NET WORTH</span>
-            <button class="btn sm" (click)="showNetWorthForm = !showNetWorthForm" style="border-color: #1D9E75; color: #1D9E75;">+ LOG</button>
-          </h3>
-          <div *ngIf="showNetWorthForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-            <input type="number" class="sys-input" placeholder="Total Assets (₹)" [(ngModel)]="newNetWorth.totalAssets" style="width: 100%; margin-bottom: 12px;" />
-            <input type="number" class="sys-input" placeholder="Total Liabilities (₹)" [(ngModel)]="newNetWorth.totalLiabilities" style="width: 100%; margin-bottom: 12px;" />
-            <button class="btn full" (click)="saveNetWorth()" style="background: rgba(29, 158, 117, 0.1); border-color: #1D9E75; color: #1D9E75;">SAVE NET WORTH</button>
-          </div>
-          <div *ngIf="netWorthHistory().length > 0">
-            <div style="background: rgba(29, 158, 117, 0.1); padding: 16px; border-radius: 8px; text-align: center;">
-              <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">CURRENT NET WORTH</div>
-              <div class="mono" style="color: #1D9E75; font-size: 2rem;">₹{{ netWorthHistory()[0].netWorth }}</div>
-              <div class="tech" style="color: #FAC775; margin-top: 8px;">RUNWAY: {{ netWorthHistory()[0].cashRunwayMonths | number:'1.1-1' }} MONTHS</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background: #0a0a0f; border: 1px solid #FAC775; border-radius: 8px; padding: 24px;">
-          <h3 class="mono head" style="width: 100%; color: #FAC775; display: flex; justify-content: space-between;">
-            <span>◈ BUDGET SETTINGS</span>
-            <button class="btn sm" (click)="showBudgetForm = !showBudgetForm" style="border-color: #FAC775; color: #FAC775;">+ UPDATE</button>
-          </h3>
-          <div *ngIf="showBudgetForm" class="form-panel" style="width: 100%; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin-top: 16px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-              <input type="number" class="sys-input" placeholder="Salary (₹)" [(ngModel)]="newBudget.salary" />
-              <input type="number" class="sys-input" placeholder="PG / Rent (₹)" [(ngModel)]="newBudget.pgRent" />
-              <input type="number" class="sys-input" placeholder="Invested in SIP (₹)" [(ngModel)]="newBudget.sipAmount" />
-              <input type="number" class="sys-input" placeholder="Cash Saved (₹)" [(ngModel)]="newBudget.saved" />
-            </div>
-            <button class="btn full" (click)="saveBudget()" style="background: rgba(250, 199, 117, 0.1); border-color: #FAC775; color: #FAC775;">SAVE BUDGET</button>
-          </div>
-          <div *ngIf="!showBudgetForm" class="tech" style="color: #8a8a9a; line-height: 1.6;">
-            Set your expected monthly salary and target savings here. The Monthly Overview dashboard uses this to calculate your 50-30-20 splits.
-          </div>
+        <div *ngIf="!showBudgetForm" class="tech" style="color: #8a8a9a; margin-top: 12px; line-height: 1.7; font-size: 0.9rem;">
+          Set your monthly salary and target savings. The system will compute your 50-30-20 rule compliance and net savings rate automatically.
         </div>
       </div>
     </div>
+
+    <!-- ════════════════════ GOALS VIEW ════════════════════ -->
+    <div *ngIf="wealthView() === 'GOALS'" @fadeInUp>
+
+      <!-- Savings Goals -->
+      <div class="glass-card" style="border-color: rgba(29,158,117,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="mono head" style="color: #5DCAA5;">◈ SAVINGS GOALS</h3>
+          <button class="sys-btn-secondary" (click)="showGoalForm = !showGoalForm" style="color: #5DCAA5; border-color: rgba(29,158,117,0.5);">+ NEW GOAL</button>
+        </div>
+
+        <div *ngIf="showGoalForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+          <input type="text" class="premium-input" placeholder="Goal Name (e.g. Emergency Fund)" [(ngModel)]="newGoal.goalName" style="margin-bottom: 12px;" />
+          <input type="number" class="premium-input" placeholder="Target Amount (₹)" [(ngModel)]="newGoal.target" style="margin-bottom: 8px;" />
+          <input type="date" class="premium-input" placeholder="Target Date" [(ngModel)]="newGoal.deadline" style="margin-bottom: 16px;" />
+          <button class="sys-btn-primary" (click)="addGoal()" style="background: linear-gradient(180deg, #1D9E75, #147354); border-color: #5DCAA5;">START SAVING</button>
+        </div>
+
+        <div class="goals-grid">
+          <div class="goal-card" *ngFor="let g of goals()">
+            <div class="goal-ring-wrap">
+              <svg class="goal-ring" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/>
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#1D9E75" stroke-width="8"
+                        [attr.stroke-dasharray]="263.9"
+                        [attr.stroke-dashoffset]="263.9 * (1 - goalPct(g) / 100)"
+                        stroke-linecap="round" transform="rotate(-90 50 50)"
+                        style="filter: drop-shadow(0 0 6px rgba(29,158,117,0.6)); transition: stroke-dashoffset 1s ease;"/>
+                <text x="50" y="54" text-anchor="middle" fill="#5DCAA5" font-size="18" font-weight="bold">{{ goalPct(g) }}%</text>
+              </svg>
+            </div>
+            <div class="goal-info">
+              <div class="goal-name">{{ g.goalName }}</div>
+              <div class="goal-vals">
+                <span class="mono" style="color: #5DCAA5;">₹{{ g.current | number:'1.0-0' }}</span>
+                <span class="tech" style="color: #6a6a7a;"> / </span>
+                <span class="mono" style="color: #fff;">₹{{ g.target | number:'1.0-0' }}</span>
+              </div>
+              <div class="tech" style="color: #FAC775; font-size: 0.75rem; margin-top: 4px;" *ngIf="g.deadline">Due: {{ g.deadline }}</div>
+              <span class="done tech" *ngIf="g.achieved">✓ ACHIEVED!</span>
+              <div class="goal-btns">
+                <button class="sys-btn-secondary" style="border-color: rgba(29,158,117,0.5); color: #5DCAA5; font-size: 0.75rem;" (click)="bumpGoal(g, 500)">+₹500</button>
+                <button class="sys-btn-secondary" style="border-color: rgba(29,158,117,0.5); color: #5DCAA5; font-size: 0.75rem;" (click)="bumpGoal(g, 1000)">+₹1K</button>
+                <button class="sys-btn-secondary" style="border-color: rgba(29,158,117,0.5); color: #5DCAA5; font-size: 0.75rem;" (click)="bumpGoal(g, 5000)">+₹5K</button>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state" *ngIf="goals().length === 0 && !showGoalForm">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🎯</div>
+            <div class="tech" style="color: #8a8a9a;">No goals yet. Create your first savings target!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Net Worth -->
+      <div class="glass-card" style="border-color: rgba(29,158,117,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 class="mono head" style="color: #1D9E75;">◈ NET WORTH</h3>
+          <button class="sys-btn-secondary" (click)="showNetWorthForm = !showNetWorthForm" style="color: #1D9E75; border-color: rgba(29,158,117,0.4);">+ LOG</button>
+        </div>
+
+        <div *ngIf="netWorthHistory().length > 0" class="nw-display">
+          <div class="nw-main">
+            <div class="tech" style="color: #8a8a9a; font-size: 0.8rem; letter-spacing: 1px;">CURRENT NET WORTH</div>
+            <div class="mono" style="color: #1D9E75; font-size: 2.5rem; line-height: 1; margin: 8px 0;">₹{{ netWorthHistory()[0].netWorth | number:'1.0-0' }}</div>
+            <div class="tech" style="color: #FAC775; font-size: 0.85rem;">
+              CASH RUNWAY: {{ netWorthHistory()[0].cashRunwayMonths | number:'1.1-1' }} MONTHS
+            </div>
+          </div>
+          <div class="nw-split">
+            <div class="nw-metric">
+              <div class="tech" style="color: #5DCAA5; font-size: 0.7rem; letter-spacing: 1px;">ASSETS</div>
+              <div class="mono" style="color: #fff; font-size: 1.1rem;">₹{{ netWorthHistory()[0].totalAssets | number:'1.0-0' }}</div>
+            </div>
+            <div class="nw-metric">
+              <div class="tech" style="color: #ff6b6b; font-size: 0.7rem; letter-spacing: 1px;">LIABILITIES</div>
+              <div class="mono" style="color: #fff; font-size: 1.1rem;">₹{{ netWorthHistory()[0].totalLiabilities | number:'1.0-0' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showNetWorthForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; margin-top: 12px;">
+          <input type="number" class="premium-input" placeholder="Total Assets (₹)" [(ngModel)]="newNetWorth.totalAssets" style="margin-bottom: 12px;" />
+          <input type="number" class="premium-input" placeholder="Total Liabilities (₹)" [(ngModel)]="newNetWorth.totalLiabilities" style="margin-bottom: 16px;" />
+          <button class="sys-btn-primary" (click)="saveNetWorth()" style="background: linear-gradient(180deg, #1D9E75, #147354); border-color: #5DCAA5;">SAVE NET WORTH</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ AI VIEW ════════════════════ -->
+    <div *ngIf="wealthView() === 'AI'" @fadeInUp>
+      <div class="glass-card ai-wealth-card">
+        <div class="ai-header">
+          <div class="ai-icon">🤖</div>
+          <div>
+            <h3 class="mono head" style="color: #b3aef0;">◈ AI WEALTH ANALYST</h3>
+            <p class="tech" style="color: #6a6a7a; font-size: 0.8rem; margin: 0;">Powered by Gemini AI · Analyzes your full transaction history</p>
+          </div>
+        </div>
+        <div class="ai-features">
+          <div class="ai-feature"><span>🔍</span> Detects spending leaks & wastage</div>
+          <div class="ai-feature"><span>📊</span> Category overspend analysis</div>
+          <div class="ai-feature"><span>💡</span> Personalized savings recommendations</div>
+          <div class="ai-feature"><span>🎯</span> Goal achievement projections</div>
+        </div>
+        <button class="sys-btn-primary ai-analyze-btn" (click)="analyzeWealth()" [disabled]="isAnalyzingWealth()">
+          <span *ngIf="!isAnalyzingWealth()">⚡ RUN DEEP ANALYSIS</span>
+          <span *ngIf="isAnalyzingWealth()" class="analyzing-text">ANALYZING<span class="dots">...</span></span>
+        </button>
+        <div *ngIf="aiAnalysis()" @fadeInUp class="ai-result">
+          <div class="ai-result-header tech">
+            <span style="color: #6C63FF;">◈</span> AI FINANCIAL REPORT
+            <span class="tech" style="color: #6a6a7a; font-size: 0.7rem; margin-left: 8px;">{{ 'Just now' }}</span>
+          </div>
+          <p class="pn ai-result-text">{{ aiAnalysis() }}</p>
+        </div>
+      </div>
+
+      <!-- Income History in AI view -->
+      <div class="glass-card" *ngIf="incomeHistory().length > 0" style="border-color: rgba(29,158,117,0.3);">
+        <h3 class="mono head" style="color: #5DCAA5; margin-bottom: 16px;">◈ INCOME HISTORY</h3>
+        <div class="tx-row" *ngFor="let inc of incomeHistory().slice(0, 10)" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 12px;">
+          <div class="tx-icon-wrap" style="background: rgba(29,158,117,0.15);">
+            <span>{{ getIncomeIcon(inc.category) }}</span>
+          </div>
+          <div class="tx-details">
+            <div class="tx-desc">{{ inc.description }}</div>
+            <div class="tx-meta">
+              <span class="tx-cat-badge" style="background: rgba(29,158,117,0.2); color: #5DCAA5;">{{ inc.category }}</span>
+              <span class="tx-date tech">{{ inc.incomeDate | date:'d MMM' }}</span>
+            </div>
+          </div>
+          <div class="tx-amount amount-income">+₹{{ inc.amount | number:'1.0-0' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── FAB Add Button ─── -->
+    <button class="wealth-fab" (click)="openTxModal('EXPENSE')" title="Add Transaction">+</button>
+
   </section>
+
 
   <!-- ===================== ENGLISH ===================== -->
   <section class="panel" *ngIf="active() === 'ENGLISH'" @fadeInUp

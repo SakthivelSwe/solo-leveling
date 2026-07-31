@@ -12,7 +12,8 @@ import {
   HealthLog, MindLog, SelfDoubtEvidence, EnglishLog, BodyLog, RelationshipLog,
   InterviewReadinessDTO, DeepWorkSession, DevMasteryProgress, BudgetEntry,
   DietEntry, FoodItem, NetWorthLog, SocialConnection, PlayerConfig,
-  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary
+  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary,
+  AccountEntry, IncomeLog, TransactionEntry
 } from '../../core/models/models';
 import { fadeInUp, listStagger } from '../../shared/animations';
 
@@ -50,7 +51,12 @@ export class LifeOsComponent implements OnInit {
   deepWork = signal<DeepWorkSession[]>([]);
   devMastery = signal<DevMasteryProgress[]>([]);
 
-  // Wealth
+  // ── Wealth OS ─────────────────────────────────────
+  wealthView = signal<'LEDGER' | 'ANALYTICS' | 'ACCOUNTS' | 'GOALS' | 'AI'>('LEDGER');
+  selectedPeriod = signal<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'TOTAL'>('MONTHLY');
+  showTxModal = signal<boolean>(false);
+  txModalType = signal<'INCOME' | 'EXPENSE' | 'TRANSFER'>('EXPENSE');
+
   goals = signal<SavingsGoal[]>([]);
   budgets = signal<BudgetEntry[]>([]);
   netWorthHistory = signal<NetWorthLog[]>([]);
@@ -68,6 +74,25 @@ export class LifeOsComponent implements OnInit {
   subscriptions = signal<SubscriptionEntry[]>([]);
   aiAnalysis = signal<string | null>(null);
   isAnalyzingWealth = signal<boolean>(false);
+
+  // Income tracking
+  incomeHistory = signal<IncomeLog[]>([]);
+  newIncome: IncomeLog = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
+  incomeCategories = [
+    { cat: 'SALARY', icon: '💼', label: 'Salary' },
+    { cat: 'FREELANCE', icon: '💻', label: 'Freelance' },
+    { cat: 'INVESTMENT', icon: '📈', label: 'Returns' },
+    { cat: 'GIFT', icon: '🎁', label: 'Gift' },
+    { cat: 'OTHER', icon: '💡', label: 'Other' }
+  ];
+
+  // Accounts (local state — calculated from transactions)
+  accounts: AccountEntry[] = [
+    { name: 'Cash', type: 'CASH', balance: 0, icon: '💵', color: '#1D9E75' },
+    { name: 'UPI / Bank', type: 'BANK', balance: 0, icon: '🏦', color: '#378ADD' },
+    { name: 'Credit Card', type: 'CARD', balance: 0, icon: '💳', color: '#E24B4A' },
+    { name: 'Savings', type: 'SAVINGS', balance: 0, icon: '🏆', color: '#FAC775' },
+  ];
 
   newExpense: ExpenseLog = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
   newEmi: EmiEntry = { loanName: '', principalAmount: 0, interestRate: 0, tenureMonths: 0, emiAmount: 0, totalPaid: 0, remainingAmount: 0, status: 'ACTIVE' };
@@ -185,6 +210,7 @@ export class LifeOsComponent implements OnInit {
         this.life.getEmis().subscribe(v => this.emis.set(v));
         this.life.getSubscriptions().subscribe(v => this.subscriptions.set(v));
         this.startWisdomEngine();
+        this.loadIncomeHistory();
         break;
       case 'HEALTH':
         this.life.getHealthToday().subscribe(v => this.health.set(v ?? { waterGlasses: 0, breakfastEaten: false, lunchEaten: false, dinnerEaten: false }));
@@ -291,6 +317,91 @@ export class LifeOsComponent implements OnInit {
   }
 
   /* ===== Wealth actions ===== */
+  switchWealthView(view: 'LEDGER' | 'ANALYTICS' | 'ACCOUNTS' | 'GOALS' | 'AI'): void {
+    this.wealthView.set(view);
+  }
+
+  openTxModal(type: 'INCOME' | 'EXPENSE' | 'TRANSFER'): void {
+    this.txModalType.set(type);
+    if (type === 'EXPENSE') this.newExpense = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
+    if (type === 'INCOME') this.newIncome = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
+    this.showTxModal.set(true);
+  }
+
+  closeTxModal(): void { this.showTxModal.set(false); }
+
+  submitTransaction(): void {
+    const type = this.txModalType();
+    if (type === 'EXPENSE') { this.logExpense(); this.closeTxModal(); }
+    else if (type === 'INCOME') { this.logIncome(); this.closeTxModal(); }
+  }
+
+  loadIncomeHistory(): void {
+    this.life.getIncomeHistory().subscribe({ next: v => this.incomeHistory.set(v), error: () => {} });
+  }
+
+  logIncome(): void {
+    if (this.newIncome.amount <= 0) { this.toast('⚠ Enter a valid income amount'); return; }
+    this.life.logIncome(this.newIncome).subscribe({
+      next: v => {
+        this.toast(`◈ Income logged: ₹${v.amount}`);
+        this.incomeHistory.update(list => [v, ...list]);
+        this.life.getMonthlySummary().subscribe(s => {
+          this.monthlySummary.set(s);
+          this.updateAdvancedWealthChart(s);
+        });
+        this.newIncome = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
+      },
+      error: () => this.toast('⚠ Income logging failed')
+    });
+  }
+
+  getTransactionList(): { date: string; type: 'INCOME' | 'EXPENSE'; amount: number; category: string; description: string; icon: string; isEssential?: boolean }[] {
+    const expenses = this.expenses().map(e => ({
+      date: e.expenseDate || '', type: 'EXPENSE' as const,
+      amount: e.amount, category: e.category,
+      description: e.description, icon: this.getCategoryIcon(e.category),
+      isEssential: e.isEssential
+    }));
+    const income = this.incomeHistory().map(i => ({
+      date: i.incomeDate || '', type: 'INCOME' as const,
+      amount: i.amount, category: i.category,
+      description: i.description, icon: this.getIncomeIcon(i.category)
+    }));
+    return [...income, ...expenses].sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  getIncomeIcon(cat: string): string {
+    return this.incomeCategories.find(c => c.cat === cat)?.icon || '💡';
+  }
+
+  getTotalBalance(): number {
+    const m = this.monthlySummary();
+    if (!m) return 0;
+    return m.totalIncome - m.totalExpenses - m.emiTotal - m.subscriptionTotal;
+  }
+
+  getFilteredTransactions(): any[] {
+    const all = this.getTransactionList();
+    const period = this.selectedPeriod();
+    const now = new Date();
+    if (period === 'DAILY') {
+      const today = now.toISOString().split('T')[0];
+      return all.filter(t => t.date === today || t.date.startsWith(today));
+    } else if (period === 'WEEKLY') {
+      const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+      return all.filter(t => new Date(t.date) >= weekAgo);
+    } else if (period === 'MONTHLY') {
+      const monthPrefix = now.toISOString().slice(0, 7);
+      return all.filter(t => t.date.startsWith(monthPrefix));
+    }
+    return all;
+  }
+
+  getMonthlyIncomeTotal(): number {
+    return this.incomeHistory().filter(i => (i.incomeDate || '').startsWith(new Date().toISOString().slice(0, 7))).reduce((s, i) => s + i.amount, 0);
+  }
+
   updateWealthChart(budgets: BudgetEntry[]): void {
     if (budgets.length > 0) {
       const b = budgets[0]; // latest budget

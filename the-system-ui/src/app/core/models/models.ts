@@ -401,6 +401,47 @@ export interface MonthlySummary {
   subscriptionTotal: number;
 }
 
+export interface AccountEntry {
+  id?: number;
+  name: string;
+  type: 'CASH' | 'BANK' | 'CARD' | 'SAVINGS' | 'WALLET';
+  balance: number;
+  icon: string;
+  color: string;
+  isDefault?: boolean;
+}
+
+export interface IncomeLog {
+  id?: number;
+  incomeDate?: string;
+  amount: number;
+  category: string; // SALARY, FREELANCE, INVESTMENT, GIFT, OTHER
+  description: string;
+  accountId?: number;
+  accountName?: string;
+}
+
+export interface CategoryBudget {
+  category: string;
+  budgetAmount: number;
+  spentAmount: number;
+  pct: number;
+  isOverBudget: boolean;
+}
+
+export interface TransactionEntry {
+  id?: number;
+  date: string;
+  type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
+  amount: number;
+  category: string;
+  description: string;
+  accountName: string;
+  toAccountName?: string;
+  icon: string;
+  color: string;
+}
+
 /* ============ Module 2 — Health OS ============ */
 export interface HealthLog {
   id?: number;

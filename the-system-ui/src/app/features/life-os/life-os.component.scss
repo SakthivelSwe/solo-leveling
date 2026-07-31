@@ -256,3 +256,580 @@
   .name { font-size: .9rem; letter-spacing: 3px; }
   .tab { padding: 10px 14px; font-size: .7rem; }
 }
+
+/* ═══════════════════════════════════════════════
+   WEALTH OS — MONEY MANAGER PREMIUM STYLES
+   ═══════════════════════════════════════════════ */
+
+/* ── Wealth Sub-Navigation ── */
+.wealth-nav {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.w-nav-btn {
+  flex: 1;
+  min-width: max-content;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #6a6a7a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+
+  &:hover { color: #fff; background: rgba(255,255,255,0.04); }
+
+  &.active {
+    color: #FAC775;
+    background: linear-gradient(135deg, rgba(250,199,117,0.15), rgba(250,199,117,0.08));
+    border-color: rgba(250,199,117,0.3);
+    box-shadow: 0 0 14px rgba(250,199,117,0.15);
+    text-shadow: 0 0 8px rgba(250,199,117,0.5);
+  }
+}
+
+/* ── Wealth Header Summary Bar ── */
+.wealth-header {
+  padding: 20px 24px;
+  border-color: rgba(250,199,117,0.3) !important;
+  background: linear-gradient(160deg, rgba(250,199,117,0.07), rgba(0,0,0,0.7)) !important;
+  margin-bottom: 16px;
+}
+.wealth-month-nav {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.wealth-header-stats {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 0;
+}
+.wh-stat {
+  text-align: center;
+  &.income .wh-val { color: #5DCAA5; text-shadow: 0 0 10px rgba(93,202,165,0.4); }
+  &.expense .wh-val { color: #ff6b6b; text-shadow: 0 0 10px rgba(255,107,107,0.4); }
+  &.balance-pos .wh-val { color: #64b5f6; text-shadow: 0 0 10px rgba(100,181,246,0.4); }
+  &.balance-neg .wh-val { color: #ff6b6b; }
+}
+.wh-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  color: #6a6a7a;
+  margin-bottom: 4px;
+}
+.wh-val { font-size: 1.4rem; font-weight: 700; }
+.wh-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.07);
+  margin: 0 12px;
+}
+
+/* ── Period Filter Pill Tabs ── */
+.period-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.period-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #6a6a7a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { color: #fff; border-color: rgba(255,255,255,0.15); }
+  &.active {
+    color: #FAC775;
+    background: rgba(250,199,117,0.1);
+    border-color: rgba(250,199,117,0.35);
+    box-shadow: 0 0 12px rgba(250,199,117,0.12);
+  }
+}
+
+/* ── Transaction List ── */
+.tx-list {
+  padding: 0;
+  overflow: hidden;
+}
+.tx-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.tx-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.2s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(255,255,255,0.025); }
+  &.tx-income { border-left: 3px solid rgba(29,158,117,0.5); }
+  &.tx-expense { border-left: 3px solid rgba(226,75,74,0.5); }
+}
+.tx-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tx-icon { font-size: 1.2rem; }
+.tx-details { flex: 1; min-width: 0; }
+.tx-desc {
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tx-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.tx-cat-badge {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+}
+.tx-date { font-size: 0.7rem; color: #6a6a7a; }
+.tx-need-tag { font-size: 0.65rem; font-family: 'Share Tech Mono', monospace; letter-spacing: 0.5px; }
+.tx-amount {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  &.amount-income { color: #5DCAA5; text-shadow: 0 0 8px rgba(93,202,165,0.3); }
+  &.amount-expense { color: #ff6b6b; }
+}
+
+/* ── Transaction Modal ── */
+.tx-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+}
+.tx-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 24px 24px 20px 20px !important;
+  border-color: rgba(250,199,117,0.25) !important;
+  background: linear-gradient(180deg, rgba(12,12,24,0.98), rgba(8,8,18,0.99)) !important;
+  padding: 0 !important;
+}
+.tx-modal-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.tx-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #6a6a7a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  padding: 10px 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { color: #fff; }
+  &.income { color: #5DCAA5; border-bottom-color: #5DCAA5; }
+  &.expense { color: #ff6b6b; border-bottom-color: #ff6b6b; }
+  &.transfer { color: #4fc3f7; border-bottom-color: #4fc3f7; }
+}
+.tx-modal-close {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #6a6a7a;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  &:hover { color: #fff; background: rgba(255,255,255,0.1); }
+}
+.tx-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tx-amount-input {
+  font-size: 1.5rem !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  text-align: center;
+  color: #fff !important;
+  height: 60px;
+}
+.income-btn { background: linear-gradient(180deg, #1D9E75, #147354) !important; border-color: #5DCAA5 !important; }
+.expense-btn { background: linear-gradient(180deg, #E24B4A, #b73232) !important; border-color: #ff6b6b !important; }
+
+/* ── Category Button Grid ── */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.cat-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  font-size: 1.2rem;
+  color: #fff;
+
+  &:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.07); }
+  &.active {
+    border-color: rgba(250,199,117,0.5);
+    background: rgba(250,199,117,0.1);
+    box-shadow: 0 0 14px rgba(250,199,117,0.15);
+  }
+}
+.cat-label {
+  font-size: 0.6rem;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.3px;
+  color: #8a8a9a;
+}
+
+/* ── Account Cards ── */
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.account-card {
+  padding: 16px !important;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, rgba(12,12,24,0.9), rgba(8,8,18,0.95)) !important;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+}
+.acc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.acc-icon { font-size: 1.4rem; }
+.acc-name { font-size: 0.85rem; color: #fff; font-weight: 600; }
+.acc-balance { font-size: 1.3rem; font-weight: 700; }
+.acc-label { font-size: 0.6rem; letter-spacing: 1.5px; color: #6a6a7a; margin-top: 2px; }
+
+/* ── Overview Grid ── */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ov-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-left: 4px solid;
+  border-radius: 12px;
+  padding: 16px;
+}
+.ov-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: #6a6a7a;
+  margin-bottom: 8px;
+}
+.ov-val { font-family: 'Share Tech Mono', monospace; font-size: 1.4rem; }
+
+/* ── Budget Health Bar ── */
+.budget-health-wrap { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.budget-bar {
+  display: flex;
+  height: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+}
+.budget-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  transition: width 0.8s ease;
+  &.needs { background: linear-gradient(90deg, #E24B4A, #ff6b6b); }
+  &.wants { background: linear-gradient(90deg, #BA7517, #FAC775); }
+  &.savings { background: linear-gradient(90deg, #1D9E75, #5DCAA5); }
+}
+.budget-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* ── Category Table ── */
+.category-table { display: flex; flex-direction: column; gap: 10px; }
+.cat-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cat-row-left { display: flex; align-items: center; gap: 8px; min-width: 100px; }
+.cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.cat-row-right { display: flex; align-items: center; gap: 12px; flex: 1; }
+.cat-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.cat-bar-fill { height: 100%; background: linear-gradient(90deg, #6C63FF, #b3aef0); border-radius: 3px; }
+
+/* ── Weekly Stats ── */
+.weekly-hero { text-align: center; margin: 16px 0 20px; }
+.week-change-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  &.up { background: rgba(226,75,74,0.15); color: #ff6b6b; border: 1px solid rgba(226,75,74,0.3); }
+  &.down { background: rgba(29,158,117,0.15); color: #5DCAA5; border: 1px solid rgba(29,158,117,0.3); }
+}
+.weekly-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.w-stat { text-align: center; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+.w-stat-label { font-size: 0.65rem; letter-spacing: 1px; color: #6a6a7a; margin-bottom: 6px; }
+.w-stat-val { font-size: 0.95rem; font-weight: 600; color: #fff; }
+
+/* ── EMI Grid ── */
+.emi-grid { display: flex; flex-direction: column; gap: 14px; }
+.emi-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(226,75,74,0.2); border-radius: 12px; padding: 16px; }
+.emi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.emi-name { font-size: 0.95rem; color: #fff; font-weight: 600; }
+.emi-monthly { font-size: 0.95rem; }
+.emi-progress-wrap { margin-bottom: 10px; }
+.emi-stats { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.75rem; color: #6a6a7a; }
+.emi-footer { display: flex; justify-content: space-between; align-items: center; }
+
+/* ── Subscriptions ── */
+.sub-list { display: flex; flex-direction: column; gap: 2px; }
+.sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: opacity 0.3s;
+  &:last-child { border-bottom: none; }
+}
+.sub-left { flex: 1; }
+.sub-name { font-size: 0.9rem; color: #fff; font-weight: 500; }
+.sub-freq { font-size: 0.7rem; color: #6a6a7a; margin-top: 2px; }
+.sub-right { display: flex; align-items: center; gap: 10px; }
+.sub-amt { font-size: 0.9rem; color: #FAC775; }
+.sub-toggle { padding: 4px 10px !important; font-size: 0.7rem !important; }
+.sub-total { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); color: #6a6a7a; font-size: 0.85rem; }
+
+/* ── Goals Grid ── */
+.goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.goal-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(29,158,117,0.2);
+  border-radius: 14px;
+  padding: 16px;
+  transition: transform 0.2s;
+  &:hover { transform: translateY(-2px); border-color: rgba(29,158,117,0.4); }
+}
+.goal-ring-wrap { flex-shrink: 0; }
+.goal-ring { width: 80px; height: 80px; }
+.goal-info { flex: 1; }
+.goal-name { font-size: 0.9rem; color: #fff; font-weight: 600; margin-bottom: 6px; }
+.goal-vals { font-size: 0.85rem; margin-bottom: 4px; }
+.goal-btns { display: flex; gap: 6px; margin-top: 10px; }
+
+/* ── Net Worth Display ── */
+.nw-display { display: flex; align-items: center; gap: 24px; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; flex-wrap: wrap; }
+.nw-main { flex: 1; }
+.nw-split { display: flex; gap: 20px; }
+.nw-metric { text-align: center; }
+
+/* ── AI Analyst Card ── */
+.ai-wealth-card { border-color: rgba(108,99,255,0.35) !important; }
+.ai-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.ai-icon { font-size: 2.5rem; }
+.ai-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.ai-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: #8a8a9a;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+
+  span { font-size: 1rem; }
+}
+.ai-analyze-btn {
+  width: 100%;
+  padding: 14px !important;
+  font-size: 0.9rem !important;
+  background: linear-gradient(180deg, #534AB7, #3d3680) !important;
+  border-color: #6C63FF !important;
+  box-shadow: 0 4px 20px rgba(108,99,255,0.3);
+  letter-spacing: 1.5px;
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+.analyzing-text .dots {
+  animation: blink 1.2s infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.ai-result {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(108,99,255,0.07);
+  border-radius: 12px;
+  border: 1px solid rgba(108,99,255,0.2);
+}
+.ai-result-header {
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  color: #8a8a9a;
+}
+.ai-result-text {
+  line-height: 1.7;
+  color: #d0d0e0;
+  font-size: 0.9rem;
+}
+
+/* ── Wisdom Card (compact) ── */
+.wisdom-card {
+  text-align: center;
+  border-color: rgba(250,199,117,0.3) !important;
+  background: linear-gradient(160deg, rgba(250,199,117,0.07), rgba(0,0,0,0.7)) !important;
+  padding: 24px !important;
+}
+.wisdom-label { font-size: 0.75rem; letter-spacing: 2px; color: #FAC775; margin-bottom: 12px; }
+.wisdom-text { font-size: 1.1rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 8px; }
+.wisdom-author { font-size: 0.8rem; color: #a0aabf; }
+
+/* ── Floating Action Button ── */
+.wealth-fab {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E24B4A, #c73332);
+  border: 2px solid rgba(255,107,107,0.6);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 300;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(226,75,74,0.5), 0 0 0 0 rgba(226,75,74,0.4);
+  z-index: 100;
+  transition: all 0.2s ease;
+  animation: fabPulse 2.5s infinite;
+
+  &:hover {
+    transform: scale(1.12) rotate(45deg);
+    box-shadow: 0 6px 32px rgba(226,75,74,0.7);
+    animation: none;
+  }
+}
+@keyframes fabPulse {
+  0%, 100% { box-shadow: 0 4px 24px rgba(226,75,74,0.5), 0 0 0 0 rgba(226,75,74,0.3); }
+  60% { box-shadow: 0 4px 24px rgba(226,75,74,0.5), 0 0 0 12px rgba(226,75,74,0); }
+}
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+/* Mobile responsive for new wealth components */
+@media (max-width: 480px) {
+  .wealth-header-stats { grid-template-columns: 1fr auto 1fr auto 1fr; }
+  .wh-val { font-size: 1.1rem; }
+  .cat-grid { grid-template-columns: repeat(5, 1fr); }
+  .goals-grid { grid-template-columns: 1fr; }
+  .ai-features { grid-template-columns: 1fr; }
+  .weekly-stats { grid-template-columns: 1fr 1fr 1fr; }
+  .accounts-grid { grid-template-columns: 1fr 1fr; }
+  .wealth-fab { bottom: 80px; right: 14px; }
+}

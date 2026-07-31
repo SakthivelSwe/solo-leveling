@@ -9,7 +9,7 @@ import {
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
   SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player, NoFapStatus,
   NetWorthLog, SocialConnection, PlayerConfig,
-  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary
+  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary, IncomeLog
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -82,6 +82,10 @@ export class LifeOsService {
   addSubscription(b: SubscriptionEntry): Observable<SubscriptionEntry> { return this.http.post<SubscriptionEntry>(`${this.api}/wealth/subscriptions`, b); }
   getSubscriptions(): Observable<SubscriptionEntry[]> { return this.http.get<SubscriptionEntry[]>(`${this.api}/wealth/subscriptions`); }
   toggleSubscription(id: number): Observable<SubscriptionEntry> { return this.http.put<SubscriptionEntry>(`${this.api}/wealth/subscriptions/${id}/toggle`, {}); }
+
+  // Income
+  logIncome(b: IncomeLog): Observable<IncomeLog> { return this.http.post<IncomeLog>(`${this.api}/wealth/income`, b); }
+  getIncomeHistory(): Observable<IncomeLog[]> { return this.http.get<IncomeLog[]>(`${this.api}/wealth/income`); }
 
   /* ===== Health OS ===== */
   getHealthToday(): Observable<HealthLog> { return this.http.get<HealthLog>(`${this.api}/health/today`); }
