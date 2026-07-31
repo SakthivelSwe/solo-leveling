@@ -112,6 +112,7 @@
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
          [class.custom-quest]="q.isCustom"
+         [class]="getDifficultyClass(q.xpReward)"
          [style.--cat]="categoryColor(q.category)"
          (click)="onComplete(q)">
       <div class="checkbox">
@@ -122,9 +123,7 @@
       </div>
       <div class="quest-body">
         <div class="quest-tags">
-          <span class="rank-badge mono" [style.color]="getRankColor(q.xpReward)" [style.border-color]="getRankColor(q.xpReward)" [style.background-color]="getRankColor(q.xpReward) + '15'">
-            {{ getRank(q.xpReward) }}
-          </span>
+          <span class="diff-badge mono" [class]="getDifficultyClass(q.xpReward)">{{ getDifficulty(q.xpReward) }}</span>
           <span class="cat-tag mono" [style.color]="categoryColor(q.category)">{{ q.category }}</span>
           <span class="custom-tag tech" *ngIf="q.isCustom">CUSTOM</span>
         </div>

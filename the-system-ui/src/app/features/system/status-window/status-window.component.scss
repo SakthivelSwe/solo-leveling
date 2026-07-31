@@ -125,10 +125,86 @@
   .ring      { width: 150px; height: 150px; }
   .lvl-num   { font-size: 2.4rem; }
   .meta      { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-  .meta-chip { min-width: 80px; padding: 8px 10px; }
-  .meta-chip .v { font-size: 1.1rem; }
 }
 @container status (min-width: 360px) {
   .title { font-size: 1.6rem; }
+}
+
+
+/* ── Radar Chart ──────────────────────────────────────────── */
+.radar-wrap {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.radar-label {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.radar-svg {
+  width: 100%;
+  max-width: 220px;
+  filter: drop-shadow(0 0 18px rgba(83,74,183,0.3));
+}
+
+/* ── 90-Day Heatmap ──────────────────────────────────────── */
+.heatmap-section {
+  margin-top: 24px;
+}
+.heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.heatmap-title {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+}
+.heatmap-streak {
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  color: var(--accent-gold);
+}
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 3px;
+}
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  cursor: default;
+  transition: transform 0.15s;
+  &:hover { transform: scale(1.5); z-index: 2; }
+  &.i0 { background: rgba(255,255,255,0.04); }
+  &.i1 { background: rgba(29,158,117,0.25); box-shadow: 0 0 4px rgba(29,158,117,0.2); }
+  &.i2 { background: rgba(29,158,117,0.5);  box-shadow: 0 0 6px rgba(29,158,117,0.3); }
+  &.i3 { background: rgba(29,158,117,0.75); box-shadow: 0 0 8px rgba(29,158,117,0.5); }
+  &.i4 { background: #1D9E75;               box-shadow: 0 0 10px rgba(29,158,117,0.7); }
+}
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  justify-content: flex-end;
+}
+.leg-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  &.l0 { background: rgba(255,255,255,0.04); }
+  &.l1 { background: rgba(29,158,117,0.25); }
+  &.l2 { background: rgba(29,158,117,0.5); }
+  &.l3 { background: rgba(29,158,117,0.75); }
+  &.l4 { background: #1D9E75; }
 }
 

@@ -120,7 +120,9 @@
         [completedToday]="s.completedToday"
         [totalQuests]="s.totalQuests"
         [dopamine]="dopamine()"
-        [noFap]="noFap()">
+        [noFap]="noFap()"
+        [heatmap]="heatmap()"
+        [currentStreak]="s.streak">
       </app-status-window>
 
       <app-skill-tree [skills]="s.skills" [nodes]="skillTreeNodes()"></app-skill-tree>

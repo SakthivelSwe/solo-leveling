@@ -105,6 +105,63 @@
     </div>
   </div>
 
+  <!-- ── Radar / Spider Chart ───────────────────────────────── -->
+  <div class="radar-wrap">
+    <div class="radar-label tech">◈ STAT RADAR</div>
+    <svg class="radar-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="radarGlow">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <radialGradient id="radarFill" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#534AB7" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#1D9E75" stop-opacity="0.15"/>
+        </radialGradient>
+      </defs>
+      <!-- Grid hexagons -->
+      <polygon [attr.points]="hexPoints(110,110,40)" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <polygon [attr.points]="hexPoints(110,110,60)" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <polygon [attr.points]="hexPoints(110,110,80)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <!-- Axis lines -->
+      <line *ngFor="let p of axisPoints(110,110,80); let i=index" [attr.x1]="110" [attr.y1]="110" [attr.x2]="p.x" [attr.y2]="p.y" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <!-- Data polygon -->
+      <polygon [attr.points]="radarPoints" fill="url(#radarFill)" stroke="#6C63FF" stroke-width="2" filter="url(#radarGlow)" style="transition: all 0.8s ease;"/>
+      <!-- Data points -->
+      <circle *ngFor="let pt of radarDots" [attr.cx]="pt.x" [attr.cy]="pt.y" r="4" [attr.fill]="pt.color" filter="url(#radarGlow)" style="transition: all 0.8s ease;"/>
+      <!-- Labels -->
+      <text *ngFor="let l of radarLabels" [attr.x]="l.x" [attr.y]="l.y" [attr.fill]="l.color" font-size="10" text-anchor="middle" dominant-baseline="middle" font-family="'Share Tech Mono',monospace" font-weight="700">{{l.text}}</text>
+    </svg>
+  </div>
+
+  <!-- ── 90-Day Activity Heatmap ─────────────────────────────── -->
+  <div class="heatmap-section" *ngIf="heatmap && heatmap.length > 0">
+    <div class="heatmap-header">
+      <span class="tech heatmap-title">◈ ACTIVITY HEATMAP</span>
+      <span class="tech heatmap-streak">{{ currentStreak }} DAY STREAK 🔥</span>
+    </div>
+    <div class="heatmap-grid">
+      <div class="heatmap-cell"
+           *ngFor="let day of heatmap"
+           [class.i0]="day.intensity === 0"
+           [class.i1]="day.intensity === 1"
+           [class.i2]="day.intensity === 2"
+           [class.i3]="day.intensity === 3"
+           [class.i4]="day.intensity === 4"
+           [title]="day.date + ' · ' + day.count + ' quests · ' + day.xp + ' XP'">
+      </div>
+    </div>
+    <div class="heatmap-legend tech">
+      <span>LESS</span>
+      <span class="leg-cell l0"></span>
+      <span class="leg-cell l1"></span>
+      <span class="leg-cell l2"></span>
+      <span class="leg-cell l3"></span>
+      <span class="leg-cell l4"></span>
+      <span>MORE</span>
+    </div>
+  </div>
+
   <div class="motivation tech">
     <span class="quote-mark">“</span>{{ motivation }}<span class="quote-mark">”</span>
   </div>

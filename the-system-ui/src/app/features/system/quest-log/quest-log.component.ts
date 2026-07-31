@@ -321,4 +321,17 @@ export class QuestLogComponent {
     if (xp <= 1000) return '#FAC775'; // A-Rank gold
     return '#E24B4A'; // S-Rank red
   }
+
+  getDifficulty(xp: number | undefined): string {
+    const v = xp || 0;
+    if (v <= 50)   return 'EASY';
+    if (v <= 150)  return 'MEDIUM';
+    if (v <= 400)  return 'HARD';
+    return 'LEGENDARY';
+  }
+
+  getDifficultyClass(xp: number | undefined): string {
+    const d = this.getDifficulty(xp);
+    return `diff-${d.toLowerCase()}`;
+  }
 }

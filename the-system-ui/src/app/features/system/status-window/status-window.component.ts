@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Player, Stats, NoFapStatus } from '../../../core/models/models';
+import { Player, Stats, NoFapStatus, HeatmapDay } from '../../../core/models/models';
 import { RankBadgeComponent } from '../../../shared/components/rank-badge.component';
 import { RotatingQuoteComponent } from './rotating-quote.component';
 import { STATS_META } from '../../../shared/system.constants';
@@ -25,6 +25,8 @@ export class StatusWindowComponent {
   @Input() totalQuests = 0;
   @Input() dopamine?: import('../../../core/models/models').DopamineSummary | null;
   @Input() noFap?: NoFapStatus | null;
+  @Input() heatmap: HeatmapDay[] = [];
+  @Input() currentStreak = 0;
 
   readonly statsMeta = STATS_META;
 
@@ -56,10 +58,59 @@ export class StatusWindowComponent {
     return (this.stats as any)[key] ?? 0;
   }
 
-  // stat bar width: normalize against a soft max so bars feel alive
   statPct(key: string): number {
     const v = this.statValue(key);
     return Math.min(100, Math.round((v / 100) * 100));
   }
-}
 
+  // ── Radar / Spider Chart ─────────────────────────────────────────────────
+
+  private readonly RADAR_KEYS = ['str', 'intelligence', 'vit', 'agi', 'per', 'dis'];
+  private readonly RADAR_LABELS_MAP = ['STR', 'INT', 'VIT', 'AGI', 'PER', 'DIS'];
+  private readonly RADAR_COLORS = ['#ff6b6b', '#4fc3f7', '#1D9E75', '#FAC775', '#b366ff', '#E24B4A'];
+
+  hexPoints(cx: number, cy: number, r: number): string {
+    return Array.from({ length: 6 }, (_, i) => {
+      const angle = (Math.PI / 3) * i - Math.PI / 2;
+      return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+    }).join(' ');
+  }
+
+  axisPoints(cx: number, cy: number, r: number): { x: number; y: number }[] {
+    return Array.from({ length: 6 }, (_, i) => {
+      const angle = (Math.PI / 3) * i - Math.PI / 2;
+      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+    });
+  }
+
+  get radarPoints(): string {
+    return this.RADAR_KEYS.map((key, i) => {
+      const angle = (Math.PI / 3) * i - Math.PI / 2;
+      const pct = Math.min(100, (this.stats as any)[key] ?? 0) / 100;
+      const r = pct * 80;
+      return `${110 + r * Math.cos(angle)},${110 + r * Math.sin(angle)}`;
+    }).join(' ');
+  }
+
+  get radarDots(): { x: number; y: number; color: string }[] {
+    return this.RADAR_KEYS.map((key, i) => {
+      const angle = (Math.PI / 3) * i - Math.PI / 2;
+      const pct = Math.min(100, (this.stats as any)[key] ?? 0) / 100;
+      const r = pct * 80;
+      return { x: 110 + r * Math.cos(angle), y: 110 + r * Math.sin(angle), color: this.RADAR_COLORS[i] };
+    });
+  }
+
+  get radarLabels(): { x: number; y: number; text: string; color: string }[] {
+    return this.RADAR_KEYS.map((key, i) => {
+      const angle = (Math.PI / 3) * i - Math.PI / 2;
+      const r = 97;
+      return {
+        x: 110 + r * Math.cos(angle),
+        y: 110 + r * Math.sin(angle),
+        text: this.RADAR_LABELS_MAP[i],
+        color: this.RADAR_COLORS[i]
+      };
+    });
+  }
+}

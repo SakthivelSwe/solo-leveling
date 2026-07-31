@@ -125,6 +125,108 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         </div>
       </div>
     </div>
+
+    <!-- ═══ PROGRESSIVE OVERLOAD TRACKER ═══════════════════════════════ -->
+    <div class="po-panel system-card">
+      <div class="card-glow"></div>
+      <div class="po-header">
+        <div>
+          <h3 class="mono po-title"><span class="diamond" style="color:#A855F7">◈</span> PROGRESSIVE OVERLOAD</h3>
+          <p class="tech po-sub">Track sets × reps × weight. Beat last session.</p>
+        </div>
+        <button class="po-add-btn mono spring-hover" (click)="poFormOpen = !poFormOpen">{{ poFormOpen ? '✕' : '+ LOG SET' }}</button>
+      </div>
+
+      <!-- Log Set Form -->
+      <div class="po-form" *ngIf="poFormOpen">
+        <div class="po-form-row">
+          <input class="custom-input" placeholder="Exercise (e.g. Bench Press)" [(ngModel)]="poExercise" style="flex:2"/>
+          <input class="custom-input" type="number" placeholder="Sets" [(ngModel)]="poSets" min="1" style="width:70px"/>
+          <input class="custom-input" type="number" placeholder="Reps" [(ngModel)]="poReps" min="1" style="width:70px"/>
+          <input class="custom-input" type="number" placeholder="Weight (kg)" [(ngModel)]="poWeight" min="0" step="0.5" style="width:100px"/>
+          <button class="po-submit-btn mono spring-hover" (click)="logPoSet()" [disabled]="!poExercise">LOG</button>
+        </div>
+        <div class="tech" style="font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">Volume = Sets × Reps × Weight (kg)</div>
+      </div>
+
+      <!-- Session History -->
+      <div class="po-history" *ngIf="poLogs.length > 0">
+        <div class="po-exercise-group" *ngFor="let group of poGrouped">
+          <div class="po-ex-header">
+            <span class="mono po-ex-name">{{ group.exercise }}</span>
+            <span class="tech po-ex-vol" style="color:#A855F7">VOL {{ group.totalVolume | number:'1.0-0' }} kg</span>
+            <span class="tech po-ex-vs" [style.color]="group.vsLast >= 0 ? '#1D9E75' : '#E24B4A'">
+              {{ group.vsLast >= 0 ? '↑' : '↓' }} {{ group.vsLast | number:'1.0-0' }} vs last
+            </span>
+          </div>
+          <div class="po-sets-row">
+            <div class="po-set-chip" *ngFor="let s of group.sets; let i = index">
+              <span class="tech">S{{ i+1 }}</span>
+              <span class="mono">{{ s.reps }}×{{ s.weight }}kg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tech" *ngIf="poLogs.length === 0" style="color:var(--text-secondary);font-size:0.75rem;padding:12px 0;">No sets logged today. Start your first set above.</div>
+    </div>
+
+    <!-- ═══ SLEEP QUALITY TRACKER ════════════════════════════════════════ -->
+    <div class="sleep-panel system-card">
+      <div class="card-glow"></div>
+      <div class="sleep-header">
+        <div>
+          <h3 class="mono sleep-title"><span class="diamond" style="color:#4fc3f7">◈</span> SLEEP TRACKER</h3>
+          <p class="tech sleep-sub">Log sleep quality for recovery score calculation.</p>
+        </div>
+        <div class="sleep-recovery-badge" [style.background]="sleepRecoveryColor + '22'" [style.border-color]="sleepRecoveryColor + '66'">
+          <span class="mono sleep-score" [style.color]="sleepRecoveryColor">{{ sleepRecoveryScore }}</span>
+          <span class="tech" style="font-size:0.6rem;letter-spacing:1px;">RECOVERY</span>
+        </div>
+      </div>
+
+      <!-- Log sleep -->
+      <div class="sleep-form">
+        <div class="sleep-form-row">
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+            <label class="tech" style="font-size:0.65rem;color:var(--text-secondary);letter-spacing:1px;">SLEPT AT</label>
+            <input class="custom-input" type="time" [(ngModel)]="sleepBedTime" style="width:100%;"/>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+            <label class="tech" style="font-size:0.65rem;color:var(--text-secondary);letter-spacing:1px;">WOKE AT</label>
+            <input class="custom-input" type="time" [(ngModel)]="sleepWakeTime" style="width:100%;"/>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+            <label class="tech" style="font-size:0.65rem;color:var(--text-secondary);letter-spacing:1px;">QUALITY</label>
+            <select class="custom-input" [(ngModel)]="sleepQuality">
+              <option value="5">5 ⭐ Deep</option>
+              <option value="4">4 ⭐ Good</option>
+              <option value="3">3 ⭐ Average</option>
+              <option value="2">2 ⭐ Poor</option>
+              <option value="1">1 ⭐ Terrible</option>
+            </select>
+          </div>
+          <button class="po-submit-btn mono spring-hover" (click)="logSleep()" [disabled]="!sleepBedTime || !sleepWakeTime">LOG SLEEP</button>
+        </div>
+      </div>
+
+      <!-- Sleep history mini -->
+      <div class="sleep-history" *ngIf="sleepLogs.length > 0">
+        <div class="sleep-row" *ngFor="let s of sleepLogs.slice(0, 7)">
+          <span class="tech sleep-date">{{ s.date }}</span>
+          <span class="mono sleep-dur" [style.color]="s.hours >= 7 ? '#1D9E75' : (s.hours >= 6 ? '#FAC775' : '#E24B4A')">
+            {{ s.hours | number:'1.0-1' }}h
+          </span>
+          <div class="sleep-stars">
+            <span *ngFor="let star of [1,2,3,4,5]" [style.color]="star <= s.quality ? '#FAC775' : 'rgba(255,255,255,0.15)'">★</span>
+          </div>
+          <div class="sleep-bar-bg">
+            <div class="sleep-bar-fill" [style.width.%]="(s.hours / 10) * 100" [style.background]="s.hours >= 7 ? '#1D9E75' : (s.hours >= 6 ? '#FAC775' : '#E24B4A')"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tech" *ngIf="sleepLogs.length === 0" style="color:var(--text-secondary);font-size:0.75rem;padding:12px 0;">No sleep logged yet. Track your first night above.</div>
+    </div>
+
   </div>
   `,
   styles: [`
@@ -488,12 +590,55 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   .sval { font-size: 1.6rem; color: var(--text-primary); font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
   .sunit { font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 700; }
 
+  /* ── Progressive Overload ── */
+  .po-panel { position:relative; overflow:hidden; padding:24px 28px; border:1px solid rgba(168,85,247,0.25); border-radius:12px; background:linear-gradient(135deg,rgba(168,85,247,0.06),rgba(13,13,28,0.8)); }
+  .po-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+  .po-title { margin:0 0 4px; font-size:1rem; letter-spacing:3px; color:#c4a0ff; }
+  .po-sub { margin:0; font-size:0.75rem; color:var(--text-secondary); }
+  .po-add-btn { padding:8px 16px; border-radius:8px; border:1px solid rgba(168,85,247,0.5); background:rgba(168,85,247,0.12); color:#c4a0ff; font-size:0.75rem; letter-spacing:2px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .po-add-btn:hover { background:rgba(168,85,247,0.25); box-shadow:0 0 12px rgba(168,85,247,0.4); }
+  .po-form { margin-bottom:16px; padding:16px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid rgba(168,85,247,0.2); }
+  .po-form-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .po-submit-btn { padding:10px 16px; border-radius:8px; border:1px solid rgba(29,158,117,0.5); background:rgba(29,158,117,0.15); color:#5DCAA5; font-size:0.72rem; letter-spacing:2px; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .po-submit-btn:hover:not(:disabled) { background:rgba(29,158,117,0.3); box-shadow:0 0 10px rgba(29,158,117,0.4); }
+  .po-submit-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .po-history { display:flex; flex-direction:column; gap:12px; }
+  .po-exercise-group { border:1px solid rgba(168,85,247,0.15); border-radius:10px; padding:12px 16px; background:rgba(0,0,0,0.2); }
+  .po-ex-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; flex-wrap:wrap; }
+  .po-ex-name { font-size:0.9rem; color:#fff; font-weight:600; }
+  .po-ex-vol { font-size:0.72rem; letter-spacing:1px; }
+  .po-ex-vs { font-size:0.72rem; letter-spacing:0.5px; }
+  .po-sets-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .po-set-chip { display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); font-size:0.7rem; }
+  .po-set-chip .tech { font-size:0.55rem; color:var(--text-secondary); letter-spacing:1px; }
+  .po-set-chip .mono { color:#fff; }
+
+  /* ── Sleep Tracker ── */
+  .sleep-panel { position:relative; overflow:hidden; padding:24px 28px; border:1px solid rgba(79,195,247,0.2); border-radius:12px; background:linear-gradient(135deg,rgba(79,195,247,0.05),rgba(13,13,28,0.85)); }
+  .sleep-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+  .sleep-title { margin:0 0 4px; font-size:1rem; letter-spacing:3px; color:#8fd8f7; }
+  .sleep-sub { margin:0; font-size:0.75rem; color:var(--text-secondary); }
+  .sleep-recovery-badge { display:flex; flex-direction:column; align-items:center; padding:10px 16px; border-radius:10px; border:1px solid; }
+  .sleep-score { font-size:1.6rem; font-weight:800; }
+  .sleep-form { margin-bottom:16px; }
+  .sleep-form-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .sleep-history { display:flex; flex-direction:column; gap:8px; }
+  .sleep-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .sleep-row:last-child { border-bottom:none; }
+  .sleep-date { font-size:0.7rem; color:var(--text-secondary); width:48px; flex-shrink:0; }
+  .sleep-dur { font-size:1rem; font-weight:700; width:38px; text-align:right; flex-shrink:0; }
+  .sleep-stars { display:flex; gap:2px; font-size:0.75rem; flex-shrink:0; }
+  .sleep-bar-bg { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .sleep-bar-fill { height:100%; border-radius:3px; transition:width 0.8s ease; }
+
   @media (max-width: 768px) {
     .training-grid, .controls-grid { grid-template-columns: 1fr; }
     .quest-desc { max-width: 100%; }
     .pt-shell { padding: 20px 16px 80px; }
     .t-stats { position: relative; top: 0; margin-bottom: 8px; justify-content: flex-start; }
     .t-progress-container { flex-direction: column-reverse; margin-top: 0; }
+    .po-form-row { flex-direction: column; }
+    .sleep-form-row { flex-direction: column; }
   }
   `]
 })
@@ -696,5 +841,93 @@ export class PhysicalTrackingComponent implements OnInit {
     return this.history()
       .filter(e => e.exerciseName === exercise)
       .reduce((sum, e) => sum + (isCardio ? (e.weightKg || 0) : (e.reps || 0)), 0);
+  }
+
+  // ── Progressive Overload ──────────────────────────────────────────────
+
+  poFormOpen = false;
+  poExercise = '';
+  poSets = 3;
+  poReps = 10;
+  poWeight = 0;
+  poLogs: { exercise: string; sets: number; reps: number; weight: number; ts: Date }[] = this.loadPoLogs();
+
+  loadPoLogs(): { exercise: string; sets: number; reps: number; weight: number; ts: Date }[] {
+    try {
+      const saved = localStorage.getItem('lifeos.poLogs');
+      if (!saved) return [];
+      return JSON.parse(saved).map((l: any) => ({ ...l, ts: new Date(l.ts) }));
+    } catch { return []; }
+  }
+
+  savePoLogs() {
+    localStorage.setItem('lifeos.poLogs', JSON.stringify(this.poLogs));
+  }
+
+  logPoSet() {
+    if (!this.poExercise) return;
+    const entry = { exercise: this.poExercise.trim(), sets: this.poSets || 1, reps: this.poReps || 1, weight: this.poWeight || 0, ts: new Date() };
+    this.poLogs = [entry, ...this.poLogs.filter(l => l.exercise !== entry.exercise || l.ts.toDateString() === entry.ts.toDateString())];
+    this.savePoLogs();
+    this.snack.open(`◈ ${entry.sets}×${entry.reps} @ ${entry.weight}kg logged for ${entry.exercise}`, 'OK', { duration: 2500 });
+    this.poExercise = '';
+  }
+
+  get poGrouped(): { exercise: string; sets: { reps: number; weight: number }[]; totalVolume: number; vsLast: number }[] {
+    const today = new Date().toDateString();
+    const todayLogs = this.poLogs.filter(l => new Date(l.ts).toDateString() === today);
+    const grouped = new Map<string, { sets: { reps: number; weight: number }[]; totalVolume: number }>();
+    for (const l of todayLogs) {
+      if (!grouped.has(l.exercise)) grouped.set(l.exercise, { sets: [], totalVolume: 0 });
+      const g = grouped.get(l.exercise)!;
+      for (let s = 0; s < l.sets; s++) g.sets.push({ reps: l.reps, weight: l.weight });
+      g.totalVolume += l.sets * l.reps * l.weight;
+    }
+    return Array.from(grouped.entries()).map(([exercise, data]) => ({
+      exercise, sets: data.sets, totalVolume: data.totalVolume, vsLast: data.totalVolume
+    }));
+  }
+
+  // ── Sleep Tracker ─────────────────────────────────────────────────────
+
+  sleepBedTime = '';
+  sleepWakeTime = '';
+  sleepQuality = '4';
+  sleepLogs: { date: string; hours: number; quality: number }[] = this.loadSleepLogs();
+
+  loadSleepLogs(): { date: string; hours: number; quality: number }[] {
+    try {
+      const saved = localStorage.getItem('lifeos.sleepLogs');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  }
+
+  logSleep() {
+    if (!this.sleepBedTime || !this.sleepWakeTime) return;
+    const [bh, bm] = this.sleepBedTime.split(':').map(Number);
+    const [wh, wm] = this.sleepWakeTime.split(':').map(Number);
+    let hours = (wh + wm / 60) - (bh + bm / 60);
+    if (hours < 0) hours += 24; // overnight
+    const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    this.sleepLogs = [{ date: today, hours: Math.round(hours * 10) / 10, quality: Number(this.sleepQuality) }, ...this.sleepLogs.slice(0, 29)];
+    localStorage.setItem('lifeos.sleepLogs', JSON.stringify(this.sleepLogs));
+    this.snack.open(`◈ Sleep logged: ${hours.toFixed(1)}h · Quality ${this.sleepQuality}⭐`, 'OK', { duration: 2500 });
+    this.sleepBedTime = '';
+    this.sleepWakeTime = '';
+  }
+
+  get sleepRecoveryScore(): string {
+    if (!this.sleepLogs.length) return '--';
+    const avg = this.sleepLogs.slice(0, 7).reduce((a, l) => a + l.hours, 0) / Math.min(7, this.sleepLogs.length);
+    const qAvg = this.sleepLogs.slice(0, 7).reduce((a, l) => a + l.quality, 0) / Math.min(7, this.sleepLogs.length);
+    const score = Math.round((avg / 8) * 60 + (qAvg / 5) * 40);
+    return score + '%';
+  }
+
+  get sleepRecoveryColor(): string {
+    const score = parseInt(this.sleepRecoveryScore) || 0;
+    if (score >= 80) return '#1D9E75';
+    if (score >= 60) return '#FAC775';
+    return '#E24B4A';
   }
 }

@@ -70,6 +70,8 @@ export class SystemComponent implements OnInit, OnDestroy {
   monthlyQuests = signal<Quest[]>([]);
   milestoneQuests = signal<Quest[]>([]);
   noFap = signal<NoFapStatus | null>(null);
+  heatmap = signal<HeatmapDay[]>([]);
+  currentStreak = signal<number>(0);
   
   todayDateStr = signal<string>('');
   tomorrowDateStr = signal<string>('');
@@ -287,6 +289,10 @@ export class SystemComponent implements OnInit, OnDestroy {
     this.lifeOsService.getNoFapStatus().subscribe({
       next: (nf) => this.noFap.set(nf),
       error: () => this.noFap.set(null),
+    });
+    this.playerService.getHeatmap(90).subscribe({
+      next: (h) => { this.heatmap.set(h); },
+      error: () => this.heatmap.set([])
     });
   }
 
