@@ -129,8 +129,13 @@ public class WealthService {
         double totalNeeds = expenseRepo.sumEssentialByDateRange(playerId, startOfMonth, endOfMonth);
         double totalWants = expenseRepo.sumNonEssentialByDateRange(playerId, startOfMonth, endOfMonth);
         
+        Double actualIncomeOpt = incomeRepo.sumAmountByPlayerIdAndDateRange(playerId, startOfMonth, endOfMonth);
+        double totalIncome = actualIncomeOpt != null ? actualIncomeOpt : 0.0;
+        
         BudgetEntry budget = budgetRepo.findByPlayerIdAndEntryMonth(playerId, today.toString().substring(0, 7)).orElse(new BudgetEntry());
-        double totalIncome = budget.getSalary();
+        if (totalIncome == 0) {
+            totalIncome = budget.getSalary(); // fallback to budget if no actual income logged
+        }
         double totalSaved = budget.getSaved() + budget.getSipAmount();
         
         double emiTotal = emiRepo.sumActiveEmiAmount(playerId);
