@@ -62,7 +62,31 @@ At certain milestones, the System will offer a **Job Change Quest**. These are g
 
 ---
 
-## 4. The Discipline Grid (Habits & The Shadow Army)
+## 4. The Discipline Protocol (NoFap Mastery)
+
+The most advanced system in the Life OS is the **Discipline Protocol**, an exact-time stopwatch built to help you conquer your deepest urges and rebuild your brain's dopamine baseline.
+
+### ⏱️ Exact 24h Elapsed Timer
+Unlike other systems that just count calendar days, the Discipline Protocol acts like a **live stopwatch**. If you start your journey at 10:00 PM, you will not earn a "Day" until exactly 10:00 PM the next day. The main dashboard and NoFap screens are perfectly synchronized to the exact second.
+
+### 🧠 Brain State & Recovery Velocity
+- **Science Timeline:** Scroll through the timeline to see exactly what is physically happening inside your brain (dopamine receptor healing, grey matter changes) based on exactly what day you are currently on.
+- **Recovery Velocity (RV):** A momentum metric based on how many clean days you've secured out of the last 90. High RV means your brain is rewiring faster.
+
+### 🚨 Emergency Urge Protocol
+When a massive urge hits, click the **Emergency Urge Protocol** button:
+1. The screen will lock into a dark mode.
+2. The **4-7-8 Breathing Technique** visualizer will guide your breathing.
+3. Your own personalized "Addiction Insights" (letters from your past self) will be presented to you.
+*Surviving an urge using this protocol grants you a massive XP bonus.*
+
+### 🌙 Nightfalls & Relapses
+- **Log Nightfall:** A natural biological reflex. Does NOT reset your streak, but logs it for tracking.
+- **Honest Relapse:** Completely resets your timer, drains HP, and forces you to perform a post-mortem to log what triggered you (Boredom, Stress, etc.).
+
+---
+
+## 5. The Discipline Grid (Habits & The Shadow Army)
 
 ### Habit Loops
 The System uses a robust Habit engine (Cue → Craving → Routine → Reward). You log your habits in the **Habits** tab. Consistency builds your "Streak". Keystone habits grant 2x XP multipliers.
@@ -78,7 +102,7 @@ When you maintain a habit streak for **25 consecutive days**, that habit is deem
 
 ---
 
-## 5. Life OS Ecosystem (Modules)
+## 6. Life OS Ecosystem (Modules)
 
 Beyond the dashboard, the **Life OS** acts as the central command for every facet of your life. Access it via the top navigation bar.
 
@@ -86,41 +110,35 @@ Beyond the dashboard, the **Life OS** acts as the central command for every face
 - **Job Applications:** Track interviews, rounds, and application statuses.
 - **LeetCode Log:** Monitor your algorithm solving streak and difficulty breakdown.
 - **Deep Work Sessions:** Log focused, uninterrupted work blocks.
-- **Skills-Gap Analyzer:** Compare your current skill levels against target job requirements.
 
 ### 💰 Wealth OS
 - **Financial Assets:** Track all cash, bank balances, crypto, stocks, and physical assets.
 - **Net Worth Log:** Visualize your wealth trajectory over time.
-- **Budgeting & Income/Expenses:** Track every penny going in and out.
-- **Savings Goals & EMIs:** Seed financial goals and manage debt payments or subscriptions.
+- **Budgeting:** Track every penny going in and out.
 
 ### 🧠 Mind & Body OS
 - **Dopamine Detox Logs:** Track your resistance against cheap dopamine triggers.
-- **Testosterone (7 Pillars):** Log daily adherence to the 7 pillars of raw energy (sleep, sunlight, nutrition, etc.).
-- **Self-Doubt Ledger:** Write down negative thoughts and immediately crush them with concrete evidence of your past successes.
+- **Testosterone (7 Pillars):** Log daily adherence to the 7 pillars of raw energy.
+- **Self-Doubt Ledger:** Write down negative thoughts and immediately crush them.
 - **Health Logs:** Daily sleep, energy, mood, and water intake tracking.
-
-### 📚 Learning OS
-- **Flashcards & Vocab:** Add new words, review flashcards, and track your English speaking practices.
-- **Course Progress:** Monitor completion rates for external courses and books.
 
 ---
 
-## 6. Dungeons, Raids, & The System Shop
+## 7. Dungeons, Raids, & The System Shop
 
 ### ⚔️ Weekly Gate Raids (Boss Battles)
 Every Monday, a **Gate** opens on your dashboard containing a Boss scaled to your current rank. 
 - The Boss has its own HP pool.
 - Every quest you complete throughout the week deals damage to the Boss.
-- Defeating the Boss before Sunday midnight grants a massive XP injection, exclusive items, and potentially new Titles.
+- Defeating the Boss before Sunday midnight grants massive XP and exclusive items.
 
 ### 🛒 The System Shop & Inventory
-Completing difficult tasks and milestones rewards you with **System Gold**. 
+Completing difficult tasks rewards you with **System Gold**. 
 You can spend this currency in the **Shop** for real-life rewards you define (e.g., "Buy a coffee", "1 hour of gaming") or system buffs (e.g., "HP Potion"). Purchased items go to your **Inventory** where you can consume them.
 
 ---
 
-## 7. Hunter's Protocol (Efficiency Guide)
+## 8. Hunter's Protocol (Efficiency Guide)
 
 To maximize your progression and avoid HP drain, follow this optimal daily loop:
 
@@ -130,9 +148,10 @@ To maximize your progression and avoid HP drain, follow this optimal daily loop:
 3. Go to **Mind OS** and log your daily intention or clear any lingering mental fog.
 
 **🛠️ The Grind (Daytime)**
-1. Use **Career OS** to start a **Deep Work Session**. Do not break focus.
-2. Knock out your **SKILL** quests. If studying or coding, log your LeetCode/Course progress.
-3. Eat clean and log your meals in **Health OS**.
+1. Check the **Discipline Protocol**. If you are feeling an urge, trigger the Emergency Breathing protocol immediately. If you made it through yesterday clean, hit **Confirm Clean Day**.
+2. Use **Career OS** to start a **Deep Work Session**. Do not break focus.
+3. Knock out your **SKILL** quests. If studying or coding, log your LeetCode progress.
+4. Eat clean and log your meals in **Health OS**.
 
 **🌑 Evening Consolidation**
 1. Check your **Status Window**. Ensure you have hit the **10+ Quest threshold** to heal/maintain HP.
