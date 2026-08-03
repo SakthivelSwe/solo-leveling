@@ -25,7 +25,7 @@ import com.thesystem.service.QuestService;
 import com.thesystem.service.HabitService;
 import com.thesystem.service.NoFapService;
 import com.thesystem.dto.HabitDTO;
-import com.thesystem.entity.NoFapStatus;
+import com.thesystem.dto.NoFapStatusDTO;
 
 @Service
 public class AiCommanderService {
@@ -85,13 +85,13 @@ public class AiCommanderService {
                 .collect(Collectors.joining("\n"));
 
         // Fetch Habit Context
-        List<HabitDTO> habits = habitService.getHabits(playerId);
+        List<HabitDTO> habits = habitService.list(playerId);
         String habitSummary = habits.stream()
                 .map(h -> "- " + h.name() + " (Streak: " + h.currentStreak() + ")")
                 .collect(Collectors.joining("\n"));
 
         // Fetch NoFap Context
-        NoFapStatus noFap = noFapService.getStatus(playerId);
+        NoFapStatusDTO noFap = noFapService.getStatus(playerId);
         String noFapSummary = "Current Streak: " + noFap.getCurrentStreak() + " days. " + 
                               (noFap.isTodayClean() ? "Clean today." : "Relapsed recently.");
 
