@@ -127,7 +127,11 @@ public class Player {
         this.clarityBuffEnd = clarityBuffEnd;
     }
 
-    @Column(name = "system_gold", nullable = false)
+    /**
+     * System Gold earned from completing quests. New column added after initial schema —
+     * columnDefinition provides DEFAULT 0 so PostgreSQL can ALTER TABLE on existing rows.
+     */
+    @Column(name = "system_gold", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
     private int systemGold = 0;
 
     public int getSystemGold() {
