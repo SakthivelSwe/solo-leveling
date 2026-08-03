@@ -53,7 +53,7 @@ public class ShadowService {
     }
 
     public void processReturningShadows(Long playerId) {
-        List<Shadow> deployed = shadowRepo.findByPlayerIdAndIsDeployedTrue(playerId);
+        List<Shadow> deployed = shadowRepo.findByPlayerIdAndDeployedTrue(playerId);
         LocalDateTime now = LocalDateTime.now();
         Player player = null;
 
