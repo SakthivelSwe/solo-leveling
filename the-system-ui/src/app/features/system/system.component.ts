@@ -328,7 +328,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   private toast(msg: string): void {
-    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'center', verticalPosition: 'top' });
+    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
   }
 
   onPenaltySurvived(): void {
@@ -379,7 +379,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     const ref = this.snack.open(
       '◈ Initiate AI Quest Sync? Analyzes your stats and generates personalized quests.',
       'CONFIRM',
-      { duration: 8000, panelClass: 'system-snack', horizontalPosition: 'center', verticalPosition: 'top' }
+      { duration: 8000, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' }
     );
 
     ref.onAction().subscribe(() => {
@@ -497,13 +497,13 @@ export class SystemComponent implements OnInit, OnDestroy {
     const statStr = res.statsGained?.length ? ' · ' + res.statsGained.join(' ') : '';
     this.snack.open(`◈ +${res.xpGained} XP${statStr}`, '✕', {
       duration: 3400, panelClass: 'system-snack',
-      horizontalPosition: 'center', verticalPosition: 'top',
+      horizontalPosition: 'right', verticalPosition: 'top',
     });
     res.newAchievements?.forEach((a: Achievement, i: number) => {
       setTimeout(() => {
         this.snack.open(`🏆 ACHIEVEMENT — ${a.title}`, '✕', {
           duration: 4200, panelClass: 'system-snack',
-          horizontalPosition: 'center', verticalPosition: 'top',
+          horizontalPosition: 'right', verticalPosition: 'top',
         });
       }, 700 * (i + 1));
     });
@@ -523,7 +523,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     const msg = e?.error?.message ?? 'Quest failed';
     this.snack.open(`⚠ ${msg}`, '✕', {
       duration: 2800, panelClass: 'system-snack-warn',
-      horizontalPosition: 'center', verticalPosition: 'top',
+      horizontalPosition: 'right', verticalPosition: 'top',
     });
   }
 

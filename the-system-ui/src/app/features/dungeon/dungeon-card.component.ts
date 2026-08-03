@@ -93,7 +93,7 @@ export class DungeonCardComponent implements OnInit {
         if (d.justCleared) {
           this.snack.open(`⚔ GATE CLEARED — ${d.bossName} felled · +${d.rewardXp} XP`, '✕', {
             duration: 5000, panelClass: 'system-snack',
-            horizontalPosition: 'center', verticalPosition: 'top',
+            horizontalPosition: 'right', verticalPosition: 'top',
           });
         }
       },

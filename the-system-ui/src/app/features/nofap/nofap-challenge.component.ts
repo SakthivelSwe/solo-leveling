@@ -749,7 +749,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     this.snack.open(msg, '✕', {
       duration: 3500,
       panelClass: 'system-snack',
-      horizontalPosition: 'center',
+      horizontalPosition: 'right',
       verticalPosition: 'top',
     });
   }

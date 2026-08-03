@@ -241,7 +241,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   private toast(msg: string): void {
-    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'center', verticalPosition: 'top' });
+    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
   }
 
   /* ===== Career actions ===== */

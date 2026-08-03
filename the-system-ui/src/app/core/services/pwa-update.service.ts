@@ -24,7 +24,7 @@ export class PwaUpdateService {
           {
             duration: 0,
             panelClass: 'system-snack',
-            horizontalPosition: 'center',
+            horizontalPosition: 'right',
             verticalPosition: 'top',
           },
         );

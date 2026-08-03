@@ -149,8 +149,8 @@ export class SseService {
       this.snack.open(`◈ ${n.title} — ${n.message}`, '✕', {
         duration: 8000,
         panelClass: 'system-snack',
-        horizontalPosition: 'end',
-        verticalPosition: 'bottom', // moved to bottom to be less intrusive to UI
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
       });
 
       // Desktop Web Notification (if app is hidden)
