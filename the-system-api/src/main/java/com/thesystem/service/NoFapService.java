@@ -162,8 +162,8 @@ public class NoFapService {
         // World stats
         dto.setWorldStats(worldStats());
 
-        // XP bonus
-        dto.setXpBonusPct(Math.min(50.0, (currentStreak / 7) * 5.0));
+        // XP bonus: 1% per clean day, capped at 50%.
+        dto.setXpBonusPct(Math.min(50.0, currentStreak * 1.0));
 
         // System verdict
         dto.setSystemVerdict(systemVerdict(currentStreak));

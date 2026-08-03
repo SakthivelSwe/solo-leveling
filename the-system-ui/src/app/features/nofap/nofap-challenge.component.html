@@ -198,26 +198,28 @@
           </div>
 
           <!-- ── LIVE ELAPSED TIMER ─────────────────────────────────────── -->
-          @if (confirmTimeDisplay()) {
-            <div class="elapsed-timer-card">
-              <!-- Header row -->
-              <div class="et-header">
-                <span class="et-label tech">⚡ TIME CLEAN</span>
+          <div class="elapsed-timer-card">
+            <!-- Header row -->
+            <div class="et-header">
+              <span class="et-label tech">⚡ TIME CLEAN</span>
+              @if (confirmTimeDisplay()) {
                 <span class="et-confirm-time tech">Since {{ confirmTimeDisplay() }}</span>
-              </div>
-
-              <!-- Big ticking counter -->
-              <div class="et-counter mono">{{ elapsedDisplay() }}</div>
-
-              <!-- Next day unlock info -->
-              @if (nextDayTimeDisplay()) {
-                <div class="et-next-row tech">
-                  <span class="et-next-label">📅 DAY {{ nextDayNumber() }} UNLOCKS AT:</span>
-                  <span class="et-next-time">{{ nextDayTimeDisplay() }}</span>
-                </div>
+              } @else {
+                <span class="et-confirm-time tech">Awaiting Confirmation</span>
               }
             </div>
-          }
+
+            <!-- Big ticking counter -->
+            <div class="et-counter mono">{{ elapsedDisplay() }}</div>
+
+            <!-- Next day unlock info -->
+            @if (nextDayTimeDisplay()) {
+              <div class="et-next-row tech">
+                <span class="et-next-label">📅 DAY {{ nextDayNumber() }} UNLOCKS AT:</span>
+                <span class="et-next-time">{{ nextDayTimeDisplay() }}</span>
+              </div>
+            }
+          </div>
 
           <!-- Action buttons -->
           <div class="action-buttons">
