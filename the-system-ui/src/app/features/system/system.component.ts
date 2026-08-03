@@ -77,6 +77,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   monthlyQuests = signal<Quest[]>([]);
   milestoneQuests = signal<Quest[]>([]);
   noFap = signal<NoFapStatus | null>(null);
+  displayDay = signal<number>(0);
   heatmap = signal<HeatmapDay[]>([]);
   currentStreak = signal<number>(0);
   
@@ -249,7 +250,10 @@ export class SystemComponent implements OnInit, OnDestroy {
       error: () => {},
     });
     this.lifeOsService.getNoFapStatus().subscribe({
-      next: (nf) => this.noFap.set(nf),
+      next: (nf) => {
+        this.noFap.set(nf);
+        this.displayDay.set(this.computeDisplayDay(nf));
+      },
       error: () => {},
     });
   }
@@ -294,13 +298,38 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
     this.loadQuestTabs();
     this.lifeOsService.getNoFapStatus().subscribe({
-      next: (nf) => this.noFap.set(nf),
+      next: (nf) => {
+        this.noFap.set(nf);
+        this.displayDay.set(this.computeDisplayDay(nf));
+      },
       error: () => this.noFap.set(null),
     });
     this.playerService.getHeatmap(90).subscribe({
-      next: (h) => { this.heatmap.set(h); },
+      next: (hm) => this.heatmap.set(hm),
       error: () => this.heatmap.set([])
     });
+  }
+
+  private computeDisplayDay(s: NoFapStatus): number {
+    let stored = localStorage.getItem('nf_streak_start_time');
+    if (stored) {
+      try {
+        if (isNaN(new Date(stored).getTime())) stored = null;
+      } catch (e) { stored = null; }
+    }
+    if (!stored && s.startDate) {
+      const fallbackStart = new Date(`${s.startDate}T00:00:00`);
+      if (!isNaN(fallbackStart.getTime())) {
+        stored = fallbackStart.toISOString();
+      }
+    }
+    if (!stored) return s.currentStreak;
+    
+    const startDate = new Date(stored);
+    const now = new Date();
+    const diffMs = Math.max(0, now.getTime() - startDate.getTime());
+    const fullDaysPassed = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return fullDaysPassed + 1;
   }
 
   /**
