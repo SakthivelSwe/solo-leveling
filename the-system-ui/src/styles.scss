@@ -409,9 +409,7 @@ $sys-theme: mat.define-dark-theme((
 
 /* ── Overlay backdrop ─────────────────────────────────────── */
 .cdk-overlay-dark-backdrop {
-  background: rgba(3,3,10,0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--bg-primary);
 }
 /* Ensure the CDK overlay sits above the bottom navigation bar on mobile */
 .cdk-overlay-container {

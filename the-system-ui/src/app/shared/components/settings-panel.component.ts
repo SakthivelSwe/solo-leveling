@@ -266,13 +266,14 @@ interface QuestItem {
   styles: [`
 :host { display: block; }
 .overlay {
-  position: fixed; inset: 0; z-index: 999; background: rgba(3,3,10,0.75);
-  backdrop-filter: blur(5px); display: flex; justify-content: flex-end;
+  position: fixed; inset: 0; z-index: 999; background: var(--bg-primary);
+  display: flex; justify-content: flex-end;
 }
 .panel {
   width: min(94vw, 520px); height: 100vh; overflow-y: auto;
   padding: 28px 24px 48px; border-radius: 0; border-right: none;
   border-top: none; border-bottom: none; border-left: 2px solid var(--accent-purple);
+  background: var(--card-bg);
 }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .panel-head h2 { margin: 0; font-size: .9rem; letter-spacing: 4px; }

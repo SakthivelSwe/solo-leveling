@@ -52,9 +52,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
     .skip-prompt-overlay {
       position: fixed; 
       inset: 0; 
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: var(--bg-primary);
       display: flex; 
       align-items: center; 
       justify-content: center;
@@ -62,11 +60,11 @@ import { trigger, transition, style, animate } from '@angular/animations';
     }
 
     .skip-prompt-container {
-      background: rgba(10, 10, 14, 0.95);
+      background: var(--card-bg);
       border: 1px solid rgba(226, 75, 74, 0.3);
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(226, 75, 74, 0.1);
+      box-shadow: var(--elev-2);
       width: 90vw;
       max-width: 400px;
       display: flex;

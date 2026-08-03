@@ -58,10 +58,16 @@ import { MindLog } from '../../core/models/models';
   :host { display: block; }
   .er-overlay {
     position: fixed; inset: 0; z-index: 9998;
-    background: radial-gradient(ellipse at 50% 20%, rgba(83,74,183,0.25), rgba(3,3,10,0.88) 70%);
+    background: var(--bg-primary);
     display: flex; align-items: center; justify-content: center; padding: 18px;
   }
-  .er-card { width: min(92vw, 460px); padding: 24px; border: 1px solid rgba(108,99,255,0.4); }
+  .er-card { 
+    width: min(92vw, 460px); padding: 24px; 
+    border: 1px solid rgba(108,99,255,0.4); 
+    border-radius: var(--r-xl); 
+    background: var(--card-bg); 
+    box-shadow: var(--elev-2); 
+  }
   .er-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
   .er-head h2 { margin: 0; font-size: .9rem; letter-spacing: 3px; color: var(--accent-purple); }
   .er-head .sub { margin: 4px 0 0; font-size: .68rem; color: var(--text-secondary); letter-spacing: .5px; }
