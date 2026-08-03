@@ -25,6 +25,15 @@ export interface AuthResponse {
   player: Player;
 }
 
+export interface AiCommanderBriefingDTO {
+  greeting: string;
+  yesterdayRecap: string;
+  todayPriorities: string[];
+  feedback: string;
+  estimatedCompletionPct: number;
+  expectedLevelUp: string;
+}
+
 export interface Stats {
   str: number;
   intelligence: number;

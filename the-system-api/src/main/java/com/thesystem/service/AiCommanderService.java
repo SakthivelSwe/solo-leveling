@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 import com.thesystem.service.AiProviderService;
 import com.thesystem.service.PlayerService;
 import com.thesystem.service.QuestService;
+import com.thesystem.service.HabitService;
+import com.thesystem.service.NoFapService;
+import com.thesystem.dto.HabitDTO;
+import com.thesystem.entity.NoFapStatus;
 
 @Service
 public class AiCommanderService {
@@ -31,6 +35,8 @@ public class AiCommanderService {
     private final com.thesystem.repository.PlayerRepository playerRepository;
     private final com.thesystem.repository.PlayerStatsRepository statsRepository;
     private final QuestService questService;
+    private final HabitService habitService;
+    private final NoFapService noFapService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     // Specific user focus context (as per user request: Angular Signals, DSA, etc.)
@@ -44,11 +50,15 @@ public class AiCommanderService {
     public AiCommanderService(AiProviderService aiProviderService,
                               com.thesystem.repository.PlayerRepository playerRepository,
                               com.thesystem.repository.PlayerStatsRepository statsRepository,
-                              QuestService questService) {
+                              QuestService questService,
+                              HabitService habitService,
+                              NoFapService noFapService) {
         this.aiProviderService = aiProviderService;
         this.playerRepository = playerRepository;
         this.statsRepository = statsRepository;
         this.questService = questService;
+        this.habitService = habitService;
+        this.noFapService = noFapService;
     }
 
     public AiCommanderBriefingDTO getMorningBriefing(Long playerId) {
@@ -74,7 +84,18 @@ public class AiCommanderService {
                 .map(q -> "- " + q.label())
                 .collect(Collectors.joining("\n"));
 
-        String prompt = buildPrompt(p, stats, completedYesterday, totalYesterday, yesterdaySummary, todaySummary);
+        // Fetch Habit Context
+        List<HabitDTO> habits = habitService.getHabits(playerId);
+        String habitSummary = habits.stream()
+                .map(h -> "- " + h.name() + " (Streak: " + h.currentStreak() + ")")
+                .collect(Collectors.joining("\n"));
+
+        // Fetch NoFap Context
+        NoFapStatus noFap = noFapService.getStatus(playerId);
+        String noFapSummary = "Current Streak: " + noFap.getCurrentStreak() + " days. " + 
+                              (noFap.isTodayClean() ? "Clean today." : "Relapsed recently.");
+
+        String prompt = buildPrompt(p, stats, completedYesterday, totalYesterday, yesterdaySummary, todaySummary, habitSummary, noFapSummary);
 
         try {
             String jsonResp = aiProviderService.generate(AiProviderService.Scenario.COACHING, "You are the AI Commander (Mentor) for a Developer Life OS.", prompt);
@@ -85,12 +106,14 @@ public class AiCommanderService {
         }
     }
 
-    private String buildPrompt(Player player, PlayerStats stats, long comp, int tot, String yest, String today) {
+    private String buildPrompt(Player player, PlayerStats stats, long comp, int tot, String yest, String today, String habits, String noFap) {
         return "Your user is " + player.getUsername() + ", Level " + player.getLevel() + " (" + player.getRankLevel() + "-Rank).\n\n" +
                "User's Core Focus:\n" + SAKTHI_FOCUS + "\n\n" +
-               "Yesterday's Performance (" + comp + "/" + tot + " quests):\n" + yest + "\n\n" +
+               "Yesterday's Quests (" + comp + "/" + tot + "):\n" + yest + "\n\n" +
+               "User's Habits (Streaks):\n" + habits + "\n\n" +
+               "Discipline Protocol (NoFap):\n" + noFap + "\n\n" +
                "Today's Active Quests:\n" + today + "\n\n" +
-               "Task: Generate a morning briefing to coach the user. Be concise, direct, and slightly authoritative like a mentor. Do not use generic motivational quotes.\n" +
+               "Task: Generate a morning briefing to coach the user. Be concise, direct, and highly analytical. Analyze what they missed yesterday, what they did well, and give strict priorities for today. Do not use generic motivational quotes.\n" +
                "Output format must be strictly a JSON object (no markdown, no backticks):\n" +
                "{\n" +
                "  \"greeting\": \"Good morning, Hunter.\",\n" +
