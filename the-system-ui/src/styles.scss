@@ -383,17 +383,34 @@ $sys-theme: mat.define-dark-theme((
   pointer-events: none;
 }
 
-/* Force ALL snackbars to the top-right across the whole application */
+/* ── Snackbar position: top-right ─────────────────────────────────────────
+   Angular CDK's GlobalPositionStrategy sets INLINE styles on the overlay wrapper
+   (top:0, bottom:auto, justify-content:flex-start, etc.).
+   CSS !important on a class beats inline styles ONLY for flex properties.
+   For top/bottom we must use !important too.
+   The :has() selector scopes this to snackbar overlays only (not dialogs).   */
 .cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
-  justify-content: flex-end !important;
-  align-items: flex-start !important;
-  padding-top: 24px !important;
-  padding-right: 24px !important;
+  align-items: flex-start   !important;  /* vertical: top   */
+  justify-content: flex-end !important;  /* horizontal: right */
+  top: 0                    !important;
+  bottom: auto              !important;
+  padding-top: 16px         !important;
+  padding-right: 16px       !important;
+  padding-bottom: 0         !important;
+  padding-left: 0           !important;
   box-sizing: border-box;
 }
+
+/* Ensure the snack container itself doesn't have margin-auto pushing it away */
 .mat-mdc-snack-bar-container {
-  pointer-events: auto; /* Re-enable clicks on the snackbar itself */
+  pointer-events: auto;
+  margin-left: auto  !important;
+  margin-right: 0    !important;
+  margin-top: 0      !important;
+  margin-bottom: 0   !important;
 }
+
+
 
 /* ── Overlay backdrop ─────────────────────────────────────── */
 .cdk-overlay-dark-backdrop {
