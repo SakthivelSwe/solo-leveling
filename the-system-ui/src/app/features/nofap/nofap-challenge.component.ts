@@ -44,6 +44,12 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   nextDayTimeDisplay = signal<string | null>(null);
   /** The integer number of the next day that is unlocking (e.g. 5) */
   nextDayNumber = signal<number>(1);
+  /**
+   * The day number derived from elapsed 24h periods since exact start time.
+   * This is the number shown in the big circle — it matches the live timer precisely.
+   * (Backend streak counts calendar days; this counts real elapsed 24h blocks.)
+   */
+  displayDay = signal<number>(0);
   private timerInterval: any = null;
 
   // Breathing widget
@@ -181,9 +187,10 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
         this.status.set(s);
         this.confirming.set(false);
 
-        // If this is the very first day of the streak, the start time was 24 hours ago
+        // If this is the very first day of the streak, the start time is right now.
+        // (User is confirming today as their first clean day.)
         if (prev === 0) {
-          const startTime = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+          const startTime = new Date();
           localStorage.setItem(this.STREAK_START_TIME_KEY, startTime.toISOString());
         }
         // Restart the display loop
@@ -273,22 +280,19 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     }
 
     let stored = localStorage.getItem(this.STREAK_START_TIME_KEY);
-    
-    // Check if the stored time's date matches the backend's startDate.
-    // If it doesn't match (e.g. user relapsed on another device, or it's missing), we must override it.
-    let storedDateStr = '';
+
+    // Validate stored value is a real date.
     if (stored) {
       try {
-        const d = new Date(stored);
-        if (!isNaN(d.getTime())) {
-          // Adjust to local date string to match backend's YYYY-MM-DD
-          storedDateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        }
-      } catch (e) {}
+        if (isNaN(new Date(stored).getTime())) stored = null;
+      } catch (e) { stored = null; }
     }
 
-    if (s.startDate && storedDateStr !== s.startDate) {
-      // Backend startDate is truth. Override localStorage to match the new date's 00:00.
+    // Only fall back to backend startDate midnight if NO precise time is stored at all.
+    // We never override a valid stored time (which may include an exact hour like 22:00)
+    // just because the date portion differs — the user intentionally set a time.
+    if (!stored && s.startDate) {
+      // No local time at all: use midnight of the backend start date as a safe fallback.
       const fallbackStart = new Date(`${s.startDate}T00:00:00`);
       if (!isNaN(fallbackStart.getTime())) {
         stored = fallbackStart.toISOString();
@@ -313,7 +317,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   }
 
   private updateTimerDisplays(startDate: Date): void {
-    // Format the confirmation time: "29 Jul 2026, 11:00 AM"
+    // Format the confirmation time: "25 Jul 2026, 10:00 PM"
     this.confirmTimeDisplay.set(
       startDate.toLocaleString('en-IN', {
         day: '2-digit', month: 'short', year: 'numeric',
@@ -321,16 +325,20 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
       }).toUpperCase()
     );
 
-    // Next day unlocks at exact 24h intervals from start time.
-    // Calculate how many full 24h periods have passed.
+    // Calculate how many FULL 24-hour periods have passed since the exact start time.
+    // e.g. If started Jul 25 10 PM and it's now Aug 3 11:34 AM → 8 full days have elapsed.
     const now = new Date();
     const diffMs = Math.max(0, now.getTime() - startDate.getTime());
     const fullDaysPassed = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    // The next milestone is the current full days + 1
+
+    // The display day is how many complete 24h cycles have passed.
+    // Day 0 = first 24h, Day 1 = next 24h, etc. We add 1 so it reads naturally.
+    // e.g. 8 full days passed → display "Day 9" (you're in your 9th day)
+    this.displayDay.set(fullDaysPassed + 1);
+
+    // The next day milestone unlocks at the next 24h boundary from the start time.
     const nextDay = new Date(startDate.getTime() + ((fullDaysPassed + 1) * 24 * 60 * 60 * 1000));
-    
-    this.nextDayNumber.set(fullDaysPassed + 1);
+    this.nextDayNumber.set(fullDaysPassed + 2);
     this.nextDayTimeDisplay.set(
       nextDay.toLocaleString('en-IN', {
         day: '2-digit', month: 'short', year: 'numeric',
@@ -338,7 +346,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
       }).toUpperCase()
     );
 
-    // Compute elapsed
+    // Compute elapsed string e.g. "8d 13h 29m 02s"
     const elapsed = this.computeElapsed(startDate);
     this.elapsedDisplay.set(elapsed);
   }
@@ -482,7 +490,9 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   phaseProgressPct(): number {
     const s = this.status();
     if (!s) return 0;
-    const current = s.currentStreak;
+    // Use displayDay (elapsed 24h periods) for accurate progress ring.
+    // Fall back to s.currentStreak when displayDay hasn't been set yet (timer not started).
+    const current = this.displayDay() || s.currentStreak;
     const next = s.nextMilestone;
     const prev = this.prevMilestone(next);
     return Math.min(100, Math.round(((current - prev) / (next - prev)) * 100));

@@ -47,7 +47,7 @@
           <span class="quote-author tech">— {{ s.dailyQuoteAuthor }}</span>
         </div>
       </div>
-      <div class="quote-day-tag tech">DAY {{ s.currentStreak }}</div>
+      <div class="quote-day-tag tech">DAY {{ displayDay() || s.currentStreak }}</div>
     </section>
 
     <!-- ════════════════════════════════════════════════════════════
@@ -159,7 +159,7 @@
                     [style.strokeDashoffset]="circleOffset()"/>
           </svg>
           <div class="streak-center">
-            <span class="streak-num mono">{{ s.currentStreak }}</span>
+            <span class="streak-num mono">{{ displayDay() || s.currentStreak }}</span>
             <span class="streak-lbl tech">DAYS</span>
           </div>
         </div>
