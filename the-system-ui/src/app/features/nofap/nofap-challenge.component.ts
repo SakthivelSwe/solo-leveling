@@ -183,26 +183,33 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     this.confirming.set(true);
     this.lifeOs.confirmCleanDay().subscribe({
       next: (s: NoFapStatus) => {
-        const prev = this.status()?.currentStreak ?? 0;
+        const prevCalendar = this.status()?.currentStreak ?? 0;
+        // Capture the DISPLAY day BEFORE updating status (timer-based, not calendar-based)
+        const prevDisplay = this.displayDay();
         this.status.set(s);
         this.confirming.set(false);
 
         // If this is the very first day of the streak, the start time is right now.
         // (User is confirming today as their first clean day.)
-        if (prev === 0) {
+        if (prevCalendar === 0) {
           const startTime = new Date();
           localStorage.setItem(this.STREAK_START_TIME_KEY, startTime.toISOString());
         }
-        // Restart the display loop
+        // Restart the display loop to refresh displayDay from the stored start time.
         this.startElapsedTimer();
 
-        // Trigger milestone animation if a milestone was just crossed
-        if ([7, 30, 90, 365].includes(s.currentStreak) && s.currentStreak > prev) {
+        // Use the ELAPSED-based day count for milestone checks, NOT the calendar count.
+        // This prevents a false "Day 7 milestone!" if the calendar says 7 but only 6
+        // full 24h periods have passed since the exact start time.
+        const elapsedDay = this.displayDay() || s.currentStreak;
+        if ([7, 30, 90, 365].includes(elapsedDay) && elapsedDay > prevDisplay) {
           this.triggerMilestone();
         }
-        this.toast(`◈ Day ${s.currentStreak} confirmed. ${s.phaseIcon} ${s.phaseName} phase active.`);
+        // Toast always shows the accurate elapsed day, not the calendar count.
+        this.toast(`◈ Day ${elapsedDay} confirmed. ${s.phaseIcon} ${s.phaseName} phase active.`);
       },
       error: () => { this.confirming.set(false); this.toast('⚠ Failed to confirm'); },
+
     });
   }
 
