@@ -20,7 +20,7 @@
           <div class="milestone-text">
             <span class="milestone-emoji">{{ s.phaseIcon }}</span>
             <span class="milestone-label mono">MILESTONE CLEARED</span>
-            <span class="milestone-day tech">DAY {{ s.currentStreak }}</span>
+            <span class="milestone-day tech">DAY {{ displayDay() || s.currentStreak }}</span>
           </div>
         </div>
       </div>
@@ -144,8 +144,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 1 — STREAK COUNTER
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section nf-hero glass-panel spring-hover" style="overflow: hidden;" [class.monarch-aura]="s.currentStreak >= 30">
-      <div class="monarch-particles" *ngIf="s.currentStreak >= 30"></div>
+    <section class="nf-section nf-hero glass-panel spring-hover" style="overflow: hidden;" [class.monarch-aura]="(displayDay() || s.currentStreak) >= 30">
+      <div class="monarch-particles" *ngIf="(displayDay() || s.currentStreak) >= 30"></div>
       <div class="card-glow"></div>
       <div class="hero-layout">
 
@@ -194,7 +194,7 @@
             <div class="s-badge" [class.clean]="s.todayClean" [class.relapse]="!s.todayClean">
               {{ s.todayConfirmed ? (s.todayClean ? '✅ CLEAN TODAY' : '☠ RELAPSED') : '⏳ NOT CONFIRMED' }}
             </div>
-            <div class="s-badge percentile">{{ percentileLabel(s.currentStreak) }}</div>
+            <div class="s-badge percentile">{{ percentileLabel(displayDay() || s.currentStreak) }}</div>
           </div>
 
           <!-- ── LIVE ELAPSED TIMER ─────────────────────────────────────── -->
@@ -305,7 +305,7 @@
          ════════════════════════════════════════════════════════════ -->
     <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
       <div class="card-glow"></div>
-      <h2 class="section-title mono">◈ YOUR BRAIN RIGHT NOW — DAY {{ s.currentStreak }}</h2>
+      <h2 class="section-title mono">◈ YOUR BRAIN RIGHT NOW — DAY {{ displayDay() || s.currentStreak }}</h2>
       <div class="science-today-card" [attr.data-category]="s.scienceCategory">
         <div class="stc-icon">{{ getCategoryIcon(s.scienceCategory) }}</div>
         <div class="stc-body">
@@ -358,8 +358,8 @@
         <div class="timeline-scroll">
           @for (card of filteredTimelineCards(); track card.day) {
             <div class="tl-card"
-                 [class.tl-active]="s.currentStreak >= card.day"
-                 [class.tl-current]="isTodayCard(card, s.currentStreak)"
+                 [class.tl-active]="(displayDay() || s.currentStreak) >= card.day"
+                 [class.tl-current]="isTodayCard(card, (displayDay() || s.currentStreak))"
                  [attr.data-phase]="card.phase"
                  (click)="selectScienceDay(card)">
               <div class="tl-day mono">D{{ card.day }}</div>
@@ -376,8 +376,8 @@
         <div class="timeline-grid">
           @for (card of filteredTimelineCards(); track card.day) {
             <div class="tg-card"
-                 [class.tg-active]="s.currentStreak >= card.day"
-                 [class.tg-current]="isTodayCard(card, s.currentStreak)"
+                 [class.tg-active]="(displayDay() || s.currentStreak) >= card.day"
+                 [class.tg-current]="isTodayCard(card, (displayDay() || s.currentStreak))"
                  [attr.data-phase]="card.phase"
                  (click)="selectScienceDay(card)">
               <div class="tg-day mono">{{ card.day }}</div>
@@ -418,7 +418,7 @@
       <div class="stat-grid">
         <div class="stat-card">
           <span class="stat-lbl tech">CURRENT STREAK</span>
-          <span class="stat-val mono">{{ s.currentStreak }}</span>
+          <span class="stat-val mono">{{ displayDay() || s.currentStreak }}</span>
           <span class="stat-unit tech">DAYS</span>
         </div>
         <div class="stat-card">
