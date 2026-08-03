@@ -377,38 +377,33 @@ $sys-theme: mat.define-dark-theme((
   font-family: 'Orbitron', sans-serif;
 }
 
-/* Fallback for environments where :has() is not supported */
+/* ── Snackbar position: top-right ─────────────────────────────────────────
+   Angular CDK's GlobalPositionStrategy uses inline styles on the overlay
+   wrapper to control snackbar placement. These cannot be reliably overridden
+   with CSS !important in all Angular Material versions.
+   SOLUTION: Use position:fixed directly on the snackbar container with explicit
+   top/right coordinates. This pulls it out of the CDK layout flow entirely and
+   pins it exactly where we want it — top-right corner, 16px from edges.       */
+.mat-mdc-snack-bar-container {
+  position: fixed    !important;
+  top:   16px        !important;
+  right: 16px        !important;
+  bottom: auto       !important;
+  left:  auto        !important;
+  pointer-events: auto;
+  /* Prevent snackbar from being full-width (handset breakpoint override) */
+  width: auto        !important;
+  max-width: 420px   !important;
+  margin: 0          !important;
+}
+
+/* Fallback wrapper rules (kept for reference, not relied upon) */
 .cdk-global-overlay-wrapper {
   display: flex !important;
   pointer-events: none;
 }
 
-/* ── Snackbar position: top-right ─────────────────────────────────────────
-   Angular CDK's GlobalPositionStrategy sets INLINE styles on the overlay wrapper
-   (top:0, bottom:auto, justify-content:flex-start, etc.).
-   CSS !important on a class beats inline styles ONLY for flex properties.
-   For top/bottom we must use !important too.
-   The :has() selector scopes this to snackbar overlays only (not dialogs).   */
-.cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
-  align-items: flex-start   !important;  /* vertical: top   */
-  justify-content: flex-end !important;  /* horizontal: right */
-  top: 0                    !important;
-  bottom: auto              !important;
-  padding-top: 16px         !important;
-  padding-right: 16px       !important;
-  padding-bottom: 0         !important;
-  padding-left: 0           !important;
-  box-sizing: border-box;
-}
 
-/* Ensure the snack container itself doesn't have margin-auto pushing it away */
-.mat-mdc-snack-bar-container {
-  pointer-events: auto;
-  margin-left: auto  !important;
-  margin-right: 0    !important;
-  margin-top: 0      !important;
-  margin-bottom: 0   !important;
-}
 
 
 
