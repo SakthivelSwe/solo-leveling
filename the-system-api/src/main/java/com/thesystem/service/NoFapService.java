@@ -115,18 +115,36 @@ public class NoFapService {
     }
 
     public NoFapStatusDTO getStatus(Long playerId) {
-        List<DopamineLog> last90 = logRepo.findByPlayerIdAndLogDateBetweenOrderByLogDateDesc(
-                playerId, LocalDate.now().minusDays(89), LocalDate.now());
+        List<DopamineLog> allLogs = logRepo.findByPlayerIdOrderByLogDateDesc(playerId);
 
-        Map<LocalDate, DopamineLog> byDate = last90.stream()
-                .collect(Collectors.toMap(DopamineLog::getLogDate, l -> l));
+        LocalDate today = LocalDate.now();
+        DopamineLog todayLog = allLogs.stream()
+            .filter(l -> l.getLogDate().equals(today))
+            .findFirst().orElse(null);
 
-        int currentStreak = computeCurrentStreak(byDate);
-        int longestStreak = computeLongestStreak(playerId);
+        LocalDate streakStart = today;
+        if (todayLog != null && todayLog.isPornViewed()) {
+            streakStart = today;
+        } else if (!allLogs.isEmpty()) {
+            for (DopamineLog log : allLogs) {
+                if (log.isPornViewed()) {
+                    streakStart = log.getLogDate().plusDays(1);
+                    if (streakStart.isAfter(today)) {
+                        streakStart = today;
+                    }
+                    break;
+                }
+                streakStart = log.getLogDate();
+            }
+        }
 
-        Optional<DopamineLog> today = Optional.ofNullable(byDate.get(LocalDate.now()));
-        boolean todayConfirmed = today.isPresent();
-        boolean todayClean = today.map(l -> !l.isPornViewed()).orElse(true); // no record = streak intact
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(streakStart, today);
+        int currentStreak = (int) daysBetween + (todayLog != null && !todayLog.isPornViewed() ? 1 : 0);
+
+        int longestStreak = computeLongestStreak(allLogs);
+
+        boolean todayConfirmed = todayLog != null;
+        boolean todayClean = todayLog == null || !todayLog.isPornViewed(); // no record = streak intact
 
         NoFapStatusDTO dto = new NoFapStatusDTO();
         dto.setCurrentStreak(currentStreak);
@@ -179,11 +197,12 @@ public class NoFapService {
         // Phase title
         dto.setPhaseTitle(getPhaseTitle(currentStreak));
 
-        // Start date — earliest clean log in the current streak chain
-        dto.setStartDate(computeStartDate(byDate, playerId));
+        // Start date
+        dto.setStartDate(streakStart.toString());
 
         // 90-day heatmap
         List<Boolean> heatmap = new ArrayList<>();
+        Map<LocalDate, DopamineLog> byDate = allLogs.stream().collect(Collectors.toMap(DopamineLog::getLogDate, l -> l));
         for (int i = 89; i >= 0; i--) {
             LocalDate d = LocalDate.now().minusDays(i);
             DopamineLog log = byDate.get(d);
@@ -281,88 +300,33 @@ public class NoFapService {
         }
     }
 
-    /**
-     * Counts consecutive clean days ending today.
-     *
-     * Rules:
-     *  - If today has a confirmed clean record → count it as day N and walk backwards.
-     *  - If today has no record yet → streak = days before today that are consecutive clean.
-     *  - If today has a relapse → streak = 0.
-     *
-     * This fixes the bug where confirming clean for today didn't increment the displayed count.
-     */
-    private int computeCurrentStreak(Map<LocalDate, DopamineLog> byDate) {
-        LocalDate cursor = LocalDate.now();
-
-        // If today has a relapse record, streak is 0
-        DopamineLog todayLog = byDate.get(cursor);
-        if (todayLog != null && todayLog.isPornViewed()) return 0;
-
-        // If today is confirmed clean, include it in the streak count
-        int streak = (todayLog != null && !todayLog.isPornViewed()) ? 1 : 0;
-
-        // Walk backwards from yesterday
-        cursor = cursor.minusDays(1);
-        while (true) {
-            DopamineLog log = byDate.get(cursor);
-            if (log == null) break; // no record on past day = stop
-            if (log.isPornViewed()) break; // relapse = stop
-            streak++;
-            cursor = cursor.minusDays(1);
-        }
-        return streak;
-    }
-
-    /**
-     * Computes the ISO date string (YYYY-MM-DD) of the first day in the current streak.
-     * Looks at all-time logs (up to 365 days) to find the earliest consecutive clean day.
-     */
-    private String computeStartDate(Map<LocalDate, DopamineLog> last90ByDate, Long playerId) {
-        LocalDate today = LocalDate.now();
-
-        // Quick check: if no streak, return today as the start date
-        DopamineLog todayLog = last90ByDate.get(today);
-        if (todayLog != null && todayLog.isPornViewed()) return today.toString();
-
-        // Walk backwards from yesterday to find the start of the current streak
-        // First check within the last 90 days cache
-        LocalDate cursor = today.minusDays(1);
-        LocalDate streakStart = (todayLog != null && !todayLog.isPornViewed()) ? today : cursor.plusDays(1);
-
-        while (cursor.isAfter(today.minusDays(89))) {
-            DopamineLog log = last90ByDate.get(cursor);
-            if (log == null || log.isPornViewed()) break;
-            streakStart = cursor;
-            cursor = cursor.minusDays(1);
-        }
-
-        // If streak started exactly at the 90-day boundary, look further back
-        if (streakStart.equals(today.minusDays(89))) {
-            LocalDate earliest = today.minusDays(365);
-            List<DopamineLog> older = logRepo.findByPlayerIdAndLogDateBetweenOrderByLogDateDesc(
-                    playerId, earliest, streakStart.minusDays(1));
-            for (DopamineLog log : older) {
-                if (log.isPornViewed()) break;
-                streakStart = log.getLogDate();
-            }
-        }
-
-        return streakStart.toString();
-    }
-
-    private int computeLongestStreak(Long playerId) {
-        List<DopamineLog> all = logRepo.findByPlayerIdAndLogDateBetweenOrderByLogDateDesc(
-                playerId, LocalDate.now().minusDays(365), LocalDate.now());
+    private int computeLongestStreak(List<DopamineLog> all) {
+        if (all == null || all.isEmpty()) return 0;
+        
         // Sort ascending
-        all.sort(Comparator.comparing(DopamineLog::getLogDate));
+        List<DopamineLog> sorted = new ArrayList<>(all);
+        sorted.sort(Comparator.comparing(DopamineLog::getLogDate));
+        
         int longest = 0, current = 0;
-        for (DopamineLog log : all) {
-            if (!log.isPornViewed()) {
-                current++;
-                longest = Math.max(longest, current);
-            } else {
+        LocalDate lastDate = null;
+        
+        for (DopamineLog log : sorted) {
+            if (log.isPornViewed()) {
                 current = 0;
+                lastDate = null;
+                continue;
             }
+            
+            // Clean day
+            if (lastDate == null) {
+                current = 1;
+            } else {
+                long gap = java.time.temporal.ChronoUnit.DAYS.between(lastDate, log.getLogDate());
+                // Unlogged days are treated as clean, so add the gap
+                current += gap;
+            }
+            lastDate = log.getLogDate();
+            longest = Math.max(longest, current);
         }
         return longest;
     }

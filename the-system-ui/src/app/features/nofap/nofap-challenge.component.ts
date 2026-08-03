@@ -274,8 +274,21 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
 
     let stored = localStorage.getItem(this.STREAK_START_TIME_KEY);
     
-    // If no stored time but backend has a startDate, fallback to 00:00 of that date
-    if (!stored && s.startDate) {
+    // Check if the stored time's date matches the backend's startDate.
+    // If it doesn't match (e.g. user relapsed on another device, or it's missing), we must override it.
+    let storedDateStr = '';
+    if (stored) {
+      try {
+        const d = new Date(stored);
+        if (!isNaN(d.getTime())) {
+          // Adjust to local date string to match backend's YYYY-MM-DD
+          storedDateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+      } catch (e) {}
+    }
+
+    if (s.startDate && storedDateStr !== s.startDate) {
+      // Backend startDate is truth. Override localStorage to match the new date's 00:00.
       const fallbackStart = new Date(`${s.startDate}T00:00:00`);
       if (!isNaN(fallbackStart.getTime())) {
         stored = fallbackStart.toISOString();

@@ -57,15 +57,6 @@
         <span class="mono v">{{ completedToday }}/{{ totalQuests }}</span>
       </div>
     </div>
-    <!-- NoFap Streak chip -->
-    @if (noFap) {
-      <a routerLink="/nofap" class="meta-chip nofap-chip" [style.borderColor]="noFap.phaseColor + '55'">
-        <span class="tech k">🔥 DISCIPLINE</span>
-        <span class="mono v" [style.color]="noFap.phaseColor">{{ noFap.currentStreak }}</span>
-        <span class="tech k" style="font-size:.52rem">DAYS · {{ noFap.phaseTitle }}</span>
-      </a>
-    }
-
     <!-- Phase 2/3 Gauges -->
     <div class="gauges" style="display: flex; gap: 16px; margin-top: 16px;">
       <div class="gauge" *ngIf="player.currentEnergy !== undefined" style="flex: 1;">
