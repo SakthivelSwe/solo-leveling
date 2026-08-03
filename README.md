@@ -4,6 +4,8 @@ A gamified, Solo Leveling anime-inspired personal life-tracking platform. Comple
 quests to earn XP, raise your stats (STR / INT / VIT / AGI / PER / HOR), grow your skill tree,
 and climb the ranks from **E-Rank → S-Rank**.
 
+> 📖 **[Read the Official SYSTEM MANUAL](SYSTEM_MANUAL.md)** for a complete step-by-step guide on how to use every feature and maximize your progression.
+
 > This build intentionally **excludes** the Gemini AI mentor, Redis/Valkey cache, and Docker.
 > It uses an **H2 in-memory database** for zero-config local development, and focuses on a
 > polished, animated Solo Leveling UI.
@@ -149,15 +151,14 @@ the top nav to access:
 
 | Module            | What it tracks                                                            |
 |-------------------|---------------------------------------------------------------------------|
-| **Career OS**     | Job applications + interview rounds, LeetCode log + stats/streak, course progress, **skills-gap analyzer** (current vs target-role thresholds) |
-| **Health OS**     | Daily health log (sleep/meals/energy), **water tracker**, exercise logs   |
-| **Mind OS**       | Mood/anxiety journal + **evidence-against-self-doubt** ledger (auto-filled on skill wins) |
-| **Wealth OS**     | Savings goals (auto-seeded) with progress, monthly budget entries         |
-| **English OS**    | Speaking-practice logs + growing vocabulary book                          |
-| **Body OS**       | The **7 testosterone pillars** tracked per day                            |
+| **Career OS**     | Job applications, LeetCode log, course progress, **Deep Work sessions**, **skills-gap analyzer** |
+| **Wealth OS**     | Financial assets tracker, income/expense/budget, net worth trajectory, EMIs, **savings goals** |
+| **Mind OS**       | Dopamine detox logs, anxiety journal, **evidence-against-self-doubt** ledger (auto-filled on wins) |
+| **Health & Body** | Sleep/energy logs, water tracker, workouts, and the **7 testosterone pillars** tracked per day |
+| **Learning OS**   | Flashcards, English speaking logs, growing vocabulary, and deep study sessions |
 | **Relationship OS** | Daily connection log (girlfriend / family / friends)                    |
 | **Notification OS** | Scheduled System alerts (wake / lunch / evening / sleep / weekly review) shown in the 🔔 alerts centre |
-| **Habits (Discipline Grid)** | **Atomic Habits + Power of Habit engine** — Cue → Craving → Routine → Reward loop, keystone habits (2× XP), 2-minute rule, habit stacking, 66-day mastery cycle, identity progress rings ("I am becoming a Hunter/Scholar/Monk/Warrior"), 1% compounding curve, per-habit cue-time reminders |
+| **Habits & Shadows** | **Power of Habit engine** — Cue → Craving → Routine → Reward. **Shadow Army**: Extract mastered habits (25+ days streak) into deployable Shadows that give passive XP bonuses! |
 
 > **Excluded by request:** Gemini AI mentor, Redis/Valkey cache, and Docker Compose. The
 > Boss Battle / AI Mentor features (Phase 3) that depend on Gemini are therefore not built.

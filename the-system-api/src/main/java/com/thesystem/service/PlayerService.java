@@ -158,7 +158,7 @@ public class PlayerService {
         String[] entities = {
                 "HabitCompletion", "Habit",
                 "QuestCompletion",
-                "BossBattle", "Dungeon",
+                "BossBattle", "Dungeon", "DungeonBreak",
                 "PlayerStats", "PlayerSkill", "Achievement", "Notification",
                 "JobApplication", "LeetcodeLog", "CourseProgress",
                 "HealthLog", "MindLog", "BodyLog", "EnglishLog", "ExerciseLog",
@@ -166,7 +166,10 @@ public class PlayerService {
                 "SelfDoubtEvidence", "AiMemoryEntry", "DailyMission",
                 "DeepWorkSession", "DopamineLog", "InventoryItem",
                 "Shadow", "SkillTreeNode", "LearningLog", "WorkoutEntry", "BodyMetric",
-                "DevMasteryProgress", "DietEntry"
+                "DevMasteryProgress", "DietEntry", "SubscriptionEntry", "SocialConnection",
+                "ShopItem", "QuestSkip", "QuestGenerationLog", "PlayerConfig",
+                "NetWorthLog", "JobChangeQuest", "IncomeLog", "Flashcard",
+                "FinancialAsset", "ExpenseLog", "EmiEntry"
         };
         for (String entity : entities) {
             em.createQuery("DELETE FROM " + entity + " e WHERE e.playerId = :id")

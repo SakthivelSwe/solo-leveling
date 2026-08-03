@@ -45,14 +45,11 @@ export class AuthService {
    * full account deletion so no stale data survives on the device.
    */
   purgeLocalAndLogout(): void {
-    const keep = new Set<string>();
-    // Clear all System-owned keys.
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (!key) continue;
-      if (key.startsWith('system_') || key.startsWith('sys_') || keep.has(key)) {
-        localStorage.removeItem(key);
-      }
+    // Save theme preference before wiping
+    const theme = localStorage.getItem('system_theme');
+    localStorage.clear();
+    if (theme) {
+      localStorage.setItem('system_theme', theme);
     }
     this.player.set(null);
     this.router.navigate(['/login']);
