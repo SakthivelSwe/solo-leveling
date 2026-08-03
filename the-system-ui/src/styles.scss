@@ -901,8 +901,32 @@ body.native-platform {
   grid-column: span 3;
 }
 
+
 @media (max-width: 768px) {
   .bento-span-2, .bento-span-3 {
     grid-column: span 1;
   }
+}
+
+/* ════════════════════════════════════════════════════════════
+   SNACKBAR THEME — Solo Leveling style toast notifications
+   ════════════════════════════════════════════════════════════ */
+.snack-success .mdc-snackbar__surface {
+  background: rgba(31, 190, 142, 0.15) !important;
+  border: 1px solid rgba(31, 190, 142, 0.5) !important;
+  backdrop-filter: blur(16px) !important;
+  color: #1FBE8E !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+}
+
+.snack-danger .mdc-snackbar__surface {
+  background: rgba(226, 75, 74, 0.15) !important;
+  border: 1px solid rgba(226, 75, 74, 0.5) !important;
+  backdrop-filter: blur(16px) !important;
+  color: #E24B4A !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
 }

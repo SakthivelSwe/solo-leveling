@@ -1,5 +1,6 @@
 package com.thesystem.security;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,13 +13,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Lightweight in-memory rate limiter for the auth endpoints — blunts brute-force
  * login/register attempts. Allows {@value #MAX_REQUESTS} requests per client IP
  * per {@value #WINDOW_MS}ms window; excess requests get HTTP 429.
+ *
+ * <p>A background task evicts stale entries every 5 minutes to prevent the
+ * internal ConcurrentHashMap from growing unbounded under large numbers of unique IPs.
  */
 @Component
 @Order(1)
@@ -38,6 +46,40 @@ public class RateLimitFilter extends OncePerRequestFilter {
             Boolean.parseBoolean(System.getenv().getOrDefault("TRUST_PROXY", "false"));
 
     private final Map<String, Deque<Long>> hits = new ConcurrentHashMap<>();
+
+    /**
+     * Schedule a periodic cleanup task that evicts IPs whose entire window has
+     * expired. Prevents unbounded memory growth in long-running deployments.
+     */
+    @PostConstruct
+    public void startEvictionScheduler() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "rate-limit-evictor");
+            t.setDaemon(true); // don't block JVM shutdown
+            return t;
+        });
+        scheduler.scheduleAtFixedRate(this::evictStaleEntries, 5, 5, TimeUnit.MINUTES);
+    }
+
+    /** Removes any IP entry where all tracked timestamps have expired. */
+    private void evictStaleEntries() {
+        long cutoff = System.currentTimeMillis() - WINDOW_MS;
+        Iterator<Map.Entry<String, Deque<Long>>> it = hits.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Deque<Long>> entry = it.next();
+            Deque<Long> window = entry.getValue();
+            synchronized (window) {
+                // Remove expired timestamps from front
+                while (!window.isEmpty() && window.peekFirst() <= cutoff) {
+                    window.pollFirst();
+                }
+                // If the window is now empty, remove the whole entry
+                if (window.isEmpty()) {
+                    it.remove();
+                }
+            }
+        }
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -87,4 +129,3 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return request.getRemoteAddr();
     }
 }
-
