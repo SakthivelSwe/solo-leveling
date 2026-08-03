@@ -430,9 +430,13 @@ import { SecondBrainComponent } from './components/second-brain/second-brain.com
         <button class="sync-btn" (click)="manualSync()" [disabled]="syncing()">
           {{ syncing() ? '⏳ SYNCING...' : '🔄 MANUAL SYNC' }}
         </button>
-        <div class="sync-note">Pulls all completed topics from DevMastery into THE SYSTEM log.</div>
       </div>
     </div>
+  </div>
+
+  <!-- ══════════════════════ SECOND BRAIN TAB ══════════════════════ -->
+  <div *ngIf="activeTab() === 'secondbrain'" @fadeInUp>
+    <app-second-brain></app-second-brain>
   </div>
 
 </div>

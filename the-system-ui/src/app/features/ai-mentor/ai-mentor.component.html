@@ -6,23 +6,7 @@
       <span class="mono diamond">◈</span>
       <span class="mono name">AI MENTOR</span>
       <span class="tech tag">GROQ + GEMINI</span>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
     </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
     <nav class="nav tech">
       <a routerLink="/system">STATUS</a>
       <a routerLink="/life">LIFE OS</a>
@@ -37,135 +21,21 @@
     <button class="vt tech" [class.active]="view() === 'BOSS'"    (click)="setView('BOSS')">⚔ BOSS BATTLE</button>
     <button class="vt tech" [class.active]="view() === 'REPORT'"  (click)="setView('REPORT')">📊 WEEKLY REPORT</button>
     <button class="vt tech" [class.active]="view() === 'HISTORY'" (click)="setView('HISTORY')">📜 BATTLE HISTORY</button>
-    <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
+    <button class="vt tech" [class.active]="view() === 'DIRECTIVE'" (click)="setView('DIRECTIVE')">⚡ DIRECTIVE</button>
   </div>
-</div>
 
   <!-- ══════════════════════════ CHAT VIEW ══════════════════════════════════ -->
   <div class="chat-view" *ngIf="view() === 'CHAT'" @fadeInUp>
     <!-- Context Sidebar -->
     <div class="chat-sidebar">
-      <div class="cs-head tech">SELECT PERSONA  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      <div class="cs-head tech">SELECT PERSONA</div>
       <button *ngFor="let ctx of contexts" class="ctx-btn tech" 
               [class.active]="selectedContext().value === ctx.value"
               (click)="selectedContext.set(ctx)">
-        <div class="ctx-icon">{{ ctx.icon }}  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-        <div class="ctx-text">
-          <div class="ctx-label">{{ ctx.label }}  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-          <div class="ctx-desc">{{ ctx.description }}  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        <span class="ctx-icon">{{ ctx.icon }}</span>
+        <span class="ctx-label">{{ ctx.label }}</span>
       </button>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
     </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
 
     <!-- Chat Area -->
     <div class="chat-main">
@@ -176,76 +46,12 @@
             <span class="who mono user-who" *ngIf="m.role==='user'">▸ HUNTER</span>
             <p class="text tech">{{ m.text }}</p>
             <span class="ts tech">{{ m.ts | date:'HH:mm' }}</span>
-            <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+          </div>
           <div class="typing tech" *ngIf="chatLoading()">
             <span class="mono">◈</span> THE SYSTEM IS PROCESSING<span class="dots"></span>
-            <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+          </div>
+        </div>
+      </div>
 
       <div class="chat-input-area">
         <div class="quick-btns">
@@ -256,96 +62,16 @@
           <button *ngIf="isVoiceMode()" class="qb tech spring-hover" (click)="startListening()" [class.listening]="isListening()">
             {{ isListening() ? '🎙️ LISTENING...' : '🎤 TAP TO SPEAK' }}
           </button>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
         <div class="chat-input-row">
           <textarea class="ci tech" [(ngModel)]="userInput" (keydown)="onInputKey($event)"
                     placeholder="Ask THE SYSTEM anything... (Enter to send, Shift+Enter for newline)"
                     rows="2"></textarea>
           <button class="send mono" (click)="sendChat()" [disabled]="chatLoading() || !userInput.trim()">◈ SEND</button>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-    <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
 
   <!-- ══════════════════════════ BOSS BATTLE VIEW ══════════════════════════ -->
   <div class="boss-view" *ngIf="view() === 'BOSS'" @fadeInUp>
@@ -355,23 +81,7 @@
       <div class="setup-head">
         <h2 class="mono">⚔ SELECT YOUR GATE</h2>
         <p class="tech sub">5 questions. Scored 0–10 each. XP awarded on completion.</p>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      </div>
 
       <div class="topic-grid">
         <button *ngFor="let t of topics" class="topic-card tech"
@@ -382,60 +92,12 @@
           <span class="t-label">{{ t.label }}</span>
           <span class="t-diff mono" [attr.data-diff]="t.difficulty">{{ t.difficulty }}</span>
         </button>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      </div>
 
       <div class="custom-topic">
-        <div class="tech sub mb-2">OR CREATE A CUSTOM GATE  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        <div class="tech sub mb-2">OR CREATE A CUSTOM GATE</div>
         <input type="text" class="custom-input tech" [(ngModel)]="customTopic" placeholder="e.g. Kubernetes, React Hooks, AWS Architecture..." />
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      </div>
 
       <div class="diff-row mt-3">
         <span class="tech">Difficulty:</span>
@@ -443,23 +105,7 @@
                 [class.active]="selectedDifficulty === d"
                 [attr.data-diff]="d"
                 (click)="selectedDifficulty = d">{{ d }}</button>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      </div>
 
       <button class="start-btn mono mt-3" (click)="startBattle()" [disabled]="battleLoading()">
         <span *ngIf="!battleLoading()">⚔ ENTER THE GATE — {{ customTopic.trim() || selectedTopic.label | uppercase }}</span>
@@ -470,40 +116,8 @@
         <span class="gold">300 XP</span> S-Rank (avg 8+) &nbsp;·&nbsp;
         <span class="teal">150 XP</span> Satisfactory (avg 5–7) &nbsp;·&nbsp;
         <span class="dim">50 XP</span> Attempted (&lt;5)
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
+      </div>
     </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
 
     <!-- Active battle -->
     <div class="battle-arena" *ngIf="battle() as b" @fadeInUp>
@@ -515,341 +129,53 @@
           <span class="diff-pill" [attr.data-diff]="b.difficulty">{{ b.difficulty }}</span>
           <div class="q-progress" *ngIf="b.questions">
           <span>Q {{ currentQ() + 1 }} / {{ b.questions.length || 5 }}</span>
-          <div class="q-track"><div class="q-fill" [style.width.%]="(currentQ() + 1) / (b.questions.length || 5) * 100"></div>  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+          <div class="q-track"><div class="q-fill" [style.width.%]="(currentQ() + 1) / (b.questions.length || 5) * 100"></div></div>
+        </div>
           <span *ngIf="b.completedAt" class="done-label">GATE CLEARED</span>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
+      </div>
 
       <!-- Completed result -->
-      <div class="result-panel glass-panel" *ngIf="b.completedAt" @fadeInUp>
-        <div class="res-head mono">◈ BATTLE COMPLETE  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      <div class="result-panel system-card" *ngIf="b.completedAt" @fadeInUp>
+        <div class="res-head mono">◈ BATTLE COMPLETE</div>
         <div class="res-score">
           <span class="score-num mono" [style.color]="scoreColor(b.score || 0)">{{ b.score }}</span>
           <span class="score-max tech">/50</span>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-        <div class="xp-award mono">+{{ b.xpEarned }} XP — {{ xpLabel(b.xpEarned) }}  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
+        <div class="xp-award mono">+{{ b.xpEarned }} XP — {{ xpLabel(b.xpEarned) }}</div>
         <div class="eval-list">
-          <div *ngFor="let ev of evaluations()" class="eval-card glass-panel">
-            <div class="ev-q tech">Q{{ ev.questionIndex + 1 }}: {{ ev.question | slice:0:80 }}...  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-            <div class="ev-score mono" [style.color]="scoreColor(ev.score)">{{ ev.score }}/10  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+          <div *ngFor="let ev of evaluations()" class="eval-card system-card">
+            <div class="ev-q tech">Q{{ ev.questionIndex + 1 }}: {{ ev.question | slice:0:80 }}...</div>
+            <div class="ev-score mono" [style.color]="scoreColor(ev.score)">{{ ev.score }}/10</div>
             <p class="ev-fb tech">{{ ev.feedback }}</p>
             <div *ngIf="ev.missedPoints?.length" class="ev-missed">
               <span class="tech label">MISSED:</span>
               <span *ngFor="let m of ev.missedPoints" class="pip missed">{{ m }}</span>
-              <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+            </div>
             <div *ngIf="ev.strongPoints?.length" class="ev-strong">
               <span class="tech label">STRONG:</span>
               <span *ngFor="let s of ev.strongPoints" class="pip strong">{{ s }}</span>
-              <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-            <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+            </div>
+          </div>
+        </div>
         <button class="retry-btn mono" (click)="battle.set(null)">◈ ENTER ANOTHER GATE</button>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      </div>
 
       <!-- Current question -->
-      <div class="question-panel glass-panel" *ngIf="!b.completedAt && b.questions">
-        <div class="q-label tech">QUESTION {{ currentQ() + 1 }}  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+      <div class="question-panel system-card" *ngIf="!b.completedAt && b.questions">
+        <div class="q-label tech">QUESTION {{ currentQ() + 1 }}</div>
         <p class="q-text mono">{{ b.questions[currentQ()].question }}</p>
         <div class="q-hint tech" *ngIf="b.questions[currentQ()].hint">
           <span class="hint-label">HINT:</span> {{ b.questions[currentQ()].hint }}
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
 
         <!-- Previous evaluation (just answered) -->
         <div class="prev-eval" *ngIf="evaluations()[currentQ() - 1] as ev" @fadeInUp>
           <div class="ev-score-inline tech">
             Last answer: <span class="mono" [style.color]="scoreColor(ev.score)">{{ ev.score }}/10</span>
             — {{ ev.feedback | slice:0:100 }}
-            <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+          </div>
+        </div>
 
         <textarea class="ans-input tech" [(ngModel)]="answer" rows="5"
                   placeholder="Type your answer here. Be thorough. The System evaluates depth, not just keywords."></textarea>
@@ -859,74 +185,10 @@
             <span *ngIf="!battleLoading()">◈ SUBMIT ANSWER</span>
             <span *ngIf="battleLoading()" class="tech">EVALUATING<span class="dots"></span></span>
           </button>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-    <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
 
   <!-- ══════════════════════════ HISTORY VIEW ═══════════════════════════════ -->
   <div class="history-view" *ngIf="view() === 'HISTORY'" @fadeInUp>
@@ -934,234 +196,76 @@
     <div class="hist-header">
       <h2 class="mono hist-head">◈ DUNGEON CLEAR LOG</h2>
       <p class="tech sub">A record of your past battles against The System.</p>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
     </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
     
     <div class="hist-list" [@listStagger]="battleHistory().length">
-      <div *ngFor="let b of battleHistory()" class="hist-card glass-panel">
+      <div *ngFor="let b of battleHistory()" class="hist-card system-card">
         <div class="hc-left">
           <span class="hc-topic tech">{{ b.topic }}</span>
           <span class="hc-diff mono" [attr.data-diff]="b.difficulty">{{ b.difficulty }}</span>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
         <div class="hc-centre">
           <span class="hc-score mono" [style.color]="b.score ? scoreColor(b.score) : '#6E7681'">
             {{ b.score ?? '—' }}/50
           </span>
           <span class="hc-xp tech">+{{ b.xpEarned }} XP</span>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
         <div class="hc-right tech">
           <span>{{ b.startedAt | date:'MMM d, HH:mm' }}</span>
           <span class="status" [class.done]="b.completedAt" [class.pending]="!b.completedAt">
             {{ b.completedAt ? 'CLEARED' : 'ONGOING' }}
           </span>
-          <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
+        </div>
+      </div>
       <div *ngIf="!battleHistory().length" class="empty tech">
         No battles yet. Enter a gate and prove your rank.
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
+      </div>
     </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
     </div>
   </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-    <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
 
   <!-- ══════════════════════════ JOURNAL VIEW ═══════════════════════════════ -->
   <div class="journal-view" *ngIf="view() === 'JOURNAL'" @fadeInUp>
-    <div class="journal-header">
+    <div class="hist-header" style="margin-bottom: 24px;">
       <h2 class="mono hist-head">◈ DAILY AI JOURNAL</h2>
       <p class="tech sub">Reflect on your actions. The System will analyze your mindset.</p>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
     </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-    <div class="journal-prompts">
-      <div class="journal-prompt-box glass-panel" *ngFor="let prompt of journalPrompts(); let i = index">
-        <label class="tech jp-label">{{ i + 1 }}. {{ prompt }}</label>
-        <textarea class="tech jp-input" [(ngModel)]="journalAnswers()[i]" rows="3" placeholder="Write your reflection here..."></textarea>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-    <div class="journal-actions">
-      <button class="submit-btn mono" (click)="submitJournal()" [disabled]="journalLoading()">
-        <span *ngIf="!journalLoading()">◈ SUBMIT JOURNAL FOR ANALYSIS</span>
-        <span *ngIf="journalLoading()" class="tech">THE SYSTEM IS ANALYZING YOUR MINDSET<span class="dots"></span></span>
+    <div class="journal-prompts" *ngIf="!journalFeedback()">
+      <div class="journal-prompt-box glass-panel" *ngFor="let prompt of journalPrompts(); let i = index" style="margin-bottom: 20px; padding: 20px;">
+        <label class="tech jp-label" style="display: block; margin-bottom: 12px; color: var(--accent-gold);">{{ i + 1 }}. {{ prompt }}</label>
+        <textarea class="tech jp-input" [(ngModel)]="journalAnswers()[i]" rows="3" placeholder="Write your reflection here..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); resize: vertical;"></textarea>
+      </div>
+      <button class="sys-btn-primary" (click)="submitJournal()" [disabled]="journalLoading()" style="width: 100%; margin-top: 20px; padding: 15px;">
+        {{ journalLoading() ? 'ANALYZING MINDSET...' : '◈ SUBMIT JOURNAL FOR AI ANALYSIS' }}
       </button>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
+    </div>
+    <div class="journal-feedback glass-panel" *ngIf="journalFeedback()" style="padding: 30px;">
+      <h3 class="mono head" style="color: var(--accent-purple); margin-bottom: 20px;">◈ SYSTEM FEEDBACK</h3>
+      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.05rem; line-height: 1.8; color: var(--text-primary);">{{ journalFeedback() }}</pre>
+      <button class="sys-btn-primary" (click)="journalFeedback.set('')" style="margin-top: 30px;">WRITE ANOTHER ENTRY</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ REPORT VIEW ════════════════════════════════ -->
+  <div class="report-view glass-panel" *ngIf="view() === 'REPORT'" @fadeInUp style="padding: 40px; margin-top: 20px;">
+    <h3 class="mono head" style="color: var(--accent-teal); margin-bottom: 24px; font-size: 1.5rem; text-align: center;">📊 WEEKLY SYSTEM REPORT</h3>
+    
+    <div style="text-align: center; margin-bottom: 30px;" *ngIf="weeklyReportLoading()">
+      <div class="mono" style="font-size: 2rem; color: var(--accent-teal); animation: pulse 1s infinite;">GENERATING...</div>
+    </div>
+
+    <div *ngIf="weeklyReport()" class="report-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(31,190,142,0.3); border-left: 4px solid var(--accent-teal); box-shadow: 0 0 20px rgba(31,190,142,0.1);">
+      <div class="mono" style="font-size: 3rem; text-align: center; color: var(--accent-gold); margin-bottom: 20px;">{{ weeklyGrade() }}</div>
+      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.05rem; line-height: 1.8; color: #fff;">{{ weeklyReport() }}</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ DIRECTIVE VIEW ═════════════════════════════ -->
+  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px; margin-top: 20px;">
+    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">⚡ DAILY DIRECTIVE</h3>
     <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
       <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
+      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px; padding: 15px;">INITIALIZE MORNING SCAN</button>
     </div>
     
     <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
@@ -1169,215 +273,8 @@
     </div>
 
     <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
+      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.05rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
     </div>
   </div>
+
 </div>
-
-    <div class="journal-feedback glass-panel" *ngIf="journalFeedback()">
-      <div class="tech jf-head">◈ SYSTEM ANALYSIS:  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <div class="tech jf-body">{{ journalFeedback() }}  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-    <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-  <!-- ══════════════════════════ WEEKLY REPORT VIEW ═══════════════════════════ -->
-  <div class="report-view" *ngIf="view() === 'REPORT'" @fadeInUp>
-    <div class="report-header">
-      <h2 class="mono hist-head">◈ WEEKLY REPORT CARD</h2>
-      <p class="tech sub">A brutal, objective analysis of your week by The System.</p>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-    <div class="report-content" *ngIf="!weeklyReportLoading() && weeklyReport()">
-      <div class="report-grade-box glass-panel" [class]="'grade-' + weeklyGrade().charAt(0)">
-        <span class="tech rg-label">WEEKLY GRADE</span>
-        <span class="mono rg-val">{{ weeklyGrade() }}</span>
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-      <div class="report-text glass-panel tech">
-        {{ weeklyReport() }}
-        <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-    <div class="typing tech" *ngIf="weeklyReportLoading()" style="padding: 40px; text-align: center;">
-      <span class="mono">◈</span> THE SYSTEM IS COMPILING YOUR REPORT<span class="dots"></span>
-      <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-    <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
-  <!-- ---------------------- MORNING DIRECTIVE VIEW ---------------------- -->
-  <div class="report-view glass-panel" *ngIf="view() === 'DIRECTIVE'" @fadeInUp style="padding: 40px;">
-    <h3 class="mono head" style="color: #FAC775; margin-bottom: 24px; font-size: 1.5rem; text-align: center;">? DAILY DIRECTIVE</h3>
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="!directiveText() && !directiveLoading()">
-      <p class="tech hint">Initialize morning scan to receive your customized daily directive based on your sleep, recovery, and recent performance.</p>
-      <button class="sys-btn-primary" (click)="generateDirective()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 20px;">INITIALIZE MORNING SCAN</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 30px;" *ngIf="directiveLoading()">
-      <div class="mono" style="font-size: 2rem; color: #FAC775; animation: pulse 1s infinite;">SCANNING...</div>
-    </div>
-
-    <div *ngIf="directiveText()" class="directive-content" style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid rgba(250,199,117,0.3); border-left: 4px solid #FAC775; box-shadow: 0 0 20px rgba(250,199,117,0.1);">
-      <pre style="white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 1.8; color: #fff;">{{ directiveText() }}</pre>
-    </div>
-  </div>
-</div>
-
