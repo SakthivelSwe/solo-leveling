@@ -9,6 +9,9 @@ import { BiometricService } from './biometric.service';
 import { AuthService } from './auth.service';
 import { PlayerService } from './player.service';
 import { DirectiveService } from './directive.service';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { AppShortcuts } from '@capawesome/capacitor-app-shortcuts';
 
 /**
  * Native-platform glue (Capacitor). No-ops on the web so the same codebase runs
@@ -28,6 +31,8 @@ export class NativeService {
   private auth               = inject(AuthService);
   private playerService      = inject(PlayerService);
   private directive          = inject(DirectiveService);
+  private dialog             = inject(MatDialog);
+  private router             = inject(Router);
 
   /** Exposed so AppComponent can show/hide the biometric lock overlay. */
   get biometricLocked(): boolean { return this.biometric.isLocked; }
@@ -48,12 +53,43 @@ export class NativeService {
 
     // Android hardware back button → go back in-app, or exit at the root.
     App.addListener('backButton', ({ canGoBack }) => {
+      // Priority 1: Close open Material Dialogs
+      if (this.dialog.openDialogs.length > 0) {
+        this.dialog.closeAll();
+        return;
+      }
+      // Priority 2: Navigate back
       if (canGoBack) {
         this.location.back();
       } else {
         App.exitApp();
       }
     });
+
+    // Android App Shortcuts
+    try {
+      await AppShortcuts.set({
+        shortcuts: [
+          {
+            id: '/system',
+            title: 'Quests',
+            description: 'Daily Quests',
+          },
+          {
+            id: '/habits',
+            title: 'Habits',
+            description: 'Habits Tracker',
+          }
+        ]
+      });
+      AppShortcuts.addListener('click', (event) => {
+        if (event.shortcutId) {
+          this.router.navigateByUrl(event.shortcutId);
+        }
+      });
+    } catch {
+      /* AppShortcuts not supported */
+    }
 
     // App resume — two things happen:
     // 1. Sync fresh player state (SSE re-connects on its own)
