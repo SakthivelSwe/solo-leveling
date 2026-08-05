@@ -1,21 +1,36 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# THE SYSTEM — ProGuard / R8 Rules
+# These rules are required when minifyEnabled = true for the release build.
+# Without them, R8 would strip Capacitor plugin classes and crash at runtime.
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# ── Capacitor / Cordova bridge ────────────────────────────────────────────────
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
+-keep class * extends com.getcapacitor.Plugin { *; }
+-keep class * extends com.getcapacitor.BridgeActivity { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# ── Our own plugin / service classes ─────────────────────────────────────────
+-keep class com.thesystem.app.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ── AndroidX WebKit / WebView ─────────────────────────────────────────────────
+-keep class androidx.webkit.** { *; }
+-keep class android.webkit.** { *; }
+
+# ── Preserve @PluginMethod annotations so the bridge can find them at runtime ─
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses
+
+# ── AppWidget (home screen widget) ────────────────────────────────────────────
+-keep public class * extends android.appwidget.AppWidgetProvider { *; }
+
+# ── BroadcastReceivers / Services referenced in AndroidManifest ───────────────
+-keep public class * extends android.content.BroadcastReceiver { *; }
+-keep public class * extends android.app.Service { *; }
+-keep public class * extends android.app.Activity { *; }
+
+# ── Health Connect API ────────────────────────────────────────────────────────
+-keep class androidx.health.** { *; }
+
+# ── Debugging: preserve line numbers in crash reports ────────────────────────
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile

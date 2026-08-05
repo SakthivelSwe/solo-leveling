@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -17,10 +18,23 @@ android {
         }
     }
     buildTypes {
-        release {
+        debug {
+            // Keep debug builds fast — no minification.
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
         }
+        release {
+            // Enable R8 full-mode minification + resource shrinking for production APKs.
+            // Reduces APK size and improves cold-start time significantly.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        // Strip duplicate licence files that inflate APK size.
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE-notice.md'
     }
 }
 

@@ -1,3 +1,11 @@
+<!-- ═══ OFFLINE BANNER ══════════════════════════════════════════ -->
+@if (network.isOffline()) {
+  <div class="offline-banner" role="alert" aria-live="polite">
+    <span class="offline-icon">⚠</span>
+    <span>No network — offline mode</span>
+  </div>
+}
+
 <!-- Page content -->
 <div class="route-host" [@routeFade]="routeState(outlet)">
   <router-outlet #outlet="outlet"></router-outlet>
@@ -89,5 +97,3 @@
   *ngIf="uiState.eveningReviewOpen()"
   (closed)="uiState.closeEveningReview()">
 </app-evening-review>
-
-

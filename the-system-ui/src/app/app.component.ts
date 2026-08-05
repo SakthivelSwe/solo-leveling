@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { SseService } from './core/services/sse.service';
 import { PwaUpdateService } from './core/services/pwa-update.service';
 import { NativeService } from './core/services/native.service';
+import { NetworkService } from './core/services/network.service';
 import { BiometricService } from './core/services/biometric.service';
 import { BiometricLockComponent } from './features/auth/biometric-lock.component';
 import { LevelUpModalComponent } from './shared/components/level-up-modal.component';
@@ -52,6 +53,9 @@ export class AppComponent {
   private aiCommander = inject(AiCommanderService);
   private dialog    = inject(MatDialog);
 
+  /** Expose network service to template for offline indicator */
+  public network    = inject(NetworkService);
+
   /** Reactive signal: true when the biometric lock overlay should be shown. */
   isLocked = computed(() => this.biometric.lockedSignal());
 
@@ -81,19 +85,30 @@ export class AppComponent {
     this.native.init();
     this.maybePromptMorningBriefing();
     this.maybePromptEveningReview();
-    this.initBadgePolling();
+
+    // Badge polling: defer until AFTER biometric resolves and app is stable.
+    // On locked startup the user hasn't authenticated yet, so network calls would
+    // fail or return stale data. Using a 3-second delay covers the biometric grace
+    // period and ensures the SSE connection is already established.
+    setTimeout(() => this.initBadgePolling(), 3000);
   }
 
   private initBadgePolling(): void {
     const poll = () => {
+      // Guard: don't poll when the user is not authenticated or app is offline.
       if (!this.auth.isAuthenticated()) return;
-      this.lifeOs.getDueFlashcards().subscribe(cards => this.uiState.dueFlashcardsCount.set(cards.length));
-      this.playerService.getTodayQuests().subscribe(quests => this.uiState.dueQuestsCount.set(quests.filter(q => !q.isCompleted).length));
+      if (this.network.isOffline()) return;
+
+      this.lifeOs.getDueFlashcards().subscribe(cards =>
+        this.uiState.dueFlashcardsCount.set(cards.length));
+      this.playerService.getTodayQuests().subscribe(quests =>
+        this.uiState.dueQuestsCount.set(quests.filter(q => !q.isCompleted).length));
     };
-    // Initial fetch after a short delay
-    setTimeout(poll, 2000);
-    // Poll every 2 minutes
-    setInterval(poll, 120000);
+
+    // Initial fetch.
+    poll();
+    // Refresh every 2 minutes.
+    setInterval(poll, 120_000);
   }
 
   /**

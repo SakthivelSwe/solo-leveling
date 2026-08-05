@@ -10,7 +10,9 @@
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="false"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true">
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"
@@ -22,9 +24,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
+
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+
+            <!-- ◈ Deep-link from home screen widget tap ("/habits" route) -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="thesystem" android:host="open" />
             </intent-filter>
         </activity>
 
@@ -87,6 +96,20 @@
         </receiver>
     </application>
 
+    <!-- ── Package visibility (Android 11+) ───────────────────────────────────
+         Required for the native Share sheet (@capacitor/share) to enumerate
+         share targets and for any cross-app interaction. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
+
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -114,4 +137,7 @@
     <!-- Screen Time & App Blocking (Deep Work / Penalty enforcement) -->
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Network state (used by @capacitor/network offline detection) -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>

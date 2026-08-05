@@ -590,17 +590,42 @@ body.native-platform .cdk-overlay-dark-backdrop {
   -webkit-backdrop-filter: none !important;
   background: rgba(3,3,10,0.96);
 }
-/* Safety net: on native, no decorative animation should loop OR fire.
-   Set animation to none entirely — not just cap the count to 1. Firing the
-   animation even once causes a GPU composite pass that wastes battery.
-   This is the strongest heat/battery guard we can apply globally. */
+
+/* ── Global native animation kill — with TARGETED EXCEPTIONS ─────────────────
+   We kill decorative looping animations (aurora, drift, pulse glows) but MUST
+   preserve:
+     a) Angular Material ripple — this IS the tap feedback. Removing it makes
+        buttons feel broken / unresponsive (the bug the user reported).
+     b) .spring-active:active transform — the :active press-down effect on buttons.
+     c) Loading spinners and progress rings.
+     d) Toast slide-in (fires once, very cheap).
+   ─────────────────────────────────────────────────────────────────────────── */
 body.native-platform *,
 body.native-platform *::before,
 body.native-platform *::after {
   animation: none !important;
-  transition-duration: 0.12s !important; /* keep micro-transitions but make them fast */
+  transition-duration: 0.10s !important;  /* quick micro-transitions, not zero */
 }
-/* …but genuine loading indicators MUST keep spinning. Re-enable them. */
+
+/* ── RE-ENABLE: Angular Material ripple (tap feel) ───────────────────────── */
+body.native-platform .mat-ripple-element {
+  animation: unset !important;
+  transition: unset !important;
+}
+body.native-platform .mdc-button__ripple::after,
+body.native-platform .mat-mdc-button-ripple .mat-ripple-element {
+  animation: unset !important;
+}
+
+/* ── RE-ENABLE: :active press-down on buttons (critical for tap response feel) */
+body.native-platform .spring-active:active,
+body.native-platform button:active,
+body.native-platform a:active,
+body.native-platform .bnav-item:active .bnav-icon {
+  transition-duration: 0.08s !important;
+}
+
+/* ── RE-ENABLE: loading indicators (spinners, rings, progress fills) ─────── */
 body.native-platform .loader-ring,
 body.native-platform .dots::after,
 body.native-platform .sys-spin,
@@ -609,6 +634,44 @@ body.native-platform .mp-fill,              /* milestone progress fill */
 body.native-platform .btn-confirm.pulse {   /* confirm clean day pulse */
   animation: unset !important;
   animation-iteration-count: infinite !important;
+}
+
+/* ── DISABLE: :hover states on touch devices ─────────────────────────────────
+   On Android, :hover fires on long-press and gets stuck after the finger lifts,
+   causing the "ghost active" visual bug that looks like a double-tap. Suppressing
+   hover transforms on native eliminates this entirely. */
+body.native-platform .glass-panel:hover,
+body.native-platform .card-3d:hover,
+body.native-platform .spring-hover:hover,
+body.native-platform .sys-btn:hover:not([disabled]),
+body.native-platform .glass-panel:hover {
+  transform: none !important;
+  box-shadow: unset !important;
+  border-color: unset !important;
+  filter: unset !important;
+}
+
+/* ── GPU-promote the bottom nav bar ──────────────────────────────────────────
+   will-change:transform puts the bottom nav in its own GPU compositor layer so
+   page scrolling and route transitions never cause it to repaint. */
+body.native-platform .bottom-nav {
+  will-change: transform;
+  transform: translateZ(0);
+  /* Remove expensive backdrop-filter from the nav bar too */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(8, 8, 20, 0.99) !important;
+}
+
+/* ── Touch scroll optimizations ──────────────────────────────────────────────
+   -webkit-overflow-scrolling: touch enables momentum scrolling in WebView.
+   overscroll-behavior: contain prevents the page from scrolling when an inner
+   list hits its boundary (fixes the pull-to-refresh fight / jank). */
+body.native-platform [style*="overflow"],
+body.native-platform .scroll,
+body.native-platform .cdk-virtual-scroll-viewport {
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
 }
 
 /* Custom Dialog Panel Classes for NoFap Features */
