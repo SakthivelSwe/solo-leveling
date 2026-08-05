@@ -99,8 +99,9 @@ export class LifeOsService {
   /* ===== Mind OS ===== */
   startMeditation(): Observable<any> { return this.http.post(`${this.api}/mind/meditate/start`, {}); }
   completeMeditation(minutes: number): Observable<any> { return this.http.post(`${this.api}/mind/meditate/complete`, { minutes }); }
-  getMindToday(): Observable<MindLog> { return this.http.get<MindLog>(`${this.api}/mind/today`); }
   upsertMind(b: MindLog): Observable<MindLog> { return this.http.post<MindLog>(`${this.api}/mind/log`, b); }
+  getMindToday(): Observable<MindLog> { return this.http.get<MindLog>(`${this.api}/mind/today`); }
+  getMindHistory(): Observable<MindLog[]> { return this.http.get<MindLog[]>(`${this.api}/mind/history`); }
   getEvidence(): Observable<SelfDoubtEvidence[]> { return this.http.get<SelfDoubtEvidence[]>(`${this.api}/mind/evidence`); }
   addEvidence(evidence: string, category = 'CHARACTER'): Observable<SelfDoubtEvidence> {
     return this.http.post<SelfDoubtEvidence>(`${this.api}/mind/evidence`, { evidence, category });

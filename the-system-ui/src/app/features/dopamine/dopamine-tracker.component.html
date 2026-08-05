@@ -1,173 +1,392 @@
-<div class="system-container">
-  <div class="page-header">
-    <h1 class="sys-title mono">DOPAMINE DETOX</h1>
-    <p class="sys-subtitle tech">Monitor neural drains. Protect your XP multiplier.</p>
+<div class="dt-shell">
+
+  <!-- ══ HEADER ══ -->
+  <header class="dt-topbar">
+    <a class="dt-back tech" routerLink="/system">← BACK</a>
+    <div class="dt-title-wrap">
+      <h1 class="mono dt-title">⚡ DOPAMINE DETOX</h1>
+      <p class="tech dt-sub">Monitor neural drains. Protect your XP multiplier.</p>
+    </div>
+    <div class="dt-streak-badge" [class.streak-fire]="cleanStreak() >= 3">
+      <span class="streak-icon">{{ getStreakIcon() }}</span>
+      <span class="streak-count mono">{{ cleanStreak() }}</span>
+      <span class="streak-label tech">CLEAN</span>
+    </div>
+  </header>
+
+  <!-- ══ STATS ROW ══ -->
+  <div class="dt-stats-row">
+    <div class="dt-stat-card" [class.stat-danger]="projectedScore() > 60" [class.stat-safe]="projectedScore() <= 30">
+      <div class="ds-icon">🧠</div>
+      <div class="ds-val mono" [style.color]="scoreLabel().color">{{ projectedScore() }}</div>
+      <div class="ds-lbl tech">TODAY'S LOAD</div>
+    </div>
+    <div class="dt-stat-card">
+      <div class="ds-icon">📈</div>
+      <div class="ds-val mono" [style.color]="weeklyAvg() <= 30 ? '#1D9E75' : weeklyAvg() <= 60 ? '#FAC775' : '#E24B4A'">{{ weeklyAvg() }}</div>
+      <div class="ds-lbl tech">7-DAY AVG</div>
+    </div>
+    <div class="dt-stat-card">
+      <div class="ds-icon">✅</div>
+      <div class="ds-val mono" style="color: #1D9E75">{{ weekCleanDays() }}/7</div>
+      <div class="ds-lbl tech">CLEAN DAYS</div>
+    </div>
+    <div class="dt-stat-card">
+      <div class="ds-icon">🎯</div>
+      <div class="ds-val mono" [style.color]="projectedMultiplier() >= 1 ? '#1D9E75' : '#E24B4A'">
+        {{ (projectedMultiplier() * 100) | number:'1.0-0' }}%
+      </div>
+      <div class="ds-lbl tech">XP MULT</div>
+    </div>
   </div>
 
-  <div class="content-grid">
-    <!-- LEFT: Inputs -->
-    <div class="left-col">
-      <div class="glass-panel input-card spring-hover" style="overflow: hidden;">
+  <!-- ══ STATUS BANNER ══ -->
+  <div class="dt-status-banner" [style.borderColor]="scoreLabel().color" [style.background]="'rgba(0,0,0,0.4)'">
+    <div class="dsb-left">
+      <span class="dsb-status mono" [style.color]="scoreLabel().color">{{ scoreLabel().text }}</span>
+      <span class="dsb-desc tech">{{ projectedScore() <= 30 ? 'Dopamine receptors are recovering well. Keep it up.' : projectedScore() <= 60 ? 'Moderate load. Reduce screen time for better focus.' : 'High load detected. Neural clarity compromised.' }}</span>
+    </div>
+    <!-- Dopamine Budget Bar -->
+    <div class="dsb-budget">
+      <div class="budget-label tech">DAILY BUDGET (limit: 40)</div>
+      <div class="budget-bar">
+        <div class="budget-fill" [style.width.%]="budgetPct()" [style.background]="budgetPct() > 100 ? '#E24B4A' : budgetPct() > 75 ? '#FAC775' : '#1D9E75'"></div>
+        <div class="budget-limit-line"></div>
+      </div>
+      <div class="budget-num tech" [style.color]="budgetPct() > 100 ? '#E24B4A' : '#a0aabf'">{{ projectedScore() }}/40</div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW TABS ══ -->
+  <div class="dt-view-tabs">
+    <button class="dt-vtab tech" [class.active]="activeView() === 'LOG'" (click)="activeView.set('LOG')">📋 LOG TODAY</button>
+    <button class="dt-vtab tech" [class.active]="activeView() === 'BREAKDOWN'" (click)="activeView.set('BREAKDOWN')">🔬 BREAKDOWN</button>
+    <button class="dt-vtab tech" [class.active]="activeView() === 'HISTORY'" (click)="activeView.set('HISTORY')">📊 HISTORY</button>
+  </div>
+
+  <!-- ══ LOG VIEW ══ -->
+  @if (activeView() === 'LOG') {
+    <div class="dt-log-grid">
+
+      <!-- LEFT: Negative Drains -->
+      <div class="dt-card dt-drains glass-panel">
         <div class="card-glow"></div>
-        <h2 class="mono"><span class="icon">🔻</span> NEGATIVE DRAINS</h2>
-        <p class="tech label-desc">These behaviors spike cheap dopamine and reduce your capacity to focus on hard tasks. Log honestly.</p>
+        <h2 class="mono dt-card-title"><span class="title-dot drain-dot"></span> NEURAL DRAINS</h2>
+        <p class="tech dt-card-desc">These behaviors spike cheap dopamine and suppress natural motivation. Log honestly.</p>
 
         <!-- Social Media -->
-        <div class="metric-row">
+        <div class="metric-row" [class.metric-active]="socialMediaMin() > 0">
+          <div class="metric-icon">📱</div>
           <div class="metric-info">
             <span class="m-label tech">SOCIAL MEDIA</span>
-            <span class="m-sub tech">+8 penalty per 30m</span>
+            <span class="m-sub tech">+8 penalty per 30 min</span>
           </div>
           <div class="m-controls">
             <button class="adj-btn" (click)="adjust(socialMediaMin, -15)">-15</button>
-            <div class="m-val mono">{{ socialMediaMin() }} <span class="unit">min</span></div>
+            <div class="m-val mono" [class.val-danger]="socialMediaMin() > 60">{{ socialMediaMin() }}<span class="unit"> min</span></div>
             <button class="adj-btn" (click)="adjust(socialMediaMin, 15)">+15</button>
           </div>
+          @if (socialMediaMin() > 0) {
+            <div class="metric-penalty tech">+{{ (Math.floor(socialMediaMin() / 30) * 8) }} pts</div>
+          }
         </div>
 
         <!-- Reels / Shorts -->
-        <div class="metric-row">
+        <div class="metric-row" [class.metric-active]="reelsMin() > 0">
+          <div class="metric-icon">🎬</div>
           <div class="metric-info">
             <span class="m-label tech text-danger">REELS / SHORTS</span>
-            <span class="m-sub tech">+15 penalty per 30m</span>
+            <span class="m-sub tech">+15 penalty per 30 min · worst drain</span>
           </div>
           <div class="m-controls">
             <button class="adj-btn" (click)="adjust(reelsMin, -15)">-15</button>
-            <div class="m-val mono">{{ reelsMin() }} <span class="unit">min</span></div>
+            <div class="m-val mono" [class.val-danger]="reelsMin() > 30">{{ reelsMin() }}<span class="unit"> min</span></div>
             <button class="adj-btn" (click)="adjust(reelsMin, 15)">+15</button>
           </div>
+          @if (reelsMin() > 0) {
+            <div class="metric-penalty tech">+{{ (Math.floor(reelsMin() / 30) * 15) }} pts</div>
+          }
         </div>
 
         <!-- Gaming -->
-        <div class="metric-row">
+        <div class="metric-row" [class.metric-active]="gamingMin() > 60">
+          <div class="metric-icon">🎮</div>
           <div class="metric-info">
             <span class="m-label tech">GAMING</span>
-            <span class="m-sub tech">+12 penalty if > 60m</span>
+            <span class="m-sub tech">+12 penalty if > 60 min</span>
           </div>
           <div class="m-controls">
             <button class="adj-btn" (click)="adjust(gamingMin, -30)">-30</button>
-            <div class="m-val mono">{{ gamingMin() }} <span class="unit">min</span></div>
+            <div class="m-val mono" [class.val-warning]="gamingMin() > 60">{{ gamingMin() }}<span class="unit"> min</span></div>
             <button class="adj-btn" (click)="adjust(gamingMin, 30)">+30</button>
           </div>
+          @if (gamingMin() > 60) {
+            <div class="metric-penalty tech">+12 pts</div>
+          }
         </div>
 
         <!-- Junk Food -->
-        <div class="metric-row">
+        <div class="metric-row" [class.metric-active]="junkFoodItems() > 0">
+          <div class="metric-icon">🍔</div>
           <div class="metric-info">
             <span class="m-label tech">JUNK FOOD</span>
-            <span class="m-sub tech">+5 penalty per item</span>
+            <span class="m-sub tech">+5 penalty per item · spikes insulin</span>
           </div>
           <div class="m-controls">
             <button class="adj-btn" (click)="adjust(junkFoodItems, -1)">-1</button>
-            <div class="m-val mono">{{ junkFoodItems() }} <span class="unit">items</span></div>
+            <div class="m-val mono" [class.val-warning]="junkFoodItems() > 2">{{ junkFoodItems() }}<span class="unit"> items</span></div>
             <button class="adj-btn" (click)="adjust(junkFoodItems, 1)">+1</button>
           </div>
+          @if (junkFoodItems() > 0) {
+            <div class="metric-penalty tech">+{{ junkFoodItems() * 5 }} pts</div>
+          }
         </div>
 
-        <!-- Porn -->
-        <div class="metric-row toggle-row">
+        <!-- Screen Time (NEW) -->
+        <div class="metric-row" [class.metric-active]="screenTimeHrs() > 2">
+          <div class="metric-icon">📺</div>
+          <div class="metric-info">
+            <span class="m-label tech">SCREEN TIME</span>
+            <span class="m-sub tech">+5 if >2h · +10 if >4h total phone</span>
+          </div>
+          <div class="m-controls">
+            <button class="adj-btn" (click)="adjust(screenTimeHrs, -1)">-1</button>
+            <div class="m-val mono" [class.val-danger]="screenTimeHrs() > 4">{{ screenTimeHrs() }}<span class="unit"> hrs</span></div>
+            <button class="adj-btn" (click)="adjust(screenTimeHrs, 1)">+1</button>
+          </div>
+          @if (screenTimeHrs() > 2) {
+            <div class="metric-penalty tech">+{{ screenTimeHrs() > 4 ? 10 : 5 }} pts</div>
+          }
+        </div>
+
+        <!-- Adult Content -->
+        <div class="metric-row toggle-row" [class.metric-danger-active]="pornViewed()">
+          <div class="metric-icon">⚠️</div>
           <div class="metric-info">
             <span class="m-label tech text-danger">ADULT CONTENT</span>
-            <span class="m-sub tech">+20 penalty</span>
+            <span class="m-sub tech">+20 penalty · damages dopamine receptors</span>
           </div>
           <button class="toggle-btn mono" [class.active-danger]="pornViewed()" (click)="pornViewed.set(!pornViewed())">
-            {{ pornViewed() ? 'VIEWED' : 'CLEAN' }}
+            {{ pornViewed() ? '⛔ VIEWED' : '✅ CLEAN' }}
           </button>
+          @if (pornViewed()) {
+            <div class="metric-penalty tech">+20 pts</div>
+          }
         </div>
       </div>
 
-      <div class="glass-panel input-card mt-4 spring-hover" style="overflow: hidden;">
-        <div class="card-glow"></div>
-        <h2 class="mono"><span class="icon">🔋</span> POSITIVE RECOVERY</h2>
-        <p class="tech label-desc">These behaviors increase baseline dopamine and repair receptors.</p>
+      <!-- RIGHT: Positive Recovery + Live Impact -->
+      <div class="dt-right-col">
 
-        <!-- Exercise -->
-        <div class="metric-row toggle-row">
-          <div class="metric-info">
-            <span class="m-label tech text-success">EXERCISE</span>
-            <span class="m-sub tech">-20 penalty</span>
+        <!-- Positive Recovery -->
+        <div class="dt-card dt-recovery glass-panel">
+          <div class="card-glow recovery-glow"></div>
+          <h2 class="mono dt-card-title"><span class="title-dot recovery-dot"></span> POSITIVE RECOVERY</h2>
+          <p class="tech dt-card-desc">These habits repair dopamine receptors and boost baseline drive.</p>
+
+          <!-- Exercise -->
+          <div class="recovery-row" [class.recovery-active]="exerciseDone()">
+            <div class="rec-icon">💪</div>
+            <div class="rec-info">
+              <span class="r-label tech text-success">EXERCISE</span>
+              <span class="r-sub tech">-20 load · raises baseline testosterone</span>
+            </div>
+            <button class="toggle-btn mono" [class.active-success]="exerciseDone()" (click)="exerciseDone.set(!exerciseDone())">
+              {{ exerciseDone() ? '✅ DONE' : 'NO' }}
+            </button>
           </div>
-          <button class="toggle-btn mono" [class.active-success]="exerciseDone()" (click)="exerciseDone.set(!exerciseDone())">
-            {{ exerciseDone() ? 'COMPLETED' : 'NO' }}
-          </button>
+
+          <!-- Cold Shower -->
+          <div class="recovery-row" [class.recovery-active]="coldShower()">
+            <div class="rec-icon">🚿</div>
+            <div class="rec-info">
+              <span class="r-label tech text-success">COLD SHOWER</span>
+              <span class="r-sub tech">-10 load · norepinephrine spike</span>
+            </div>
+            <button class="toggle-btn mono" [class.active-success]="coldShower()" (click)="coldShower.set(!coldShower())">
+              {{ coldShower() ? '✅ DONE' : 'NO' }}
+            </button>
+          </div>
+
+          <!-- Meditation (NEW) -->
+          <div class="recovery-row" [class.recovery-active]="meditationDone()">
+            <div class="rec-icon">🧘</div>
+            <div class="rec-info">
+              <span class="r-label tech text-success">MEDITATION</span>
+              <span class="r-sub tech">-8 load · restores prefrontal control</span>
+            </div>
+            <button class="toggle-btn mono" [class.active-success]="meditationDone()" (click)="meditationDone.set(!meditationDone())">
+              {{ meditationDone() ? '✅ DONE' : 'NO' }}
+            </button>
+          </div>
         </div>
 
-        <!-- Cold Shower -->
-        <div class="metric-row toggle-row">
-          <div class="metric-info">
-            <span class="m-label tech text-success">COLD SHOWER</span>
-            <span class="m-sub tech">-10 penalty</span>
-          </div>
-          <button class="toggle-btn mono" [class.active-success]="coldShower()" (click)="coldShower.set(!coldShower())">
-            {{ coldShower() ? 'COMPLETED' : 'NO' }}
-          </button>
-        </div>
-      </div>
-      
-      <button class="btn-save tech sys-btn spring-hover" [disabled]="isSaving()" (click)="saveLog()">
-        {{ isSaving() ? 'SYNCING...' : 'SYNC NEURAL STATE' }}
-      </button>
-      
-      @if (saveSuccess()) {
-        <div class="success-msg tech">DATA SYNCED WITH SYSTEM.</div>
-      }
-    </div>
+        <!-- Live Impact Card -->
+        <div class="dt-card dt-impact glass-panel">
+          <div class="card-glow"></div>
+          <h2 class="mono dt-card-title">⚡ LIVE IMPACT</h2>
 
-    <!-- RIGHT: Status & History -->
-    <div class="right-col">
-      <!-- Live Impact -->
-      <div class="glass-panel impact-card spring-hover" style="overflow: hidden;">
-        <div class="card-glow"></div>
-        <h2 class="mono">LIVE IMPACT</h2>
-        
-        <div class="gauges">
-          <div class="gauge-box">
-            <div class="g-label tech">DOPAMINE LOAD (0-100)</div>
-            <div class="g-val mono" [class.danger]="projectedScore() > 60" [class.safe]="projectedScore() <= 30">
-              {{ projectedScore() }}
-            </div>
-            <div class="g-bar">
-              <div class="g-fill" [style.width.%]="projectedScore()" [class.danger-bg]="projectedScore() > 60"></div>
-            </div>
-            <div class="g-desc tech">Higher score = more brain fog</div>
-          </div>
-
-          <div class="gauge-box">
-            <div class="g-label tech">XP MULTIPLIER</div>
-            <div class="g-val mono" [class.danger]="projectedMultiplier() < 1.0">
-              {{ projectedMultiplier() | percent }}
-            </div>
-            <div class="g-desc tech">Affects all Quest XP earned today</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 14-Day History -->
-      <div class="glass-panel history-card mt-4 spring-hover" style="overflow: hidden;">
-        <div class="card-glow"></div>
-        <h2 class="mono">14-DAY HISTORY</h2>
-        
-        @if (history().length > 0) {
-          <div class="chart-container">
-            @for (log of history(); track log.id) {
-              <div class="bar-col">
-                <div class="bar-wrap">
-                  <div class="bar" 
-                       [style.height.%]="log.dopamineScore"
-                       [class.bar-danger]="log.dopamineScore > 60"
-                       [class.bar-warning]="log.dopamineScore > 30 && log.dopamineScore <= 60"
-                       [class.bar-safe]="log.dopamineScore <= 30">
-                  </div>
-                  <div class="bar-val tech">{{ log.dopamineScore }}</div>
-                </div>
-                <div class="bar-date tech">{{ log.logDate | slice:5:10 }}</div>
+          <!-- Score Ring -->
+          <div class="impact-score-wrap">
+            <div class="score-ring" [style.--score]="projectedScore()" [class.ring-safe]="projectedScore() <= 30" [class.ring-warn]="projectedScore() > 30 && projectedScore() <= 60" [class.ring-danger]="projectedScore() > 60">
+              <div class="score-ring-inner">
+                <div class="score-num mono" [style.color]="scoreLabel().color">{{ projectedScore() }}</div>
+                <div class="score-status tech" [style.color]="scoreLabel().color">{{ scoreLabel().text }}</div>
               </div>
+            </div>
+          </div>
+
+          <!-- XP Multiplier -->
+          <div class="impact-row">
+            <div class="ir-label tech">XP MULTIPLIER TODAY</div>
+            <div class="ir-val mono" [class.ir-bonus]="projectedMultiplier() > 1" [class.ir-penalty]="projectedMultiplier() < 1">
+              {{ (projectedMultiplier() * 100) | number:'1.0-0' }}%
+            </div>
+          </div>
+          <div class="impact-desc tech">
+            @if (projectedMultiplier() > 1.0) {
+              🔥 Bonus XP for staying clean!
+            } @else if (projectedMultiplier() === 1.0) {
+              Baseline XP. Push for clean day bonus.
+            } @else {
+              ⚠️ XP reduced by {{ ((1 - projectedMultiplier()) * 100) | number:'1.0-0' }}% due to neural drain.
             }
           </div>
-        } @else {
-          <div class="empty-state tech">NO DATA LOGGED YET.</div>
+
+          <!-- Budget Bar -->
+          <div class="impact-budget">
+            <div class="ib-labels">
+              <span class="tech" style="color: #8a8a9a; font-size: 0.7rem;">BUDGET USAGE</span>
+              <span class="tech" style="font-size: 0.7rem;" [style.color]="budgetPct() > 100 ? '#E24B4A' : '#1D9E75'">{{ budgetPct() }}%</span>
+            </div>
+            <div class="ib-bar">
+              <div class="ib-fill" [style.width.%]="budgetPct() > 100 ? 100 : budgetPct()" [style.background]="budgetPct() > 100 ? '#E24B4A' : budgetPct() > 75 ? '#FAC775' : '#1D9E75'"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <button class="btn-save tech sys-btn spring-hover" [disabled]="isSaving()" (click)="saveLog()">
+          {{ isSaving() ? '⏳ SYNCING...' : '💾 SYNC NEURAL STATE' }}
+        </button>
+
+        @if (saveSuccess()) {
+          <div class="success-msg tech">✅ NEURAL STATE SYNCED WITH SYSTEM.</div>
         }
       </div>
     </div>
-  </div>
+  }
+
+  <!-- ══ BREAKDOWN VIEW ══ -->
+  @if (activeView() === 'BREAKDOWN') {
+    <div class="dt-breakdown glass-panel">
+      <div class="card-glow"></div>
+      <h2 class="mono dt-card-title">🔬 TODAY'S SCORE BREAKDOWN</h2>
+      <p class="tech dt-card-desc">Every behavior that shaped your dopamine load today.</p>
+
+      @if (scoreBreakdown().length === 0) {
+        <div class="empty-breakdown tech">Log some data first to see your breakdown.</div>
+      } @else {
+        <div class="breakdown-list">
+          @for (item of scoreBreakdown(); track item.label) {
+            <div class="bk-row" [class.bk-positive]="item.penalty < 0">
+              <span class="bk-icon">{{ item.icon }}</span>
+              <span class="bk-label tech">{{ item.label }}</span>
+              <div class="bk-bar-wrap">
+                <div class="bk-bar" [style.width.%]="(Math.abs(item.penalty) / 20) * 100" [style.background]="item.penalty < 0 ? '#1D9E75' : item.color"></div>
+              </div>
+              <span class="bk-val mono" [style.color]="item.penalty < 0 ? '#1D9E75' : item.color">
+                {{ item.penalty > 0 ? '+' : '' }}{{ item.penalty }}
+              </span>
+            </div>
+          }
+        </div>
+        <div class="bk-total">
+          <span class="tech">TOTAL LOAD</span>
+          <span class="mono" [style.color]="scoreLabel().color">{{ projectedScore() }} / 100</span>
+        </div>
+      }
+
+      <!-- Science explanation -->
+      <div class="bk-science">
+        <h3 class="mono" style="color: #b3aef0; font-size: 0.85rem; margin-bottom: 12px;">🧪 WHY THIS MATTERS</h3>
+        <div class="science-items">
+          <div class="sci-item">
+            <span class="sci-icon">🔴</span>
+            <span class="tech sci-text"><strong>Score 61-100:</strong> D2 receptor downregulation. Real rewards feel hollow. Motivation crashes.</span>
+          </div>
+          <div class="sci-item">
+            <span class="sci-icon">🟡</span>
+            <span class="tech sci-text"><strong>Score 31-60:</strong> Moderate drain. You can focus but less efficiently. Dreams feel further.</span>
+          </div>
+          <div class="sci-item">
+            <span class="sci-icon">🟢</span>
+            <span class="tech sci-text"><strong>Score 0-30:</strong> Receptors recovering. Work feels rewarding. Motivation is natural.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ══ HISTORY VIEW ══ -->
+  @if (activeView() === 'HISTORY') {
+    <div class="dt-history glass-panel">
+      <div class="card-glow"></div>
+      <h2 class="mono dt-card-title">📊 14-DAY NEURAL HISTORY</h2>
+
+      <!-- Weekly Sparkline -->
+      <div class="weekly-spark">
+        @for (log of last7Days(); track log.logDate) {
+          <div class="spark-col">
+            <div class="spark-bar-wrap">
+              <div class="spark-bar" [style.height.%]="log.dopamineScore" [style.background]="getBarColor(log.dopamineScore)"></div>
+            </div>
+            <div class="spark-label tech">{{ log.logDate | slice:5:10 }}</div>
+            <div class="spark-val tech" [style.color]="getBarColor(log.dopamineScore)">{{ log.dopamineScore }}</div>
+          </div>
+        }
+        @if (!last7Days().length) {
+          <div class="empty-state tech">No data yet. Start logging daily.</div>
+        }
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="history-summary">
+        <div class="hs-item">
+          <span class="tech">7-DAY AVERAGE</span>
+          <span class="mono" [style.color]="weeklyAvg() <= 30 ? '#1D9E75' : weeklyAvg() <= 60 ? '#FAC775' : '#E24B4A'">{{ weeklyAvg() }}</span>
+        </div>
+        <div class="hs-item">
+          <span class="tech">CLEAN DAYS (≤30)</span>
+          <span class="mono" style="color: #1D9E75">{{ weekCleanDays() }}/7</span>
+        </div>
+        <div class="hs-item">
+          <span class="tech">CLEAN STREAK</span>
+          <span class="mono" style="color: #FAC775">{{ cleanStreak() }} days</span>
+        </div>
+      </div>
+
+      <!-- Full 14-day chart -->
+      @if (history().length > 0) {
+        <div class="chart-container">
+          @for (log of history(); track log.id) {
+            <div class="bar-col">
+              <div class="bar-wrap">
+                <div class="bar"
+                     [style.height.%]="log.dopamineScore"
+                     [style.background]="getBarColor(log.dopamineScore)">
+                  <div class="bar-glow" [style.background]="getBarColor(log.dopamineScore)"></div>
+                </div>
+                <div class="bar-val tech">{{ log.dopamineScore }}</div>
+              </div>
+              <div class="bar-date tech">{{ log.logDate | slice:5:10 }}</div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state tech" style="padding: 40px; text-align: center;">NO HISTORY LOGGED YET.<br><span style="font-size: 0.8rem; opacity: 0.5;">Log your first day to start tracking your neural health.</span></div>
+      }
+    </div>
+  }
+
 </div>

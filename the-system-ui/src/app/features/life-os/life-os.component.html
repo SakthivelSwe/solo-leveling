@@ -111,6 +111,11 @@
           <button class="sys-btn-primary" (click)="addDeepWork()">+ LOG</button>
         </div>
         
+        <!-- Deep Work Trend Chart -->
+        <div *ngIf="deepWorkChartData" style="height: 120px; margin-bottom: 24px;">
+          <canvas baseChart [data]="deepWorkChartData" [options]="deepWorkChartOptions" [type]="'line'"></canvas>
+        </div>
+
         <ul class="mini-list" @listStagger style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
           <li *ngFor="let dw of deepWork()" class="log-item" style="align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
             <div style="display: flex; align-items: center; gap: 16px;">
@@ -125,6 +130,62 @@
           </li>
           <li *ngIf="!deepWork().length" class="empty tech" style="text-align: center; padding: 24px; color: #8a8a9a; background: rgba(0,0,0,0.3); border-radius: 8px;">No deep work logged this week.</li>
         </ul>
+      </div>
+
+      <!-- ◈ JOB APPLICATION TRACKER (Kanban) -->
+      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(29,158,117,0.3);">
+        <h3 class="mono head" style="color: #1D9E75;">◈ JOB APPLICATION PIPELINE</h3>
+        <p class="tech" style="color: #8a8a9a; font-size: 0.82rem; margin-bottom: 20px;">Track every application through the funnel. Know your conversion rate.</p>
+
+        <!-- Stats Row -->
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 10px; border-top: 2px solid #534AB7;">
+            <div class="tech" style="color: #8a8a9a; font-size: 0.7rem; margin-bottom: 4px;">TOTAL</div>
+            <div class="mono" style="color: #fff; font-size: 1.4rem;">{{ jobs().length }}</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 10px; border-top: 2px solid #1D9E75;">
+            <div class="tech" style="color: #8a8a9a; font-size: 0.7rem; margin-bottom: 4px;">INTERVIEWS</div>
+            <div class="mono" style="color: #1D9E75; font-size: 1.4rem;">{{ countJobsByStatus('INTERVIEW') }}</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 10px; border-top: 2px solid #FAC775;">
+            <div class="tech" style="color: #8a8a9a; font-size: 0.7rem; margin-bottom: 4px;">OFFERS</div>
+            <div class="mono" style="color: #FAC775; font-size: 1.4rem;">{{ countJobsByStatus('OFFER') }}</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 10px; border-top: 2px solid #E24B4A;">
+            <div class="tech" style="color: #8a8a9a; font-size: 0.7rem; margin-bottom: 4px;">REJECTED</div>
+            <div class="mono" style="color: #E24B4A; font-size: 1.4rem;">{{ countJobsByStatus('REJECTED') }}</div>
+          </div>
+        </div>
+
+        <!-- Add New Job Form -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+          <input class="premium-input" style="flex: 1; min-width: 120px;" placeholder="Company" [(ngModel)]="newJob.company" />
+          <input class="premium-input" style="flex: 1; min-width: 120px;" placeholder="Role" [(ngModel)]="newJob.role" />
+          <select class="premium-input" [(ngModel)]="newJob.status" style="min-width: 120px;">
+            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+          </select>
+          <button class="sys-btn-primary" (click)="addJob()">+ ADD</button>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="job-kanban">
+          <div class="kanban-col" *ngFor="let status of ['APPLIED','SCREENING','INTERVIEW','OFFER','REJECTED']">
+            <div class="kanban-header" [attr.data-status]="status">
+              <span class="tech">{{ status }}</span>
+              <span class="mono" style="font-size: 0.9rem;">{{ countJobsByStatus(status) }}</span>
+            </div>
+            <div class="kanban-cards">
+              <div class="kanban-card" *ngFor="let job of filterJobsByStatus(status)">
+                <div class="kc-company mono">{{ job.company }}</div>
+                <div class="kc-role tech">{{ job.role }}</div>
+                <div class="kc-actions">
+                  <button *ngFor="let s of statuses" class="kc-btn tech" [class.kc-active]="job.status === s" (click)="changeStatus(job, s)">{{ s | slice:0:3 }}</button>
+                </div>
+              </div>
+              <div *ngIf="!filterJobsByStatus(status).length" class="kc-empty tech">—</div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -193,20 +254,36 @@
       <div class="system-card block" style="border-color: #1D9E75;">
         <h3 class="mono head" style="color: #1D9E75;">◈ DAILY METRICS</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-          <!-- Macros -->
+          <!-- Protein (dynamic from diet history) -->
           <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; text-align: center; border-top: 3px solid #b3aef0;">
-            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">PROTEIN TARGET</div>
-            <div class="mono" style="color: #b3aef0; font-size: 1.5rem;">0 / 150g</div>
+            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">PROTEIN TODAY</div>
+            <div class="mono" style="color: #b3aef0; font-size: 1.5rem;">{{ getTodayProtein() | number:'1.0-0' }} / 150g</div>
             <div class="gap-track" style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px;">
-              <div class="gap-fill" style="width: 0%; background: linear-gradient(90deg, #834ab7, #b3aef0); height: 100%;"></div>
+              <div class="gap-fill" [style.width.%]="(getTodayProtein() / 150) * 100" style="background: linear-gradient(90deg, #834ab7, #b3aef0); height: 100%;"></div>
             </div>
           </div>
-          <!-- Sleep Debt -->
+          <!-- Sleep Hours (editable) -->
           <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; text-align: center; border-top: 3px solid #FAC775;">
-            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SLEEP DEBT</div>
-            <div class="mono" style="color: #FAC775; font-size: 1.5rem;">-2.5 hrs</div>
-            <div class="tech" style="color: #E24B4A; margin-top: 8px;">CRITICAL</div>
+            <div class="tech" style="color: #8a8a9a; margin-bottom: 8px;">SLEEP LAST NIGHT</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <button class="btn sm" style="border-color: #FAC775; color: #FAC775;" (click)="adjustSleep(-0.5)">-</button>
+              <div class="mono" style="color: #FAC775; font-size: 1.5rem;">{{ sleepHours() }}h</div>
+              <button class="btn sm" style="border-color: #FAC775; color: #FAC775;" (click)="adjustSleep(0.5)">+</button>
+            </div>
+            <div class="tech" style="margin-top: 8px; font-size: 0.8rem;" [style.color]="sleepHours() >= 7 ? '#1D9E75' : sleepHours() >= 5 ? '#FAC775' : '#E24B4A'">
+              {{ sleepHours() >= 7 ? 'OPTIMAL' : sleepHours() >= 5 ? 'SUBOPTIMAL' : 'SLEEP DEBT' }}
+            </div>
           </div>
+        </div>
+
+        <!-- Step Count (NEW) -->
+        <div style="display: flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="font-size: 1.3rem;">🚶</span>
+          <span class="tech" style="color: #8a8a9a; flex: 1;">STEPS TODAY</span>
+          <button class="btn sm" style="border-color: #8a8a9a;" (click)="adjustSteps(-500)">-500</button>
+          <span class="mono" style="color: #fff; min-width: 60px; text-align: center;">{{ stepCount() | number }}</span>
+          <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="adjustSteps(500)">+500</button>
+          <button class="btn sm" style="border-color: #1D9E75; color: #1D9E75;" (click)="adjustSteps(1000)">+1k</button>
         </div>
       </div>
 
@@ -250,6 +327,25 @@
             "{{ stoicQuotes[stoicQuoteIndex()].quote }}"
           </p>
           <span class="tech" style="color: #a0aabf; font-weight: 500; letter-spacing: 1px;">— {{ stoicQuotes[stoicQuoteIndex()].author }}</span>
+        </div>
+      </div>
+
+      <!-- Mood Tracker (7-day dots) -->
+      <div class="glass-card" style="border-color: rgba(211, 107, 155, 0.4); margin-bottom: 24px;" *ngIf="moodHistory().length">
+        <h3 class="mono head" style="color: #D36B9B;">◈ 7-DAY MOOD</h3>
+        <p class="tech dim" style="margin-bottom: 16px;">Morning & Evening logs</p>
+        <div style="display: flex; gap: 12px; align-items: center; overflow-x: auto; padding-bottom: 8px;">
+          <div *ngFor="let m of moodHistory()" style="display: flex; flex-direction: column; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <div class="tech" style="font-size: 0.7rem; color: #8a8a9a;">{{ m.logDate | slice:5:10 }}</div>
+            <div style="display: flex; gap: 6px;">
+              <!-- Morning Mood -->
+              <div [title]="'Morning: ' + m.moodMorning" style="width: 12px; height: 12px; border-radius: 50%;" 
+                   [style.background]="!m.moodMorning ? 'rgba(255,255,255,0.1)' : m.moodMorning >= 8 ? '#1D9E75' : m.moodMorning >= 5 ? '#FAC775' : '#E24B4A'"></div>
+              <!-- Evening Mood -->
+              <div [title]="'Evening: ' + m.moodEvening" style="width: 12px; height: 12px; border-radius: 50%;" 
+                   [style.background]="!m.moodEvening ? 'rgba(255,255,255,0.1)' : m.moodEvening >= 8 ? '#1D9E75' : m.moodEvening >= 5 ? '#FAC775' : '#E24B4A'"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -897,27 +993,99 @@
   <section class="panel" *ngIf="active() === 'BODY'" @fadeInUp
            role="tabpanel" id="panel-BODY" aria-labelledby="tab-BODY">
     <div class="cards">
-      
+
+      <!-- T-Score Gauge -->
+      <div class="glass-card" style="grid-column: 1 / -1; border-color: rgba(226,75,74,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+          <!-- Score ring -->
+          <div style="text-align: center; min-width: 140px;">
+            <div class="mono" style="font-size: 3.5rem; color: #E24B4A; text-shadow: 0 0 20px rgba(226,75,74,0.5); line-height: 1;">{{ testosteroneScore() }}</div>
+            <div class="tech" style="color: #8a8a9a; font-size: 0.75rem; letter-spacing: 2px; margin-top: 4px;">TESTOSTERONE SCORE</div>
+            <div class="tech" style="margin-top: 8px; font-size: 0.85rem;" [style.color]="testosteroneScore() >= 80 ? '#1D9E75' : testosteroneScore() >= 50 ? '#FAC775' : '#E24B4A'">
+              {{ testosteroneScore() >= 80 ? '🔥 PEAK MODE' : testosteroneScore() >= 50 ? '⚡ BUILDING' : '💀 LOW-T' }}
+            </div>
+          </div>
+          <!-- Score bar -->
+          <div style="flex: 1; min-width: 200px;">
+            <div style="background: rgba(255,255,255,0.04); border-radius: 8px; overflow: hidden; height: 12px; margin-bottom: 8px;">
+              <div style="height: 100%; border-radius: 8px; transition: width 0.8s ease;" [style.width.%]="testosteroneScore()" [style.background]="testosteroneScore() >= 80 ? '#1D9E75' : testosteroneScore() >= 50 ? '#FAC775' : '#E24B4A'"></div>
+            </div>
+            <div class="tech" style="color: #8a8a9a; font-size: 0.78rem;">Complete more pillars to raise your testosterone production score. Each pillar is backed by research.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- 7 Pillars of Testosterone -->
-      <div class="system-card block" *ngIf="body() as b" style="border-color: #E24B4A;">
-        <h3 class="mono head" style="color: #E24B4A; margin-bottom: 24px;">◈ 7 PILLARS OF TESTOSTERONE</h3>
-        
-        <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;" class="mobile-stack">
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.coldShower" /> ❄️ Cold shower</label>
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.exerciseDone" /> 🏋️ Exercise</label>
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.zincMeal" /> 🥚 Zinc meal</label>
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.noSoda" /> 🚫 No soda</label>
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.noPorn" /> 🧠 No porn</label>
-          <label class="chk tech"><input type="checkbox" [(ngModel)]="b.sleptBefore1130" /> 😴 Slept &lt; 11:30</label>
+      <div class="glass-card" style="border-color: rgba(226,75,74,0.3);">
+        <h3 class="mono head" style="color: #E24B4A; margin-bottom: 4px;">◈ 7 PILLARS OF TESTOSTERONE</h3>
+        <p class="tech" style="color: #8a8a9a; font-size: 0.78rem; margin-bottom: 20px;">Each pillar completed = +14 points. Research-backed habits that directly impact testosterone levels.</p>
+
+        <div *ngIf="body() as b" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+          <div class="pillar-row" [class.pillar-done]="b.coldShower">
+            <span class="pillar-icon">❄️</span>
+            <div class="pillar-info">
+              <label class="chk tech" style="margin: 0;"><input type="checkbox" [(ngModel)]="b.coldShower" /> Cold Shower</label>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">Raises norepinephrine 300% · improves mood & energy</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.coldShower">+14</span>
+          </div>
+          <div class="pillar-row" [class.pillar-done]="b.exerciseDone">
+            <span class="pillar-icon">🏋️</span>
+            <div class="pillar-info">
+              <label class="chk tech" style="margin: 0;"><input type="checkbox" [(ngModel)]="b.exerciseDone" /> Exercise / Training</label>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">Resistance training raises T 15-20% acutely</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.exerciseDone">+14</span>
+          </div>
+          <div class="pillar-row" [class.pillar-done]="b.zincMeal">
+            <span class="pillar-icon">🥚</span>
+            <div class="pillar-info">
+              <label class="chk tech" style="margin: 0;"><input type="checkbox" [(ngModel)]="b.zincMeal" /> Zinc-Rich Meal</label>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">Eggs, nuts, red meat · zinc deficiency drops T 50%</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.zincMeal">+14</span>
+          </div>
+          <div class="pillar-row" [class.pillar-done]="b.noSoda">
+            <span class="pillar-icon">🚫</span>
+            <div class="pillar-info">
+              <label class="chk tech" style="margin: 0;"><input type="checkbox" [(ngModel)]="b.noSoda" /> No Soda / Sugar</label>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">Fructose raises cortisol and suppresses T directly</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.noSoda">+14</span>
+          </div>
+          <div class="pillar-row" [class.pillar-done]="b.noPorn">
+            <span class="pillar-icon">🧠</span>
+            <div class="pillar-info">
+              <label class="chk tech" style="margin: 0;"><input type="checkbox" [(ngModel)]="b.noPorn" /> No Porn / Abstain</label>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">Day 7 abstinence: 145% T surge (Zhejiang University)</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.noPorn">+14</span>
+          </div>
+          <div class="pillar-row" [class.pillar-done]="b.sleptBefore1130">
+            <span class="pillar-icon">😴</span>
+            <div class="pillar-info">
+              <label class="chk tech" style="margin: 0;"><input type="checkbox" [(ngModel)]="b.sleptBefore1130" /> Slept Before 11:30 PM</label>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">95% of daily T produced during deep sleep</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.sleptBefore1130">+14</span>
+          </div>
+
+          <!-- Morning Sun Pillar -->
+          <div class="pillar-row" [class.pillar-done]="b.morningSunMin >= 15">
+            <span class="pillar-icon">☀️</span>
+            <div class="pillar-info" style="flex: 1;">
+              <span class="tech" style="display: block; margin-bottom: 4px;">☀️ Morning Sun Exposure</span>
+              <div class="slider-row" style="margin: 0;">
+                <input type="range" min="0" max="60" step="5" [(ngModel)]="b.morningSunMin" style="flex: 1;" />
+                <span class="mono" style="color: #E24B4A; min-width: 36px;">{{ b.morningSunMin }}m</span>
+              </div>
+              <span class="tech" style="font-size: 0.7rem; color: #8a8a9a;">15+ min boosts vitamin D and morning cortisol rhythm</span>
+            </div>
+            <span class="pillar-xp mono" [class.xp-done]="b.morningSunMin >= 15">+14</span>
+          </div>
         </div>
 
-        <div class="slider-row" style="background: rgba(226, 75, 74, 0.1); padding: 12px; border-radius: 8px;">
-          <span class="tech" style="color: #E24B4A;">Morning sun exposure (min)</span>
-          <input type="range" min="0" max="60" step="5" [(ngModel)]="b.morningSunMin" />
-          <span class="mono" style="color: #E24B4A; font-size: 1.2rem;">{{ b.morningSunMin }}m</span>
-        </div>
-
-        <button class="btn full" style="border-color: #E24B4A; color: #E24B4A; margin-top: 24px; font-weight: bold; letter-spacing: 1px;" (click)="saveBody()">LOCK IN PILLARS</button>
+        <button class="btn full" style="border-color: #E24B4A; color: #E24B4A; font-weight: bold; letter-spacing: 1px;" (click)="saveBody()">🔒 LOCK IN PILLARS</button>
       </div>
 
     </div>

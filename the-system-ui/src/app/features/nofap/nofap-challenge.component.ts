@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +30,8 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     return d.toTimeString().slice(0, 5); // "HH:MM"
   })();
   activeInsightTab = signal<'BRAIN' | 'TESTOSTERONE' | 'RELATIONSHIPS' | 'WORLD_STATS' | 'DOPAMINE'>('BRAIN');
+  /** Language toggle: 'en' = English, 'tanglish' = Tamil+English */
+  insightLang = signal<'en' | 'tanglish'>('en');
   activeScienceDay = signal<ScienceDayCard | null>(null);
   showMilestoneAnimation = signal(false);
 
@@ -469,6 +471,10 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     this.activeInsightTab.set(tab);
   }
 
+  toggleInsightLang(): void {
+    this.insightLang.set(this.insightLang() === 'en' ? 'tanglish' : 'en');
+  }
+
   selectScienceDay(card: ScienceDayCard): void {
     this.activeScienceDay.set(card);
   }
@@ -795,4 +801,6 @@ interface TriggerEntry {
   trigger: string;      // key e.g. BOREDOM, STRESS, CUSTOM_...
   label: string;        // human label
 }
+
+
 

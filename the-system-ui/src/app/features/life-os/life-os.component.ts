@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -50,6 +50,13 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   readiness = signal<InterviewReadinessDTO | null>(null);
   deepWork = signal<DeepWorkSession[]>([]);
   devMastery = signal<DevMasteryProgress[]>([]);
+  deepWorkChartData: ChartData<'line'> | undefined;
+  deepWorkChartOptions: ChartConfiguration['options'] = {
+    responsive: true, maintainAspectRatio: false,
+    scales: { y: { min: 0, max: 100, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8a8a9a' }, grid: { display: false } } },
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    elements: { line: { tension: 0.4 }, point: { radius: 4, hoverRadius: 6 } }
+  };
 
   // ── Wealth OS ─────────────────────────────────────
   wealthView = signal<'LEDGER' | 'ANALYTICS' | 'ACCOUNTS' | 'GOALS' | 'AI'>('LEDGER');
@@ -153,9 +160,12 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   ];
 
   // Mind
+  // Mind extras
   mind: MindLog = {};
+  moodHistory = signal<MindLog[]>([]);
   evidence = signal<SelfDoubtEvidence[]>([]);
   stoicQuoteIndex = signal<number>(0);
+  stoicInterval: any;
   stoicQuotes = [
     { quote: "You have power over your mind - not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },
     { quote: "We suffer more often in imagination than in reality.", author: "Seneca" },
@@ -179,6 +189,25 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   // Body
   body = signal<BodyLog | null>(null);
 
+  // Health extras
+  sleepHours = signal<number>(7);
+  stepCount = signal<number>(0);
+
+  // Body — computed testosterone score from pillars
+  testosteroneScore = computed(() => {
+    const b = this.body();
+    if (!b) return 0;
+    let score = 0;
+    if (b.coldShower) score += 14;
+    if (b.exerciseDone) score += 14;
+    if (b.zincMeal) score += 14;
+    if (b.noSoda) score += 14;
+    if (b.noPorn) score += 14;
+    if (b.sleptBefore1130) score += 14;
+    if (b.morningSunMin >= 15) score += 16;
+    return Math.min(100, score);
+  });
+
   // Relationship
   relationship = signal<RelationshipLog | null>(null);
   connections = signal<SocialConnection[]>([]);
@@ -201,7 +230,10 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         this.life.leetcodeHistory().subscribe(v => this.leetHistory.set(v.slice(0, 8)));
         this.life.skillsGap().subscribe(v => this.gap.set(v));
         this.life.interviewReadiness().subscribe(v => this.readiness.set(v));
-        this.life.getDeepWorkWeekly().subscribe(v => this.deepWork.set(v));
+        this.life.getDeepWorkWeekly().subscribe(v => {
+          this.deepWork.set(v);
+          this.updateDeepWorkChart(v);
+        });
         break;
       case 'WEALTH':
         this.life.getGoals().subscribe(v => this.goals.set(v));
@@ -227,7 +259,8 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         break;
       case 'MIND':
         this.life.getMindToday().subscribe(v => this.mind = v ?? {});
-        this.life.getEvidence().subscribe(v => this.evidence.set(v));
+        this.life.getMindHistory().subscribe(v => this.moodHistory.set(v.slice(0, 7)));
+        this.life.getEvidence().subscribe(e => this.evidence.set(e));
         this.startStoicEngine();
         break;
       case 'BODY':
@@ -242,6 +275,32 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   private toast(msg: string): void {
     this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
+  }
+
+  /** Compute total protein consumed today from diet history */
+  getTodayProtein(): number {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return this.dietHistory()
+      .filter(d => d.consumedDate?.startsWith(todayStr))
+      .reduce((acc, d) => acc + (d.proteinGrams || 0), 0);
+  }
+
+  adjustSleep(delta: number): void {
+    this.sleepHours.update(v => Math.max(0, Math.min(12, parseFloat((v + delta).toFixed(1)))));
+  }
+
+  adjustSteps(delta: number): void {
+    this.stepCount.update(v => Math.max(0, v + delta));
+  }
+
+  /** Count jobs by status for kanban header */
+  countJobsByStatus(status: string): number {
+    return this.jobs().filter(j => j.status === status).length;
+  }
+
+  /** Filter jobs by status for kanban cards */
+  filterJobsByStatus(status: string): JobApplication[] {
+    return this.jobs().filter(j => j.status === status);
   }
 
   /* ===== Career actions ===== */
@@ -286,11 +345,26 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   addDeepWork(): void {
     if (this.newDeepWork.codingMinutes <= 0) { this.toast('⚠ Minutes must be greater than 0'); return; }
-    this.life.logDeepWork(this.newDeepWork).subscribe(() => {
-      this.toast('◈ Deep work logged');
+    this.life.logDeepWork(this.newDeepWork).subscribe(res => {
+      this.toast('Deep work logged! +' + res.focusXpEarned + ' XP');
+      this.life.getDeepWorkWeekly().subscribe(v => {
+        this.deepWork.set(v);
+        this.updateDeepWorkChart(v);
+      });
       this.newDeepWork = { codingMinutes: 0, interruptions: 0, mobilePickups: 0, focusSessions: 0 };
-      this.life.getDeepWorkWeekly().subscribe(v => this.deepWork.set(v));
     });
+  }
+
+  updateDeepWorkChart(sessions: DeepWorkSession[]): void {
+    if (!sessions || sessions.length === 0) { this.deepWorkChartData = undefined; return; }
+    // Sort by date ascending for chart
+    const sorted = [...sessions].reverse(); // assuming api returns newest first or we just reverse to get chronological
+    this.deepWorkChartData = {
+      labels: sorted.map(s => s.sessionDate?.substring(5, 10) || ''),
+      datasets: [
+        { data: sorted.map(s => s.focusScore || 0), label: 'Focus Score', borderColor: '#b3aef0', backgroundColor: 'rgba(179, 174, 240, 0.1)', fill: true }
+      ]
+    };
   }
 
   addGoal(): void {
@@ -590,7 +664,8 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   /* ===== Mind actions ===== */
   startStoicEngine(): void {
-    setInterval(() => {
+    if (this.stoicInterval) clearInterval(this.stoicInterval);
+    this.stoicInterval = setInterval(() => {
       this.stoicQuoteIndex.update(i => (i + 1) % this.stoicQuotes.length);
     }, 12000); // rotate every 12 seconds
   }
@@ -769,6 +844,9 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     }
     if (this.clarityInterval) {
       clearInterval(this.clarityInterval);
+    }
+    if (this.stoicInterval) {
+      clearInterval(this.stoicInterval);
     }
   }
 }

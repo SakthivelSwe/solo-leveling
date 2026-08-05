@@ -1,4 +1,4 @@
-<div class="nf-shell">
+﻿<div class="nf-shell">
 
   <!-- ═══ LOADING ═══════════════════════════════════════════════ -->
   @if (loading()) {
@@ -522,6 +522,15 @@
       <h2 class="section-title mono">◈ WHAT PORN DOES TO YOUR BRAIN</h2>
       <p class="section-sub tech">Science-backed evidence — know your enemy</p>
 
+      <!-- Language Toggle -->
+      <div class="lang-toggle-row">
+        <span class="lang-label tech">{{ insightLang() === 'en' ? '🌐 English' : '🗣️ Tanglish' }}</span>
+        <button class="lang-switch" (click)="toggleInsightLang()" [class.tanglish]="insightLang() === 'tanglish'">
+          <span class="lang-switch-thumb"></span>
+        </button>
+        <span class="lang-hint tech">{{ insightLang() === 'en' ? 'Switch to Tanglish' : 'Switch to English' }}</span>
+      </div>
+
       <!-- Insight tabs -->
       <div class="insight-tabs">
         <button class="it-tab tech" [class.active]="activeInsightTab() === 'BRAIN'"
@@ -549,7 +558,9 @@
                 <h3 class="ic-title mono">{{ insight.title }}</h3>
               </div>
             </div>
-            <p class="ic-desc">{{ insight.description }}</p>
+            <p class="ic-desc">
+              {{ insightLang() === 'tanglish' ? insight.descriptionTanglish : insight.description }}
+            </p>
           </div>
         }
       </div>
@@ -1099,3 +1110,4 @@
   } <!-- end status block -->
 
 </div>
+

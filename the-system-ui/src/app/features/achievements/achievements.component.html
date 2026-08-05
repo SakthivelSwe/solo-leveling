@@ -13,16 +13,38 @@
 
   <div class="head">
     <h1 class="mono title glow-text">ACHIEVEMENTS</h1>
-    <p class="tech sub">{{ unlockedCount }} / {{ catalogue.length }} UNLOCKED</p>
-    <div class="progress-track">
+    <p class="tech sub">{{ unlockedCount }} / {{ catalogue.length }} TOTAL UNLOCKED</p>
+    <div class="progress-track" style="margin-bottom: 24px;">
       <div class="progress-fill" [style.width.%]="(unlockedCount / catalogue.length) * 100"></div>
     </div>
   </div>
 
+  <div class="spotlight" *ngIf="nextUnlocks().length > 0">
+    <h3 class="mono head" style="color: #b3aef0; margin-bottom: 12px; letter-spacing: 2px; font-size: 0.9rem;">◈ NEXT UNLOCKS</h3>
+    <div class="spotlight-grid">
+      <div class="card glass-panel spotlight-card locked" *ngFor="let a of nextUnlocks()">
+        <div class="icon">🔒</div>
+        <div class="info">
+          <h3 class="a-title">{{ a.title }}</h3>
+          <p class="a-desc tech">{{ a.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button *ngFor="let cat of categories" 
+            class="filter-btn tech" 
+            [class.active]="activeCategory() === cat"
+            (click)="setCategory(cat)">
+      {{ cat }}
+    </button>
+  </div>
+
   <div class="grid">
-    <div class="card glass-panel" *ngFor="let a of catalogue; let i = index"
+    <div class="card glass-panel" *ngFor="let a of filteredCatalogue(); let i = index"
          [class.locked]="!isUnlocked(a.key)"
-         [style.animationDelay.ms]="i * 70">
+         [style.animationDelay.ms]="i * 40">
       <div class="icon">{{ isUnlocked(a.key) ? a.icon : '🔒' }}</div>
       <div class="info">
         <h3 class="a-title">{{ a.title }}</h3>

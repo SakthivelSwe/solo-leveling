@@ -9,19 +9,19 @@ import java.util.List;
  * Full No Fap Challenge status response.
  *
  * Streak is computed from DopamineLog.pornViewed == false on consecutive days.
- * No new DB table needed — reuses the existing dopamine_logs table.
+ * No new DB table needed â€” reuses the existing dopamine_logs table.
  */
 @Getter
 @Setter
 public class NoFapStatusDTO {
 
-    // ── Streak ──────────────────────────────────────────────────────────────
+    // â”€â”€ Streak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private int currentStreak;
     private int longestStreak;
     private boolean todayClean;
     private boolean todayConfirmed;
 
-    // ── Milestone ────────────────────────────────────────────────────────────
+    // â”€â”€ Milestone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Current milestone tier: 7, 30, 90, or 365 */
     private int milestone;
     /** Next milestone to aim for */
@@ -29,60 +29,60 @@ public class NoFapStatusDTO {
     /** Days remaining until next milestone */
     private int daysToNextMilestone;
 
-    // ── Phase ────────────────────────────────────────────────────────────────
+    // â”€â”€ Phase â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Phase name: "Rewiring" | "Clarity" | "Transformation" | "Mastery" */
     private String phaseName;
-    /** Phase emoji icon: 🧠 | ⚡ | 🔥 | 👑 */
+    /** Phase emoji icon: ðŸ§  | âš¡ | ðŸ”¥ | ðŸ‘‘ */
     private String phaseIcon;
     /** Phase color hex for UI theming */
     private String phaseColor;
 
-    // ── Today's science ──────────────────────────────────────────────────────
+    // â”€â”€ Today's science â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private String scienceTitle;
     private String scienceFact;
     private String scienceCategory;
 
-    // ── Full 90-day science timeline ─────────────────────────────────────────
+    // â”€â”€ Full 90-day science timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private List<ScienceDayCard> dayByDayScience;
 
-    // ── Addiction impact insights ─────────────────────────────────────────────
+    // â”€â”€ Addiction impact insights â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private List<AddictionInsight> addictionInsights;
 
-    // ── World statistics ─────────────────────────────────────────────────────
+    // â”€â”€ World statistics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private List<String> worldStats;
 
-    // ── XP bonus ─────────────────────────────────────────────────────────────
+    // â”€â”€ XP bonus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Extra XP bonus % earned this streak: 5% per 7 clean days, capped at 50% */
     private double xpBonusPct;
 
-    // ── System verdict ───────────────────────────────────────────────────────
+    // â”€â”€ System verdict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private String systemVerdict;
 
-    // ── 90-day heatmap history ────────────────────────────────────────────────
+    // â”€â”€ 90-day heatmap history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Index 0 = 89 days ago, last element = today. null = no data, true = clean, false = relapse */
     private List<Boolean> last90Days;
 
-    // ── Daily motivational quote ──────────────────────────────────────────────
+    // â”€â”€ Daily motivational quote â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Today's motivational quote based on streak day */
     private String dailyQuote;
     /** Quote author / source */
     private String dailyQuoteAuthor;
 
-    // ── Recovery velocity ─────────────────────────────────────────────────────
-    /** Recovery velocity score vs global average (0–200+, 100 = on par with average) */
+    // â”€â”€ Recovery velocity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /** Recovery velocity score vs global average (0â€“200+, 100 = on par with average) */
     private double recoveryVelocity;
 
-    // ── Phase title ───────────────────────────────────────────────────────────
+    // â”€â”€ Phase title â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Unlockable title based on current phase milestone, e.g. "Awakening Hunter" */
     private String phaseTitle;
 
-    // ── Start date ────────────────────────────────────────────────────────────
+    // â”€â”€ Start date â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** ISO date string (YYYY-MM-DD) of the first clean day in the current streak */
     private String startDate;
 
-    // ────────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Nested types
-    // ────────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Getter
     @Setter
@@ -117,17 +117,20 @@ public class NoFapStatusDTO {
         private String icon;
         private String title;
         private String description;
+        /** Tanglish (Tamil + English) version of the description */
+        private String descriptionTanglish;
         /** LOW | MEDIUM | HIGH | CRITICAL */
         private String severity;
 
         public AddictionInsight() {}
 
         public AddictionInsight(String category, String icon, String title,
-                                String description, String severity) {
+                                String description, String descriptionTanglish, String severity) {
             this.category = category;
             this.icon = icon;
             this.title = title;
             this.description = description;
+            this.descriptionTanglish = descriptionTanglish;
             this.severity = severity;
         }
     }

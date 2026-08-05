@@ -1,4 +1,4 @@
-/* ════════════════════════════════════════════════════════════════
+﻿/* ════════════════════════════════════════════════════════════════
    NO FAP CHALLENGE — Styles
    Dark, premium solo-leveling aesthetic with phase-color theming
    ════════════════════════════════════════════════════════════════ */
@@ -2266,3 +2266,58 @@
   0% { transform: translateY(0); }
   100% { transform: translateY(-100px); }
 }
+
+/* ===== LANGUAGE TOGGLE ===== */
+.lang-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: rgba(83, 74, 183, 0.08);
+  border: 1px solid rgba(83, 74, 183, 0.25);
+  border-radius: 10px;
+}
+.lang-label {
+  font-size: .72rem;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 90px;
+}
+.lang-hint {
+  font-size: .65rem;
+  color: var(--text-secondary);
+  letter-spacing: .5px;
+}
+.lang-switch {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(83,74,183,0.5);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .3s, border-color .3s;
+  flex-shrink: 0;
+  padding: 0;
+  &.tanglish {
+    background: rgba(226, 75, 74, 0.25);
+    border-color: rgba(226, 75, 74, 0.7);
+    .lang-switch-thumb {
+      transform: translateX(22px);
+      background: #E24B4A;
+    }
+  }
+}
+.lang-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #534AB7;
+  transition: transform .3s cubic-bezier(.4,0,.2,1), background .3s;
+}
+/* ===== END LANGUAGE TOGGLE ===== */

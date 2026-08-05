@@ -4,15 +4,17 @@ import { RouterLink } from '@angular/router';
 import { PlayerService } from '../../core/services/player.service';
 import { AiService } from '../../core/services/ai.service';
 import { SseService } from '../../core/services/sse.service';
-import { HeatmapDay, MonthlyReport, Title, NoFapStatus, NetWorthLog, SleepEntry, WorkoutEntry, StatusWindow } from '../../core/models/models';
+import { HeatmapDay, MonthlyReport, Title, NoFapStatus, NetWorthLog, SleepEntry, WorkoutEntry, StatusWindow, DopamineLog } from '../../core/models/models';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { fadeInUp, listStagger } from '../../shared/animations';
 import { ProgressChartComponent } from './progress-chart.component';
+import { ChartConfiguration, ChartData } from 'chart.js';
+import { NgChartsModule } from 'ng2-charts';
 
 @Component({
   selector: 'app-progress-report',
   standalone: true,
-  imports: [CommonModule, RouterLink, ProgressChartComponent],
+  imports: [CommonModule, RouterLink, ProgressChartComponent, NgChartsModule],
   templateUrl: './progress-report.component.html',
   styleUrls: ['./progress-report.component.scss'],
   animations: [fadeInUp, listStagger],
@@ -34,6 +36,16 @@ export class ProgressReportComponent implements OnInit {
   netWorth = signal<NetWorthLog[]>([]);
   sleep = signal<SleepEntry[]>([]);
   workouts = signal<WorkoutEntry[]>([]);
+  dopamine = signal<DopamineLog[]>([]);
+
+  // Dopamine Chart
+  dopaChartData: ChartData<'line'> | undefined;
+  dopaChartOptions: ChartConfiguration['options'] = {
+    responsive: true, maintainAspectRatio: false,
+    scales: { y: { display: false, min: 0 }, x: { display: false } },
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    elements: { line: { tension: 0.4 }, point: { radius: 2, hoverRadius: 4 } }
+  };
 
   // Computed Stats
   syncRate = computed(() => {
@@ -133,6 +145,24 @@ export class ProgressReportComponent implements OnInit {
     this.lifeOs.getNetWorthHistory().subscribe({ next: v => this.netWorth.set(v), error: () => {} });
     this.lifeOs.sleepHistory().subscribe({ next: v => this.sleep.set(v), error: () => {} });
     this.lifeOs.workoutHistory().subscribe({ next: v => this.workouts.set(v), error: () => {} });
+    this.lifeOs.getDopamineHistory().subscribe({ 
+      next: v => { 
+        this.dopamine.set(v); 
+        this.updateDopaChart(v);
+      }, 
+      error: () => {} 
+    });
+  }
+
+  updateDopaChart(logs: DopamineLog[]): void {
+    if (!logs || !logs.length) { this.dopaChartData = undefined; return; }
+    const sorted = [...logs].reverse();
+    this.dopaChartData = {
+      labels: sorted.map(d => d.logDate?.substring(5, 10) || ''),
+      datasets: [
+        { data: sorted.map(d => d.dopamineScore || 0), label: 'Dopamine Score', borderColor: '#FAC775', backgroundColor: 'rgba(250, 199, 117, 0.1)', fill: true }
+      ]
+    };
   }
 
   intensityColor(level: number): string {

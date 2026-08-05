@@ -84,6 +84,41 @@
       </div>
     </section>
 
+    <!-- LIFE OS METRICS (NoFap, Dopamine, Sleep) -->
+    <section class="life-os-metrics" @fadeInUp style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
+      
+      <!-- NoFap Retention -->
+      <div class="glass-panel" style="padding: 20px; border-left: 4px solid #E24B4A;">
+        <h3 class="mono" style="color: #E24B4A; margin-bottom: 8px;">◈ RETENTION</h3>
+        <div style="display: flex; align-items: baseline; gap: 12px;">
+          <span class="mono" style="font-size: 2.5rem; color: #fff;">{{ noFap()?.currentStreak || 0 }}</span>
+          <span class="tech dim">DAYS</span>
+        </div>
+        <p class="tech" style="color: #8a8a9a; font-size: 0.85rem; margin-top: 8px;">Longest: {{ noFap()?.longestStreak || 0 }} days</p>
+      </div>
+
+      <!-- Dopamine Trend -->
+      <div class="glass-panel" style="padding: 20px; border-left: 4px solid #FAC775; display: flex; flex-direction: column;">
+        <h3 class="mono" style="color: #FAC775; margin-bottom: 8px;">◈ DOPAMINE FOCUS</h3>
+        <div class="tech dim" style="margin-bottom: 12px;">Score Trend (Last 7 Days)</div>
+        <div style="flex: 1; min-height: 60px;">
+          <canvas *ngIf="dopaChartData" baseChart [data]="dopaChartData" [options]="dopaChartOptions" [type]="'line'"></canvas>
+          <div *ngIf="!dopaChartData" class="tech dim">No data</div>
+        </div>
+      </div>
+
+      <!-- Sleep Sparkline -->
+      <div class="glass-panel" style="padding: 20px; border-left: 4px solid #378ADD;">
+        <h3 class="mono" style="color: #378ADD; margin-bottom: 8px;">◈ SLEEP AVG</h3>
+        <div style="display: flex; align-items: baseline; gap: 12px;">
+          <span class="mono" style="font-size: 2.5rem; color: #fff;">{{ sleepAvgStr() }}</span>
+          <span class="tech dim">/ NIGHT</span>
+        </div>
+        <p class="tech" style="color: #8a8a9a; font-size: 0.85rem; margin-top: 8px;">7-Day Rolling Average</p>
+      </div>
+
+    </section>
+
     <!-- AI WEEKLY REVIEW -->
     <section class="ai-card glass-panel" @fadeInUp>
       <div class="ai-head">

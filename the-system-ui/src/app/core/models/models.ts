@@ -1,4 +1,4 @@
-export interface Player {
+﻿export interface Player {
   id: number;
   username: string;
   displayName: string;
@@ -724,6 +724,8 @@ export interface AddictionInsight {
   icon: string;
   title: string;
   description: string;
+  /** Tanglish (Tamil + English) version of description */
+  descriptionTanglish: string;
   /** LOW | MEDIUM | HIGH | CRITICAL */
   severity: string;
 }
@@ -790,3 +792,4 @@ export interface PlayerConfig {
   targetSleepHours: number;
   monthlyBaselineExpenses: number;
 }
+
