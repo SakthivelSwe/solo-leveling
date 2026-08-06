@@ -1,4 +1,4 @@
-﻿export interface Player {
+export interface Player {
   id: number;
   username: string;
   displayName: string;
@@ -370,7 +370,7 @@ export interface BudgetEntry {
 
 export interface ExpenseLog {
   id?: number;
-  expenseDate?: string;
+  expenseDate?: string;  // YYYY-MM-DD — supports backdating
   amount: number;
   category: string;
   description: string;
@@ -438,12 +438,62 @@ export interface AccountEntry {
 
 export interface IncomeLog {
   id?: number;
-  incomeDate?: string;
+  incomeDate?: string;  // YYYY-MM-DD — supports backdating (e.g. salary received on 5th logged on 7th)
   amount: number;
   category: string; // SALARY, FREELANCE, INVESTMENT, GIFT, OTHER
   description: string;
   accountId?: number;
   accountName?: string;
+}
+
+/** One row from an uploaded bank statement (Axis Bank / other banks) */
+export interface BankStatementRow {
+  srl?: number;
+  tranDate: string;       // DD-MM-YYYY from bank
+  chqNo?: string;
+  particulars: string;    // raw bank description e.g. "UPI/P2M/123/BLINKIT"
+  debit?: number;
+  credit?: number;
+  balance: number;
+  myLabel?: string;       // user-editable annotation: "coffee", "clothes", "EMI" etc.
+  aiCategory?: string;   // AI-classified: FOOD / TRANSPORT / SHOPPING / etc.
+  selected?: boolean;     // for import selection checkbox
+  isEditing?: boolean;    // inline label edit mode
+}
+
+/** Bank statement header info parsed from the file */
+export interface StatementHeader {
+  accountHolder: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  period?: string;         // e.g. "From: 06-05-2026 To: 06-08-2026"
+  openingBalance?: number;
+  bankName: string;        // e.g. "AXIS BANK"
+  customerNo?: string;
+}
+
+/** Chit Fund investment tracking (Tamil traditional savings — Chit/Cheetu) */
+export interface ChitFund {
+  id?: number;
+  playerId?: number;
+  chitName: string;              // e.g. "1 Lakh Chit - Shriram"
+  totalAmount: number;           // total chit value e.g. 100000
+  monthlyContribution: number;   // monthly installment e.g. 5000
+  totalMonths: number;           // 100000/5000 = 20 months
+  groupMembers?: number;         // number of members in chit group
+  startDate?: string;
+  currentMonth: number;          // months paid so far
+  totalPaid: number;             // currentMonth × monthlyContribution
+  prizeReceived: boolean;        // have you won/received the prize?
+  prizeReceivedMonth?: number;   // which month prize was received
+  prizeAmount?: number;          // actual cash/gold received
+  discountAmount?: number;       // auction discount/bid amount
+  chitType: 'REGULAR' | 'JEWEL'; // JEWEL = gold grams instead of cash
+  jewelGrams?: number;           // for jewel chit
+  status: 'ACTIVE' | 'COMPLETED' | 'WITHDRAWN';
+  chitCompany?: string;          // e.g. "Shriram Finance"
+  notes?: string;
+  lastPaymentDate?: string;
 }
 
 export interface CategoryBudget {

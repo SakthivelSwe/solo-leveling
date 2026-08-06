@@ -164,4 +164,39 @@ public class WealthController {
             yield
         );
     }
+
+    // ---- Chit Funds ----
+    @GetMapping("/chit")
+    public List<ChitFund> getChitFunds(Principal p) {
+        return wealthService.getChitFunds(currentPlayer.id(p));
+    }
+
+    @PostMapping("/chit")
+    public ChitFund createChitFund(Principal p, @RequestBody ChitFund body) {
+        return wealthService.createChitFund(currentPlayer.id(p), body);
+    }
+
+    @PutMapping("/chit/{id}/pay")
+    public ChitFund payChitInstallment(Principal p, @PathVariable Long id) {
+        return wealthService.payChitInstallment(currentPlayer.id(p), id);
+    }
+
+    @PutMapping("/chit/{id}/claim")
+    public ChitFund claimChitPrize(Principal p, @PathVariable Long id, @RequestBody Map<String, Double> body) {
+        double prizeAmount = body.getOrDefault("prizeAmount", 0.0);
+        double discountAmount = body.getOrDefault("discountAmount", 0.0);
+        return wealthService.claimChitPrize(currentPlayer.id(p), id, prizeAmount, discountAmount);
+    }
+
+    @DeleteMapping("/chit/{id}")
+    public void deleteChitFund(Principal p, @PathVariable Long id) {
+        wealthService.deleteChitFund(currentPlayer.id(p), id);
+    }
+
+    // ---- Bank Statement AI Classifier ----
+    @PostMapping("/statement/classify")
+    public List<String> classifyTransactions(Principal p, @RequestBody Map<String, List<String>> body) {
+        List<String> particulars = body.getOrDefault("particulars", List.of());
+        return wealthService.classifyTransactionDescriptions(particulars);
+    }
 }

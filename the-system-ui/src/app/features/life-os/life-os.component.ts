@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import * as XLSX from 'xlsx';
 
 import { LifeOsService } from '../../core/services/life-os.service';
 import {
@@ -13,7 +14,7 @@ import {
   InterviewReadinessDTO, DeepWorkSession, DevMasteryProgress, BudgetEntry,
   DietEntry, FoodItem, NetWorthLog, SocialConnection, PlayerConfig,
   ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary,
-  AccountEntry, IncomeLog, TransactionEntry
+  AccountEntry, IncomeLog, TransactionEntry, BankStatementRow, StatementHeader, ChitFund
 } from '../../core/models/models';
 import { fadeInUp, listStagger } from '../../shared/animations';
 
@@ -59,7 +60,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   };
 
   // ── Wealth OS ─────────────────────────────────────
-  wealthView = signal<'LEDGER' | 'ANALYTICS' | 'ACCOUNTS' | 'GOALS' | 'AI'>('LEDGER');
+  wealthView = signal<'LEDGER' | 'ANALYTICS' | 'STATEMENT' | 'GOALS' | 'AI'>('LEDGER');
   selectedPeriod = signal<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'TOTAL'>('MONTHLY');
   showTxModal = signal<boolean>(false);
   txModalType = signal<'INCOME' | 'EXPENSE' | 'TRANSFER'>('EXPENSE');
@@ -101,12 +102,31 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     { name: 'Savings', type: 'SAVINGS', balance: 0, icon: '🏆', color: '#FAC775' },
   ];
 
-  newExpense: ExpenseLog = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
+  newExpense: ExpenseLog = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false, expenseDate: new Date().toISOString().split('T')[0] };
   newEmi: EmiEntry = { loanName: '', principalAmount: 0, interestRate: 0, tenureMonths: 0, emiAmount: 0, totalPaid: 0, remainingAmount: 0, status: 'ACTIVE' };
   newSub: SubscriptionEntry = { name: '', amount: 0, frequency: 'MONTHLY', category: 'ENTERTAINMENT', isActive: true };
 
   showEmiForm = false;
   showSubForm = false;
+
+  // ── Bank Statement ─────────────────────────────────
+  statementRows = signal<BankStatementRow[]>([]);
+  statementHeader = signal<StatementHeader | null>(null);
+  statementFilter = signal<'ALL' | 'MONTH' | 'WEEK' | 'YEAR' | 'CUSTOM'>('ALL');
+  statementGroupBy = signal<'MONTH' | 'WEEK' | 'YEAR'>('MONTH');
+  isParsingStatement = signal<boolean>(false);
+  isClassifyingStatement = signal<boolean>(false);
+  statementCustomStart = '';
+  statementCustomEnd = '';
+  statementFileName = signal<string>('');
+
+  // ── Chit Funds ────────────────────────────────────
+  chitFunds = signal<ChitFund[]>([]);
+  showChitForm = signal<boolean>(false);
+  newChit: ChitFund = this.blankChit();
+  showClaimForm: { [id: number]: boolean } = {};
+  claimAmounts: { [id: number]: { prize: number; discount: number } } = {};
+  goalsSubTab = signal<'SAVINGS' | 'CHIT' | 'NETWORTH'>('SAVINGS');
 
   quickExpenseCategories = [
     { cat: 'FOOD', icon: '🍕', label: 'Food' },
@@ -252,6 +272,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         this.life.getSubscriptions().subscribe(v => this.subscriptions.set(v));
         this.startWisdomEngine();
         this.loadIncomeHistory();
+        this.life.getChitFunds().subscribe(v => this.chitFunds.set(v));
         break;
       case 'HEALTH':
         this.life.getHealthToday().subscribe(v => this.health.set(v ?? { waterGlasses: 0, breakfastEaten: false, lunchEaten: false, dinnerEaten: false }));
@@ -400,14 +421,15 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   /* ===== Wealth actions ===== */
-  switchWealthView(view: 'LEDGER' | 'ANALYTICS' | 'ACCOUNTS' | 'GOALS' | 'AI'): void {
+  switchWealthView(view: 'LEDGER' | 'ANALYTICS' | 'STATEMENT' | 'GOALS' | 'AI'): void {
     this.wealthView.set(view);
   }
 
   openTxModal(type: 'INCOME' | 'EXPENSE' | 'TRANSFER'): void {
     this.txModalType.set(type);
-    if (type === 'EXPENSE') this.newExpense = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
-    if (type === 'INCOME') this.newIncome = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
+    const today = new Date().toISOString().split('T')[0];
+    if (type === 'EXPENSE') this.newExpense = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false, expenseDate: today };
+    if (type === 'INCOME') this.newIncome = { amount: 0, category: 'SALARY', description: 'Monthly Salary', incomeDate: today };
     this.showTxModal.set(true);
   }
 
@@ -544,14 +566,16 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   logExpense(): void {
     if (this.newExpense.amount <= 0) { this.toast('⚠ Enter a valid amount'); return; }
     if (!this.newExpense.description) this.newExpense.description = this.newExpense.category;
-    
+    if (!this.newExpense.expenseDate) this.newExpense.expenseDate = new Date().toISOString().split('T')[0];
+
     this.life.logExpense(this.newExpense).subscribe(e => {
       this.toast(`◈ Expense logged: ₹${e.amount}`);
       this.expenses.update(list => [e, ...list]);
       this.life.getWeeklySummary().subscribe(v => this.weeklySummary.set(v));
       this.life.getMonthlySummary().subscribe(v => this.monthlySummary.set(v));
-      
-      this.newExpense = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false };
+
+      const today = new Date().toISOString().split('T')[0];
+      this.newExpense = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false, expenseDate: today };
     });
   }
 
@@ -615,6 +639,414 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         this.isAnalyzingWealth.set(false);
       }
     });
+  }
+
+  /* ===== Day name helper ===== */
+  getDayName(dateStr: string | undefined): string {
+    if (!dateStr) return '';
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? '' : days[d.getDay()];
+  }
+
+  /* ===== Bank Statement ===== */
+  onStatementFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.statementFileName.set(file.name);
+    this.isParsingStatement.set(true);
+    this.statementRows.set([]);
+    this.statementHeader.set(null);
+
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
+    if (ext === 'csv' || ext === 'xls' || ext === 'xlsx') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const wb = XLSX.read(data, { type: 'array' });
+          const sheet = wb.Sheets[wb.SheetNames[0]];
+          const rows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+          this.parseAxisBankXlsRows(rows);
+        } catch (err) {
+          this.toast('❌ Failed to parse statement file');
+        }
+        this.isParsingStatement.set(false);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      this.toast('❌ Please upload XLS, XLSX, or CSV file');
+      this.isParsingStatement.set(false);
+    }
+  }
+
+  private parseAxisBankXlsRows(rows: any[][]): void {
+    const header: StatementHeader = { accountHolder: '', bankName: 'AXIS BANK' };
+    const txRows: BankStatementRow[] = [];
+    let dataStarted = false;
+    let srl = 1;
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i].map(c => String(c || '').trim());
+      const joined = row.join(' ').toLowerCase();
+
+      // Parse header info
+      if (!dataStarted) {
+        if (joined.includes('name')) {
+          const nameIdx = row.findIndex(c => c.toLowerCase() === 'name' || c.toLowerCase().includes('name'));
+          if (nameIdx >= 0 && row[nameIdx + 1]) header.accountHolder = row[nameIdx + 1];
+        }
+        if (joined.includes('customer id') || joined.includes('customer no')) {
+          const idx = row.findIndex(c => c.toLowerCase().includes('customer'));
+          if (idx >= 0 && row[idx + 1]) header.customerNo = row[idx + 1];
+        }
+        if (joined.includes('ifsc')) {
+          const idx = row.findIndex(c => c.toLowerCase().includes('ifsc'));
+          if (idx >= 0 && row[idx + 1]) header.ifscCode = row[idx + 1];
+        }
+        if (joined.includes('period') || joined.includes('statement of')) {
+          header.period = row.join(' ').replace(/\s+/g, ' ');
+        }
+
+        // Detect data header row — look for "Tran Date" or "SRL" or "Date"
+        const hasTranDate = row.some(c => c.toLowerCase().includes('tran') && c.toLowerCase().includes('date'));
+        const hasSRL = row.some(c => c.toLowerCase() === 'srl' || c.toLowerCase() === 'srl no');
+        const hasDate = row.some(c => c.toLowerCase() === 'date');
+        if (hasTranDate || hasSRL || hasDate) {
+          dataStarted = true;
+          continue; // skip the header row itself
+        }
+        continue;
+      }
+
+      // Skip empty rows
+      if (!row[0] && !row[1] && !row[2]) continue;
+      // Skip OPENING BALANCE row
+      if (joined.includes('opening balance')) {
+        const balIdx = row.findIndex(c => /^\d/.test(c) && c.includes('.'));
+        if (balIdx >= 0) header.openingBalance = parseFloat(row[balIdx].replace(/,/g, ''));
+        continue;
+      }
+
+      // Try to parse a transaction row
+      // Axis Bank XLS format: SRL | Tran Date | CHQNO | PARTICULARS | CR | BAL | SOL
+      // Axis Bank PDF format: Tran Date | Chq No | Particulars | Debit | Credit | Balance
+      let tranDate = '';
+      let particulars = '';
+      let debit: number | undefined;
+      let credit: number | undefined;
+      let balance = 0;
+
+      // Try to detect format from row content
+      // Check if row[0] is a number (SRL format)
+      const isXlsFormat = /^\d+$/.test(row[0]);
+
+      if (isXlsFormat && row.length >= 5) {
+        // Axis Bank XLS: SRL NO | Tran Date | CHQNO | PARTICULARS | DR | CR | BAL | SOL
+        tranDate = row[1] || '';
+        particulars = row[3] || '';
+        
+        let debitVal = 0;
+        let creditVal = 0;
+        let balVal = 0;
+
+        if (row.length >= 7) {
+          debitVal = parseFloat((row[4] || '0').replace(/,/g, ''));
+          creditVal = parseFloat((row[5] || '0').replace(/,/g, ''));
+          balVal = parseFloat((row[6] || '0').replace(/,/g, ''));
+        } else {
+          // Fallback if columns are missing
+          debitVal = parseFloat((row[4] || '0').replace(/,/g, ''));
+          balVal = parseFloat((row[5] || '0').replace(/,/g, ''));
+        }
+
+        if (debitVal > 0) debit = debitVal;
+        if (creditVal > 0) credit = creditVal;
+        balance = isNaN(balVal) ? 0 : balVal;
+      } else if (row[0].match(/\d{2}[-\/]\d{2}[-\/]\d{2,4}/)) {
+        // Date-first format: Tran Date | Chq | Particulars | Debit | Credit | Balance
+        tranDate = row[0];
+        particulars = row[2] || row[1] || '';
+        const debitVal = parseFloat((row[3] || '0').replace(/,/g, ''));
+        const creditVal = parseFloat((row[4] || '0').replace(/,/g, ''));
+        const balVal = parseFloat((row[5] || '0').replace(/,/g, ''));
+        if (debitVal > 0) debit = debitVal;
+        if (creditVal > 0) credit = creditVal;
+        balance = isNaN(balVal) ? 0 : balVal;
+      } else {
+        continue; // skip unrecognized rows
+      }
+
+      if (!tranDate || !particulars) continue;
+
+      txRows.push({
+        srl: srl++,
+        tranDate,
+        particulars,
+        debit: isNaN(debit as number) ? undefined : debit,
+        credit: isNaN(credit as number) ? undefined : credit,
+        balance,
+        selected: true,
+        isEditing: false
+      });
+    }
+
+    this.statementHeader.set(header);
+    this.statementRows.set(txRows);
+    if (txRows.length === 0) this.toast('⚠ No transactions found. Check file format.');
+    else this.toast(`◈ Parsed ${txRows.length} transactions from statement`);
+  }
+
+  getFilteredStatementRows(): BankStatementRow[] {
+    const rows = this.statementRows();
+    const filter = this.statementFilter();
+    if (filter === 'ALL') return rows;
+
+    const now = new Date();
+    return rows.filter(r => {
+      const d = this.parseBankDate(r.tranDate);
+      if (!d) return true;
+      if (filter === 'MONTH') {
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      } else if (filter === 'WEEK') {
+        const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+        return d >= weekAgo;
+      } else if (filter === 'YEAR') {
+        return d.getFullYear() === now.getFullYear();
+      } else if (filter === 'CUSTOM') {
+        const start = this.statementCustomStart ? new Date(this.statementCustomStart) : null;
+        const end = this.statementCustomEnd ? new Date(this.statementCustomEnd) : null;
+        if (start && d < start) return false;
+        if (end && d > end) return false;
+        return true;
+      }
+      return true;
+    });
+  }
+
+  getStatementMonthGroups(): { month: string; rows: BankStatementRow[]; totalDebit: number; totalCredit: number }[] {
+    const rows = this.getFilteredStatementRows();
+    const groups: { [key: string]: BankStatementRow[] } = {};
+    for (const r of rows) {
+      const d = this.parseBankDate(r.tranDate);
+      const key = d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : 'Unknown';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    }
+    return Object.entries(groups)
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([month, rows]) => ({
+        month,
+        rows,
+        totalDebit: rows.reduce((s, r) => s + (r.debit || 0), 0),
+        totalCredit: rows.reduce((s, r) => s + (r.credit || 0), 0)
+      }));
+  }
+
+  getStatementTotals(): { totalDebit: number; totalCredit: number; net: number } {
+    const rows = this.getFilteredStatementRows();
+    const totalDebit = rows.reduce((s, r) => s + (r.debit || 0), 0);
+    const totalCredit = rows.reduce((s, r) => s + (r.credit || 0), 0);
+    return { totalDebit, totalCredit, net: totalCredit - totalDebit };
+  }
+
+  private parseBankDate(dateStr: string): Date | null {
+    if (!dateStr) return null;
+    // Handle DD-MM-YYYY or DD/MM/YYYY
+    const parts = dateStr.split(/[-\/]/);
+    if (parts.length === 3) {
+      const [d, m, y] = parts;
+      const year = y.length === 2 ? 2000 + parseInt(y) : parseInt(y);
+      return new Date(year, parseInt(m) - 1, parseInt(d));
+    }
+    return null;
+  }
+
+  startEditLabel(row: BankStatementRow): void {
+    row.isEditing = true;
+  }
+
+  saveLabel(row: BankStatementRow): void {
+    row.isEditing = false;
+  }
+
+  classifyStatementWithAi(): void {
+    const rows = this.statementRows();
+    if (rows.length === 0) { this.toast('⚠ No statement loaded'); return; }
+    this.isClassifyingStatement.set(true);
+    const particulars = rows.map(r => r.particulars);
+
+    this.life.classifyTransactions(particulars).subscribe({
+      next: (cats) => {
+        const updated = rows.map((r, i) => ({ ...r, aiCategory: cats[i] || 'MISC' }));
+        this.statementRows.set(updated);
+        this.isClassifyingStatement.set(false);
+        this.toast(`◈ AI classified ${updated.length} transactions`);
+      },
+      error: () => {
+        this.toast('⚠ AI classify failed');
+        this.isClassifyingStatement.set(false);
+      }
+    });
+  }
+
+  importSelectedToLedger(): void {
+    const selected = this.statementRows().filter(r => r.selected);
+    if (selected.length === 0) { this.toast('⚠ Select rows to import'); return; }
+    let done = 0;
+    for (const row of selected) {
+      const d = this.parseBankDate(row.tranDate);
+      const dateStr = d ? d.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+      if (row.debit && row.debit > 0) {
+        const expense: ExpenseLog = {
+          amount: row.debit,
+          category: row.aiCategory || 'MISC',
+          description: row.myLabel || row.particulars,
+          isEssential: false,
+          paymentMethod: 'UPI',
+          isRecurring: false,
+          expenseDate: dateStr
+        };
+        this.life.logExpense(expense).subscribe(() => {
+          done++;
+          if (done === selected.length) this.toast(`◈ ${done} transactions imported to ledger`);
+        });
+      } else if (row.credit && row.credit > 0) {
+        const income: IncomeLog = {
+          amount: row.credit,
+          category: row.aiCategory === 'SALARY' ? 'SALARY' : 'OTHER',
+          description: row.myLabel || row.particulars,
+          incomeDate: dateStr
+        };
+        this.life.logIncome(income).subscribe(() => {
+          done++;
+          if (done === selected.length) this.toast(`◈ ${done} transactions imported to ledger`);
+        });
+      } else {
+        done++;
+      }
+    }
+  }
+
+  exportStatementAs(format: 'CSV' | 'EXCEL'): void {
+    const rows = this.getFilteredStatementRows();
+    if (rows.length === 0) { this.toast('⚠ No data to export'); return; }
+
+    if (format === 'CSV') {
+      const header = 'Date,Particulars,Debit,Credit,Balance,My Label,Category';
+      const lines = rows.map(r =>
+        `${r.tranDate},"${r.particulars}",${r.debit || ''},${r.credit || ''},${r.balance},"${r.myLabel || ''}",${r.aiCategory || ''}`
+      );
+      const blob = new Blob([header + '\n' + lines.join('\n')], { type: 'text/csv' });
+      this.downloadBlob(blob, 'statement.csv');
+    } else {
+      const data = rows.map(r => ({
+        Date: r.tranDate, Particulars: r.particulars, Debit: r.debit || '',
+        Credit: r.credit || '', Balance: r.balance,
+        'My Label': r.myLabel || '', Category: r.aiCategory || ''
+      }));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Statement');
+      XLSX.writeFile(wb, 'statement.xlsx');
+      this.toast('◈ Excel exported');
+    }
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+    this.toast(`◈ ${filename} downloaded`);
+  }
+
+  toggleStatementRow(row: BankStatementRow): void {
+    row.selected = !row.selected;
+  }
+
+  toggleAllStatementRows(checked: boolean): void {
+    this.statementRows.update(rows => rows.map(r => ({ ...r, selected: checked })));
+  }
+
+  getStatementTopMerchant(): string {
+    const rows = this.getFilteredStatementRows().filter(r => r.debit && r.debit > 0);
+    const totals: { [k: string]: number } = {};
+    for (const r of rows) {
+      const key = r.myLabel || r.particulars.substring(0, 20);
+      totals[key] = (totals[key] || 0) + (r.debit || 0);
+    }
+    let top = ''; let max = 0;
+    for (const [k, v] of Object.entries(totals)) { if (v > max) { max = v; top = k; } }
+    return top || 'N/A';
+  }
+
+  /* ===== Chit Fund ===== */
+  addChitFund(): void {
+    if (!this.newChit.chitName || this.newChit.totalAmount <= 0 || this.newChit.monthlyContribution <= 0) {
+      this.toast('⚠ Fill all required fields'); return;
+    }
+    this.newChit.totalMonths = Math.round(this.newChit.totalAmount / this.newChit.monthlyContribution);
+    this.life.createChitFund(this.newChit).subscribe(c => {
+      this.toast(`◈ Chit Fund "${c.chitName}" started`);
+      this.chitFunds.update(list => [c, ...list]);
+      this.newChit = this.blankChit();
+      this.showChitForm.set(false);
+    });
+  }
+
+  payChitInstallment(chitId: number | undefined): void {
+    if (!chitId) return;
+    this.life.payChitInstallment(chitId).subscribe(c => {
+      this.chitFunds.update(list => list.map(x => x.id === c.id ? c : x));
+      this.toast(`◈ Month ${c.currentMonth} paid — ₹${c.monthlyContribution}`);
+    });
+  }
+
+  claimChitPrize(chit: ChitFund): void {
+    if (!chit.id) return;
+    const amounts = this.claimAmounts[chit.id] || { prize: 0, discount: 0 };
+    if (amounts.prize <= 0) { this.toast('⚠ Enter the prize amount received'); return; }
+    this.life.claimChitPrize(chit.id, amounts.prize, amounts.discount).subscribe(c => {
+      this.chitFunds.update(list => list.map(x => x.id === c.id ? c : x));
+      delete this.showClaimForm[chit.id!];
+      this.toast(`🏆 Chit prize claimed! ₹${c.prizeAmount?.toLocaleString()}`);
+    });
+  }
+
+  chitProgress(c: ChitFund): number {
+    return Math.min(100, Math.round((c.currentMonth / c.totalMonths) * 100));
+  }
+
+  chitRemainingMonths(c: ChitFund): number {
+    return Math.max(0, c.totalMonths - c.currentMonth);
+  }
+
+  chitNetBenefit(c: ChitFund): number {
+    if (!c.prizeReceived || !c.prizeAmount) return 0;
+    return c.prizeAmount - c.totalPaid;
+  }
+
+  getActiveChitMonthlyTotal(): number {
+    return this.chitFunds().filter(c => c.status === 'ACTIVE').reduce((s, c) => s + c.monthlyContribution, 0);
+  }
+
+  private blankChit(): ChitFund {
+    return {
+      chitName: '', totalAmount: 0, monthlyContribution: 0, totalMonths: 0,
+      currentMonth: 0, totalPaid: 0, prizeReceived: false,
+      chitType: 'REGULAR', status: 'ACTIVE',
+      startDate: new Date().toISOString().split('T')[0]
+    };
+  }
+
+  toggleClaimForm(chitId: number): void {
+    this.showClaimForm[chitId] = !this.showClaimForm[chitId];
+    if (this.showClaimForm[chitId] && !this.claimAmounts[chitId]) {
+      this.claimAmounts[chitId] = { prize: 0, discount: 0 };
+    }
   }
 
   /* ===== Health actions ===== */

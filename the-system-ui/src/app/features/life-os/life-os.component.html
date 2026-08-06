@@ -1,4 +1,4 @@
-<div class="life-shell">
+﻿<div class="life-shell">
   <header class="topbar">
     <div class="brand">
       <span class="mono diamond">◈</span>
@@ -461,6 +461,11 @@
           </div>
           <input type="number" class="premium-input tx-amount-input" placeholder="Amount (₹)" [(ngModel)]="newIncome.amount" />
           <input type="text" class="premium-input" placeholder="Description (e.g. July Salary)" [(ngModel)]="newIncome.description" />
+          <!-- Date picker with day name -->
+          <div class="date-picker-wrap">
+            <input type="date" class="premium-input date-input" [(ngModel)]="newIncome.incomeDate" />
+            <span class="day-name-badge" *ngIf="getDayName(newIncome.incomeDate)">{{ getDayName(newIncome.incomeDate) }}</span>
+          </div>
           <select class="premium-input" [(ngModel)]="newExpense.paymentMethod">
             <option value="UPI">UPI / Bank Transfer</option>
             <option value="CASH">Cash</option>
@@ -477,6 +482,11 @@
           </div>
           <input type="number" class="premium-input tx-amount-input" placeholder="Amount (₹)" [(ngModel)]="newExpense.amount" />
           <input type="text" class="premium-input" placeholder="Description / Shop name" [(ngModel)]="newExpense.description" />
+          <!-- Date picker with day name -->
+          <div class="date-picker-wrap">
+            <input type="date" class="premium-input date-input" [(ngModel)]="newExpense.expenseDate" />
+            <span class="day-name-badge" *ngIf="getDayName(newExpense.expenseDate)">{{ getDayName(newExpense.expenseDate) }}</span>
+          </div>
           <div style="display: flex; gap: 12px;">
             <select class="premium-input" [(ngModel)]="newExpense.paymentMethod" style="flex: 1;">
               <option value="UPI">UPI</option>
@@ -505,7 +515,7 @@
     <div class="wealth-nav">
       <button class="w-nav-btn" [class.active]="wealthView() === 'LEDGER'" (click)="switchWealthView('LEDGER')">📋 LEDGER</button>
       <button class="w-nav-btn" [class.active]="wealthView() === 'ANALYTICS'" (click)="switchWealthView('ANALYTICS')">📊 ANALYTICS</button>
-      <button class="w-nav-btn" [class.active]="wealthView() === 'ACCOUNTS'" (click)="switchWealthView('ACCOUNTS')">🏦 ACCOUNTS</button>
+      <button class="w-nav-btn" [class.active]="wealthView() === 'STATEMENT'" (click)="switchWealthView('STATEMENT')">📄 STATEMENT</button>
       <button class="w-nav-btn" [class.active]="wealthView() === 'GOALS'" (click)="switchWealthView('GOALS')">🎯 GOALS</button>
       <button class="w-nav-btn" [class.active]="wealthView() === 'AI'" (click)="switchWealthView('AI')">🤖 AI</button>
     </div>
@@ -681,133 +691,255 @@
       </div>
     </div>
 
-    <!-- ════════════════════ ACCOUNTS VIEW ════════════════════ -->
-    <div *ngIf="wealthView() === 'ACCOUNTS'" @fadeInUp>
+    <!-- ════════════════════ STATEMENT VIEW ════════════════════ -->
+    <div *ngIf="wealthView() === 'STATEMENT'" @fadeInUp>
 
-      <!-- Account Cards -->
-      <div class="accounts-grid">
-        <div class="account-card glass-card" *ngFor="let acc of accounts" [style.border-color]="acc.color + '66'">
-          <div class="acc-header">
-            <span class="acc-icon">{{ acc.icon }}</span>
-            <div>
-              <div class="acc-name tech">{{ acc.name }}</div>
-              <div class="acc-type tech" style="color: #6a6a7a; font-size: 0.65rem;">{{ acc.type }}</div>
-            </div>
+      <!-- Upload Zone -->
+      <div class="glass-card stmt-upload-card" [class.has-file]="statementRows().length > 0">
+        <div class="stmt-upload-header">
+          <div>
+            <h3 class="mono head" style="color: #4fc3f7;">◈ BANK STATEMENT ANALYZER</h3>
+            <p class="tech" style="color: #6a6a7a; font-size: 0.8rem; margin: 4px 0 0;">Upload XLS / XLSX / CSV — Axis Bank & most banks supported</p>
           </div>
-          <div class="acc-balance mono" [style.color]="acc.color">
-            ₹{{ acc.balance | number:'1.0-0' }}
+          <div class="stmt-bank-logo" *ngIf="statementHeader()">
+            <span style="font-size: 1.5rem;">🏦</span>
+            <span class="mono" style="color: #4fc3f7; font-size: 0.8rem;">{{ statementHeader()!.bankName }}</span>
           </div>
-          <div class="acc-label tech">BALANCE</div>
+        </div>
+
+        <label class="stmt-drop-zone" [class.loading]="isParsingStatement()" for="stmt-file-input">
+          <span *ngIf="!isParsingStatement() && statementRows().length === 0">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">📂</div>
+            <div class="tech" style="color: #a0aabf;">Click to select or drag & drop</div>
+            <div class="tech" style="font-size: 0.75rem; color: #6a6a7a; margin-top: 6px;">Axis Bank XLS / XLSX / CSV</div>
+          </span>
+          <span *ngIf="isParsingStatement()">
+            <div style="font-size: 2rem; animation: spin 1s linear infinite;">⚙️</div>
+            <div class="tech" style="color: #FAC775; margin-top: 8px;">Parsing statement...</div>
+          </span>
+          <span *ngIf="!isParsingStatement() && statementRows().length > 0" style="text-align: center;">
+            <div style="font-size: 1.5rem;">✅</div>
+            <div class="tech" style="color: #5DCAA5; font-size: 0.85rem;">{{ statementFileName() }}</div>
+            <div class="tech" style="color: #a0aabf; font-size: 0.75rem; margin-top: 4px;">{{ statementRows().length }} transactions · Click to replace</div>
+          </span>
+        </label>
+        <input type="file" id="stmt-file-input" accept=".xls,.xlsx,.csv" style="display:none" (change)="onStatementFileSelected($event)" />
+
+        <!-- Account Header Info -->
+        <div class="stmt-account-info" *ngIf="statementHeader() && statementHeader()!.accountHolder">
+          <div class="stmt-info-row">
+            <span class="tech" style="color: #6a6a7a;">Account Holder</span>
+            <span class="mono" style="color: #fff;">{{ statementHeader()!.accountHolder }}</span>
+          </div>
+          <div class="stmt-info-row" *ngIf="statementHeader()!.ifscCode">
+            <span class="tech" style="color: #6a6a7a;">IFSC</span>
+            <span class="mono" style="color: #a0aabf;">{{ statementHeader()!.ifscCode }}</span>
+          </div>
+          <div class="stmt-info-row" *ngIf="statementHeader()!.period">
+            <span class="tech" style="color: #6a6a7a;">Period</span>
+            <span class="tech" style="color: #FAC775; font-size: 0.8rem;">{{ statementHeader()!.period }}</span>
+          </div>
+          <div class="stmt-info-row" *ngIf="statementHeader()!.openingBalance">
+            <span class="tech" style="color: #6a6a7a;">Opening Balance</span>
+            <span class="mono" style="color: #5DCAA5;">₹{{ statementHeader()!.openingBalance! | number:'1.0-2' }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- EMI & Loan Tracker -->
-      <div class="glass-card" style="border-color: rgba(226, 75, 74, 0.4);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 class="mono head" style="color: #ff6b6b;">◈ LIABILITIES & EMI</h3>
-          <button class="sys-btn-secondary" (click)="showEmiForm = !showEmiForm" style="color: #ff6b6b; border-color: rgba(226, 75, 74, 0.5);">+ ADD LOAN</button>
-        </div>
+      <!-- Statement loaded -->
+      <ng-container *ngIf="statementRows().length > 0">
 
-        <div *ngIf="showEmiForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.06);">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px;">
-            <input type="text" class="premium-input" placeholder="Loan Name" [(ngModel)]="newEmi.loanName" />
-            <input type="number" class="premium-input" placeholder="Principal (₹)" [(ngModel)]="newEmi.principalAmount" (change)="calculateEmiAmount()" />
-            <input type="number" class="premium-input" placeholder="Interest (%)" [(ngModel)]="newEmi.interestRate" (change)="calculateEmiAmount()" />
-            <input type="number" class="premium-input" placeholder="Tenure (Months)" [(ngModel)]="newEmi.tenureMonths" (change)="calculateEmiAmount()" />
-            <div class="premium-input" style="display: flex; align-items: center; gap: 8px; background: rgba(226,75,74,0.1); border-color: rgba(226,75,74,0.3);">
-              <span class="tech" style="color: #a0aabf; font-size: 0.8rem;">EMI:</span>
-              <span class="mono" style="color: #ff6b6b;">₹{{ newEmi.emiAmount | number:'1.0-0' }}</span>
+        <!-- Summary Banner -->
+        <div class="glass-card stmt-summary-banner">
+          <div class="stmt-total-card debit-card">
+            <div class="tech" style="color: #ff6b6b; font-size: 0.7rem; letter-spacing: 1px;">TOTAL DEBITS</div>
+            <div class="mono" style="color: #ff6b6b; font-size: 1.8rem; line-height: 1;">₹{{ getStatementTotals().totalDebit | number:'1.0-0' }}</div>
+          </div>
+          <div class="stmt-total-divider"></div>
+          <div class="stmt-total-card credit-card">
+            <div class="tech" style="color: #5DCAA5; font-size: 0.7rem; letter-spacing: 1px;">TOTAL CREDITS</div>
+            <div class="mono" style="color: #5DCAA5; font-size: 1.8rem; line-height: 1;">₹{{ getStatementTotals().totalCredit | number:'1.0-0' }}</div>
+          </div>
+          <div class="stmt-total-divider"></div>
+          <div class="stmt-total-card">
+            <div class="tech" style="color: #a0aabf; font-size: 0.7rem; letter-spacing: 1px;">NET</div>
+            <div class="mono" style="font-size: 1.8rem; line-height: 1;"
+                 [style.color]="getStatementTotals().net >= 0 ? '#5DCAA5' : '#ff6b6b'">
+              {{ getStatementTotals().net >= 0 ? '+' : '' }}₹{{ getStatementTotals().net | number:'1.0-0' }}
             </div>
           </div>
-          <button class="sys-btn-primary" (click)="addEmi()" style="background: linear-gradient(180deg, #E24B4A, #b73232); border-color: #ff6b6b;">SAVE LIABILITY</button>
+          <div class="stmt-total-divider"></div>
+          <div class="stmt-total-card">
+            <div class="tech" style="color: #a0aabf; font-size: 0.7rem; letter-spacing: 1px;">TOP SPEND</div>
+            <div style="color: #FAC775; font-size: 0.85rem; margin-top: 4px; word-break: break-all;">{{ getStatementTopMerchant() }}</div>
+          </div>
         </div>
 
-        <div class="empty-state" *ngIf="emis().length === 0 && !showEmiForm">
-          <div style="font-size: 2rem; margin-bottom: 8px;">🎉</div>
-          <div class="tech" style="color: #5DCAA5;">No active liabilities. Financial freedom!</div>
+        <!-- Filter + View Controls -->
+        <div class="stmt-controls glass-card">
+          <!-- Time Filter -->
+          <div class="stmt-filter-group">
+            <span class="tech" style="color: #6a6a7a; font-size: 0.75rem;">FILTER:</span>
+            <button class="period-btn" [class.active]="statementFilter() === 'ALL'" (click)="statementFilter.set('ALL')">ALL</button>
+            <button class="period-btn" [class.active]="statementFilter() === 'MONTH'" (click)="statementFilter.set('MONTH')">THIS MONTH</button>
+            <button class="period-btn" [class.active]="statementFilter() === 'WEEK'" (click)="statementFilter.set('WEEK')">THIS WEEK</button>
+            <button class="period-btn" [class.active]="statementFilter() === 'YEAR'" (click)="statementFilter.set('YEAR')">THIS YEAR</button>
+            <button class="period-btn" [class.active]="statementFilter() === 'CUSTOM'" (click)="statementFilter.set('CUSTOM')">CUSTOM</button>
+          </div>
+          <!-- Custom date range -->
+          <div *ngIf="statementFilter() === 'CUSTOM'" class="stmt-custom-range">
+            <input type="date" class="premium-input" [(ngModel)]="statementCustomStart" style="font-size: 0.8rem; padding: 8px;" />
+            <span class="tech" style="color: #6a6a7a;">to</span>
+            <input type="date" class="premium-input" [(ngModel)]="statementCustomEnd" style="font-size: 0.8rem; padding: 8px;" />
+          </div>
+          <!-- Group by tabs -->
+          <div class="stmt-filter-group">
+            <span class="tech" style="color: #6a6a7a; font-size: 0.75rem;">VIEW:</span>
+            <button class="period-btn" [class.active]="statementGroupBy() === 'MONTH'" (click)="statementGroupBy.set('MONTH')">MONTH</button>
+            <button class="period-btn" [class.active]="statementGroupBy() === 'WEEK'" (click)="statementGroupBy.set('WEEK')">ALL ROWS</button>
+          </div>
         </div>
 
-        <div class="emi-grid">
-          <div class="emi-card" *ngFor="let emi of emis()">
-            <div class="emi-header">
-              <span class="emi-name">{{ emi.loanName }}</span>
-              <span class="mono emi-monthly" style="color: #ff6b6b;">₹{{ emi.emiAmount | number:'1.0-0' }}/mo</span>
-            </div>
-            <div class="emi-progress-wrap">
-              <div class="bar-bg">
-                <div class="bar-fill" [style.width.%]="(emi.totalPaid / emi.principalAmount) * 100" style="background: linear-gradient(90deg, #E24B4A, #ff8a8a);"></div>
+        <!-- Action Bar -->
+        <div class="stmt-action-bar glass-card">
+          <button class="sys-btn-secondary stmt-action-btn ai-classify-btn"
+                  (click)="classifyStatementWithAi()" [disabled]="isClassifyingStatement()">
+            <span *ngIf="!isClassifyingStatement()">🤖 AI CLASSIFY</span>
+            <span *ngIf="isClassifyingStatement()">⚙️ Classifying...</span>
+          </button>
+          <button class="sys-btn-secondary stmt-action-btn" (click)="exportStatementAs('CSV')" style="color: #5DCAA5; border-color: rgba(93,202,165,0.4);">
+            📥 Export CSV
+          </button>
+          <button class="sys-btn-secondary stmt-action-btn" (click)="exportStatementAs('EXCEL')" style="color: #FAC775; border-color: rgba(250,199,117,0.4);">
+            📊 Export Excel
+          </button>
+          <button class="sys-btn-primary stmt-action-btn" (click)="importSelectedToLedger()" style="padding: 8px 16px;">
+            ⚡ IMPORT SELECTED TO LEDGER
+          </button>
+        </div>
+
+        <!-- Month-grouped view -->
+        <ng-container *ngIf="statementGroupBy() === 'MONTH'">
+          <div class="glass-card stmt-month-group" *ngFor="let group of getStatementMonthGroups()">
+            <div class="stmt-month-header">
+              <span class="mono" style="color: #FAC775;">{{ group.month }}</span>
+              <div class="stmt-month-totals">
+                <span class="tech" style="color: #ff6b6b; font-size: 0.8rem;">-₹{{ group.totalDebit | number:'1.0-0' }}</span>
+                <span class="tech" style="color: #5DCAA5; font-size: 0.8rem;">+₹{{ group.totalCredit | number:'1.0-0' }}</span>
+                <span class="tech" style="color: #a0aabf; font-size: 0.75rem;">{{ group.rows.length }} txns</span>
               </div>
-              <div class="emi-stats tech">
-                <span>Paid: <span class="mono" style="color: #fff;">₹{{ emi.totalPaid | number:'1.0-0' }}</span></span>
-                <span>Left: <span class="mono" style="color: #ff6b6b;">₹{{ emi.remainingAmount | number:'1.0-0' }}</span></span>
-              </div>
             </div>
-            <div class="emi-footer">
-              <span class="tech emi-due" style="color: #FAC775; background: rgba(250,199,117,0.1); border: 1px solid rgba(250,199,117,0.3); padding: 4px 10px; border-radius: 6px;">Due: {{ emi.nextDueDate || 'TBD' }}</span>
-              <button class="sys-btn-secondary" (click)="payEmi(emi.id)" style="color: #5DCAA5; border-color: rgba(93, 202, 165, 0.5);">PAY EMI</button>
+            <div class="stmt-table-wrap">
+              <table class="stmt-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" (change)="toggleAllStatementRows($any($event.target).checked)" style="accent-color: #6C63FF;" /></th>
+                    <th class="tech">DATE</th>
+                    <th class="tech">PARTICULARS</th>
+                    <th class="tech">DEBIT</th>
+                    <th class="tech">CREDIT</th>
+                    <th class="tech">BALANCE</th>
+                    <th class="tech">MY LABEL</th>
+                    <th class="tech">CATEGORY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of group.rows"
+                      [class.stmt-row-debit]="row.debit && row.debit > 0"
+                      [class.stmt-row-credit]="row.credit && row.credit > 0">
+                    <td><input type="checkbox" [(ngModel)]="row.selected" style="accent-color: #6C63FF;" /></td>
+                    <td class="mono stmt-date">{{ row.tranDate }}</td>
+                    <td class="stmt-particulars tech">{{ row.particulars }}</td>
+                    <td class="mono stmt-debit" *ngIf="row.debit">₹{{ row.debit | number:'1.0-0' }}</td>
+                    <td class="stmt-debit" *ngIf="!row.debit">—</td>
+                    <td class="mono stmt-credit" *ngIf="row.credit">₹{{ row.credit | number:'1.0-0' }}</td>
+                    <td class="stmt-credit" *ngIf="!row.credit">—</td>
+                    <td class="mono stmt-balance">₹{{ row.balance | number:'1.0-0' }}</td>
+                    <td class="stmt-label-cell">
+                      <span *ngIf="!row.isEditing" class="stmt-label-text" (click)="startEditLabel(row)">
+                        {{ row.myLabel || '+ add label' }}
+                      </span>
+                      <input *ngIf="row.isEditing" type="text" class="stmt-label-input"
+                             [(ngModel)]="row.myLabel" (blur)="saveLabel(row)" (keyup.enter)="saveLabel(row)"
+                             placeholder="coffee, food, EMI..." autofocus />
+                    </td>
+                    <td>
+                      <span class="ai-cat-badge" *ngIf="row.aiCategory" [attr.data-cat]="row.aiCategory">{{ row.aiCategory }}</span>
+                      <span class="tech" *ngIf="!row.aiCategory" style="color: #6a6a7a; font-size: 0.7rem;">—</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-      </div>
+        </ng-container>
 
-      <!-- Subscriptions -->
-      <div class="glass-card" style="border-color: rgba(186, 117, 23, 0.4);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 class="mono head" style="color: #FAC775;">◈ SUBSCRIPTIONS</h3>
-          <button class="sys-btn-secondary" (click)="showSubForm = !showSubForm" style="color: #FAC775; border-color: rgba(250,199,117,0.5);">+ ADD</button>
-        </div>
-
-        <div *ngIf="showSubForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-          <input type="text" class="premium-input" placeholder="Service (e.g. Netflix)" [(ngModel)]="newSub.name" style="margin-bottom: 12px;" />
-          <input type="number" class="premium-input" placeholder="Amount (₹)" [(ngModel)]="newSub.amount" style="margin-bottom: 16px;" />
-          <button class="sys-btn-primary" (click)="addSubscription()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775;">ADD SUBSCRIPTION</button>
-        </div>
-
-        <div class="sub-list">
-          <div class="sub-row" *ngFor="let s of subscriptions()" [style.opacity]="s.isActive ? '1' : '0.5'">
-            <div class="sub-left">
-              <div class="sub-name">{{ s.name }}</div>
-              <div class="sub-freq tech">{{ s.frequency }} · {{ s.category }}</div>
-            </div>
-            <div class="sub-right">
-              <span class="mono sub-amt">₹{{ s.amount | number:'1.0-0' }}</span>
-              <button class="sys-btn-secondary sub-toggle" (click)="toggleSub(s.id)" [style.color]="s.isActive ? '#ff6b6b' : '#5DCAA5'" [style.border-color]="s.isActive ? 'rgba(226,75,74,0.4)' : 'rgba(93,202,165,0.4)'">
-                {{ s.isActive ? 'CANCEL' : 'ACTIVATE' }}
-              </button>
+        <!-- All Rows flat view -->
+        <ng-container *ngIf="statementGroupBy() === 'WEEK'">
+          <div class="glass-card">
+            <div class="stmt-table-wrap">
+              <table class="stmt-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" (change)="toggleAllStatementRows($any($event.target).checked)" style="accent-color: #6C63FF;" /></th>
+                    <th class="tech">DATE</th>
+                    <th class="tech">PARTICULARS</th>
+                    <th class="tech">DEBIT</th>
+                    <th class="tech">CREDIT</th>
+                    <th class="tech">BALANCE</th>
+                    <th class="tech">MY LABEL</th>
+                    <th class="tech">CATEGORY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of getFilteredStatementRows()"
+                      [class.stmt-row-debit]="row.debit && row.debit > 0"
+                      [class.stmt-row-credit]="row.credit && row.credit > 0">
+                    <td><input type="checkbox" [(ngModel)]="row.selected" style="accent-color: #6C63FF;" /></td>
+                    <td class="mono stmt-date">{{ row.tranDate }}</td>
+                    <td class="stmt-particulars tech">{{ row.particulars }}</td>
+                    <td class="mono stmt-debit" *ngIf="row.debit">₹{{ row.debit | number:'1.0-0' }}</td>
+                    <td class="stmt-debit" *ngIf="!row.debit">—</td>
+                    <td class="mono stmt-credit" *ngIf="row.credit">₹{{ row.credit | number:'1.0-0' }}</td>
+                    <td class="stmt-credit" *ngIf="!row.credit">—</td>
+                    <td class="mono stmt-balance">₹{{ row.balance | number:'1.0-0' }}</td>
+                    <td class="stmt-label-cell">
+                      <span *ngIf="!row.isEditing" class="stmt-label-text" (click)="startEditLabel(row)">
+                        {{ row.myLabel || '+ add label' }}
+                      </span>
+                      <input *ngIf="row.isEditing" type="text" class="stmt-label-input"
+                             [(ngModel)]="row.myLabel" (blur)="saveLabel(row)" (keyup.enter)="saveLabel(row)"
+                             placeholder="coffee, food, EMI..." autofocus />
+                    </td>
+                    <td>
+                      <span class="ai-cat-badge" *ngIf="row.aiCategory" [attr.data-cat]="row.aiCategory">{{ row.aiCategory }}</span>
+                      <span class="tech" *ngIf="!row.aiCategory" style="color: #6a6a7a; font-size: 0.7rem;">—</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
+        </ng-container>
 
-        <div class="tech sub-total" *ngIf="subscriptions().length > 0 && monthlySummary()">
-          Total monthly: <span class="mono" style="color: #FAC775;">₹{{ monthlySummary()!.subscriptionTotal | number:'1.0-0' }}</span>
-        </div>
-      </div>
-
-      <!-- Budget Settings -->
-      <div class="glass-card" style="border-color: rgba(250,199,117,0.3);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="mono head" style="color: #FAC775;">◈ BUDGET SETTINGS</h3>
-          <button class="sys-btn-secondary" (click)="showBudgetForm = !showBudgetForm" style="color: #FAC775; border-color: rgba(250,199,117,0.4);">+ UPDATE</button>
-        </div>
-        <div *ngIf="showBudgetForm" class="form-panel" style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; margin-top: 16px;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <input type="number" class="premium-input" placeholder="Salary (₹)" [(ngModel)]="newBudget.salary" />
-            <input type="number" class="premium-input" placeholder="PG / Rent (₹)" [(ngModel)]="newBudget.pgRent" />
-            <input type="number" class="premium-input" placeholder="Invested in SIP (₹)" [(ngModel)]="newBudget.sipAmount" />
-            <input type="number" class="premium-input" placeholder="Cash Saved (₹)" [(ngModel)]="newBudget.saved" />
-          </div>
-          <button class="sys-btn-primary" (click)="saveBudget()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775;">SAVE BUDGET</button>
-        </div>
-        <div *ngIf="!showBudgetForm" class="tech" style="color: #8a8a9a; margin-top: 12px; line-height: 1.7; font-size: 0.9rem;">
-          Set your monthly salary and target savings. The system will compute your 50-30-20 rule compliance and net savings rate automatically.
-        </div>
-      </div>
+      </ng-container>
     </div>
 
+
+    <!-- ════════════════════ GOALS VIEW ════════════════════ -->
     <!-- ════════════════════ GOALS VIEW ════════════════════ -->
     <div *ngIf="wealthView() === 'GOALS'" @fadeInUp>
 
-      <!-- Savings Goals -->
+      <!-- Goals Sub-Tabs -->
+      <div class="goals-subtabs">
+        <button class="goals-subtab" [class.active]="goalsSubTab() === 'SAVINGS'" (click)="goalsSubTab.set('SAVINGS')">🎯 SAVINGS</button>
+        <button class="goals-subtab" [class.active]="goalsSubTab() === 'CHIT'" (click)="goalsSubTab.set('CHIT')">🪙 CHIT FUNDS</button>
+        <button class="goals-subtab" [class.active]="goalsSubTab() === 'NETWORTH'" (click)="goalsSubTab.set('NETWORTH')">📈 NET WORTH</button>
+      </div>
+
+      <!-- ── SAVINGS GOALS ── -->
+      <ng-container *ngIf="goalsSubTab() === 'SAVINGS'">
+
       <div class="glass-card" style="border-color: rgba(29,158,117,0.4);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h3 class="mono head" style="color: #5DCAA5;">◈ SAVINGS GOALS</h3>
@@ -856,8 +988,167 @@
           </div>
         </div>
       </div>
+      </ng-container>  <!-- end SAVINGS -->
 
-      <!-- Net Worth -->
+      <!-- ── CHIT FUNDS ── -->
+      <ng-container *ngIf="goalsSubTab() === 'CHIT'">
+
+        <!-- Monthly Commitment Banner -->
+        <div class="glass-card chit-banner" *ngIf="chitFunds().length > 0">
+          <div class="chit-banner-item">
+            <div class="tech" style="color: #6a6a7a; font-size: 0.7rem; letter-spacing: 1px;">ACTIVE CHITS</div>
+            <div class="mono" style="color: #FAC775; font-size: 1.8rem;">{{ chitFunds().length }}</div>
+          </div>
+          <div class="chit-banner-divider"></div>
+          <div class="chit-banner-item">
+            <div class="tech" style="color: #6a6a7a; font-size: 0.7rem; letter-spacing: 1px;">MONTHLY COMMIT</div>
+            <div class="mono" style="color: #ff6b6b; font-size: 1.8rem;">₹{{ getActiveChitMonthlyTotal() | number:'1.0-0' }}</div>
+          </div>
+          <div class="chit-banner-divider"></div>
+          <div class="chit-banner-item">
+            <div class="tech" style="color: #6a6a7a; font-size: 0.7rem; letter-spacing: 1px;">TOTAL INVESTED</div>
+            <div class="mono" style="color: #5DCAA5; font-size: 1.8rem;">₹{{ chitFunds().reduce !== undefined ? 0 : 0 | number:'1.0-0' }}</div>
+          </div>
+        </div>
+
+        <!-- Chit Fund Info Banner -->
+        <div class="glass-card chit-info-card">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <span style="font-size: 2rem;">🪙</span>
+            <div>
+              <div class="mono" style="color: #FAC775;">CHIT FUND (CHEETU)</div>
+              <div class="tech" style="color: #6a6a7a; font-size: 0.8rem;">Tamil traditional rotating savings scheme</div>
+            </div>
+          </div>
+          <div class="tech" style="color: #8a8a9a; font-size: 0.82rem; line-height: 1.6;">
+            A group of members contribute monthly. Total amount = members × monthly. Each month one member wins the prize (auction price = total − discount). <strong style="color: #FAC775;">Jewel Chit</strong> = prize is gold grams instead of cash.
+          </div>
+        </div>
+
+        <!-- Add New Chit Fund -->
+        <div class="glass-card" style="border-color: rgba(250,199,117,0.4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 class="mono head" style="color: #FAC775;">◈ MY CHIT FUNDS</h3>
+            <button class="sys-btn-secondary" (click)="showChitForm.set(!showChitForm())" style="color: #FAC775; border-color: rgba(250,199,117,0.4);">+ NEW CHIT</button>
+          </div>
+
+          <!-- New Chit Form -->
+          <div *ngIf="showChitForm()" class="chit-form-panel">
+            <div class="chit-form-grid">
+              <input type="text" class="premium-input" placeholder="Chit Name (e.g. 1 Lakh Chit - Shriram)" [(ngModel)]="newChit.chitName" />
+              <input type="text" class="premium-input" placeholder="Chit Company (e.g. Shriram Finance)" [(ngModel)]="newChit.chitCompany" />
+              <input type="number" class="premium-input" placeholder="Total Chit Amount (₹)" [(ngModel)]="newChit.totalAmount" />
+              <input type="number" class="premium-input" placeholder="Monthly Installment (₹)" [(ngModel)]="newChit.monthlyContribution" />
+              <input type="number" class="premium-input" placeholder="Group Members" [(ngModel)]="newChit.groupMembers" />
+              <input type="date" class="premium-input" [(ngModel)]="newChit.startDate" />
+            </div>
+            <div style="display: flex; gap: 12px; margin: 12px 0;">
+              <select class="premium-input" [(ngModel)]="newChit.chitType" style="flex: 1;">
+                <option value="REGULAR">💰 Regular Chit (Cash)</option>
+                <option value="JEWEL">💛 Jewel Chit (Gold)</option>
+              </select>
+              <input *ngIf="newChit.chitType === 'JEWEL'" type="number" class="premium-input" placeholder="Gold Grams" [(ngModel)]="newChit.jewelGrams" style="flex: 1;" />
+            </div>
+            <div class="chit-calc-preview" *ngIf="newChit.totalAmount > 0 && newChit.monthlyContribution > 0">
+              <span class="tech" style="color: #6a6a7a;">Duration:</span>
+              <span class="mono" style="color: #FAC775;">{{ (newChit.totalAmount / newChit.monthlyContribution) | number:'1.0-0' }} months</span>
+            </div>
+            <button class="sys-btn-primary" (click)="addChitFund()" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775; margin-top: 12px;">START CHIT FUND</button>
+          </div>
+
+          <!-- Chit Fund Cards Grid -->
+          <div class="chit-cards-grid" *ngIf="chitFunds().length > 0">
+            <div class="chit-card" *ngFor="let c of chitFunds()" [class.chit-completed]="c.status === 'COMPLETED'">
+              <!-- Ring -->
+              <div class="chit-ring-wrap">
+                <svg viewBox="0 0 100 100" class="chit-ring">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="42" fill="none"
+                          [attr.stroke]="c.prizeReceived ? '#FAC775' : '#6C63FF'"
+                          stroke-width="8"
+                          [attr.stroke-dasharray]="263.9"
+                          [attr.stroke-dashoffset]="263.9 * (1 - chitProgress(c) / 100)"
+                          stroke-linecap="round" transform="rotate(-90 50 50)"
+                          style="transition: stroke-dashoffset 1s ease;"/>
+                  <text x="50" y="48" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">{{ chitProgress(c) }}%</text>
+                  <text x="50" y="63" text-anchor="middle" fill="#8a8a9a" font-size="10">{{ c.currentMonth }}/{{ c.totalMonths }}mo</text>
+                </svg>
+                <div class="chit-type-badge" [class.jewel]="c.chitType === 'JEWEL'">
+                  {{ c.chitType === 'JEWEL' ? '💛 JEWEL' : '💰 CASH' }}
+                </div>
+              </div>
+
+              <!-- Info -->
+              <div class="chit-info">
+                <div class="chit-name">{{ c.chitName }}</div>
+                <div class="chit-company" *ngIf="c.chitCompany">{{ c.chitCompany }}</div>
+
+                <div class="chit-stats">
+                  <div class="chit-stat">
+                    <div class="tech" style="color: #6a6a7a; font-size: 0.65rem;">TOTAL CHIT</div>
+                    <div class="mono" style="color: #fff;">₹{{ c.totalAmount | number:'1.0-0' }}</div>
+                  </div>
+                  <div class="chit-stat">
+                    <div class="tech" style="color: #6a6a7a; font-size: 0.65rem;">MONTHLY</div>
+                    <div class="mono" style="color: #FAC775;">₹{{ c.monthlyContribution | number:'1.0-0' }}</div>
+                  </div>
+                  <div class="chit-stat">
+                    <div class="tech" style="color: #6a6a7a; font-size: 0.65rem;">PAID SO FAR</div>
+                    <div class="mono" style="color: #5DCAA5;">₹{{ c.totalPaid | number:'1.0-0' }}</div>
+                  </div>
+                  <div class="chit-stat">
+                    <div class="tech" style="color: #6a6a7a; font-size: 0.65rem;">REMAINING</div>
+                    <div class="mono" style="color: #a0aabf;">{{ chitRemainingMonths(c) }} months</div>
+                  </div>
+                </div>
+
+                <!-- Jewel info -->
+                <div *ngIf="c.chitType === 'JEWEL' && c.jewelGrams" class="chit-jewel-info">
+                  <span class="tech" style="color: #FAC775; font-size: 0.75rem;">🥇 Prize: {{ c.jewelGrams }}g Gold</span>
+                </div>
+
+                <!-- Prize received -->
+                <div *ngIf="c.prizeReceived" class="chit-prize-received">
+                  <span style="font-size: 1.1rem;">🏆</span>
+                  <span class="mono" style="color: #FAC775;">Prize Received: ₹{{ c.prizeAmount | number:'1.0-0' }}</span>
+                  <span class="tech" style="color: #6a6a7a; font-size: 0.75rem;">Discount: ₹{{ c.discountAmount | number:'1.0-0' }}</span>
+                </div>
+
+                <!-- Status badge -->
+                <div class="chit-status-badge" [attr.data-status]="c.status">{{ c.status }}</div>
+
+                <!-- Actions -->
+                <div class="chit-actions" *ngIf="c.status === 'ACTIVE'">
+                  <button class="sys-btn-secondary chit-pay-btn" (click)="payChitInstallment(c.id)">💳 PAY ₹{{ c.monthlyContribution | number:'1.0-0' }}</button>
+                  <button class="sys-btn-secondary chit-claim-btn" *ngIf="!c.prizeReceived" (click)="showClaimForm[c.id!] = !showClaimForm[c.id!]" style="color: #FAC775; border-color: rgba(250,199,117,0.4);">🏆 RECEIVED PRIZE</button>
+                </div>
+
+                <!-- Claim Form -->
+                <div *ngIf="showClaimForm[c.id!]" class="chit-claim-form">
+                  <input type="number" class="premium-input" placeholder="Prize Amount Received (₹)" [(ngModel)]="claimAmounts[c.id!].prize" style="margin-bottom: 8px;" />
+                  <input type="number" class="premium-input" placeholder="Discount / Bid Amount (₹)" [(ngModel)]="claimAmounts[c.id!].discount" style="margin-bottom: 8px;" />
+                  <button class="sys-btn-primary" (click)="claimChitPrize(c)" style="background: linear-gradient(180deg, #BA7517, #8c5710); border-color: #FAC775;">CONFIRM PRIZE</button>
+                </div>
+
+                <div *ngIf="c.lastPaymentDate" class="tech" style="color: #6a6a7a; font-size: 0.72rem; margin-top: 8px;">
+                  Last paid: {{ c.lastPaymentDate | date:'d MMM yyyy' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="chitFunds().length === 0 && !showChitForm()">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">🪙</div>
+            <div class="tech" style="color: #8a8a9a;">No chit funds tracked yet.</div>
+            <div class="tech" style="color: #6a6a7a; font-size: 0.8rem; margin-top: 4px;">Add your Shriram / Kapil / local chit fund to track installments</div>
+          </div>
+        </div>
+
+      </ng-container>  <!-- end CHIT -->
+
+      <!-- ── NET WORTH ── -->
+      <ng-container *ngIf="goalsSubTab() === 'NETWORTH'">
+
       <div class="glass-card" style="border-color: rgba(29,158,117,0.3);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h3 class="mono head" style="color: #1D9E75;">◈ NET WORTH</h3>
@@ -890,7 +1181,9 @@
           <button class="sys-btn-primary" (click)="saveNetWorth()" style="background: linear-gradient(180deg, #1D9E75, #147354); border-color: #5DCAA5;">SAVE NET WORTH</button>
         </div>
       </div>
-    </div>
+      </ng-container>  <!-- end NETWORTH -->
+
+    </div>  <!-- end GOALS view -->
 
     <!-- ════════════════════ AI VIEW ════════════════════ -->
     <div *ngIf="wealthView() === 'AI'" @fadeInUp>

@@ -9,7 +9,8 @@ import {
   DailyMissionDTO, DopamineLog, DeepWorkSession, InterviewReadinessDTO, DopamineSummary,
   SkillTreeNode, Shadow, BodyMetric, SleepEntry, MoodPoint, WorkoutEntry, Player, NoFapStatus,
   NetWorthLog, SocialConnection, PlayerConfig,
-  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary, IncomeLog
+  ExpenseLog, EmiEntry, SubscriptionEntry, WeeklySummary, MonthlySummary, IncomeLog,
+  ChitFund
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -85,7 +86,25 @@ export class LifeOsService {
 
   // Income
   logIncome(b: IncomeLog): Observable<IncomeLog> { return this.http.post<IncomeLog>(`${this.api}/wealth/income`, b); }
-  getIncomeHistory(): Observable<IncomeLog[]> { return this.http.get<IncomeLog[]>(`${this.api}/wealth/income`); }
+  getIncomeHistory(start?: string, end?: string): Observable<IncomeLog[]> { 
+    let query = '';
+    if (start && end) query = `?start=${start}&end=${end}`;
+    return this.http.get<IncomeLog[]>(`${this.api}/wealth/income${query}`); 
+  }
+
+  // Chit Funds
+  getChitFunds(): Observable<ChitFund[]> { return this.http.get<ChitFund[]>(`${this.api}/wealth/chit`); }
+  createChitFund(b: ChitFund): Observable<ChitFund> { return this.http.post<ChitFund>(`${this.api}/wealth/chit`, b); }
+  payChitInstallment(id: number): Observable<ChitFund> { return this.http.put<ChitFund>(`${this.api}/wealth/chit/${id}/pay`, {}); }
+  claimChitPrize(id: number, prizeAmount: number, discountAmount: number): Observable<ChitFund> {
+    return this.http.put<ChitFund>(`${this.api}/wealth/chit/${id}/claim`, { prizeAmount, discountAmount });
+  }
+  deleteChitFund(id: number): Observable<void> { return this.http.delete<void>(`${this.api}/wealth/chit/${id}`); }
+
+  // Bank Statement AI Classifier
+  classifyTransactions(particulars: string[]): Observable<string[]> {
+    return this.http.post<string[]>(`${this.api}/wealth/statement/classify`, { particulars });
+  }
 
   /* ===== Health OS ===== */
   getHealthToday(): Observable<HealthLog> { return this.http.get<HealthLog>(`${this.api}/health/today`); }

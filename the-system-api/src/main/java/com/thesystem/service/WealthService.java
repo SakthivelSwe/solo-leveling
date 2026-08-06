@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class WealthService {
     private final IncomeLogRepository incomeRepo;
     private final FinancialAssetRepository assetRepo;
     private final PlayerRepository playerRepo;
+    private final ChitFundRepository chitRepo;
 
     public WealthService(BudgetEntryRepository budgetRepo, 
                          SavingsGoalRepository goalRepo, 
@@ -39,7 +41,8 @@ public class WealthService {
                          AiProviderService aiProviderService,
                          IncomeLogRepository incomeRepo,
                          FinancialAssetRepository assetRepo,
-                         PlayerRepository playerRepo) {
+                         PlayerRepository playerRepo,
+                         ChitFundRepository chitRepo) {
         this.budgetRepo = budgetRepo;
         this.goalRepo = goalRepo;
         this.netWorthRepo = netWorthRepo;
@@ -51,6 +54,7 @@ public class WealthService {
         this.incomeRepo = incomeRepo;
         this.assetRepo = assetRepo;
         this.playerRepo = playerRepo;
+        this.chitRepo = chitRepo;
     }
 
     // ---- Income ----
@@ -350,5 +354,92 @@ public class WealthService {
         a.setCost(costPerShare);
         a.setDailyGoldYield(yieldPerShare);
         return assetRepo.save(a);
+    }
+
+    // ---- Chit Funds ----
+    public List<ChitFund> getChitFunds(Long playerId) {
+        return chitRepo.findByPlayerIdOrderByStartDateDesc(playerId);
+    }
+
+    public ChitFund createChitFund(Long playerId, ChitFund body) {
+        body.setId(null);
+        body.setPlayerId(playerId);
+        if (body.getStartDate() == null) body.setStartDate(LocalDate.now());
+        if (body.getStatus() == null) body.setStatus("ACTIVE");
+        if (body.getTotalMonths() == 0 && body.getMonthlyContribution() > 0) {
+            body.setTotalMonths((int) Math.round(body.getTotalAmount() / body.getMonthlyContribution()));
+        }
+        if (body.getGroupMembers() == 0) body.setGroupMembers(body.getTotalMonths());
+        return chitRepo.save(body);
+    }
+
+    public ChitFund payChitInstallment(Long playerId, Long chitId) {
+        ChitFund chit = chitRepo.findById(chitId)
+            .orElseThrow(() -> new ApiException("Chit fund not found", HttpStatus.NOT_FOUND));
+        if (!chit.getPlayerId().equals(playerId)) throw new ApiException("Not your chit", HttpStatus.FORBIDDEN);
+        if ("COMPLETED".equals(chit.getStatus())) throw new ApiException("Chit is already completed", HttpStatus.BAD_REQUEST);
+
+        chit.setCurrentMonth(chit.getCurrentMonth() + 1);
+        chit.setTotalPaid(chit.getCurrentMonth() * chit.getMonthlyContribution());
+        chit.setLastPaymentDate(LocalDate.now());
+
+        if (chit.getCurrentMonth() >= chit.getTotalMonths()) {
+            chit.setStatus("COMPLETED");
+        }
+        return chitRepo.save(chit);
+    }
+
+    public ChitFund claimChitPrize(Long playerId, Long chitId, double prizeAmount, double discountAmount) {
+        ChitFund chit = chitRepo.findById(chitId)
+            .orElseThrow(() -> new ApiException("Chit fund not found", HttpStatus.NOT_FOUND));
+        if (!chit.getPlayerId().equals(playerId)) throw new ApiException("Not your chit", HttpStatus.FORBIDDEN);
+        if (chit.isPrizeReceived()) throw new ApiException("Prize already claimed", HttpStatus.BAD_REQUEST);
+
+        chit.setPrizeReceived(true);
+        chit.setPrizeReceivedMonth(chit.getCurrentMonth());
+        chit.setPrizeAmount(prizeAmount);
+        chit.setDiscountAmount(discountAmount);
+        return chitRepo.save(chit);
+    }
+
+    public void deleteChitFund(Long playerId, Long chitId) {
+        ChitFund chit = chitRepo.findById(chitId)
+            .orElseThrow(() -> new ApiException("Chit fund not found", HttpStatus.NOT_FOUND));
+        if (!chit.getPlayerId().equals(playerId)) throw new ApiException("Not your chit", HttpStatus.FORBIDDEN);
+        chitRepo.delete(chit);
+    }
+
+    // ---- Bank Statement AI Classifier ----
+    public List<String> classifyTransactionDescriptions(List<String> particulars) {
+        if (particulars == null || particulars.isEmpty()) return new ArrayList<>();
+
+        StringBuilder prompt = new StringBuilder(
+            "Classify each bank transaction into ONE category from: FOOD, TRANSPORT, SHOPPING, ONLINE_ORDER, ENTERTAINMENT, BILLS, HEALTH, EDUCATION, SALARY, TRANSFER, ATM, INVESTMENT, MISC.\n" +
+            "Reply with ONLY a comma-separated list of categories matching the same order as input. No spaces after commas.\n" +
+            "Transactions:\n");
+        for (int i = 0; i < particulars.size(); i++) {
+            prompt.append(i + 1).append(". ").append(particulars.get(i)).append("\n");
+        }
+
+        try {
+            String response = aiProviderService.generate(
+                AiProviderService.Scenario.COACHING,
+                "You are a bank transaction classifier. Reply ONLY with comma-separated category names.",
+                prompt.toString()
+            );
+            // parse comma-separated
+            String[] parts = response.trim().split(",");
+            List<String> result = new ArrayList<>();
+            for (String p : parts) {
+                result.add(p.trim().toUpperCase());
+            }
+            // pad if AI returned fewer
+            while (result.size() < particulars.size()) result.add("MISC");
+            return result.subList(0, particulars.size());
+        } catch (Exception e) {
+            List<String> fallback = new ArrayList<>();
+            for (int i = 0; i < particulars.size(); i++) fallback.add("MISC");
+            return fallback;
+        }
     }
 }
