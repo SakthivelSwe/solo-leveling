@@ -711,7 +711,7 @@
           <span *ngIf="!isParsingStatement() && statementRows().length === 0">
             <div style="font-size: 2.5rem; margin-bottom: 12px;">📂</div>
             <div class="tech" style="color: #a0aabf;">Click to select or drag & drop</div>
-            <div class="tech" style="font-size: 0.75rem; color: #6a6a7a; margin-top: 6px;">Axis Bank XLS / XLSX / CSV</div>
+            <div class="tech" style="font-size: 0.75rem; color: #6a6a7a; margin-top: 6px;">Axis Bank XLS / XLSX / CSV / PDF</div>
           </span>
           <span *ngIf="isParsingStatement()">
             <div style="font-size: 2rem; animation: spin 1s linear infinite;">⚙️</div>
@@ -723,7 +723,7 @@
             <div class="tech" style="color: #a0aabf; font-size: 0.75rem; margin-top: 4px;">{{ statementRows().length }} transactions · Click to replace</div>
           </span>
         </label>
-        <input type="file" id="stmt-file-input" accept=".xls,.xlsx,.csv" style="display:none" (change)="onStatementFileSelected($event)" />
+        <input type="file" id="stmt-file-input" accept=".xls,.xlsx,.csv,.pdf" style="display:none" (change)="onStatementFileSelected($event)" />
 
         <!-- Account Header Info -->
         <div class="stmt-account-info" *ngIf="statementHeader() && statementHeader()!.accountHolder">

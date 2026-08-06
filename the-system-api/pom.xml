@@ -41,6 +41,13 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Apache PDFBox for parsing PDF bank statements -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
         <!-- Lombok - reduces entity boilerplate -->
         <dependency>
             <groupId>org.projectlombok</groupId>

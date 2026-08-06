@@ -157,6 +157,13 @@ export class LifeOsService {
     return this.http.post<any[]>(`${this.api}/ai/commander/directive`, config);
   }
 
+  /* ===== Bank Statement Upload ===== */
+  uploadPdfStatement(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.api}/wealth/statement/parse-pdf`, formData);
+  }
+
   /* ===== Dopamine OS ===== */
   logDopamine(b: DopamineLog): Observable<DopamineLog> { return this.http.post<DopamineLog>(`${this.api}/dopamine/log`, b); }
   getDopamineToday(): Observable<DopamineSummary> { return this.http.get<DopamineSummary>(`${this.api}/dopamine/today`); }

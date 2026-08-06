@@ -1,4 +1,4 @@
-:host { display: block; }
+﻿:host { display: block; }
 
 .life-shell {
   max-width: 1180px; margin: 0 auto;
@@ -127,11 +127,11 @@
   text-align: center;
 }
 
-.sys-btn-primary:hover:not([disabled]) {
+@media (hover: hover) and (pointer: fine) { .sys-btn-primary:hover:not([disabled]) {
   filter: brightness(1.15);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(108, 99, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
+} }
 
 .sys-btn-primary:active:not([disabled]) {
   transform: translateY(1px);
@@ -158,11 +158,11 @@
   backdrop-filter: blur(4px);
 }
 
-.sys-btn-secondary:hover {
+@media (hover: hover) and (pointer: fine) { .sys-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
-}
+} }
 
 .sys-btn-secondary:active {
   transform: translateY(1px);
@@ -257,11 +257,11 @@
   .tab { padding: 10px 14px; font-size: .7rem; }
 }
 
-/* ═══════════════════════════════════════════════
-   WEALTH OS — MONEY MANAGER PREMIUM STYLES
-   ═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   WEALTH OS â€” MONEY MANAGER PREMIUM STYLES
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* ── Wealth Sub-Navigation ── */
+/* â”€â”€ Wealth Sub-Navigation â”€â”€ */
 .wealth-nav {
   display: flex;
   gap: 6px;
@@ -301,7 +301,7 @@
   }
 }
 
-/* ── Wealth Header Summary Bar ── */
+/* â”€â”€ Wealth Header Summary Bar â”€â”€ */
 .wealth-header {
   padding: 20px 24px;
   border-color: rgba(250,199,117,0.3) !important;
@@ -340,7 +340,7 @@
   margin: 0 12px;
 }
 
-/* ── Period Filter Pill Tabs ── */
+/* â”€â”€ Period Filter Pill Tabs â”€â”€ */
 .period-filter {
   display: flex;
   gap: 8px;
@@ -368,7 +368,7 @@
   }
 }
 
-/* ── Transaction List ── */
+/* â”€â”€ Transaction List â”€â”€ */
 .tx-list {
   padding: 0;
   overflow: hidden;
@@ -441,7 +441,7 @@
   &.amount-expense { color: #ff6b6b; }
 }
 
-/* ── Transaction Modal ── */
+/* â”€â”€ Transaction Modal â”€â”€ */
 .tx-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -520,7 +520,7 @@
 .income-btn { background: linear-gradient(180deg, #1D9E75, #147354) !important; border-color: #5DCAA5 !important; }
 .expense-btn { background: linear-gradient(180deg, #E24B4A, #b73232) !important; border-color: #ff6b6b !important; }
 
-/* ── Category Button Grid ── */
+/* â”€â”€ Category Button Grid â”€â”€ */
 .cat-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -555,7 +555,7 @@
   color: #8a8a9a;
 }
 
-/* ── Account Cards ── */
+/* â”€â”€ Account Cards â”€â”€ */
 .accounts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -579,7 +579,7 @@
 .acc-balance { font-size: 1.3rem; font-weight: 700; }
 .acc-label { font-size: 0.6rem; letter-spacing: 1.5px; color: #6a6a7a; margin-top: 2px; }
 
-/* ── Overview Grid ── */
+/* â”€â”€ Overview Grid â”€â”€ */
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -602,7 +602,7 @@
 }
 .ov-val { font-family: 'Share Tech Mono', monospace; font-size: 1.4rem; }
 
-/* ── Budget Health Bar ── */
+/* â”€â”€ Budget Health Bar â”€â”€ */
 .budget-health-wrap { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
 .budget-bar {
   display: flex;
@@ -631,7 +631,7 @@
   font-weight: 600;
 }
 
-/* ── Category Table ── */
+/* â”€â”€ Category Table â”€â”€ */
 .category-table { display: flex; flex-direction: column; gap: 10px; }
 .cat-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cat-row-left { display: flex; align-items: center; gap: 8px; min-width: 100px; }
@@ -640,7 +640,7 @@
 .cat-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
 .cat-bar-fill { height: 100%; background: linear-gradient(90deg, #6C63FF, #b3aef0); border-radius: 3px; }
 
-/* ── Weekly Stats ── */
+/* â”€â”€ Weekly Stats â”€â”€ */
 .weekly-hero { text-align: center; margin: 16px 0 20px; }
 .week-change-badge {
   display: inline-block;
@@ -662,7 +662,7 @@
 .w-stat-label { font-size: 0.65rem; letter-spacing: 1px; color: #6a6a7a; margin-bottom: 6px; }
 .w-stat-val { font-size: 0.95rem; font-weight: 600; color: #fff; }
 
-/* ── EMI Grid ── */
+/* â”€â”€ EMI Grid â”€â”€ */
 .emi-grid { display: flex; flex-direction: column; gap: 14px; }
 .emi-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(226,75,74,0.2); border-radius: 12px; padding: 16px; }
 .emi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -672,7 +672,7 @@
 .emi-stats { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.75rem; color: #6a6a7a; }
 .emi-footer { display: flex; justify-content: space-between; align-items: center; }
 
-/* ── Subscriptions ── */
+/* â”€â”€ Subscriptions â”€â”€ */
 .sub-list { display: flex; flex-direction: column; gap: 2px; }
 .sub-row {
   display: flex;
@@ -691,7 +691,7 @@
 .sub-toggle { padding: 4px 10px !important; font-size: 0.7rem !important; }
 .sub-total { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); color: #6a6a7a; font-size: 0.85rem; }
 
-/* ── Goals Grid ── */
+/* â”€â”€ Goals Grid â”€â”€ */
 .goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 .goal-card {
   display: flex;
@@ -711,13 +711,13 @@
 .goal-vals { font-size: 0.85rem; margin-bottom: 4px; word-break: break-word; }
 .goal-btns { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 
-/* ── Net Worth Display ── */
+/* â”€â”€ Net Worth Display â”€â”€ */
 .nw-display { display: flex; align-items: center; gap: 24px; padding: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; flex-wrap: wrap; }
 .nw-main { flex: 1; }
 .nw-split { display: flex; gap: 20px; }
 .nw-metric { text-align: center; }
 
-/* ── AI Analyst Card ── */
+/* â”€â”€ AI Analyst Card â”€â”€ */
 .ai-wealth-card { border-color: rgba(108,99,255,0.35) !important; }
 .ai-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
 .ai-icon { font-size: 2.5rem; }
@@ -775,7 +775,7 @@
   font-size: 0.9rem;
 }
 
-/* ── Wisdom Card (compact) ── */
+/* â”€â”€ Wisdom Card (compact) â”€â”€ */
 .wisdom-card {
   text-align: center;
   border-color: rgba(250,199,117,0.3) !important;
@@ -786,7 +786,7 @@
 .wisdom-text { font-size: 1.1rem; font-style: italic; color: #fff; line-height: 1.6; margin-bottom: 8px; }
 .wisdom-author { font-size: 0.8rem; color: #a0aabf; }
 
-/* ── Floating Action Button ── */
+/* â”€â”€ Floating Action Button â”€â”€ */
 .wealth-fab {
   position: fixed;
   bottom: 90px;
@@ -816,7 +816,7 @@
   60% { box-shadow: 0 4px 24px rgba(226,75,74,0.5), 0 0 0 12px rgba(226,75,74,0); }
 }
 
-/* ── Empty State ── */
+/* â”€â”€ Empty State â”€â”€ */
 .empty-state {
   text-align: center;
   padding: 32px 20px;
@@ -834,7 +834,7 @@
   .wealth-fab { bottom: 80px; right: 14px; }
 }
 
-/* ═══════════════════ JOB KANBAN ═══════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• JOB KANBAN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .job-kanban {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -887,7 +887,7 @@
 }
 .kc-empty { font-size: 0.75rem; color: #8a8a9a; text-align: center; padding: 12px; }
 
-/* ═══════════════════ PILLAR ROWS ═══════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PILLAR ROWS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .pillar-row {
   display: grid;
   grid-template-columns: 32px 1fr auto;
@@ -922,9 +922,9 @@
   .job-kanban { grid-template-columns: 1fr 1fr; }
 }
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // DATE PICKER + DAY NAME BADGE
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 .date-picker-wrap {
   display: flex;
   align-items: center;
@@ -959,9 +959,9 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // BANK STATEMENT VIEW
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 .stmt-upload-card {
   margin-bottom: 0;
   transition: border-color 0.3s ease;
@@ -1152,7 +1152,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.04);
     transition: background 0.15s ease;
 
-    &:hover { background: rgba(255,255,255,0.03); }
+    @media (hover: hover) and (pointer: fine) { &:hover { background: rgba(255,255,255,0.03); } }
     &:last-child { border-bottom: none; }
 
     &.stmt-row-debit { border-left: 2px solid rgba(226,75,74,0.3); }
@@ -1241,9 +1241,9 @@
   &[data-cat="HEALTH"] { background: rgba(93,202,165,0.12); color: #5DCAA5; border-color: rgba(93,202,165,0.3); }
 }
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // GOALS SUB-TABS
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 .goals-subtabs {
   display: flex;
   gap: 8px;
@@ -1277,9 +1277,9 @@
   }
 }
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // CHIT FUND STYLES
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 .chit-banner {
   display: flex;
   align-items: stretch;
@@ -1512,3 +1512,11 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+
+
+/* Production Level Table & Mobile UX Enhancements */
+.stmt-table-wrap { max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.stmt-table thead th { position: sticky; top: 0; z-index: 10; background: #1a1a2e; box-shadow: 0 1px 0 rgba(255,255,255,0.1); }
+@media (max-width: 768px) { .stmt-table td, .stmt-table th { padding: 16px 12px; font-size: 0.85rem; } .sys-btn-primary, .sys-btn-secondary { padding: 14px 20px; font-size: 1rem; } .stmt-pagination button { padding: 12px 16px; } .tab { padding: 14px 18px; } }
+

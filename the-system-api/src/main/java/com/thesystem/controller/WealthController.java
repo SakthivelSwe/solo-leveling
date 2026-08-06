@@ -1,9 +1,12 @@
 package com.thesystem.controller;
 
 import com.thesystem.entity.*;
+import com.thesystem.dto.StatementParseResponse;
 import com.thesystem.security.CurrentPlayer;
+import com.thesystem.service.StatementParserService;
 import com.thesystem.service.WealthService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -14,10 +17,12 @@ import java.util.Map;
 public class WealthController {
 
     private final WealthService wealthService;
+    private final StatementParserService statementParserService;
     private final CurrentPlayer currentPlayer;
 
-    public WealthController(WealthService wealthService, CurrentPlayer currentPlayer) {
+    public WealthController(WealthService wealthService, StatementParserService statementParserService, CurrentPlayer currentPlayer) {
         this.wealthService = wealthService;
+        this.statementParserService = statementParserService;
         this.currentPlayer = currentPlayer;
     }
 
@@ -198,5 +203,10 @@ public class WealthController {
     public List<String> classifyTransactions(Principal p, @RequestBody Map<String, List<String>> body) {
         List<String> particulars = body.getOrDefault("particulars", List.of());
         return wealthService.classifyTransactionDescriptions(particulars);
+    }
+
+    @PostMapping("/statement/parse-pdf")
+    public StatementParseResponse parsePdfStatement(@RequestParam("file") MultipartFile file) throws Exception {
+        return statementParserService.parseAxisBankPdf(file);
     }
 }
