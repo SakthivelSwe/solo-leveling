@@ -110,7 +110,7 @@
   --duration-slow:   420ms;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; touch-action: manipulation; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
 /* Enable GPU-accelerated 3D across the app — perspective on html causes
