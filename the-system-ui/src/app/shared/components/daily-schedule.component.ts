@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -362,6 +362,7 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
   private readonly lifeOsSvc = inject(LifeOsService);
   private readonly notificationsSvc = inject(LocalNotificationsService);
   private readonly snack = inject(MatSnackBar);
+  private readonly ngZone = inject(NgZone);
   readonly schedule   = this.svc.items;
   readonly config     = this.svc.config;
 
@@ -422,7 +423,12 @@ export class DailyScheduleComponent implements OnInit, OnDestroy {
   isGenerating = signal(false);
   draft: DraftForm = this.emptyDraft();
 
-  ngOnInit():  void { this.tick(); this.timer = setInterval(() => this.tick(), 30_000); }
+  ngOnInit():  void { 
+    this.tick(); 
+    this.ngZone.runOutsideAngular(() => {
+      this.timer = setInterval(() => this.tick(), 30_000); 
+    });
+  }
   ngOnDestroy(): void { clearInterval(this.timer); }
 
   private tick(): void {

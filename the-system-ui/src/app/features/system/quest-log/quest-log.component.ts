@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -39,8 +39,9 @@ const SKIP_MSGS: Record<string, string[]> = {
   templateUrl: './quest-log.component.html',
   styleUrls: ['./quest-log.component.scss'],
   animations: [listStagger],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QuestLogComponent implements OnInit {
+export class QuestLogComponent implements OnInit, OnChanges {
   todayDateNum = new Date().getDate();
   @Input({ required: true }) quests: Quest[] = [];      // daily quests
   @Input() weeklyQuests: Quest[] = [];
@@ -107,6 +108,45 @@ export class QuestLogComponent implements OnInit {
     private uiState: UiStateService
   ) {}
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['quests'] || changes['weeklyQuests'] || changes['monthlyQuests'] || changes['milestoneQuests']) {
+      this.recalculateArrays();
+    }
+  }
+
+  setCategory(cat: string): void {
+    this.selectedCategory = cat;
+    this.recalculateArrays();
+  }
+
+  // ── Cached lists ────────────────────────────────────────────────────────────
+  _filteredDaily: Quest[] = [];
+  _filteredWeekly: Quest[] = [];
+  _filteredMonthly: Quest[] = [];
+  _filteredMilestones: Quest[] = [];
+  
+  _doneCount = 0;
+  _pendingCount = 0;
+  _weeklyDone = 0;
+  _monthlyDone = 0;
+  _milestonesDone = 0;
+
+  recalculateArrays(): void {
+    const list = this.selectedCategory === 'ALL'
+      ? this.quests
+      : this.quests.filter(q => q.category === this.selectedCategory);
+    this._filteredDaily = [...list].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
+    
+    this._filteredWeekly = [...this.weeklyQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
+    this._filteredMonthly = [...this.monthlyQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
+    this._filteredMilestones = [...this.milestoneQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
+    
+    this._doneCount = this.quests.filter(q => q.isCompleted).length;
+    this._pendingCount = this.quests.filter(q => !q.isCompleted).length;
+    this._weeklyDone = this.weeklyQuests.filter(q => q.isCompleted).length;
+    this._monthlyDone = this.monthlyQuests.filter(q => q.isCompleted).length;
+    this._milestonesDone = this.milestoneQuests.filter(q => q.isCompleted).length;
+  }
 
   /** Expose Math to template for progress calculations. */
   readonly Math = Math;
@@ -117,7 +157,10 @@ export class QuestLogComponent implements OnInit {
   setTab(tab: QuestTab): void {
     this.activeTab = tab;
     this.skipWarningKey = null;
-    if (tab === 'today') this.selectedCategory = 'ALL';
+    if (tab === 'today') {
+       this.selectedCategory = 'ALL';
+       this.recalculateArrays();
+    }
   }
 
   get tabLabel(): string {
@@ -140,32 +183,18 @@ export class QuestLogComponent implements OnInit {
 
   // ── Quest lists ─────────────────────────────────────────────────────────────
 
-  get filteredDaily(): Quest[] {
-    const list = this.selectedCategory === 'ALL'
-      ? this.quests
-      : this.quests.filter(q => q.category === this.selectedCategory);
-    return [...list].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
-  }
-
-  get filteredWeekly(): Quest[] {
-    return [...this.weeklyQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
-  }
-
-  get filteredMonthly(): Quest[] {
-    return [...this.monthlyQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
-  }
-
-  get filteredMilestones(): Quest[] {
-    return [...this.milestoneQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
-  }
+  get filteredDaily(): Quest[] { return this._filteredDaily; }
+  get filteredWeekly(): Quest[] { return this._filteredWeekly; }
+  get filteredMonthly(): Quest[] { return this._filteredMonthly; }
+  get filteredMilestones(): Quest[] { return this._filteredMilestones; }
 
   // ── Counts ──────────────────────────────────────────────────────────────────
 
-  get doneCount():      number { return this.quests.filter(q => q.isCompleted).length; }
-  get pendingCount():   number { return this.quests.filter(q => !q.isCompleted).length; }
-  get weeklyDone():     number { return this.weeklyQuests.filter(q => q.isCompleted).length; }
-  get monthlyDone():    number { return this.monthlyQuests.filter(q => q.isCompleted).length; }
-  get milestonesDone(): number { return this.milestoneQuests.filter(q => q.isCompleted).length; }
+  get doneCount():      number { return this._doneCount; }
+  get pendingCount():   number { return this._pendingCount; }
+  get weeklyDone():     number { return this._weeklyDone; }
+  get monthlyDone():    number { return this._monthlyDone; }
+  get milestonesDone(): number { return this._milestonesDone; }
 
   progressPct(tab: QuestTab): number {
     switch (tab) {

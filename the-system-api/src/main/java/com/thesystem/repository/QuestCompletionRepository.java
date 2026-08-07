@@ -23,6 +23,12 @@ public interface QuestCompletionRepository extends JpaRepository<QuestCompletion
 
     List<QuestCompletion> findByPlayerIdOrderByCompletedAtDesc(Long playerId);
 
+    @Query("SELECT DISTINCT c.questId FROM QuestCompletion c WHERE c.playerId = :playerId")
+    java.util.Set<Long> findCompletedQuestIdsByPlayerId(@Param("playerId") Long playerId);
+
+    @Query("SELECT c.completedAt, COUNT(c) FROM QuestCompletion c WHERE c.playerId = :playerId GROUP BY c.completedAt ORDER BY c.completedAt DESC")
+    List<Object[]> countCompletionsByDate(@Param("playerId") Long playerId);
+
     /** Counts completions in a date window — used for WEEKLY and MONTHLY quest duplicate checks. */
     boolean existsByPlayerIdAndQuestIdAndCompletedAtBetween(Long playerId, Long questId,
                                                              LocalDate start, LocalDate end);

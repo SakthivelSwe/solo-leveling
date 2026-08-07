@@ -105,10 +105,12 @@ public class QuestService {
         LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate weekEnd = today;
 
+        List<QuestCompletion> completions = completionRepository.findByPlayerIdAndCompletedAtBetween(playerId, weekStart, weekEnd);
+        Map<Long, Long> counts = completions.stream().collect(Collectors.groupingBy(QuestCompletion::getQuestId, Collectors.counting()));
+
         return questRepository.findWeeklyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .map(q -> {
-                    long doneCount = completionRepository.countByPlayerIdAndQuestIdAndCompletedAtBetween(
-                            playerId, q.getId(), weekStart, weekEnd);
+                    long doneCount = counts.getOrDefault(q.getId(), 0L);
                     boolean isCompleted = doneCount >= 1;
                     QuestDTO dto = toDto(q, isCompleted, player);
                     return new QuestDTO(dto.id(), dto.questKey(), dto.label(), dto.category(),
@@ -132,10 +134,12 @@ public class QuestService {
         LocalDate monthStart = today.withDayOfMonth(1);
         LocalDate monthEnd = today;
 
+        List<QuestCompletion> completions = completionRepository.findByPlayerIdAndCompletedAtBetween(playerId, monthStart, monthEnd);
+        Map<Long, Long> counts = completions.stream().collect(Collectors.groupingBy(QuestCompletion::getQuestId, Collectors.counting()));
+
         return questRepository.findMonthlyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .map(q -> {
-                    long doneCount = completionRepository.countByPlayerIdAndQuestIdAndCompletedAtBetween(
-                            playerId, q.getId(), monthStart, monthEnd);
+                    long doneCount = counts.getOrDefault(q.getId(), 0L);
                     boolean isCompleted = doneCount >= 1;
                     QuestDTO dto = toDto(q, isCompleted, player);
                     return new QuestDTO(dto.id(), dto.questKey(), dto.label(), dto.category(),
@@ -156,8 +160,7 @@ public class QuestService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
 
-        Set<Long> completedAllTime = completionRepository.findByPlayerIdOrderByCompletedAtDesc(playerId)
-                .stream().map(QuestCompletion::getQuestId).collect(Collectors.toSet());
+        Set<Long> completedAllTime = completionRepository.findCompletedQuestIdsByPlayerId(playerId);
 
         return questRepository.findMilestoneQuests(player.getLevel()).stream()
                 .map(q -> toDto(q, completedAllTime.contains(q.getId()), player))

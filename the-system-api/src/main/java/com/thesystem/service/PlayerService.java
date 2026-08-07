@@ -231,10 +231,14 @@ public class PlayerService {
     /**
      * Streak = consecutive days (ending today or yesterday) with at least 5 quests completed.
      */
-    public int calculateStreak(Long playerId) {        List<QuestCompletion> all =
-                completionRepository.findByPlayerIdOrderByCompletedAtDesc(playerId);
-        Map<LocalDate, Long> countByDate = all.stream()
-                .collect(Collectors.groupingBy(QuestCompletion::getCompletedAt, Collectors.counting()));
+    public int calculateStreak(Long playerId) {
+        List<Object[]> dateCounts = completionRepository.countCompletionsByDate(playerId);
+        Map<LocalDate, Long> countByDate = new HashMap<>();
+        for (Object[] row : dateCounts) {
+            LocalDate date = (LocalDate) row[0];
+            Long count = ((Number) row[1]).longValue();
+            countByDate.put(date, count);
+        }
 
         int streak = 0;
         LocalDate cursor = LocalDate.now();

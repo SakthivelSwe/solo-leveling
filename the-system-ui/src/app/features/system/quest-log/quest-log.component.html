@@ -94,7 +94,7 @@
     <button *ngFor="let c of dailyCategories" class="filter-btn tech"
             [class.active]="selectedCategory === c.key"
             [style.--fc]="c.color"
-            (click)="selectedCategory = c.key">
+            (click)="setCategory(c.key)">
       {{ c.label }}
     </button>
   </div>
