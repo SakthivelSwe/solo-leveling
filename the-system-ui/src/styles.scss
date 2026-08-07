@@ -10,7 +10,6 @@
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Touch Interaction Optimizations Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 *, body, button, a {
-  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -110,7 +109,7 @@
   --duration-slow:   250ms;
 }
 
-* { box-sizing: border-box; touch-action: manipulation; }
+* { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
 /* Enable GPU-accelerated 3D across the app Ã¢â‚¬â€ perspective on html causes

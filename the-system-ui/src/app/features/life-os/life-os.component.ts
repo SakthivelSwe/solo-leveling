@@ -30,12 +30,12 @@ type Tab = 'CAREER' | 'HEALTH' | 'MIND' | 'WEALTH' | 'ENGLISH' | 'BODY' | 'RELAT
 })
 export class LifeOsComponent implements OnInit, OnDestroy {
   readonly tabs: { key: Tab; label: string; icon: string; color: string }[] = [
-    { key: 'CAREER', label: 'Career', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¼', color: '#534AB7' },
+    { key: 'CAREER', label: 'Career', icon: '💼', color: '#534AB7' },
     { key: 'HEALTH', label: 'Health', icon: 'ÃƒÂ¢Ã‚ÂÃ‚Â¤', color: '#1D9E75' },
-    { key: 'MIND', label: 'Mind', icon: 'ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â ', color: '#378ADD' },
-    { key: 'WEALTH', label: 'Wealth', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â°', color: '#FAC775' },
+    { key: 'MIND', label: 'Mind', icon: '🧠', color: '#378ADD' },
+    { key: 'WEALTH', label: 'Wealth', icon: '💰', color: '#FAC775' },
     { key: 'ENGLISH', label: 'English', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â€Ã‚Âº', color: '#BA7517' },
-    { key: 'BODY', label: 'Body', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Âª', color: '#E24B4A' },
+    { key: 'BODY', label: 'Body', icon: '💪', color: '#E24B4A' },
     { key: 'RELATIONSHIP', label: 'Bonds', icon: 'ÃƒÂ°Ã…Â¸Ã‚Â¤Ã‚Â', color: '#F0997B' },
   ];
   active = signal<Tab>('CAREER');
@@ -59,7 +59,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     elements: { line: { tension: 0.4 }, point: { radius: 4, hoverRadius: 6 } }
   };
 
-  // ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Wealth OS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+  // ─ Wealth OS ─
   wealthView = signal<'LEDGER' | 'ANALYTICS' | 'STATEMENT' | 'GOALS' | 'AI'>('LEDGER');
   selectedPeriod = signal<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'TOTAL'>('MONTHLY');
   showTxModal = signal<boolean>(false);
@@ -87,18 +87,18 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   incomeHistory = signal<IncomeLog[]>([]);
   newIncome: IncomeLog = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
   incomeCategories = [
-    { cat: 'SALARY', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¼', label: 'Salary' },
-    { cat: 'FREELANCE', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â»', label: 'Freelance' },
-    { cat: 'INVESTMENT', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‹â€ ', label: 'Returns' },
+    { cat: 'SALARY', icon: '💼', label: 'Salary' },
+    { cat: 'FREELANCE', icon: '💻', label: 'Freelance' },
+    { cat: 'INVESTMENT', icon: '📈', label: 'Returns' },
     { cat: 'GIFT', icon: 'ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â', label: 'Gift' },
-    { cat: 'OTHER', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â°', label: 'Other' }
+    { cat: 'OTHER', icon: '💰', label: 'Other' }
   ];
 
-  // Accounts (local state ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â calculated from transactions)
+  // Accounts (local state — calculated from transactions)
   accounts: AccountEntry[] = [
-    { name: 'Cash', type: 'CASH', balance: 0, icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Âµ', color: '#1D9E75' },
+    { name: 'Cash', type: 'CASH', balance: 0, icon: '💵', color: '#1D9E75' },
     { name: 'UPI / Bank', type: 'BANK', balance: 0, icon: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â¦', color: '#378ADD' },
-    { name: 'Credit Card', type: 'CARD', balance: 0, icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â³', color: '#E24B4A' },
+    { name: 'Credit Card', type: 'CARD', balance: 0, icon: '💳', color: '#E24B4A' },
     { name: 'Savings', type: 'SAVINGS', balance: 0, icon: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â½', color: '#FAC775' },
   ];
 
@@ -109,7 +109,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   showEmiForm = false;
   showSubForm = false;
 
-  // ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Bank Statement ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+  // ─ Bank Statement ─
   statementRows = signal<BankStatementRow[]>([]);
   statementHeader = signal<StatementHeader | null>(null);
   statementHistory = signal<any[]>([]);
@@ -125,7 +125,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   statementPageSize = signal<number>(50);
   isExportingStatement = signal(false);
 
-  // ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Chit Funds ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+  // ─ Chit Funds ─
   chitFunds = signal<ChitFund[]>([]);
   showChitForm = signal<boolean>(false);
   newChit: ChitFund = this.blankChit();
@@ -134,15 +134,15 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   goalsSubTab = signal<'SAVINGS' | 'CHIT' | 'NETWORTH'>('SAVINGS');
 
   quickExpenseCategories = [
-    { cat: 'FOOD', icon: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Â¢', label: 'Food' },
-    { cat: 'TRANSPORT', icon: 'ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â‚¬â€', label: 'Transport' },
-    { cat: 'SHOPPING', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ‚Â', label: 'Shopping' },
-    { cat: 'ONLINE_ORDER', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¦', label: 'Online' },
-    { cat: 'ENTERTAINMENT', icon: 'ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¥', label: 'Ent.' },
-    { cat: 'BILLS', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹', label: 'Bills' },
-    { cat: 'HEALTH', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…Â ', label: 'Health' },
-    { cat: 'EDUCATION', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â¡', label: 'Edu.' },
-    { cat: 'MISC', icon: 'ÃƒÂ¢Ã‚Â­Ã‚Â', label: 'Misc' }
+    { cat: 'FOOD', icon: '🍕', label: 'Food' },
+    { cat: 'TRANSPORT', icon: '🚗', label: 'Transport' },
+    { cat: 'SHOPPING', icon: '🛍', label: 'Shopping' },
+    { cat: 'ONLINE_ORDER', icon: '📦', label: 'Online' },
+    { cat: 'ENTERTAINMENT', icon: '🎥', label: 'Ent.' },
+    { cat: 'BILLS', icon: '📋', label: 'Bills' },
+    { cat: 'HEALTH', icon: '💊', label: 'Health' },
+    { cat: 'EDUCATION', icon: '📚', label: 'Edu.' },
+    { cat: 'MISC', icon: '⭐', label: 'Misc' }
   ];
 
   // Wisdom Engine Carousel
@@ -174,14 +174,14 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   isGeneratingReport = signal<boolean>(false);
 
   foodCatalog: FoodItem[] = [
-    { name: 'Idli (3 pcs)', category: 'Carb', baseGrams: 150, calories: 117, protein: 3, vitamins: 'Iron, B-Vitamins', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒâ€¦Ã‚Â¡' },
-    { name: 'Curd Rice', category: 'Probiotic', baseGrams: 200, calories: 230, protein: 6, vitamins: 'Calcium, B12', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã‚Âº' },
-    { name: 'Boiled Eggs (2)', category: 'Protein', baseGrams: 100, calories: 155, protein: 13, vitamins: 'B12, Vitamin D', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¥Ãƒâ€¦Ã‚Â¡' },
-    { name: 'Peanuts (Roasted)', category: 'Nut', baseGrams: 30, calories: 161, protein: 7, vitamins: 'Vitamin E, Magnesium', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¥Ãƒâ€¦Ã¢â‚¬Å“' },
-    { name: 'Banana', category: 'Fruit', baseGrams: 118, calories: 105, protein: 1, vitamins: 'Potassium, Vitamin B6', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒâ€¦Ã¢â‚¬â„¢' },
-    { name: 'Chana / Sundal', category: 'Protein', baseGrams: 100, calories: 164, protein: 9, vitamins: 'Iron, Folate', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ' },
-    { name: 'Chapati (2 pcs)', category: 'Carb', baseGrams: 80, calories: 200, protein: 6, vitamins: 'Iron, Magnesium', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â«ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ' },
-    { name: 'Milk (1 Glass)', category: 'Dairy', baseGrams: 200, calories: 122, protein: 6, vitamins: 'Calcium, Vitamin D', icon: 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¥ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âº' }
+    { name: 'Idli (3 pcs)', category: 'Carb', baseGrams: 150, calories: 117, protein: 3, vitamins: 'Iron, B-Vitamins', icon: '🥟' },
+    { name: 'Curd Rice', category: 'Probiotic', baseGrams: 200, calories: 230, protein: 6, vitamins: 'Calcium, B12', icon: '🥣' },
+    { name: 'Boiled Eggs (2)', category: 'Protein', baseGrams: 100, calories: 155, protein: 13, vitamins: 'B12, Vitamin D', icon: '🥚' },
+    { name: 'Peanuts (Roasted)', category: 'Nut', baseGrams: 30, calories: 161, protein: 7, vitamins: 'Vitamin E, Magnesium', icon: '🥜' },
+    { name: 'Banana', category: 'Fruit', baseGrams: 118, calories: 105, protein: 1, vitamins: 'Potassium, Vitamin B6', icon: '🍌' },
+    { name: 'Chana / Sundal', category: 'Protein', baseGrams: 100, calories: 164, protein: 9, vitamins: 'Iron, Folate', icon: '🥙' },
+    { name: 'Chapati (2 pcs)', category: 'Carb', baseGrams: 80, calories: 200, protein: 6, vitamins: 'Iron, Magnesium', icon: '🫓' },
+    { name: 'Milk (1 Glass)', category: 'Dairy', baseGrams: 200, calories: 122, protein: 6, vitamins: 'Calcium, Vitamin D', icon: '🥛' }
   ];
 
   // Mind
@@ -218,7 +218,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   sleepHours = signal<number>(7);
   stepCount = signal<number>(0);
 
-  // Body ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â computed testosterone score from pillars
+  // Body — computed testosterone score from pillars
   testosteroneScore = computed(() => {
     const b = this.body();
     if (!b) return 0;
@@ -301,7 +301,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   private toast(msg: string): void {
-    this.snack.open(msg, 'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
+    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
   }
 
   /** Compute total protein consumed today from diet history */
@@ -332,24 +332,24 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   /* ===== Career actions ===== */
   addJob(): void {
-    if (!this.newJob.company || !this.newJob.role) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Company and role required'); return; }
+    if (!this.newJob.company || !this.newJob.role) { this.toast('⚠ Company and role required'); return; }
     this.life.createJob(this.newJob).subscribe(v => {
       this.jobs.update(j => [v, ...j]);
       this.newJob = this.blankJob();
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Job application logged');
+      this.toast('◈ Job application logged');
     });
   }
 
   syncDevMastery(): void {
-    this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Syncing with Dev-Mastery...');
+    this.toast('◈ Syncing with Dev-Mastery...');
     this.life.syncDevMastery().subscribe({
       next: v => {
         this.devMastery.set(v);
-        this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Dev-Mastery Progress Synced!');
+        this.toast('◈ Dev-Mastery Progress Synced!');
       },
       error: err => {
         const msg = err.error?.message || 'Sync failed. Ensure Dev-Mastery is running.';
-        this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  ' + msg);
+        this.toast('⚠ ' + msg);
       }
     });
   }
@@ -361,9 +361,9 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     });
   }
   addLeet(): void {
-    if (!this.newLeet.problemName) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Problem name required'); return; }
+    if (!this.newLeet.problemName) { this.toast('⚠ Problem name required'); return; }
     this.life.logLeetcode(this.newLeet).subscribe(() => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  LeetCode solve logged');
+      this.toast('◈ LeetCode solve logged');
       this.newLeet = this.blankLeet();
       this.life.leetcodeStats().subscribe(v => this.leetStats.set(v));
       this.life.leetcodeHistory().subscribe(v => this.leetHistory.set(v.slice(0, 8)));
@@ -371,7 +371,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   addDeepWork(): void {
-    if (this.newDeepWork.codingMinutes <= 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Minutes must be greater than 0'); return; }
+    if (this.newDeepWork.codingMinutes <= 0) { this.toast('⚠ Minutes must be greater than 0'); return; }
     this.life.logDeepWork(this.newDeepWork).subscribe(res => {
       this.toast('Deep work logged! +' + res.focusXpEarned + ' XP');
       this.life.getDeepWorkWeekly().subscribe(v => {
@@ -395,9 +395,9 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   addGoal(): void {
-    if (!this.newGoal.goalName || this.newGoal.target <= 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Valid name and target required'); return; }
+    if (!this.newGoal.goalName || this.newGoal.target <= 0) { this.toast('⚠ Valid name and target required'); return; }
     this.life.createGoal(this.newGoal).subscribe(g => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Savings Goal Added');
+      this.toast('◈ Savings Goal Added');
       this.goals.update(list => [...list, g]);
       this.newGoal = { goalName: '', target: 0, current: 0 };
       this.showGoalForm = false;
@@ -405,9 +405,9 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   saveBudget(): void {
-    if (this.newBudget.salary <= 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Salary must be > 0'); return; }
+    if (this.newBudget.salary <= 0) { this.toast('⚠ Salary must be > 0'); return; }
     this.life.upsertBudget(this.newBudget).subscribe(b => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Budget Logged for ' + b.entryMonth);
+      this.toast('◈ Budget Logged for ' + b.entryMonth);
       this.life.getBudgets().subscribe(v => {
         this.budgets.set(v);
         this.updateWealthChart(v);
@@ -419,7 +419,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   saveNetWorth(): void {
     if (this.newNetWorth.totalAssets < 0) return;
     this.life.logNetWorth(this.newNetWorth).subscribe(nw => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Net Worth Logged');
+      this.toast('◈ Net Worth Logged');
       this.netWorthHistory.update(list => [nw, ...list]);
       this.showNetWorthForm = false;
       this.newNetWorth = { totalAssets: 0, totalLiabilities: 0, netWorth: 0, cashRunwayMonths: 0 };
@@ -452,10 +452,10 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   logIncome(): void {
-    if (this.newIncome.amount <= 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Enter a valid income amount'); return; }
+    if (this.newIncome.amount <= 0) { this.toast('⚠ Enter a valid income amount'); return; }
     this.life.logIncome(this.newIncome).subscribe({
       next: v => {
-        this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Income logged: ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¹${v.amount}`);
+        this.toast(`◈ Income logged: ₹${v.amount}`);
         this.incomeHistory.update(list => [v, ...list]);
         this.life.getMonthlySummary().subscribe(s => {
           this.monthlySummary.set(s);
@@ -463,7 +463,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         });
         this.newIncome = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
       },
-      error: () => this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Income logging failed')
+      error: () => this.toast('⚠ Income logging failed')
     });
   }
 
@@ -483,7 +483,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   getIncomeIcon(cat: string): string {
-    return this.incomeCategories.find(c => c.cat === cat)?.icon || 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â°';
+    return this.incomeCategories.find(c => c.cat === cat)?.icon || '💰';
   }
 
   getTotalBalance(): number {
@@ -540,7 +540,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     const next = Math.max(0, goal.current + amount);
     this.life.updateGoal(goal.id, next).subscribe(g => {
       this.goals.update(list => list.map(x => x.id === g.id ? g : x));
-      if (g.achieved) this.toast(`ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã‚Â  Goal cleared ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ${g.goalName}`);
+      if (g.achieved) this.toast(`🏆 Goal cleared — ${g.goalName}`);
     });
   }
   goalPct(g: SavingsGoal): number { return Math.min(100, Math.round((g.current / g.target) * 100)); }
@@ -566,16 +566,16 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   getCategoryIcon(cat: string): string {
-    return this.quickExpenseCategories.find(c => c.cat === cat)?.icon || 'ÃƒÂ¢Ã‚Â­Ã‚Â';
+    return this.quickExpenseCategories.find(c => c.cat === cat)?.icon || '⭐';
   }
 
   logExpense(): void {
-    if (this.newExpense.amount <= 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Enter a valid amount'); return; }
+    if (this.newExpense.amount <= 0) { this.toast('⚠ Enter a valid amount'); return; }
     if (!this.newExpense.description) this.newExpense.description = this.newExpense.category;
     if (!this.newExpense.expenseDate) this.newExpense.expenseDate = new Date().toISOString().split('T')[0];
 
     this.life.logExpense(this.newExpense).subscribe(e => {
-      this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Expense logged: ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¹${e.amount}`);
+      this.toast(`◈ Expense logged: ₹${e.amount}`);
       this.expenses.update(list => [e, ...list]);
       this.life.getWeeklySummary().subscribe(v => this.weeklySummary.set(v));
       this.life.getMonthlySummary().subscribe(v => this.monthlySummary.set(v));
@@ -599,7 +599,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     if (this.newEmi.principalAmount <= 0) return;
     this.calculateEmiAmount(); // ensure it's calculated
     this.life.addEmi(this.newEmi).subscribe(e => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  EMI Added');
+      this.toast('◈ EMI Added');
       this.emis.update(list => [...list, e]);
       this.showEmiForm = false;
       this.newEmi = { loanName: '', principalAmount: 0, interestRate: 0, tenureMonths: 0, emiAmount: 0, totalPaid: 0, remainingAmount: 0, status: 'ACTIVE' };
@@ -609,7 +609,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   payEmi(emiId: number | undefined): void {
     if (!emiId) return;
     this.life.payEmi(emiId).subscribe(e => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  EMI Payment Recorded');
+      this.toast('◈ EMI Payment Recorded');
       this.emis.update(list => list.map(x => x.id === e.id ? e : x));
       this.life.getMonthlySummary().subscribe(v => this.monthlySummary.set(v));
     });
@@ -618,7 +618,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   addSubscription(): void {
     if (this.newSub.amount <= 0 || !this.newSub.name) return;
     this.life.addSubscription(this.newSub).subscribe(s => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Subscription Added');
+      this.toast('◈ Subscription Added');
       this.subscriptions.update(list => [...list, s]);
       this.showSubForm = false;
       this.newSub = { name: '', amount: 0, frequency: 'MONTHLY', category: 'ENTERTAINMENT', isActive: true };
@@ -641,7 +641,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         this.isAnalyzingWealth.set(false);
       },
       error: () => {
-        this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Analysis failed');
+        this.toast('⚠ Analysis failed');
         this.isAnalyzingWealth.set(false);
       }
     });
@@ -718,7 +718,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
                this.loadStatementHistory();
                this.loadSelectedStatement({ target: { value: saved.id } });
                this.isParsingStatement.set(false);
-               this.toast('âœ“ Parsed and saved PDF statement');
+               this.toast('✓ Parsed and saved PDF statement');
             },
             error: () => {
                this.toast('Failed to save statement history');
@@ -751,7 +751,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
                this.loadStatementHistory();
                this.loadSelectedStatement({ target: { value: saved.id } });
                this.isParsingStatement.set(false);
-               this.toast('âœ“ Parsed and saved XLS statement');
+               this.toast('✓ Parsed and saved XLS statement');
             }
           });
         } catch (err) {
@@ -794,7 +794,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
           header.period = row.join(' ').replace(/\s+/g, ' ');
         }
 
-        // Detect data header row ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â look for "Tran Date" or "SRL" or "Date"
+        // Detect data header row — look for "Tran Date" or "SRL" or "Date"
         const hasTranDate = row.some(c => c.toLowerCase().includes('tran') && c.toLowerCase().includes('date'));
         const hasSRL = row.some(c => c.toLowerCase() === 'srl' || c.toLowerCase() === 'srl no');
         const hasDate = row.some(c => c.toLowerCase() === 'date');
@@ -879,8 +879,8 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
     this.statementHeader.set(header);
     this.statementRows.set(txRows);
-    if (txRows.length === 0) this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  No transactions found. Check file format.');
-    else this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Parsed ${txRows.length} transactions from statement`);
+    if (txRows.length === 0) this.toast('⚠ No transactions found. Check file format.');
+    else this.toast(`◈ Parsed ${txRows.length} transactions from statement`);
   }
 
   getFilteredStatementRows(paginated: boolean = true): BankStatementRow[] {
@@ -958,7 +958,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   classifyStatementWithAi(): void {
     const rows = this.statementRows();
-    if (rows.length === 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  No statement loaded'); return; }
+    if (rows.length === 0) { this.toast('⚠ No statement loaded'); return; }
     this.isClassifyingStatement.set(true);
     const particulars = rows.map(r => r.particulars);
 
@@ -967,10 +967,10 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         const updated = rows.map((r, i) => ({ ...r, aiCategory: cats[i] || 'MISC' }));
         this.statementRows.set(updated);
         this.isClassifyingStatement.set(false);
-        this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  AI classified ${updated.length} transactions`);
+        this.toast(`◈ AI classified ${updated.length} transactions`);
       },
       error: () => {
-        this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  AI classify failed');
+        this.toast('⚠ AI classify failed');
         this.isClassifyingStatement.set(false);
       }
     });
@@ -978,7 +978,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   importSelectedToLedger(): void {
     const selected = this.statementRows().filter(r => r.selected);
-    if (selected.length === 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Select rows to import'); return; }
+    if (selected.length === 0) { this.toast('⚠ Select rows to import'); return; }
     let done = 0;
     for (const row of selected) {
       const d = this.parseBankDate(row.tranDate);
@@ -995,7 +995,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         };
         this.life.logExpense(expense).subscribe(() => {
           done++;
-          if (done === selected.length) this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  ${done} transactions imported to ledger`);
+          if (done === selected.length) this.toast(`◈ ${done} transactions imported to ledger`);
         });
       } else if (row.credit && row.credit > 0) {
         const income: IncomeLog = {
@@ -1006,7 +1006,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         };
         this.life.logIncome(income).subscribe(() => {
           done++;
-          if (done === selected.length) this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  ${done} transactions imported to ledger`);
+          if (done === selected.length) this.toast(`◈ ${done} transactions imported to ledger`);
         });
       } else {
         done++;
@@ -1016,7 +1016,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   exportStatementAs(format: 'CSV' | 'EXCEL'): void {
     const rows = this.getFilteredStatementRows(false);
-    if (rows.length === 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  No data to export'); return; }
+    if (rows.length === 0) { this.toast('⚠ No data to export'); return; }
 
     if (format === 'CSV') {
       const header = 'Date,Particulars,Debit,Credit,Balance,My Label,Category';
@@ -1035,7 +1035,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Statement');
       XLSX.writeFile(wb, 'statement.xlsx');
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Excel exported');
+      this.toast('◈ Excel exported');
     }
   }
 
@@ -1044,7 +1044,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     const a = document.createElement('a');
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
-    this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  ${filename} downloaded`);
+    this.toast(`◈ ${filename} downloaded`);
   }
 
   toggleStatementRow(row: BankStatementRow): void {
@@ -1070,11 +1070,11 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   /* ===== Chit Fund ===== */
   addChitFund(): void {
     if (!this.newChit.chitName || this.newChit.totalAmount <= 0 || this.newChit.monthlyContribution <= 0) {
-      this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Fill all required fields'); return;
+      this.toast('⚠ Fill all required fields'); return;
     }
     this.newChit.totalMonths = Math.round(this.newChit.totalAmount / this.newChit.monthlyContribution);
     this.life.createChitFund(this.newChit).subscribe(c => {
-      this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Chit Fund "${c.chitName}" started`);
+      this.toast(`◈ Chit Fund "${c.chitName}" started`);
       this.chitFunds.update(list => [c, ...list]);
       this.newChit = this.blankChit();
       this.showChitForm.set(false);
@@ -1085,18 +1085,18 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     if (!chitId) return;
     this.life.payChitInstallment(chitId).subscribe(c => {
       this.chitFunds.update(list => list.map(x => x.id === c.id ? c : x));
-      this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Month ${c.currentMonth} paid ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¹${c.monthlyContribution}`);
+      this.toast(`◈ Month ${c.currentMonth} paid — ₹${c.monthlyContribution}`);
     });
   }
 
   claimChitPrize(chit: ChitFund): void {
     if (!chit.id) return;
     const amounts = this.claimAmounts[chit.id] || { prize: 0, discount: 0 };
-    if (amounts.prize <= 0) { this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Enter the prize amount received'); return; }
+    if (amounts.prize <= 0) { this.toast('⚠ Enter the prize amount received'); return; }
     this.life.claimChitPrize(chit.id, amounts.prize, amounts.discount).subscribe(c => {
       this.chitFunds.update(list => list.map(x => x.id === c.id ? c : x));
       delete this.showClaimForm[chit.id!];
-      this.toast(`ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã‚Â  Chit prize claimed! ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¹${c.prizeAmount?.toLocaleString()}`);
+      this.toast(`🏆 Chit prize claimed! ₹${c.prizeAmount?.toLocaleString()}`);
     });
   }
 
@@ -1145,7 +1145,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     };
     this.life.logDiet(entry).subscribe(v => {
       this.dietHistory.update(h => [v, ...h]);
-      this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Logged ${food.name}`);
+      this.toast(`◈ Logged ${food.name}`);
     });
   }
 
@@ -1158,7 +1158,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         this.isGeneratingReport.set(false);
       },
       error: () => {
-        this.toast('ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â  Failed to generate AI Report');
+        this.toast('⚠ Failed to generate AI Report');
         this.isGeneratingReport.set(false);
       }
     });
@@ -1174,7 +1174,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     const h = this.health(); if (!h) return;
     this.life.upsertHealth(h).subscribe(v => {
       this.health.set(v);
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Health logged');
+      this.toast('◈ Health logged');
     });
   }
 
@@ -1188,14 +1188,14 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   saveMind(): void {
     this.life.upsertMind(this.mind).subscribe(v => {
-      this.mind = v; this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Reflection saved');
+      this.mind = v; this.toast('◈ Reflection saved');
       this.life.getEvidence().subscribe(e => this.evidence.set(e));
     });
   }
 
   /* ===== English actions ===== */
   saveEnglish(): void {
-    this.life.upsertEnglish(this.english).subscribe(() => this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  English session logged'));
+    this.life.upsertEnglish(this.english).subscribe(() => this.toast('◈ English session logged'));
   }
 
   addSpeakingTime(mins: number): void {
@@ -1206,7 +1206,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     if (this.newWordInput.trim()) {
       this.english.newWords = (this.english.newWords || 0) + 1;
       this.newWordInput = '';
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Vocabulary word added');
+      this.toast('◈ Vocabulary word added');
     }
   }
 
@@ -1225,13 +1225,13 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     if ((b.morningSunMin ?? 0) >= 15) pillars++;
     b.testosteronePillars = pillars;
 
-    this.life.upsertBody(b).subscribe(v => { this.body.set(v); this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  ${v.testosteronePillars}/7 pillars locked in`); });
+    this.life.upsertBody(b).subscribe(v => { this.body.set(v); this.toast(`◈ ${v.testosteronePillars}/7 pillars locked in`); });
   }
 
   /* ===== Relationship actions ===== */
   saveRelationship(): void {
     const r = this.relationship(); if (!r) return;
-    this.life.upsertRelationship(r).subscribe(v => { this.relationship.set(v); this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Bonds updated'); });
+    this.life.upsertRelationship(r).subscribe(v => { this.relationship.set(v); this.toast('◈ Bonds updated'); });
   }
   
   addCallTime(mins: number): void {
@@ -1243,7 +1243,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   addConnection(): void {
     if (!this.newConnection.name) return;
     this.life.addSocialConnection(this.newConnection).subscribe(c => {
-      this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Connection Added');
+      this.toast('◈ Connection Added');
       this.connections.update(list => [...list, c]);
       this.showConnectionForm = false;
       this.newConnection = { name: '', relationType: 'FRIEND', targetContactFrequencyDays: 7, lastContactDate: new Date().toISOString().split('T')[0], healthScore: 100 };
@@ -1253,7 +1253,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   contactConnection(c: SocialConnection): void {
     if (!c.id) return;
     this.life.updateSocialContact(c.id, new Date().toISOString().split('T')[0]).subscribe(updated => {
-      this.toast(`ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Contacted ${updated.name}`);
+      this.toast(`◈ Contacted ${updated.name}`);
       this.connections.update(list => list.map(x => x.id === updated.id ? updated : x));
     });
   }
@@ -1304,7 +1304,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   completeMeditation() {
     this.cancelMeditation();
-    this.toast('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒâ€¹Ã¢â‚¬Â  Meditation Complete! Clarity Buff Applied (2h)');
+    this.toast('◈ Meditation Complete! Clarity Buff Applied (2h)');
     
     // Set buff for 2 hours
     const end = new Date();
