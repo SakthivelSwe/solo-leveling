@@ -954,6 +954,18 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     return { totalDebit, totalCredit, net: totalCredit - totalDebit };
   });
 
+  collapsedStatementMonths = signal<Set<string>>(new Set());
+
+  toggleStatementMonth(month: string): void {
+    const current = new Set(this.collapsedStatementMonths());
+    if (current.has(month)) {
+      current.delete(month);
+    } else {
+      current.add(month);
+    }
+    this.collapsedStatementMonths.set(current);
+  }
+
   private parseBankDate(dateStr: string): Date | null {
     if (!dateStr) return null;
     // Handle DD-MM-YYYY or DD/MM/YYYY

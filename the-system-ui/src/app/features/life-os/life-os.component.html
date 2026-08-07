@@ -834,15 +834,18 @@
         <!-- Month-grouped view -->
         <ng-container *ngIf="statementGroupBy() === 'MONTH'">
           <div class="glass-card stmt-month-group" *ngFor="let group of statementMonthGroups()">
-            <div class="stmt-month-header">
-              <span class="mono" style="color: #FAC775;">{{ group.month }}</span>
+            <div class="stmt-month-header" (click)="toggleStatementMonth(group.month)" style="cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.8rem; color: #8a8a9a;">{{ collapsedStatementMonths().has(group.month) ? '▶' : '▼' }}</span>
+                <span class="mono" style="color: #FAC775;">{{ group.month }}</span>
+              </div>
               <div class="stmt-month-totals">
                 <span class="tech" style="color: #ff6b6b; font-size: 0.8rem;">-₹{{ group.totalDebit | number:'1.0-0' }}</span>
                 <span class="tech" style="color: #5DCAA5; font-size: 0.8rem;">+₹{{ group.totalCredit | number:'1.0-0' }}</span>
                 <span class="tech" style="color: #a0aabf; font-size: 0.75rem;">{{ group.rows.length }} txns</span>
               </div>
             </div>
-            <div class="stmt-table-wrap">
+            <div class="stmt-table-wrap" *ngIf="!collapsedStatementMonths().has(group.month)">
               <table class="stmt-table">
                 <thead>
                   <tr>
