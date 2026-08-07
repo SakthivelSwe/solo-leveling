@@ -30,13 +30,13 @@ type Tab = 'CAREER' | 'HEALTH' | 'MIND' | 'WEALTH' | 'ENGLISH' | 'BODY' | 'RELAT
 })
 export class LifeOsComponent implements OnInit, OnDestroy {
   readonly tabs: { key: Tab; label: string; icon: string; color: string }[] = [
-    { key: 'CAREER', label: 'Career', icon: 'ðŸ’¼', color: '#534AB7' },
-    { key: 'HEALTH', label: 'Health', icon: 'ðŸ©º', color: '#1D9E75' },
-    { key: 'MIND', label: 'Mind', icon: 'ðŸ§ ', color: '#378ADD' },
-    { key: 'WEALTH', label: 'Wealth', icon: 'ðŸ’°', color: '#FAC775' },
-    { key: 'ENGLISH', label: 'English', icon: 'ðŸ—£ï¸', color: '#BA7517' },
-    { key: 'BODY', label: 'Body', icon: 'ðŸ”¥', color: '#E24B4A' },
-    { key: 'RELATIONSHIP', label: 'Bonds', icon: 'ðŸ¤', color: '#F0997B' },
+    { key: 'CAREER', label: 'Career', icon: '💼', color: '#534AB7' },
+    { key: 'HEALTH', label: 'Health', icon: '❤', color: '#1D9E75' },
+    { key: 'MIND', label: 'Mind', icon: '🧠', color: '#378ADD' },
+    { key: 'WEALTH', label: 'Wealth', icon: '💰', color: '#FAC775' },
+    { key: 'ENGLISH', label: 'English', icon: '🗺', color: '#BA7517' },
+    { key: 'BODY', label: 'Body', icon: '💪', color: '#E24B4A' },
+    { key: 'RELATIONSHIP', label: 'Bonds', icon: '🤝', color: '#F0997B' },
   ];
   active = signal<Tab>('CAREER');
 
@@ -87,19 +87,19 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   incomeHistory = signal<IncomeLog[]>([]);
   newIncome: IncomeLog = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
   incomeCategories = [
-    { cat: 'SALARY', icon: 'ðŸ’¼', label: 'Salary' },
-    { cat: 'FREELANCE', icon: 'ðŸ’»', label: 'Freelance' },
-    { cat: 'INVESTMENT', icon: 'ðŸ“ˆ', label: 'Returns' },
-    { cat: 'GIFT', icon: 'ðŸŽ', label: 'Gift' },
-    { cat: 'OTHER', icon: 'ðŸ’¡', label: 'Other' }
+    { cat: 'SALARY', icon: '💼', label: 'Salary' },
+    { cat: 'FREELANCE', icon: '💻', label: 'Freelance' },
+    { cat: 'INVESTMENT', icon: '📈', label: 'Returns' },
+    { cat: 'GIFT', icon: '🎁', label: 'Gift' },
+    { cat: 'OTHER', icon: '💰', label: 'Other' }
   ];
 
   // Accounts (local state â€” calculated from transactions)
   accounts: AccountEntry[] = [
-    { name: 'Cash', type: 'CASH', balance: 0, icon: 'ðŸ’µ', color: '#1D9E75' },
-    { name: 'UPI / Bank', type: 'BANK', balance: 0, icon: 'ðŸ¦', color: '#378ADD' },
-    { name: 'Credit Card', type: 'CARD', balance: 0, icon: 'ðŸ’³', color: '#E24B4A' },
-    { name: 'Savings', type: 'SAVINGS', balance: 0, icon: 'ðŸ†', color: '#FAC775' },
+    { name: 'Cash', type: 'CASH', balance: 0, icon: '💵', color: '#1D9E75' },
+    { name: 'UPI / Bank', type: 'BANK', balance: 0, icon: '🏦', color: '#378ADD' },
+    { name: 'Credit Card', type: 'CARD', balance: 0, icon: '💳', color: '#E24B4A' },
+    { name: 'Savings', type: 'SAVINGS', balance: 0, icon: '🐽', color: '#FAC775' },
   ];
 
   newExpense: ExpenseLog = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false, expenseDate: new Date().toISOString().split('T')[0] };
@@ -132,15 +132,15 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   goalsSubTab = signal<'SAVINGS' | 'CHIT' | 'NETWORTH'>('SAVINGS');
 
   quickExpenseCategories = [
-    { cat: 'FOOD', icon: 'ðŸ•', label: 'Food' },
-    { cat: 'TRANSPORT', icon: 'ðŸš—', label: 'Transport' },
-    { cat: 'SHOPPING', icon: 'ðŸ›’', label: 'Shopping' },
-    { cat: 'ONLINE_ORDER', icon: 'ðŸ“¦', label: 'Online' },
-    { cat: 'ENTERTAINMENT', icon: 'ðŸŽ¬', label: 'Ent.' },
-    { cat: 'BILLS', icon: 'ðŸ“‹', label: 'Bills' },
-    { cat: 'HEALTH', icon: 'ðŸ’Š', label: 'Health' },
-    { cat: 'EDUCATION', icon: 'ðŸ“š', label: 'Edu.' },
-    { cat: 'MISC', icon: 'â“', label: 'Misc' }
+    { cat: 'FOOD', icon: '🍕', label: 'Food' },
+    { cat: 'TRANSPORT', icon: '🚗', label: 'Transport' },
+    { cat: 'SHOPPING', icon: '🛍', label: 'Shopping' },
+    { cat: 'ONLINE_ORDER', icon: '📦', label: 'Online' },
+    { cat: 'ENTERTAINMENT', icon: '🎥', label: 'Ent.' },
+    { cat: 'BILLS', icon: '📋', label: 'Bills' },
+    { cat: 'HEALTH', icon: '💊', label: 'Health' },
+    { cat: 'EDUCATION', icon: '📚', label: 'Edu.' },
+    { cat: 'MISC', icon: '⭐', label: 'Misc' }
   ];
 
   // Wisdom Engine Carousel
@@ -480,7 +480,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   getIncomeIcon(cat: string): string {
-    return this.incomeCategories.find(c => c.cat === cat)?.icon || 'ðŸ’¡';
+    return this.incomeCategories.find(c => c.cat === cat)?.icon || '💰';
   }
 
   getTotalBalance(): number {
@@ -563,7 +563,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   getCategoryIcon(cat: string): string {
-    return this.quickExpenseCategories.find(c => c.cat === cat)?.icon || 'â“';
+    return this.quickExpenseCategories.find(c => c.cat === cat)?.icon || '⭐';
   }
 
   logExpense(): void {
