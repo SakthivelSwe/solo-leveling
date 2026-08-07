@@ -836,7 +836,7 @@
           <div class="glass-card stmt-month-group" *ngFor="let group of statementMonthGroups()">
             <div class="stmt-month-header" (click)="toggleStatementMonth(group.month)" style="cursor: pointer;">
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 0.8rem; color: #8a8a9a;">{{ collapsedStatementMonths().has(group.month) ? '▶' : '▼' }}</span>
+                <span style="font-size: 0.8rem; color: #8a8a9a;">{{ expandedStatementMonths().has(group.month) ? '▼' : '▶' }}</span>
                 <span class="mono" style="color: #FAC775;">{{ group.month }}</span>
               </div>
               <div class="stmt-month-totals">
@@ -845,7 +845,7 @@
                 <span class="tech" style="color: #a0aabf; font-size: 0.75rem;">{{ group.rows.length }} txns</span>
               </div>
             </div>
-            <div class="stmt-table-wrap" *ngIf="!collapsedStatementMonths().has(group.month)">
+            <div class="stmt-table-wrap" *ngIf="expandedStatementMonths().has(group.month)">
               <table class="stmt-table">
                 <thead>
                   <tr>

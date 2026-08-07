@@ -954,16 +954,16 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     return { totalDebit, totalCredit, net: totalCredit - totalDebit };
   });
 
-  collapsedStatementMonths = signal<Set<string>>(new Set());
+  expandedStatementMonths = signal<Set<string>>(new Set());
 
   toggleStatementMonth(month: string): void {
-    const current = new Set(this.collapsedStatementMonths());
+    const current = new Set(this.expandedStatementMonths());
     if (current.has(month)) {
       current.delete(month);
     } else {
       current.add(month);
     }
-    this.collapsedStatementMonths.set(current);
+    this.expandedStatementMonths.set(current);
   }
 
   private parseBankDate(dateStr: string): Date | null {
