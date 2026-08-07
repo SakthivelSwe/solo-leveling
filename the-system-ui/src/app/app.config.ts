@@ -1,5 +1,5 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withPreloading, PreloadAllModules } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -18,10 +18,10 @@ export const appConfig: ApplicationConfig = {
     // reducing the number of digest passes per frame — especially on rapid tap events.
     provideZoneChangeDetection({ eventCoalescing: true, runCoalescing: true }),
 
-    // withViewTransitions() uses the native View Transitions API for smooth
-    // page-to-page animations without Angular's JS animation engine overhead.
-    // withComponentInputBinding() allows route params to bind directly to @Input().
-    provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
+    // withPreloading(PreloadAllModules) eagerly downloads lazy chunks in the background
+    // so navigating between tabs has zero network delay.
+    // Removed withViewTransitions() to eliminate artificial crossfade delays and freezing.
+    provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
 
     // Async animations: defers the BrowserAnimationsModule load until after first paint
     // so the initial bundle is smaller and cold-start is faster on Android.
