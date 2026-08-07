@@ -90,16 +90,16 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     { cat: 'SALARY', icon: '💼', label: 'Salary' },
     { cat: 'FREELANCE', icon: '💻', label: 'Freelance' },
     { cat: 'INVESTMENT', icon: '📈', label: 'Returns' },
-    { cat: 'GIFT', icon: 'ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â', label: 'Gift' },
+    { cat: 'GIFT', icon: '🎁', label: 'Gift' },
     { cat: 'OTHER', icon: '💰', label: 'Other' }
   ];
 
   // Accounts (local state — calculated from transactions)
   accounts: AccountEntry[] = [
     { name: 'Cash', type: 'CASH', balance: 0, icon: '💵', color: '#1D9E75' },
-    { name: 'UPI / Bank', type: 'BANK', balance: 0, icon: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â¦', color: '#378ADD' },
+    { name: 'UPI / Bank', type: 'BANK', balance: 0, icon: '🏦', color: '#378ADD' },
     { name: 'Credit Card', type: 'CARD', balance: 0, icon: '💳', color: '#E24B4A' },
-    { name: 'Savings', type: 'SAVINGS', balance: 0, icon: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â½', color: '#FAC775' },
+    { name: 'Savings', type: 'SAVINGS', balance: 0, icon: '🐖', color: '#FAC775' },
   ];
 
   newExpense: ExpenseLog = { amount: 0, category: 'FOOD', description: '', isEssential: true, paymentMethod: 'UPI', isRecurring: false, expenseDate: new Date().toISOString().split('T')[0] };
