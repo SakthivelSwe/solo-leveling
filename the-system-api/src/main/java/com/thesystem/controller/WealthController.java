@@ -206,7 +206,22 @@ public class WealthController {
     }
 
     @PostMapping("/statement/parse-pdf")
-    public StatementParseResponse parsePdfStatement(@RequestParam("file") MultipartFile file) throws Exception {
-        return statementParserService.parseAxisBankPdf(file);
+    public org.springframework.http.ResponseEntity<?> parsePdfStatement(@RequestParam("file") MultipartFile file) {
+        try {
+            StatementParseResponse result = statementParserService.parseAxisBankPdf(file);
+            if (result.getRows() == null || result.getRows().isEmpty()) {
+                return org.springframework.http.ResponseEntity.ok(result); // return empty but not an error
+            }
+            return org.springframework.http.ResponseEntity.ok(result);
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(WealthController.class)
+                .error("PDF parse error for file '{}': {}", file.getOriginalFilename(), e.getMessage(), e);
+            return org.springframework.http.ResponseEntity
+                .status(org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(java.util.Map.of(
+                    "error", "PDF parsing failed: " + e.getMessage(),
+                    "hint", "Ensure this is a valid Axis Bank PDF statement"
+                ));
+        }
     }
 }
