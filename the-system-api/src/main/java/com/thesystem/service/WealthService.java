@@ -30,6 +30,8 @@ public class WealthService {
     private final FinancialAssetRepository assetRepo;
     private final PlayerRepository playerRepo;
     private final ChitFundRepository chitRepo;
+    private final BankStatementRecordRepository statementRepo;
+    private final BankStatementTxnRepository txnRepo;
 
     public WealthService(BudgetEntryRepository budgetRepo, 
                          SavingsGoalRepository goalRepo, 
@@ -42,7 +44,9 @@ public class WealthService {
                          IncomeLogRepository incomeRepo,
                          FinancialAssetRepository assetRepo,
                          PlayerRepository playerRepo,
-                         ChitFundRepository chitRepo) {
+                         ChitFundRepository chitRepo,
+                         BankStatementRecordRepository statementRepo,
+                         BankStatementTxnRepository txnRepo) {
         this.budgetRepo = budgetRepo;
         this.goalRepo = goalRepo;
         this.netWorthRepo = netWorthRepo;
@@ -55,6 +59,8 @@ public class WealthService {
         this.assetRepo = assetRepo;
         this.playerRepo = playerRepo;
         this.chitRepo = chitRepo;
+        this.statementRepo = statementRepo;
+        this.txnRepo = txnRepo;
     }
 
     // ---- Income ----
@@ -190,7 +196,7 @@ public class WealthService {
         
         StringBuilder prompt = new StringBuilder("Analyze the following expenses for this month and identify unwanted or impulse spending. Give actionable, concise advice (under 150 words). Categorize severity as GOOD, CAUTION, or OVERSPEND:\n");
         for (ExpenseLog e : expenses) {
-            prompt.append("- ").append(e.getCategory()).append(" | ").append(e.getDescription()).append(" | ₹").append(e.getAmount()).append("\n");
+            prompt.append("- ").append(e.getCategory()).append(" | ").append(e.getDescription()).append(" | â‚¹").append(e.getAmount()).append("\n");
         }
         
         try {
@@ -403,10 +409,57 @@ public class WealthService {
     }
 
     public void deleteChitFund(Long playerId, Long chitId) {
-        ChitFund chit = chitRepo.findById(chitId)
-            .orElseThrow(() -> new ApiException("Chit fund not found", HttpStatus.NOT_FOUND));
-        if (!chit.getPlayerId().equals(playerId)) throw new ApiException("Not your chit", HttpStatus.FORBIDDEN);
-        chitRepo.delete(chit);
+        ChitFund c = chitRepo.findById(chitId).orElseThrow(() -> new ApiException("Chit fund not found", HttpStatus.NOT_FOUND));
+        if (!c.getPlayerId().equals(playerId)) throw new ApiException("Not your chit fund", HttpStatus.FORBIDDEN);
+        chitRepo.delete(c);
+    }
+
+    // ---- Bank Statement History ----
+    public BankStatementRecord saveStatement(Long playerId, com.thesystem.dto.StatementParseResponse parsed, String fileName) {
+        Player p = playerRepo.findById(playerId).orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
+        
+        BankStatementRecord record = new BankStatementRecord();
+        record.setPlayer(p);
+        record.setFileName(fileName);
+        record.setUploadDate(LocalDate.now());
+        if (parsed.getHeader() != null) {
+            record.setBankName(parsed.getHeader().getBankName());
+            record.setPeriod(parsed.getHeader().getPeriod());
+            record.setAccountHolder(parsed.getHeader().getAccountHolder());
+            record.setOpeningBalance(parsed.getHeader().getOpeningBalance());
+        }
+
+        if (parsed.getRows() != null) {
+            for (com.thesystem.dto.BankStatementRowDTO dto : parsed.getRows()) {
+                BankStatementTxn txn = new BankStatementTxn();
+                txn.setStatement(record);
+                txn.setSrl(dto.getSrl());
+                txn.setTranDate(dto.getTranDate());
+                txn.setParticulars(dto.getParticulars());
+                txn.setDebit(dto.getDebit());
+                txn.setCredit(dto.getCredit());
+                txn.setBalance(dto.getBalance());
+                record.getTransactions().add(txn);
+            }
+        }
+        
+        return statementRepo.save(record);
+    }
+
+    public List<BankStatementRecord> getStatementHistory(Long playerId) {
+        return statementRepo.findByPlayerIdOrderByUploadDateDesc(playerId);
+    }
+
+    public BankStatementRecord getStatement(Long playerId, Long statementId) {
+        BankStatementRecord record = statementRepo.findById(statementId).orElseThrow(() -> new ApiException("Statement not found", HttpStatus.NOT_FOUND));
+        if (!record.getPlayer().getId().equals(playerId)) throw new ApiException("Not your statement", HttpStatus.FORBIDDEN);
+        return record;
+    }
+
+    public void deleteStatement(Long playerId, Long statementId) {
+        BankStatementRecord record = statementRepo.findById(statementId).orElseThrow(() -> new ApiException("Statement not found", HttpStatus.NOT_FOUND));
+        if (!record.getPlayer().getId().equals(playerId)) throw new ApiException("Not your statement", HttpStatus.FORBIDDEN);
+        statementRepo.delete(record);
     }
 
     // ---- Bank Statement AI Classifier ----

@@ -224,4 +224,25 @@ public class WealthController {
                 ));
         }
     }
+
+    // ---- Statement History ----
+    @PostMapping("/statements/save")
+    public BankStatementRecord saveStatement(Principal p, @RequestParam("fileName") String fileName, @RequestBody StatementParseResponse parsed) {
+        return wealthService.saveStatement(currentPlayer.id(p), parsed, fileName);
+    }
+
+    @GetMapping("/statements")
+    public List<BankStatementRecord> getStatements(Principal p) {
+        return wealthService.getStatementHistory(currentPlayer.id(p));
+    }
+
+    @GetMapping("/statements/{id}")
+    public BankStatementRecord getStatement(Principal p, @PathVariable Long id) {
+        return wealthService.getStatement(currentPlayer.id(p), id);
+    }
+
+    @DeleteMapping("/statements/{id}")
+    public void deleteStatement(Principal p, @PathVariable Long id) {
+        wealthService.deleteStatement(currentPlayer.id(p), id);
+    }
 }

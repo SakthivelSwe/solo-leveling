@@ -157,11 +157,27 @@ export class LifeOsService {
     return this.http.post<any[]>(`${this.api}/ai/commander/directive`, config);
   }
 
-  /* ===== Bank Statement Upload ===== */
+  /* ===== Bank Statement Analyzer & History ===== */
   uploadPdfStatement(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<any>(`${this.api}/wealth/statement/parse-pdf`, formData);
+  }
+
+  saveBankStatement(fileName: string, parsedData: any): Observable<any> {
+    return this.http.post<any>(`${this.api}/wealth/statements/save?fileName=${encodeURIComponent(fileName)}`, parsedData);
+  }
+
+  getStatementHistory(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/wealth/statements`);
+  }
+
+  getStatement(id: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/wealth/statements/${id}`);
+  }
+
+  deleteStatement(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}/wealth/statements/${id}`);
   }
 
   /* ===== Dopamine OS ===== */

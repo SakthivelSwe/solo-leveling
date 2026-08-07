@@ -1,4 +1,4 @@
-﻿<div class="life-shell">
+<div class="life-shell">
   <header class="topbar">
     <div class="brand">
       <span class="mono diamond">◈</span>
@@ -699,8 +699,21 @@
         <div class="stmt-upload-header">
           <div>
             <h3 class="mono head" style="color: #4fc3f7;">◈ BANK STATEMENT ANALYZER</h3>
-            <p class="tech" style="color: #6a6a7a; font-size: 0.8rem; margin: 4px 0 0;">Upload XLS / XLSX / CSV — Axis Bank & most banks supported</p>
-          </div>
+                          <p class="tech" style="color: #6a6a7a; font-size: 0.8rem; margin: 4px 0 0;">Upload XLS / XLSX / CSV / PDF — Most major banks supported</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <select class="cyber-input mono" style="padding: 4px 12px; font-size: 0.8rem; width: 250px;" 
+                      (change)="loadSelectedStatement($event)"
+                      [value]="selectedStatementId() || 'new'">
+                <option value="new">+ Upload New Statement</option>
+                <option *ngFor="let h of statementHistory()" [value]="h.id">
+                  {{ h.bankName }} ({{ h.uploadDate | date:'MMM yyyy' }}) - {{ h.fileName }}
+                </option>
+              </select>
+              <button class="cyber-button error" *ngIf="selectedStatementId()" (click)="deleteStatement(selectedStatementId()!)" style="padding: 4px 8px; min-width: auto;" title="Delete History">
+                🗑️
+              </button>
+            </div>
           <div class="stmt-bank-logo" *ngIf="statementHeader()">
             <span style="font-size: 1.5rem;">🏦</span>
             <span class="mono" style="color: #4fc3f7; font-size: 0.8rem;">{{ statementHeader()!.bankName }}</span>
