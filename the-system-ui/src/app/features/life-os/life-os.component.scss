@@ -1,4 +1,4 @@
-﻿:host { display: block; }
+:host { display: block; }
 
 .life-shell {
   max-width: 1180px; margin: 0 auto;
@@ -1118,11 +1118,18 @@
   border: 1px solid rgba(255,255,255,0.05);
 
   &::-webkit-scrollbar {
-    height: 4px;
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
   }
 }
 
