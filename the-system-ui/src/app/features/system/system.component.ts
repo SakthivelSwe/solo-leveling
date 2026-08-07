@@ -263,7 +263,9 @@ export class SystemComponent implements OnInit, OnDestroy {
    * heavy data (shadow extraction, job add, AI sync). Fetches all 12 endpoints.
    */
   loadFull(): void {
-    this.loading.set(true);
+    if (!this.status()) {
+      this.loading.set(true);
+    }
     this.playerService.getStatus().subscribe({
       next: (s: StatusWindow) => { this.handleStatusUpdate(s); this.loading.set(false); },
       error: () => { this.loading.set(false); this.toast('⚠ Connection to the System lost'); },
