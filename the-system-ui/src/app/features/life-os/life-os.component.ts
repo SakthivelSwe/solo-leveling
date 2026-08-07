@@ -31,12 +31,12 @@ type Tab = 'CAREER' | 'HEALTH' | 'MIND' | 'WEALTH' | 'ENGLISH' | 'BODY' | 'RELAT
 export class LifeOsComponent implements OnInit, OnDestroy {
   readonly tabs: { key: Tab; label: string; icon: string; color: string }[] = [
     { key: 'CAREER', label: 'Career', icon: '💼', color: '#534AB7' },
-    { key: 'HEALTH', label: 'Health', icon: 'ÃƒÂ¢Ã‚ÂÃ‚Â¤', color: '#1D9E75' },
+    { key: 'HEALTH', label: 'Health', icon: '❤', color: '#1D9E75' },
     { key: 'MIND', label: 'Mind', icon: '🧠', color: '#378ADD' },
     { key: 'WEALTH', label: 'Wealth', icon: '💰', color: '#FAC775' },
-    { key: 'ENGLISH', label: 'English', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬â€Ã‚Âº', color: '#BA7517' },
+    { key: 'ENGLISH', label: 'English', icon: '🗺', color: '#BA7517' },
     { key: 'BODY', label: 'Body', icon: '💪', color: '#E24B4A' },
-    { key: 'RELATIONSHIP', label: 'Bonds', icon: 'ÃƒÂ°Ã…Â¸Ã‚Â¤Ã‚Â', color: '#F0997B' },
+    { key: 'RELATIONSHIP', label: 'Bonds', icon: '🤝', color: '#F0997B' },
   ];
   active = signal<Tab>('CAREER');
 
