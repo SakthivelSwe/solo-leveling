@@ -175,14 +175,14 @@
               <span class="mono" style="font-size: 0.9rem;">{{ countJobsByStatus(status) }}</span>
             </div>
             <div class="kanban-cards">
-              <div class="kanban-card" *ngFor="let job of filterJobsByStatus(status)">
+              <div class="kanban-card" *ngFor="let job of jobsByStatus()[status] || []">
                 <div class="kc-company mono">{{ job.company }}</div>
                 <div class="kc-role tech">{{ job.role }}</div>
                 <div class="kc-actions">
                   <button *ngFor="let s of statuses" class="kc-btn tech" [class.kc-active]="job.status === s" (click)="changeStatus(job, s)">{{ s | slice:0:3 }}</button>
                 </div>
               </div>
-              <div *ngIf="!filterJobsByStatus(status).length" class="kc-empty tech">—</div>
+              <div *ngIf="!jobsByStatus()[status] || [].length" class="kc-empty tech">—</div>
             </div>
           </div>
         </div>
@@ -531,7 +531,7 @@
         <div class="wealth-header-stats">
           <div class="wh-stat income">
             <div class="wh-label">INCOME</div>
-            <div class="wh-val mono">₹{{ (monthlySummary()?.totalIncome || getMonthlyIncomeTotal()) | number:'1.0-0' }}</div>
+            <div class="wh-val mono">₹{{ (monthlySummary()?.totalIncome || monthlyIncomeTotal()) | number:'1.0-0' }}</div>
           </div>
           <div class="wh-divider"></div>
           <div class="wh-stat expense">
@@ -539,9 +539,9 @@
             <div class="wh-val mono">₹{{ ((monthlySummary()?.totalExpenses || 0) + (monthlySummary()?.emiTotal || 0) + (monthlySummary()?.subscriptionTotal || 0)) | number:'1.0-0' }}</div>
           </div>
           <div class="wh-divider"></div>
-          <div class="wh-stat" [class.balance-pos]="getTotalBalance() >= 0" [class.balance-neg]="getTotalBalance() < 0">
+          <div class="wh-stat" [class.balance-pos]="totalBalance() >= 0" [class.balance-neg]="totalBalance() < 0">
             <div class="wh-label">BALANCE</div>
-            <div class="wh-val mono">₹{{ getTotalBalance() | number:'1.0-0' }}</div>
+            <div class="wh-val mono">₹{{ totalBalance() | number:'1.0-0' }}</div>
           </div>
         </div>
       </div>
@@ -564,13 +564,13 @@
           </div>
         </div>
 
-        <div class="tx-empty" *ngIf="getFilteredTransactions().length === 0">
+        <div class="tx-empty" *ngIf="filteredTransactions().length === 0">
           <div style="font-size: 2.5rem; margin-bottom: 12px;">🌿</div>
           <div class="tech" style="color: #8a8a9a;">No transactions this period.</div>
           <div class="tech" style="font-size: 0.8rem; color: #6a6a7a; margin-top: 6px;">Tap + Income or + Expense to log.</div>
         </div>
 
-        <div class="tx-row" *ngFor="let tx of getFilteredTransactions()" [class.tx-income]="tx.type === 'INCOME'" [class.tx-expense]="tx.type === 'EXPENSE'">
+        <div class="tx-row" *ngFor="let tx of filteredTransactions()" [class.tx-income]="tx.type === 'INCOME'" [class.tx-expense]="tx.type === 'EXPENSE'">
           <div class="tx-icon-wrap" [style.background]="tx.type === 'INCOME' ? 'rgba(29,158,117,0.15)' : 'rgba(226,75,74,0.12)'">
             <span class="tx-icon">{{ tx.icon }}</span>
           </div>
@@ -766,19 +766,19 @@
         <div class="glass-card stmt-summary-banner">
           <div class="stmt-total-card debit-card">
             <div class="tech" style="color: #ff6b6b; font-size: 0.7rem; letter-spacing: 1px;">TOTAL DEBITS</div>
-            <div class="mono" style="color: #ff6b6b; font-size: 1.8rem; line-height: 1;">₹{{ getStatementTotals().totalDebit | number:'1.0-0' }}</div>
+            <div class="mono" style="color: #ff6b6b; font-size: 1.8rem; line-height: 1;">₹{{ statementTotals().totalDebit | number:'1.0-0' }}</div>
           </div>
           <div class="stmt-total-divider"></div>
           <div class="stmt-total-card credit-card">
             <div class="tech" style="color: #5DCAA5; font-size: 0.7rem; letter-spacing: 1px;">TOTAL CREDITS</div>
-            <div class="mono" style="color: #5DCAA5; font-size: 1.8rem; line-height: 1;">₹{{ getStatementTotals().totalCredit | number:'1.0-0' }}</div>
+            <div class="mono" style="color: #5DCAA5; font-size: 1.8rem; line-height: 1;">₹{{ statementTotals().totalCredit | number:'1.0-0' }}</div>
           </div>
           <div class="stmt-total-divider"></div>
           <div class="stmt-total-card">
             <div class="tech" style="color: #a0aabf; font-size: 0.7rem; letter-spacing: 1px;">NET</div>
             <div class="mono" style="font-size: 1.8rem; line-height: 1;"
-                 [style.color]="getStatementTotals().net >= 0 ? '#5DCAA5' : '#ff6b6b'">
-              {{ getStatementTotals().net >= 0 ? '+' : '' }}₹{{ getStatementTotals().net | number:'1.0-0' }}
+                 [style.color]="statementTotals().net >= 0 ? '#5DCAA5' : '#ff6b6b'">
+              {{ statementTotals().net >= 0 ? '+' : '' }}₹{{ statementTotals().net | number:'1.0-0' }}
             </div>
           </div>
           <div class="stmt-total-divider"></div>
@@ -833,7 +833,7 @@
 
         <!-- Month-grouped view -->
         <ng-container *ngIf="statementGroupBy() === 'MONTH'">
-          <div class="glass-card stmt-month-group" *ngFor="let group of getStatementMonthGroups()">
+          <div class="glass-card stmt-month-group" *ngFor="let group of statementMonthGroups()">
             <div class="stmt-month-header">
               <span class="mono" style="color: #FAC775;">{{ group.month }}</span>
               <div class="stmt-month-totals">
@@ -905,7 +905,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of getFilteredStatementRows()"
+                  <tr *ngFor="let row of filteredStatementRowsPaginated()"
                       [class.stmt-row-debit]="row.debit && row.debit > 0"
                       [class.stmt-row-credit]="row.credit && row.credit > 0">
                     <td><input type="checkbox" [(ngModel)]="row.selected" style="accent-color: #6C63FF;" /></td>
@@ -1230,7 +1230,7 @@
       <!-- Income History in AI view -->
       <div class="glass-card" *ngIf="incomeHistory().length > 0" style="border-color: rgba(29,158,117,0.3);">
         <h3 class="mono head" style="color: #5DCAA5; margin-bottom: 16px;">◈ INCOME HISTORY</h3>
-        <div class="tx-row" *ngFor="let inc of incomeHistory().slice(0, 10)" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 12px;">
+        <div class="tx-row" *ngFor="let inc of recentIncomeHistory()" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 12px;">
           <div class="tx-icon-wrap" style="background: rgba(29,158,117,0.15);">
             <span>{{ getIncomeIcon(inc.category) }}</span>
           </div>
@@ -1457,4 +1457,6 @@
     </div>
   </section>
 </div>
+
+
 

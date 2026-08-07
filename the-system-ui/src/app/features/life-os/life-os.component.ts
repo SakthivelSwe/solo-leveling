@@ -85,6 +85,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   // Income tracking
   incomeHistory = signal<IncomeLog[]>([]);
+  recentIncomeHistory = computed(() => this.incomeHistory().slice(0, 10));
   newIncome: IncomeLog = { amount: 0, category: 'SALARY', description: 'Monthly Salary' };
   incomeCategories = [
     { cat: 'SALARY', icon: '💼', label: 'Salary' },
@@ -326,9 +327,14 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   /** Filter jobs by status for kanban cards */
-  filterJobsByStatus(status: string): JobApplication[] {
-    return this.jobs().filter(j => j.status === status);
-  }
+  jobsByStatus = computed(() => {
+    const list = this.jobs();
+    const grouped: { [status: string]: JobApplication[] } = {};
+    for (const s of this.statuses) {
+      grouped[s] = list.filter(j => j.status === s).sort((a, b) => b.id! - a.id!);
+    }
+    return grouped;
+  });
 
   /* ===== Career actions ===== */
   addJob(): void {
@@ -467,7 +473,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getTransactionList(): { date: string; type: 'INCOME' | 'EXPENSE'; amount: number; category: string; description: string; icon: string; isEssential?: boolean }[] {
+  transactionList = computed(() => {
     const expenses = this.expenses().map(e => ({
       date: e.expenseDate || '', type: 'EXPENSE' as const,
       amount: e.amount, category: e.category,
@@ -480,20 +486,20 @@ export class LifeOsComponent implements OnInit, OnDestroy {
       description: i.description, icon: this.getIncomeIcon(i.category)
     }));
     return [...income, ...expenses].sort((a, b) => b.date.localeCompare(a.date));
-  }
+  });
 
   getIncomeIcon(cat: string): string {
     return this.incomeCategories.find(c => c.cat === cat)?.icon || '💰';
   }
 
-  getTotalBalance(): number {
+  totalBalance = computed(() => {
     const m = this.monthlySummary();
     if (!m) return 0;
     return m.totalIncome - m.totalExpenses - m.emiTotal - m.subscriptionTotal;
-  }
+  });
 
-  getFilteredTransactions(): any[] {
-    const all = this.getTransactionList();
+  filteredTransactions = computed(() => {
+    const all = this.transactionList();
     const period = this.selectedPeriod();
     const now = new Date();
     if (period === 'DAILY') {
@@ -507,11 +513,11 @@ export class LifeOsComponent implements OnInit, OnDestroy {
       return all.filter(t => t.date.startsWith(monthPrefix));
     }
     return all;
-  }
+  });
 
-  getMonthlyIncomeTotal(): number {
+  monthlyIncomeTotal = computed(() => {
     return this.incomeHistory().filter(i => (i.incomeDate || '').startsWith(new Date().toISOString().slice(0, 7))).reduce((s, i) => s + i.amount, 0);
-  }
+  });
 
   updateWealthChart(budgets: BudgetEntry[]): void {
     if (budgets.length > 0) {
@@ -887,35 +893,43 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     else this.toast(`◈ Parsed ${txRows.length} transactions from statement`);
   }
 
-  getFilteredStatementRows(paginated: boolean = true): BankStatementRow[] {
-    const rows = this.statementRows();
+  filteredStatementRowsAll = computed(() => {
+    let rows = this.statementRows();
     const filter = this.statementFilter();
-    if (filter === 'ALL') return rows;
-
-    const now = new Date();
-    return rows.filter(r => {
-      const d = this.parseBankDate(r.tranDate);
-      if (!d) return true;
-      if (filter === 'MONTH') {
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      } else if (filter === 'WEEK') {
-        const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
-        return d >= weekAgo;
-      } else if (filter === 'YEAR') {
-        return d.getFullYear() === now.getFullYear();
-      } else if (filter === 'CUSTOM') {
-        const start = this.statementCustomStart ? new Date(this.statementCustomStart) : null;
-        const end = this.statementCustomEnd ? new Date(this.statementCustomEnd) : null;
-        if (start && d < start) return false;
-        if (end && d > end) return false;
+    if (filter !== 'ALL') {
+      const now = new Date();
+      rows = rows.filter(r => {
+        const d = this.parseBankDate(r.tranDate);
+        if (!d) return true;
+        if (filter === 'MONTH') {
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        } else if (filter === 'WEEK') {
+          const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+          return d >= weekAgo;
+        } else if (filter === 'YEAR') {
+          return d.getFullYear() === now.getFullYear();
+        } else if (filter === 'CUSTOM') {
+          const start = this.statementCustomStart ? new Date(this.statementCustomStart) : null;
+          const end = this.statementCustomEnd ? new Date(this.statementCustomEnd) : null;
+          if (start && d < start) return false;
+          if (end && d > end) return false;
+          return true;
+        }
         return true;
-      }
-      return true;
-    });
-  }
+      });
+    }
+    return rows;
+  });
 
-  getStatementMonthGroups(): { month: string; rows: BankStatementRow[]; totalDebit: number; totalCredit: number }[] {
-    const rows = this.getFilteredStatementRows(false);
+  filteredStatementRowsPaginated = computed(() => {
+    let rows = this.filteredStatementRowsAll();
+    const size = this.statementPageSize();
+    const start = (this.statementCurrentPage() - 1) * size;
+    return rows.slice(start, start + size);
+  });
+
+  statementMonthGroups = computed(() => {
+    const rows = this.filteredStatementRowsAll();
     const groups: { [key: string]: BankStatementRow[] } = {};
     for (const r of rows) {
       const d = this.parseBankDate(r.tranDate);
@@ -931,14 +945,14 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         totalDebit: rows.reduce((s, r) => s + (r.debit || 0), 0),
         totalCredit: rows.reduce((s, r) => s + (r.credit || 0), 0)
       }));
-  }
+  });
 
-  getStatementTotals(): { totalDebit: number; totalCredit: number; net: number } {
-    const rows = this.getFilteredStatementRows(false);
+  statementTotals = computed(() => {
+    const rows = this.filteredStatementRowsAll();
     const totalDebit = rows.reduce((s, r) => s + (r.debit || 0), 0);
     const totalCredit = rows.reduce((s, r) => s + (r.credit || 0), 0);
     return { totalDebit, totalCredit, net: totalCredit - totalDebit };
-  }
+  });
 
   private parseBankDate(dateStr: string): Date | null {
     if (!dateStr) return null;
@@ -1019,7 +1033,8 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   exportStatementAs(format: 'CSV' | 'EXCEL'): void {
-    const rows = this.getFilteredStatementRows(false);
+    const rows = this.filteredStatementRowsAll();
+    this.isExportingStatement.set(true);
     if (rows.length === 0) { this.toast('⚠ No data to export'); return; }
 
     if (format === 'CSV') {
@@ -1060,7 +1075,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   getStatementTopMerchant(): string {
-    const rows = this.getFilteredStatementRows(false).filter(r => r.debit && r.debit > 0);
+    const rows = this.filteredStatementRowsAll().filter(r => r.debit && r.debit > 0);
     const totals: { [k: string]: number } = {};
     for (const r of rows) {
       const key = r.myLabel || r.particulars.substring(0, 20);
