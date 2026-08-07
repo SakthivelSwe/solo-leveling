@@ -450,9 +450,11 @@ public class WealthService {
         return statementRepo.findByPlayerIdOrderByUploadDateDesc(playerId);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public BankStatementRecord getStatement(Long playerId, Long statementId) {
         BankStatementRecord record = statementRepo.findById(statementId).orElseThrow(() -> new ApiException("Statement not found", HttpStatus.NOT_FOUND));
         if (!record.getPlayer().getId().equals(playerId)) throw new ApiException("Not your statement", HttpStatus.FORBIDDEN);
+        record.getTransactions().size(); // Initialize lazy collection
         return record;
     }
 

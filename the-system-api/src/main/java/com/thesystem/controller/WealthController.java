@@ -237,8 +237,18 @@ public class WealthController {
     }
 
     @GetMapping("/statements/{id}")
-    public BankStatementRecord getStatement(Principal p, @PathVariable Long id) {
-        return wealthService.getStatement(currentPlayer.id(p), id);
+    public java.util.Map<String, Object> getStatement(Principal p, @PathVariable Long id) {
+        BankStatementRecord record = wealthService.getStatement(currentPlayer.id(p), id);
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("id", record.getId());
+        result.put("fileName", record.getFileName());
+        result.put("bankName", record.getBankName());
+        result.put("period", record.getPeriod());
+        result.put("accountHolder", record.getAccountHolder());
+        result.put("uploadDate", record.getUploadDate());
+        result.put("openingBalance", record.getOpeningBalance());
+        result.put("transactions", record.getTransactions());
+        return result;
     }
 
     @DeleteMapping("/statements/{id}")

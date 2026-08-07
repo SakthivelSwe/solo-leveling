@@ -15,6 +15,7 @@ public class BankStatementRecord {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Player player;
 
     private String fileName;
@@ -27,6 +28,7 @@ public class BankStatementRecord {
     private Double openingBalance;
 
     @OneToMany(mappedBy = "statement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<BankStatementTxn> transactions = new ArrayList<>();
 
     // Getters and Setters
