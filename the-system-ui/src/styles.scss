@@ -1,28 +1,28 @@
 /* ============================================================
-   THE SYSTEM — Solo Leveling Life OS · Premium 3D Theme v4
+   THE SYSTEM â€” Solo Leveling Life OS Â· Premium 3D Theme v4
    Foundation: design tokens + container queries + spacing scale.
    ============================================================ */
 @use '@angular/material' as mat;
 @import '@angular/cdk/overlay-prebuilt.css';
 
-/* ── Google Fonts ─────────────────────────────────────────── */
+/* â”€â”€ Google Fonts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ── Touch Interaction Optimizations ────────────────────── */
+/* â”€â”€ Touch Interaction Optimizations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 *, body, button, a {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
 :root {
-  /* ── Backgrounds ────────────────────────────────────────── */
+  /* â”€â”€ Backgrounds â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --bg-primary:   #05050d;
   --bg-secondary: #0a0a18;
   --card-bg:      #10101e;
   --border:       #1c1c34;
   --border-glow:  #2b2b52;
 
-  /* ── Accents ────────────────────────────────────────────── */
+  /* â”€â”€ Accents â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --accent-purple:     #6C63FF;
   --accent-purple-2:   #534AB7;
   --accent-purple-dim: rgba(108,99,255,0.18);
@@ -31,12 +31,12 @@
   --accent-red:    #E24B4A;
   --accent-cyan:   #4fc3f7;
 
-  /* ── Text ───────────────────────────────────────────────── */
+  /* â”€â”€ Text â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --text-primary:   #EEF3FA;
   --text-secondary: #7a8494;
   --text-dim:       #3a4050;
 
-  /* ── Stat colors ────────────────────────────────────────── */
+  /* â”€â”€ Stat colors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --stat-str: #FF6B3D;
   --stat-int: #6C63FF;
   --stat-vit: #1FBE8E;
@@ -47,12 +47,12 @@
   --system-blue: #4fc3f7;
   --system-glow: rgba(108,99,255,0.60);
 
-  /* ── HP colors ──────────────────────────────────────────── */
+  /* â”€â”€ HP colors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --hp-high: #1FBE8E;
   --hp-mid:  #FAC775;
   --hp-low:  #E24B4A;
 
-  /* ── Spacing scale ──────────────────────────────────────── */
+  /* â”€â”€ Spacing scale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --s-1:  4px;
   --s-2:  8px;
   --s-3: 12px;
@@ -62,18 +62,18 @@
   --s-8: 32px;
   --s-10: 40px;
 
-  /* ── Mobile navigation ──────────────────────────────────────── */
+  /* â”€â”€ Mobile navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --bottom-nav-height: 64px;
   --bottom-nav-total: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
 
-  /* ── Border radius scale ────────────────────────────────── */
+  /* â”€â”€ Border radius scale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --r-sm:   6px;
   --r-md:  10px;
   --r-lg:  16px;
   --r-xl:  20px;
   --r-pill: 999px;
 
-  /* ── Typography scale ───────────────────────────────────── */
+  /* â”€â”€ Typography scale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --fs-2xs: 0.5rem;
   --fs-xs:  0.62rem;
   --fs-sm:  0.72rem;
@@ -81,7 +81,7 @@
   --fs-lg:  1rem;
   --fs-xl:  1.2rem;
 
-  /* ── 3D depth / elevation tokens ───────────────────────── */
+  /* â”€â”€ 3D depth / elevation tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --elev-1:
     0 1px 2px rgba(0,0,0,0.40),
     0 2px 8px rgba(0,0,0,0.35);
@@ -99,33 +99,33 @@
     0 8px 24px rgba(108,99,255,0.22),
     0 1px 0 rgba(255,255,255,0.07) inset;
 
-  /* ── Glass surface ──────────────────────────────────────── */
+  /* â”€â”€ Glass surface â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --glass-fill: linear-gradient(160deg, rgba(24,24,44,0.72), rgba(12,12,26,0.78));
   --glass-blur: 16px;
 
-  /* ── Motion ─────────────────────────────────────────────── */
+  /* â”€â”€ Motion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --ease-spring: cubic-bezier(.22,1,.36,1);
-  --duration-fast:   150ms;
-  --duration-normal: 280ms;
-  --duration-slow:   420ms;
+  --duration-fast:   80ms;
+  --duration-normal: 150ms;
+  --duration-slow:   250ms;
 }
 
 * { box-sizing: border-box; touch-action: manipulation; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
-/* Enable GPU-accelerated 3D across the app — perspective on html causes
+/* Enable GPU-accelerated 3D across the app â€” perspective on html causes
    backdrop-filter blur artefacts on nested elements, so we apply it only
    per-element where needed (see .card-3d hover in styles below). */
-/* html { perspective: 1400px; } ← intentionally removed */
+/* html { perspective: 1400px; } â† intentionally removed */
 
-/* ── Mobile-first responsive foundations ─────────────────────── */
+/* â”€â”€ Mobile-first responsive foundations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 html {
   font-size: clamp(14px, 1.5vw + 10px, 16px);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
-/* ── Touch targets — only on primary interactive elements ──── */
+/* â”€â”€ Touch targets â€” only on primary interactive elements â”€â”€â”€â”€ */
 /* Avoids forcing 44px on tiny UI micro-buttons (handled per-component) */
 a[href], [role='button']:not([class*="mini"]):not([class*="tog"]):not([class*="gear"]):not([class*="cls"]) {
   min-height: 44px;
@@ -147,7 +147,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Animated aurora / nebula layer (adds living depth) ──────── */
+/* â”€â”€ Animated aurora / nebula layer (adds living depth) â”€â”€â”€â”€â”€â”€â”€â”€ */
 body::before {
   content: '';
   position: fixed;
@@ -168,7 +168,7 @@ body::before {
   100% { transform: translate3d(-2%, 2%, 0) scale(1.04); opacity: .8; }
 }
 
-/* ── Star / particle field ───────────────────────────────────── */
+/* â”€â”€ Star / particle field â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body::after {
   content: '';
   position: fixed;
@@ -196,7 +196,7 @@ body::after {
   to   { background-position: 600px 600px; }
 }
 
-/* ── Typography ───────────────────────────────────────────── */
+/* â”€â”€ Typography â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .mono  { font-family: 'Orbitron', 'Courier New', monospace; }
 .tech  { font-family: 'Rajdhani', sans-serif; letter-spacing: .5px; }
 
@@ -229,7 +229,7 @@ body::after {
   color: var(--text-primary);
 }
 
-/* ── Scrollbar ─────────────────────────────────────────────── */
+/* â”€â”€ Scrollbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 ::-webkit-scrollbar-thumb {
@@ -240,10 +240,10 @@ body::after {
 ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #8b83ff, #3a34a0); }
 
 /* ============================================================
-   3D SYSTEM CARD — glassmorphic surface with real depth
+   3D SYSTEM CARD â€” glassmorphic surface with real depth
    container-type: inline-size enables @container queries in
    child components so they adapt to the card's own width, not
-   the viewport — this is the key to rock-solid responsive UX.
+   the viewport â€” this is the key to rock-solid responsive UX.
    ============================================================ */
 .glass-panel {
   background: 
@@ -256,7 +256,7 @@ body::after {
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   box-shadow: var(--elev-2);
-  /* Container query foundation — child CSS can use @container */
+  /* Container query foundation â€” child CSS can use @container */
   container-type: inline-size;
   container-name: card;
   transition:
@@ -302,7 +302,7 @@ body::after {
 }
 .card-3d:active { transform: perspective(900px) translateY(-1px) scale(.997); }
 
-/* ── Premium 3D buttons ──────────────────────────────────────
+/* â”€â”€ Premium 3D buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Use class="btn-3d" for primary actions. */
 .btn-3d {
   position: relative;
@@ -329,7 +329,7 @@ body::after {
     0 1px 0 rgba(255,255,255,0.25) inset;
 }
 
-/* ── Glow utilities ───────────────────────────────────────── */
+/* â”€â”€ Glow utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .glow-text  { text-shadow: 0 0 18px var(--system-glow), 0 0 36px var(--system-glow); }
 .glow-teal  { text-shadow: 0 0 12px rgba(31,190,142,0.8); }
 .glow-gold  { text-shadow: 0 0 12px rgba(250,199,117,0.7); }
@@ -340,7 +340,7 @@ body::after {
   100%   { transform: translateX(300%); }
 }
 
-/* ── Angular Material dark theme ──────────────────────────── */
+/* â”€â”€ Angular Material dark theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $sys-primary: mat.define-palette(mat.$indigo-palette, 400);
 $sys-accent:  mat.define-palette(mat.$teal-palette,   400);
 $sys-warn:    mat.define-palette(mat.$red-palette);
@@ -352,7 +352,7 @@ $sys-theme: mat.define-dark-theme((
 @include mat.core();
 @include mat.all-component-themes($sys-theme);
 
-/* ── System Snackbar ──────────────────────────────────────── */
+/* â”€â”€ System Snackbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes systemSnackPulse {
   0% { box-shadow: 0 0 15px rgba(31,190,142,0.6), inset 0 0 10px rgba(31,190,142,0.2); border-color: rgba(31,190,142, 0.8); }
   50% { box-shadow: 0 0 35px rgba(31,190,142,0.9), inset 0 0 20px rgba(31,190,142,0.4); border-color: rgba(31,190,142, 1); }
@@ -363,7 +363,7 @@ $sys-theme: mat.define-dark-theme((
   --mdc-snackbar-container-color:       rgba(10, 10, 24, 0.95);
   --mdc-snackbar-supporting-text-color: #EEF3FA;
   --mat-snack-bar-button-color:         #FAC775;
-  /* NOTE: Do NOT add position:fixed here — it overrides Angular CDK overlay positioning.
+  /* NOTE: Do NOT add position:fixed here â€” it overrides Angular CDK overlay positioning.
      The verticalPosition / horizontalPosition options on snack.open() control placement. */
   z-index: 9999 !important;
 }
@@ -383,13 +383,13 @@ $sys-theme: mat.define-dark-theme((
   font-family: 'Orbitron', sans-serif;
 }
 
-/* ── Snackbar position: top-right ─────────────────────────────────────────
+/* â”€â”€ Snackbar position: top-right â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Angular CDK's GlobalPositionStrategy uses inline styles on the overlay
    wrapper to control snackbar placement. These cannot be reliably overridden
    with CSS !important in all Angular Material versions.
    SOLUTION: Use position:fixed directly on the snackbar container with explicit
    top/right coordinates. This pulls it out of the CDK layout flow entirely and
-   pins it exactly where we want it — top-right corner, 16px from edges.       */
+   pins it exactly where we want it â€” top-right corner, 16px from edges.       */
 .mat-mdc-snack-bar-container {
   position: fixed    !important;
   top:   16px        !important;
@@ -413,7 +413,7 @@ $sys-theme: mat.define-dark-theme((
 
 
 
-/* ── Overlay backdrop ─────────────────────────────────────── */
+/* â”€â”€ Overlay backdrop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .cdk-overlay-dark-backdrop {
   background: var(--bg-primary);
 }
@@ -426,7 +426,7 @@ $sys-theme: mat.define-dark-theme((
   width: 100vw;
   height: 100vh;
 }
-/* ── Holographic flicker animation ──────────────────────────── */
+/* â”€â”€ Holographic flicker animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes holoBlink {
   0%,100% { opacity: 1; }
   92%     { opacity: 1; }
@@ -436,7 +436,7 @@ $sys-theme: mat.define-dark-theme((
   97%     { opacity: 1; }
 }
 
-/* ── Stat increase pop ─────────────────────────────────────── */
+/* â”€â”€ Stat increase pop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes statPop {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.22); filter: brightness(1.8); }
@@ -445,14 +445,14 @@ $sys-theme: mat.define-dark-theme((
 }
 .stat-pop { animation: statPop .55s var(--ease-spring) both; }
 
-/* ── HP danger pulse ─────────────────────────────────────────── */
+/* â”€â”€ HP danger pulse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes dangerPulse {
   0%,100% { box-shadow: 0 0 8px rgba(226,75,74,0.4); }
   50%     { box-shadow: 0 0 28px rgba(226,75,74,0.9); }
 }
 .hp-danger { animation: dangerPulse 1.6s ease-in-out infinite; }
 
-/* ── Level-up dialog — full-screen centered overlay ─────────── */
+/* â”€â”€ Level-up dialog â€” full-screen centered overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 /* The CDK overlay container is already position:fixed full-screen.
    We just need to ensure our custom panel class strips Material's
    padding and that the surface is transparent so our card shows. */
@@ -472,7 +472,7 @@ $sys-theme: mat.define-dark-theme((
   overflow: visible;
   padding: 0;
 }
-/* The CDK overlay pane that wraps the dialog — make sure it's centred */
+/* The CDK overlay pane that wraps the dialog â€” make sure it's centred */
 .cdk-overlay-pane:has(.level-up-panel),
 .cdk-global-overlay-wrapper:has(.level-up-panel) {
   display: flex;
@@ -480,8 +480,8 @@ $sys-theme: mat.define-dark-theme((
   justify-content: center;
 }
 
-/* ── Android 15 / iOS edge-to-edge safe areas ───────────────── */
-/* Applied universally — env() returns 0 on desktop so no visual change there */
+/* â”€â”€ Android 15 / iOS edge-to-edge safe areas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Applied universally â€” env() returns 0 on desktop so no visual change there */
 .route-host {
   min-height: 100dvh;
 }
@@ -497,8 +497,8 @@ body.native-platform .route-host {
   padding-right: max(env(safe-area-inset-right, 0px), 0px);
 }
 
-/* ── Global responsive shell padding ────────────────────────── */
-/* Add safe-area-inset-top to all page shells — prevents content going under status bar on Android */
+/* â”€â”€ Global responsive shell padding â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Add safe-area-inset-top to all page shells â€” prevents content going under status bar on Android */
 .system-shell,
 .habits-shell,
 .life-shell,
@@ -527,7 +527,7 @@ body.native-platform .route-host {
   }
 }
 
-/* ── Utility: prevent long words overflowing containers ──────────── */
+/* â”€â”€ Utility: prevent long words overflowing containers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 /* Applied broadly, but overridden per-component for badge/tag elements */
 p, h1, h2, h3, h4, h5, h6, a, label {
   overflow-wrap: break-word;
@@ -538,7 +538,7 @@ span {
   overflow-wrap: break-word;
 }
 
-/* ── Reduced-motion: respect user preference ────────────────── */
+/* â”€â”€ Reduced-motion: respect user preference â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important;
@@ -549,7 +549,7 @@ span {
 }
 
 /* ============================================================
-   NATIVE (Android WebView) PERFORMANCE MODE  ·  anti-overheat
+   NATIVE (Android WebView) PERFORMANCE MODE  Â·  anti-overheat
    ------------------------------------------------------------
    The Capacitor WebView composites continuous `backdrop-filter`
    blur and infinite full-screen animations far less efficiently
@@ -563,7 +563,7 @@ span {
    <body> by NativeService on Android only.
    ============================================================ */
 body.native-platform::before {
-  /* Kill the animated, blurred full-screen aurora — keep a cheap static tint. */
+  /* Kill the animated, blurred full-screen aurora â€” keep a cheap static tint. */
   animation: none !important;
   filter: none !important;
   opacity: .45;
@@ -591,15 +591,15 @@ body.native-platform .cdk-overlay-dark-backdrop {
   background: rgba(3,3,10,0.96);
 }
 
-/* ── Global native animation kill — with TARGETED EXCEPTIONS ─────────────────
+/* â”€â”€ Global native animation kill â€” with TARGETED EXCEPTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    We kill decorative looping animations (aurora, drift, pulse glows) but MUST
    preserve:
-     a) Angular Material ripple — this IS the tap feedback. Removing it makes
+     a) Angular Material ripple â€” this IS the tap feedback. Removing it makes
         buttons feel broken / unresponsive (the bug the user reported).
-     b) .spring-active:active transform — the :active press-down effect on buttons.
+     b) .spring-active:active transform â€” the :active press-down effect on buttons.
      c) Loading spinners and progress rings.
      d) Toast slide-in (fires once, very cheap).
-   ─────────────────────────────────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body.native-platform *,
 body.native-platform *::before,
 body.native-platform *::after {
@@ -607,7 +607,7 @@ body.native-platform *::after {
   transition-duration: 0.10s !important;  /* quick micro-transitions, not zero */
 }
 
-/* ── RE-ENABLE: Angular Material ripple (tap feel) ───────────────────────── */
+/* â”€â”€ RE-ENABLE: Angular Material ripple (tap feel) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 body.native-platform .mat-ripple-element {
   animation: unset !important;
   transition: unset !important;
@@ -617,7 +617,7 @@ body.native-platform .mat-mdc-button-ripple .mat-ripple-element {
   animation: unset !important;
 }
 
-/* ── RE-ENABLE: :active press-down on buttons (critical for tap response feel) */
+/* â”€â”€ RE-ENABLE: :active press-down on buttons (critical for tap response feel) */
 body.native-platform .spring-active:active,
 body.native-platform button:active,
 body.native-platform a:active,
@@ -625,7 +625,7 @@ body.native-platform .bnav-item:active .bnav-icon {
   transition-duration: 0.08s !important;
 }
 
-/* ── RE-ENABLE: loading indicators (spinners, rings, progress fills) ─────── */
+/* â”€â”€ RE-ENABLE: loading indicators (spinners, rings, progress fills) â”€â”€â”€â”€â”€â”€â”€ */
 body.native-platform .loader-ring,
 body.native-platform .dots::after,
 body.native-platform .sys-spin,
@@ -636,7 +636,7 @@ body.native-platform .btn-confirm.pulse {   /* confirm clean day pulse */
   animation-iteration-count: infinite !important;
 }
 
-/* ── DISABLE: :hover states on touch devices ─────────────────────────────────
+/* â”€â”€ DISABLE: :hover states on touch devices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    On Android, :hover fires on long-press and gets stuck after the finger lifts,
    causing the "ghost active" visual bug that looks like a double-tap. Suppressing
    hover transforms on native eliminates this entirely. */
@@ -651,7 +651,7 @@ body.native-platform .glass-panel:hover {
   filter: unset !important;
 }
 
-/* ── GPU-promote the bottom nav bar ──────────────────────────────────────────
+/* â”€â”€ GPU-promote the bottom nav bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    will-change:transform puts the bottom nav in its own GPU compositor layer so
    page scrolling and route transitions never cause it to repaint. */
 body.native-platform .bottom-nav {
@@ -663,7 +663,7 @@ body.native-platform .bottom-nav {
   background: rgba(8, 8, 20, 0.99) !important;
 }
 
-/* ── Touch scroll optimizations ──────────────────────────────────────────────
+/* â”€â”€ Touch scroll optimizations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    -webkit-overflow-scrolling: touch enables momentum scrolling in WebView.
    overscroll-behavior: contain prevents the page from scrolling when an inner
    list hits its boundary (fixes the pull-to-refresh fight / jank). */
@@ -724,7 +724,7 @@ body.native-platform .cdk-virtual-scroll-viewport {
    PHASE 1: DYNAMIC THEMES & MICRO-INTERACTIONS
    ============================================================ */
 
-/* ── Spring Animations (Micro-interactions) ── */
+/* â”€â”€ Spring Animations (Micro-interactions) â”€â”€ */
 .spring-hover {
   transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-spring);
 }
@@ -737,7 +737,7 @@ body.native-platform .cdk-virtual-scroll-viewport {
   transition: transform 0.1s ease-out;
 }
 
-/* ── Premium System Buttons ── */
+/* â”€â”€ Premium System Buttons â”€â”€ */
 .sys-btn {
   padding: 10px 20px; border-radius: 8px; 
   border: 1px solid rgba(255,255,255,0.08); 
@@ -761,12 +761,12 @@ body.native-platform .cdk-virtual-scroll-viewport {
   pointer-events: none;
 }
 
-/* ── Premium Form Controls ── */
+/* â”€â”€ Premium Form Controls â”€â”€ */
 .fin, .custom-input {
   width: 100%; padding: 12px 16px; 
   background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
   color: var(--text-primary); font-size: 0.9rem;
-  transition: all 0.3s;
+  transition: all 0.15s;
   outline: none;
   box-sizing: border-box;
 }
@@ -776,7 +776,7 @@ body.native-platform .cdk-virtual-scroll-viewport {
 .input-wrapper { position: relative; }
 .input-focus-border {
   position: absolute; bottom: -1px; left: 10%; right: 10%; height: 2px;
-  background: var(--accent-purple); opacity: 0; transition: all 0.3s;
+  background: var(--accent-purple); opacity: 0; transition: all 0.15s;
   box-shadow: 0 0 10px var(--accent-purple);
 }
 .fin:focus + .input-focus-border, .custom-input:focus + .input-focus-border { left: 0; right: 0; opacity: 1; }
@@ -800,7 +800,7 @@ body.native-platform .cdk-virtual-scroll-viewport {
 }
 .custom-checkbox input:checked ~ .checkmark:after { display: block; }
 
-/* ── Critical HP Glitch Effect ── */
+/* â”€â”€ Critical HP Glitch Effect â”€â”€ */
 .hp-critical-glitch {
   position: relative;
   overflow: hidden;
@@ -941,7 +941,7 @@ body.native-platform {
   box-shadow: var(--glass-shadow);
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .glass-panel:hover {
@@ -988,9 +988,9 @@ body.native-platform {
   }
 }
 
-/* ════════════════════════════════════════════════════════════
-   SNACKBAR THEME — Solo Leveling style toast notifications
-   ════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SNACKBAR THEME â€” Solo Leveling style toast notifications
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .snack-success .mdc-snackbar__surface {
   background: rgba(31, 190, 142, 0.15) !important;
   border: 1px solid rgba(31, 190, 142, 0.5) !important;
