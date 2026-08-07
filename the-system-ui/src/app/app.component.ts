@@ -40,8 +40,7 @@ const AUTH_ROUTES = new Set(['/login', '/register', '/']);
     SystemBroadcastComponent
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  animations: [routeFade],
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'the-system-ui';

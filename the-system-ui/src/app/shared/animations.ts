@@ -27,7 +27,7 @@ export const listStagger = trigger('listStagger', [
 export const routeFade = trigger('routeFade', [
   transition('* <=> *', [
     style({ opacity: 0, transform: 'scale(.985)' }),
-    animate('320ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
+    animate('0ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
   ]),
 ]);
 
