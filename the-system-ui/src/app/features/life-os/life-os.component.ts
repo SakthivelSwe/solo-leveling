@@ -752,6 +752,10 @@ export class LifeOsComponent implements OnInit, OnDestroy {
                this.loadSelectedStatement({ target: { value: saved.id } });
                this.isParsingStatement.set(false);
                this.toast('✓ Parsed and saved XLS statement');
+            },
+            error: (err) => {
+               this.toast('❌ Failed to save parsed statement to backend');
+               this.isParsingStatement.set(false);
             }
           });
         } catch (err) {
