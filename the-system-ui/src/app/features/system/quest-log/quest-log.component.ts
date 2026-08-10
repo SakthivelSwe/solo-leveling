@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 import { Quest, CustomQuestRequest, JobChangeQuest } from '../../../core/models/models';
 import { UiStateService } from '../../../core/services/ui-state.service';
 import { PlayerService } from '../../../core/services/player.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CATEGORY_META } from '../../../shared/system.constants';
 import { listStagger } from '../../../shared/animations';
 import { SkipPromptModalComponent } from '../../../shared/components/skip-prompt-modal.component';
@@ -83,14 +84,21 @@ export class QuestLogComponent implements OnInit, OnChanges {
   }
 
   readonly cats = CATEGORY_META;
-  readonly dailyCategories = [
-    { key: 'ALL',          label: 'All Quests',      color: '#4fc3f7' },
-    { key: 'DAILY',        label: 'Daily Habits',    color: CATEGORY_META['DAILY'].color },
-    { key: 'SKILL',        label: 'Skill Grind',     color: CATEGORY_META['SKILL'].color },
-    { key: 'DISCIPLINE',   label: 'Discipline',      color: CATEGORY_META['DISCIPLINE'].color },
-    { key: 'TESTOSTERONE', label: 'Testosterone',    color: '#D85A30' },
-  ];
-
+  private auth = inject(AuthService);
+  
+  get dailyCategories() {
+    const isSakthi = this.auth.player()?.email === 'sakthiveltony@gmail.com';
+    const cats = [
+      { key: 'ALL',          label: 'All Quests',      color: '#4fc3f7' },
+      { key: 'DAILY',        label: 'Daily Habits',    color: CATEGORY_META['DAILY'].color },
+      { key: 'SKILL',        label: 'Skill Grind',     color: CATEGORY_META['SKILL'].color },
+      { key: 'DISCIPLINE',   label: 'Discipline',      color: CATEGORY_META['DISCIPLINE'].color }
+    ];
+    if (isSakthi) {
+      cats.push({ key: 'TESTOSTERONE', label: 'Testosterone',    color: '#D85A30' });
+    }
+    return cats;
+  }
 
   jobChangeQuest = signal<JobChangeQuest | null>(null);
   private http = inject(HttpClient);

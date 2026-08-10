@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, effect, HostListener, NgZone, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, effect, HostListener, NgZone, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -60,6 +60,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   settingsOpen = signal(false);
   profileMenuOpen = signal(false);
   pressureLevel = signal(localStorage.getItem('sys_pressure') ?? 'STANDARD');
+  isSakthi = computed(() => this.auth.player()?.email === 'sakthiveltony@gmail.com');
   /** Mobile section tabs: 'status' | 'quests' | 'schedule' */
   mobileTab = signal<'status' | 'quests' | 'schedule'>('status');
 

@@ -6,6 +6,7 @@ import { AiService } from '../../core/services/ai.service';
 import { SseService } from '../../core/services/sse.service';
 import { HeatmapDay, MonthlyReport, Title, NoFapStatus, NetWorthLog, SleepEntry, WorkoutEntry, StatusWindow, DopamineLog } from '../../core/models/models';
 import { LifeOsService } from '../../core/services/life-os.service';
+import { AuthService } from '../../core/services/auth.service';
 import { fadeInUp, listStagger } from '../../shared/animations';
 import { ProgressChartComponent } from './progress-chart.component';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -39,6 +40,7 @@ export class ProgressReportComponent implements OnInit {
   dopamine = signal<DopamineLog[]>([]);
 
   // Dopamine Chart
+  isSakthi = computed(() => this.auth.player()?.email === 'sakthiveltony@gmail.com');
   dopaChartData: ChartData<'line'> | undefined;
   dopaChartOptions: ChartConfiguration['options'] = {
     responsive: true, maintainAspectRatio: false,
@@ -110,7 +112,8 @@ export class ProgressReportComponent implements OnInit {
     private playerService: PlayerService,
     private ai: AiService,
     public sse: SseService,
-    private lifeOs: LifeOsService
+    private lifeOs: LifeOsService,
+    public auth: AuthService
   ) {
     // Live: refresh analytics when a real-time player-update arrives.
     let last = 0;

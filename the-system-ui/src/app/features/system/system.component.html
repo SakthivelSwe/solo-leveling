@@ -22,7 +22,9 @@
       <a routerLink="/ai" routerLinkActive="active" title="AI Mentor">AI</a>
       <a routerLink="/insights" routerLinkActive="active" title="Insights">DATA</a>
       <a routerLink="/achievements" routerLinkActive="active" title="Ranks & Achievements">RANKS</a>
-      <a routerLink="/nofap" routerLinkActive="active" class="nav-discipline" title="Discipline Protocol">🔥</a>
+      @if (isSakthi()) {
+        <a routerLink="/nofap" routerLinkActive="active" class="nav-discipline" title="Discipline Protocol">🔥</a>
+      }
       <a routerLink="/shadow-army" routerLinkActive="active" style="color: #b366ff; font-weight: 800; font-size: 1.1rem; padding-left: 8px;" title="Shadow Army">👥</a>
     </nav>
 
@@ -222,7 +224,7 @@
       <app-pomodoro></app-pomodoro>
 
       <!-- ── NoFap Discipline Mini-Widget ─────────────────────── -->
-      @if (noFap(); as nf) {
+      @if (isSakthi() && noFap(); as nf) {
         <div class="system-card block nofap-widget spring-hover" style="margin-top: 16px; overflow: hidden;">
           <div class="card-glow"></div>
           <div class="nfw-header">

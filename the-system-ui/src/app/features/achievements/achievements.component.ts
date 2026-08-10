@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PlayerService } from '../../core/services/player.service';
 import { Achievement } from '../../core/models/models';
+import { AuthService } from '../../core/services/auth.service';
 
 type AchCategory = 'ALL' | 'DISCIPLINE' | 'RANK' | 'LEVEL' | 'NOFAP' | 'STREAK' | 'LEARNING';
 
@@ -101,16 +102,30 @@ export class AchievementsComponent implements OnInit {
     { key: 'KEYSTONE',    title: 'Keystone Bearer',  description: 'Maintain a keystone habit', icon: '🗝', category: 'DISCIPLINE' },
   ];
 
-  constructor(private playerService: PlayerService) {}
+  constructor(
+    private playerService: PlayerService,
+    private auth: AuthService
+  ) {}
+
+  isSakthi = computed(() => this.auth.player()?.email === 'sakthiveltony@gmail.com');
 
   // Category filter
   activeCategory = signal<AchCategory>('ALL');
-  readonly categories: AchCategory[] = ['ALL', 'DISCIPLINE', 'RANK', 'LEVEL', 'NOFAP', 'STREAK', 'LEARNING'];
+  
+  categories = computed((): AchCategory[] => {
+    const cats: AchCategory[] = ['ALL', 'DISCIPLINE', 'RANK', 'LEVEL', 'STREAK', 'LEARNING'];
+    if (this.isSakthi()) cats.splice(4, 0, 'NOFAP');
+    return cats;
+  });
 
   filteredCatalogue = computed(() => {
     const cat = this.activeCategory();
-    if (cat === 'ALL') return this.catalogue;
-    return this.catalogue.filter(a => a.category === cat);
+    let catList = this.catalogue;
+    if (!this.isSakthi()) {
+      catList = catList.filter(a => a.category !== 'NOFAP');
+    }
+    if (cat === 'ALL') return catList;
+    return catList.filter(a => a.category === cat);
   });
 
   nextUnlocks = computed((): AchievementDef[] => {

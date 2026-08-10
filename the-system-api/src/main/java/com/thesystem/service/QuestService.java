@@ -82,6 +82,7 @@ public class QuestService {
         Map<Long, String> skipMap = skips.stream().collect(Collectors.toMap(QuestSkip::getQuestId, QuestSkip::getReason));
 
         List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel()).stream()
+                .filter(q -> "sakthiveltony@gmail.com".equals(player.getEmail()) || !("NO_PORN".equals(q.getQuestKey()) || "TESTOSTERONE".equals(q.getCategory().name())))
                 .map(q -> toDto(q, completedIds.contains(q.getId()), skipMap.containsKey(q.getId()), skipMap.get(q.getId()), player))
                 .collect(Collectors.toList());
 
@@ -109,6 +110,7 @@ public class QuestService {
         Map<Long, Long> counts = completions.stream().collect(Collectors.groupingBy(QuestCompletion::getQuestId, Collectors.counting()));
 
         return questRepository.findWeeklyQuestsForPlayer(playerId, player.getLevel()).stream()
+                .filter(q -> "sakthiveltony@gmail.com".equals(player.getEmail()) || !("NO_PORN".equals(q.getQuestKey()) || "TESTOSTERONE".equals(q.getCategory().name())))
                 .map(q -> {
                     long doneCount = counts.getOrDefault(q.getId(), 0L);
                     boolean isCompleted = doneCount >= 1;
@@ -138,6 +140,7 @@ public class QuestService {
         Map<Long, Long> counts = completions.stream().collect(Collectors.groupingBy(QuestCompletion::getQuestId, Collectors.counting()));
 
         return questRepository.findMonthlyQuestsForPlayer(playerId, player.getLevel()).stream()
+                .filter(q -> "sakthiveltony@gmail.com".equals(player.getEmail()) || !("NO_PORN".equals(q.getQuestKey()) || "TESTOSTERONE".equals(q.getCategory().name())))
                 .map(q -> {
                     long doneCount = counts.getOrDefault(q.getId(), 0L);
                     boolean isCompleted = doneCount >= 1;
@@ -163,6 +166,7 @@ public class QuestService {
         Set<Long> completedAllTime = completionRepository.findCompletedQuestIdsByPlayerId(playerId);
 
         return questRepository.findMilestoneQuests(player.getLevel()).stream()
+                .filter(q -> "sakthiveltony@gmail.com".equals(player.getEmail()) || !("NO_PORN".equals(q.getQuestKey()) || "TESTOSTERONE".equals(q.getCategory().name())))
                 .map(q -> toDto(q, completedAllTime.contains(q.getId()), player))
                 .collect(Collectors.toList());
     }

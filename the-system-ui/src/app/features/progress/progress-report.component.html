@@ -88,14 +88,16 @@
     <section class="life-os-metrics" @fadeInUp style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
       
       <!-- NoFap Retention -->
-      <div class="glass-panel" style="padding: 20px; border-left: 4px solid #E24B4A;">
-        <h3 class="mono" style="color: #E24B4A; margin-bottom: 8px;">◈ RETENTION</h3>
-        <div style="display: flex; align-items: baseline; gap: 12px;">
-          <span class="mono" style="font-size: 2.5rem; color: #fff;">{{ noFap()?.currentStreak || 0 }}</span>
-          <span class="tech dim">DAYS</span>
+      @if (isSakthi()) {
+        <div class="glass-panel" style="padding: 20px; border-left: 4px solid #E24B4A;">
+          <h3 class="mono" style="color: #E24B4A; margin-bottom: 8px;">◈ RETENTION</h3>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <span class="mono" style="font-size: 2.5rem; color: #fff;">{{ noFap()?.currentStreak || 0 }}</span>
+            <span class="tech dim">DAYS</span>
+          </div>
+          <p class="tech" style="color: #8a8a9a; font-size: 0.85rem; margin-top: 8px;">Longest: {{ noFap()?.longestStreak || 0 }} days</p>
         </div>
-        <p class="tech" style="color: #8a8a9a; font-size: 0.85rem; margin-top: 8px;">Longest: {{ noFap()?.longestStreak || 0 }} days</p>
-      </div>
+      }
 
       <!-- Dopamine Trend -->
       <div class="glass-panel" style="padding: 20px; border-left: 4px solid #FAC775; display: flex; flex-direction: column;">

@@ -1,7 +1,8 @@
-﻿import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../core/services/auth.service';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -142,10 +143,16 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   constructor(
     private lifeOs: LifeOsService,
     private snack: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private auth: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    if (this.auth.player()?.email !== 'sakthiveltony@gmail.com') {
+      this.router.navigate(['/system']);
+      return;
+    }
     this.load();
     this.loadMoodJournal();
     this.loadTriggerLog();

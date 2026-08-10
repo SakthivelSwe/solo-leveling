@@ -91,6 +91,10 @@ public class NoFapController {
 
     private Long playerId(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return playerService.getByUsername(jwtService.extractUsername(token)).getId();
+        com.thesystem.entity.Player player = playerService.getByUsername(jwtService.extractUsername(token));
+        if (!"sakthiveltony@gmail.com".equals(player.getEmail())) {
+            throw new com.thesystem.exception.ApiException("NoFap module is strictly gated.", org.springframework.http.HttpStatus.FORBIDDEN);
+        }
+        return player.getId();
     }
 }
