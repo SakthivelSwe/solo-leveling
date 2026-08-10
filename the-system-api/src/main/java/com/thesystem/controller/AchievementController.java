@@ -24,8 +24,9 @@ public class AchievementController {
 
     @GetMapping("/api/v1/achievements")
     public List<AchievementDTO> achievements(Principal principal) {
-        Long playerId = playerService.getByUsername(principal.getName()).getId();
-        return achievementService.getPlayerAchievements(playerId);
+        com.thesystem.entity.Player player = playerService.getByUsername(principal.getName());
+        achievementService.evaluate(player);
+        return achievementService.getPlayerAchievements(player.getId());
     }
 
     @GetMapping("/api/v1/progress/weekly")

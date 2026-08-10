@@ -10,6 +10,7 @@ import com.thesystem.repository.HabitRepository;
 import com.thesystem.repository.LeetcodeLogRepository;
 import com.thesystem.repository.QuestCompletionRepository;
 import com.thesystem.repository.QuestRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,17 +25,20 @@ public class AchievementService {
     private final QuestRepository questRepository;
     private final LeetcodeLogRepository leetcodeRepository;
     private final HabitRepository habitRepository;
+    private final NoFapService noFapService;
 
     public AchievementService(AchievementRepository achievementRepository,
                               QuestCompletionRepository completionRepository,
                               QuestRepository questRepository,
                               LeetcodeLogRepository leetcodeRepository,
-                              HabitRepository habitRepository) {
+                              HabitRepository habitRepository,
+                              @Lazy NoFapService noFapService) {
         this.achievementRepository = achievementRepository;
         this.completionRepository = completionRepository;
         this.questRepository = questRepository;
         this.leetcodeRepository = leetcodeRepository;
         this.habitRepository = habitRepository;
+        this.noFapService = noFapService;
     }
 
     public List<AchievementDTO> getPlayerAchievements(Long playerId) {
@@ -89,7 +93,9 @@ public class AchievementService {
             tryUnlock(pid, "DAWN_HUNTER", "Dawn Hunter",
                     "Get morning sunlight 10 days in a row", unlocked);
         }
-        if (consecutiveDays(pid, "NO_PORN", today) >= 14) {
+        
+        int nofapStreak = noFapService.getStatus(pid).getCurrentStreak();
+        if (nofapStreak >= 14) {
             tryUnlock(pid, "DOPAMINE_RESET", "Dopamine Reset",
                     "Complete NO_PORN quest 14 days — dopamine restored", unlocked);
         }
@@ -171,9 +177,9 @@ public class AchievementService {
 
         // ── Long discipline streaks (30-day+) ──
         if (consecutiveDays(pid, "COLD_SHOWER", today) >= 30) tryUnlock(pid, "COLD_30",   "Ice Monarch",     "Cold shower 30 days straight", unlocked);
-        if (consecutiveDays(pid, "NO_PORN", today)     >= 30) tryUnlock(pid, "NOPORN_30", "Monk Mode",       "NO_PORN 30 days straight", unlocked);
-        if (consecutiveDays(pid, "NO_PORN", today)     >= 60) tryUnlock(pid, "NOPORN_60", "Steel Discipline","NO_PORN 60 days straight", unlocked);
-        if (consecutiveDays(pid, "NO_PORN", today)     >= 90) tryUnlock(pid, "NOPORN_90", "Reborn",          "NO_PORN 90 days straight", unlocked);
+        if (nofapStreak >= 30) tryUnlock(pid, "NOPORN_30", "Monk Mode",       "NO_PORN 30 days straight", unlocked);
+        if (nofapStreak >= 60) tryUnlock(pid, "NOPORN_60", "Steel Discipline","NO_PORN 60 days straight", unlocked);
+        if (nofapStreak >= 90) tryUnlock(pid, "NOPORN_90", "Reborn",          "NO_PORN 90 days straight", unlocked);
         if (consecutiveDays(pid, "MORNING_SUN", today) >= 30) tryUnlock(pid, "SUN_30",    "Sun Disciple",    "Morning sunlight 30 days straight", unlocked);
         if (consecutiveDays(pid, "NO_SODA", today)     >= 30) tryUnlock(pid, "NOSODA_30", "Clean Machine",   "No soda 30 days straight", unlocked);
         if (consecutiveDays(pid, "CODE_NO_AI", today)  >= 10) tryUnlock(pid, "NOAI_10",   "Sharpening Steel","Code without AI 10 days straight", unlocked);
@@ -212,6 +218,9 @@ public class AchievementService {
                 .collect(Collectors.toSet());
         int streak = 0;
         LocalDate cursor = today;
+        if (!dates.contains(cursor)) {
+            cursor = cursor.minusDays(1);
+        }
         while (dates.contains(cursor)) {
             streak++;
             cursor = cursor.minusDays(1);
