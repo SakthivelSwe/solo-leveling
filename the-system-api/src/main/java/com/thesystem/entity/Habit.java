@@ -53,6 +53,20 @@ public class Habit {
     @Column(name = "stack_after_habit_id")
     private Long stackAfterHabitId;
 
+    /**
+     * Phase 2B: Habit chain group name (e.g. "MORNING_ROUTINE").
+     * Habits sharing the same stackGroup form a visible chain in the UI.
+     */
+    @Column(name = "stack_group", length = 80)
+    private String stackGroup;
+
+    /**
+     * Phase 2B: Position within the chain (0-based).
+     * Habits are displayed in ascending stackOrder within a stackGroup.
+     */
+    @Column(name = "stack_order", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
+    private int stackOrder = 0;
+
     /** Cue time (24h HH:mm) for scheduling reminders + implementation intention. */
     @Column(name = "cue_time", length = 5)
     private String cueTime;
@@ -74,6 +88,19 @@ public class Habit {
 
     @Column(nullable = false)
     private boolean archived = false;
+
+    /**
+     * Phase 1C — Cached current streak (updated on each completion/break).
+     * Eliminates the expensive "load all completions to compute streak" query.
+     */
+    @Column(name = "current_streak", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
+    private int currentStreak = 0;
+
+    /**
+     * Phase 1C — Cached all-time longest streak (updated when currentStreak beats it).
+     */
+    @Column(name = "longest_streak", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
+    private int longestStreak = 0;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -100,6 +127,10 @@ public class Habit {
     public void setTwoMinuteVersion(String twoMinuteVersion) { this.twoMinuteVersion = twoMinuteVersion; }
     public Long getStackAfterHabitId() { return stackAfterHabitId; }
     public void setStackAfterHabitId(Long stackAfterHabitId) { this.stackAfterHabitId = stackAfterHabitId; }
+    public String getStackGroup() { return stackGroup; }
+    public void setStackGroup(String stackGroup) { this.stackGroup = stackGroup; }
+    public int getStackOrder() { return stackOrder; }
+    public void setStackOrder(int stackOrder) { this.stackOrder = stackOrder; }
     public String getCueTime() { return cueTime; }
     public void setCueTime(String cueTime) { this.cueTime = cueTime; }
     public String getCueLocation() { return cueLocation; }
@@ -112,6 +143,10 @@ public class Habit {
     public void setActiveDays(int activeDays) { this.activeDays = activeDays; }
     public boolean isArchived() { return archived; }
     public void setArchived(boolean archived) { this.archived = archived; }
+    public int getCurrentStreak() { return currentStreak; }
+    public void setCurrentStreak(int currentStreak) { this.currentStreak = currentStreak; }
+    public int getLongestStreak() { return longestStreak; }
+    public void setLongestStreak(int longestStreak) { this.longestStreak = longestStreak; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

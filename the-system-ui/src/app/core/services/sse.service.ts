@@ -1,9 +1,10 @@
 import { Injectable, NgZone, effect, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
-import { SystemNotification } from '../models/models';
+import { SystemNotification, StatusWindow } from '../models/models';
 import { LocalNotificationsService } from './local-notifications.service';
 
 interface PlayerUpdate {
@@ -36,12 +37,19 @@ export class SseService {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectDelayMs = 5000; // starts at 5s, caps at 30s
 
+  /** Offline queue key — stores quest completions while offline. */
+  private readonly OFFLINE_QUEUE_KEY = 'system_offline_queue';
+
+  /** Emits when a status hydration completes on reconnect. */
+  readonly freshStatus = signal<StatusWindow | null>(null);
+
   constructor(
     private auth: AuthService,
     private notifications: NotificationService,
     private snack: MatSnackBar,
     private zone: NgZone,
     private localNotifs: LocalNotificationsService,
+    private http: HttpClient,
   ) {
     // Open the link while authenticated; close it on logout.
     effect(
@@ -88,6 +96,17 @@ export class SseService {
       this.zone.run(() => {
         this.connected.set(true);
         this.reconnectDelayMs = 5000; // reset backoff on successful connection
+
+        // Phase 3A (ANDROID-1 FIX): Hydrate dashboard immediately on reconnect.
+        // On Doze mode wakeup, SSE reconnects but no events arrive for seconds.
+        // Eagerly fetching fresh status eliminates stale data in that window.
+        this.http.get<StatusWindow>(`${environment.apiUrl}/player/status`).subscribe({
+          next: s => this.freshStatus.set(s),
+          error: () => { /* non-fatal — SSE will catch up via events */ }
+        });
+
+        // Phase 3B (ANDROID-2 FIX): Replay any queued offline completions.
+        this.replayOfflineQueue();
       }),
     );
 
@@ -134,6 +153,67 @@ export class SseService {
     this.eventSource?.close();
     this.eventSource = undefined;
     this.connected.set(false);
+  }
+
+  // ── Phase 3B: Offline Quest Completion Queue (ANDROID-2 FIX) ─────────────
+
+  /**
+   * Queue a quest completion for retry when offline.
+   * Called by the quest completion handler when HTTP POST fails with network error.
+   * Stored in localStorage so it survives app restarts.
+   */
+  queueOfflineCompletion(questKey: string): void {
+    const queue = this.getOfflineQueue();
+    if (!queue.includes(questKey)) {
+      queue.push(questKey);
+      localStorage.setItem(this.OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+      this.snack.open(
+        `◈ Queued — "${questKey}" will sync when online`,
+        '✕', { duration: 5000, panelClass: 'system-snack' }
+      );
+    }
+  }
+
+  /** Returns the number of pending offline quest completions. */
+  get pendingOfflineCount(): number {
+    return this.getOfflineQueue().length;
+  }
+
+  private getOfflineQueue(): string[] {
+    try {
+      return JSON.parse(localStorage.getItem(this.OFFLINE_QUEUE_KEY) || '[]');
+    } catch { return []; }
+  }
+
+  private replayOfflineQueue(): void {
+    const queue = this.getOfflineQueue();
+    if (queue.length === 0) return;
+
+    this.snack.open(
+      `◈ Syncing ${queue.length} offline quest${queue.length > 1 ? 's' : ''}…`,
+      '', { duration: 3000, panelClass: 'system-snack' }
+    );
+
+    // Replay in sequence — each queued key re-fires the complete POST
+    const replay = (keys: string[]) => {
+      if (keys.length === 0) {
+        localStorage.removeItem(this.OFFLINE_QUEUE_KEY);
+        this.snack.open('◈ Offline queue synced ✓', '', { duration: 2000, panelClass: 'system-snack' });
+        this.playerTick.update(v => v + 1); // refresh dashboard
+        return;
+      }
+      const [head, ...rest] = keys;
+      this.http.post(`${environment.apiUrl}/quests/${head}/complete`, {}).subscribe({
+        next: () => replay(rest),
+        error: () => {
+          // Re-queue only failed items
+          localStorage.setItem(this.OFFLINE_QUEUE_KEY, JSON.stringify(keys));
+          this.snack.open('◈ Partial sync — some quests remain queued', '', { duration: 3000, panelClass: 'system-snack' });
+        }
+      });
+    };
+
+    replay(queue);
   }
 
   private onNotification(ev: MessageEvent): void {

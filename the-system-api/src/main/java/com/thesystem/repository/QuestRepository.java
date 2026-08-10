@@ -48,5 +48,12 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
 
     /** Find a custom quest owned by a specific player. */
     Optional<Quest> findByQuestKeyAndOwnerId(String questKey, Long ownerId);
+
+    /**
+     * PERF-1 FIX: Lightweight projection — returns only (id, bossDamage) pairs.
+     * Used by DungeonService to calculate boss damage without loading entire Quest entities.
+     */
+    @Query("SELECT q.id, q.bossDamage FROM Quest q")
+    List<Object[]> findAllBossDamageValues();
 }
 

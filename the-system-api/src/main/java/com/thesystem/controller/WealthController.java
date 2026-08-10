@@ -255,4 +255,16 @@ public class WealthController {
     public void deleteStatement(Principal p, @PathVariable Long id) {
         wealthService.deleteStatement(currentPlayer.id(p), id);
     }
+
+    // ---- Phase 2A: Recurring Expense Detection ----
+
+    /**
+     * GET /api/v1/wealth/recurring
+     * Returns detected recurring expense patterns from the last 90 days.
+     * Patterns qualify if they appear 3+ times with amount variance ≤ 40%.
+     */
+    @GetMapping("/recurring")
+    public List<com.thesystem.dto.RecurringExpenseDTO> getRecurringExpenses(Principal p) {
+        return wealthService.detectRecurringExpenses(currentPlayer.id(p));
+    }
 }

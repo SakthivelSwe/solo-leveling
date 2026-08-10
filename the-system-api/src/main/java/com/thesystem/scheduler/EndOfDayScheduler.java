@@ -117,6 +117,11 @@ public class EndOfDayScheduler {
             // Penalty Zone: only trigger on catastrophic failure (< minimum threshold = -20 HP day).
             // This prevents double-punishment where a player loses HP AND enters penalty zone
             // for the same mild underperformance day.
+            //
+            // BUG-5 FIX: removed the else branch that cleared inPenaltyZone on non-catastrophic days.
+            // Penalty zone should ONLY be exited via completePenaltyQuest() or survivePenalty(),
+            // not automatically by the scheduler. Otherwise the player escapes punishment by simply
+            // waiting until the next day.
             if (hpChange <= -20) {
                 player.setInPenaltyZone(true);
                 player.setPenaltyZoneEndTime(null);
@@ -125,8 +130,6 @@ public class EndOfDayScheduler {
                         "A Penalty Survival Quest has been assigned. Rise, Hunter.", "SYSTEM_PENALTY");
                 log.warn("◈ Player {} sent to PENALTY ZONE (catastrophic failure: {} effective quests).",
                         player.getUsername(), effectiveDone);
-            } else {
-                player.setInPenaltyZone(false);
             }
 
             playerRepository.save(player);

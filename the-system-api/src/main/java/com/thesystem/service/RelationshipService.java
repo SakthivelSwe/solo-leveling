@@ -64,5 +64,24 @@ public class RelationshipService {
         conn.setHealthScore(Math.min(100, conn.getHealthScore() + 10)); // bump health on contact
         return socialRepo.save(conn);
     }
+
+    /**
+     * Phase 2C: Store birthday and/or anniversary for a social connection.
+     * Only updates the fields that are present in the request body.
+     */
+    public SocialConnection updateSpecialDates(Long playerId, Long connectionId, java.util.Map<String, String> body) {
+        SocialConnection conn = socialRepo.findById(connectionId).orElseThrow();
+        if (!conn.getPlayerId().equals(playerId)) {
+            throw new com.thesystem.exception.ApiException("Not your connection",
+                    org.springframework.http.HttpStatus.FORBIDDEN);
+        }
+        if (body.containsKey("birthday") && body.get("birthday") != null) {
+            conn.setBirthday(LocalDate.parse(body.get("birthday")));
+        }
+        if (body.containsKey("anniversary") && body.get("anniversary") != null) {
+            conn.setAnniversary(LocalDate.parse(body.get("anniversary")));
+        }
+        return socialRepo.save(conn);
+    }
 }
 

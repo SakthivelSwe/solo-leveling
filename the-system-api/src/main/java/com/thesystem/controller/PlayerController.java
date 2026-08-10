@@ -5,6 +5,7 @@ import com.thesystem.dto.StatusWindowDTO;
 import com.thesystem.dto.UpdateProfileRequest;
 import com.thesystem.entity.Player;
 import com.thesystem.service.PlayerService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -31,7 +32,7 @@ public class PlayerController {
     }
 
     @PutMapping("/profile")
-    public PlayerDTO updateProfile(Principal principal, @RequestBody UpdateProfileRequest request) {
+    public PlayerDTO updateProfile(Principal principal, @Valid @RequestBody UpdateProfileRequest request) {
         return playerService.updateProfile(playerId(principal), request);
     }
 

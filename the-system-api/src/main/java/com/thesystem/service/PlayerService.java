@@ -112,12 +112,16 @@ public class PlayerService {
     public PlayerDTO survivePenalty(Long playerId) {
         Player player = find(playerId);
         
-        if (player.getHp() > 0) {
+        // BUG-4 FIX: check inPenaltyZone flag, not hp.
+        // A player can have hp=0 without being in penalty zone (e.g., after demotion),
+        // and can be in penalty zone with hp > 0 (penalty triggers on catastrophic failure).
+        if (!player.isInPenaltyZone()) {
             throw new ApiException("You are not currently in the Penalty Zone.", HttpStatus.BAD_REQUEST);
         }
 
-        // Penalty survived: restore HP to 50
+        // Penalty survived: restore HP to 50 and clear penalty zone
         player.setHp(50);
+        player.setInPenaltyZone(false);
         player = playerRepository.save(player);
         
         // Reward some XP for surviving the grueling penalty
@@ -237,8 +241,11 @@ public class PlayerService {
     }
 
     /**
-     * Streak = consecutive days (ending today or yesterday) with at least 5 quests completed.
+     * Current consecutive-day streak (≥5 quests/day threshold).
+     * PERF-3: Also updates player.longestQuestStreak whenever the live streak beats it,
+     * so longestStreak() can just read the cached column without a full scan.
      */
+    @Transactional
     public int calculateStreak(Long playerId) {
         List<Object[]> dateCounts = completionRepository.countCompletionsByDate(playerId);
         Map<LocalDate, Long> countByDate = new HashMap<>();
@@ -258,33 +265,24 @@ public class PlayerService {
             streak++;
             cursor = cursor.minusDays(1);
         }
+
+        // PERF-3: keep longestQuestStreak cached and current.
+        Player p = find(playerId);
+        if (streak > p.getLongestQuestStreak()) {
+            p.setLongestQuestStreak(streak);
+            playerRepository.save(p);
+        }
+
         return streak;
     }
 
-    /** Longest ever run of consecutive days with >= 5 quests completed. */
+    /**
+     * PERF-3: Reads the cached longestQuestStreak column — O(1) instead of the
+     * previous O(n) full QuestCompletion scan. The column is kept up-to-date by
+     * calculateStreak() which is called on every getStatusWindow() call.
+     */
     public int longestStreak(Long playerId) {
-        Set<LocalDate> strongDays = completionRepository
-                .findByPlayerIdOrderByCompletedAtDesc(playerId).stream()
-                .collect(Collectors.groupingBy(QuestCompletion::getCompletedAt, Collectors.counting()))
-                .entrySet().stream()
-                .filter(e -> e.getValue() >= 5)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-
-        int best = 0;
-        for (LocalDate day : strongDays) {
-            // count only when this day is the start of a run (previous day not strong)
-            if (!strongDays.contains(day.minusDays(1))) {
-                int run = 0;
-                LocalDate cursor = day;
-                while (strongDays.contains(cursor)) {
-                    run++;
-                    cursor = cursor.plusDays(1);
-                }
-                best = Math.max(best, run);
-            }
-        }
-        return best;
+        return find(playerId).getLongestQuestStreak();
     }
 
     /** GitHub-style consistency heatmap for the last {@code days} days (capped 1..366). */

@@ -246,10 +246,10 @@ interface QuestItem {
       </button>
 
       <div class="del-confirm" *ngIf="confirmingDelete()">
-        <p class="tech del-note">Type <b>DELETE</b> to confirm. This cannot be reversed.</p>
-        <input class="fin" placeholder="DELETE" [(ngModel)]="deleteConfirmText" aria-label="Type DELETE to confirm" />
+        <p class="tech del-note">Type your <b>username</b> to confirm permanent deletion. This cannot be reversed.</p>
+        <input class="fin" [placeholder]="playerUsername()" [(ngModel)]="deleteConfirmText" aria-label="Type your username to confirm account deletion" autocomplete="off" autocorrect="off" autocapitalize="off" />
         <div class="del-actions">
-          <button class="btn-danger mono" [disabled]="deleteConfirmText.trim().toUpperCase() !== 'DELETE' || deleting()"
+          <button class="btn-danger mono" [disabled]="deleteConfirmText.trim() !== playerUsername() || deleting()"
                   (click)="deleteProfile()">
             {{ deleting() ? 'DELETING…' : 'PERMANENTLY DELETE' }}
           </button>
@@ -440,6 +440,9 @@ export class SettingsPanelComponent implements OnInit {
   deleting = signal(false);
   deleteErr = signal<string | null>(null);
   deleteConfirmText = '';
+
+  /** The current player's username — required to type exactly for deletion confirmation. */
+  readonly playerUsername = () => this.auth.player()?.username ?? '';
 
   get aiVisionEnabled(): boolean {
     return localStorage.getItem('ai_vision_enabled') === 'true';
@@ -690,7 +693,8 @@ export class SettingsPanelComponent implements OnInit {
   }
 
   deleteProfile(): void {
-    if (this.deleteConfirmText.trim().toUpperCase() !== 'DELETE' || this.deleting()) return;
+    const username = this.playerUsername();
+    if (this.deleteConfirmText.trim() !== username || this.deleting()) return;
     this.deleting.set(true);
     this.deleteErr.set(null);
     this.players.deleteAccount().subscribe({

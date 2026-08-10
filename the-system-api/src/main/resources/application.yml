@@ -34,6 +34,11 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 2
+  # SEC-4 FIX: limit file upload size to prevent DoS via large PDF statements.
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
 
 # THE SYSTEM game config
 thesystem:
@@ -46,8 +51,8 @@ thesystem:
     secret: "${JWT_SECRET:}"
     access-expiration-ms: 86400000       # 24 hours — refresh interceptor silently renews before this
     refresh-expiration-ms: 2592000000   # 30 days
-  game:
-    xp-threshold: 100                    # XP required per level
+  # DATA-5 FIX: removed stale xp-threshold config — LevelService uses
+  # tiered thresholds (500/800/1200/1800/2500/3500) hardcoded in the service.
   scheduler:
     timezone: Asia/Kolkata
   ai:

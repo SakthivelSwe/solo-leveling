@@ -46,22 +46,29 @@ public class Player {
     /**
      * When true, the end-of-day HP penalty threshold drops from 4 quests to 2.
      * Activated on days the player has work/PG schedule constraints (e.g. Saturdays).
+     *
+     * BUG-1 FIX: was @Transient — now persisted so the EndOfDayScheduler
+     * correctly applies rest-day thresholds after server restarts.
      */
-    @jakarta.persistence.Transient
+    @Column(name = "rest_day_active", nullable = false, columnDefinition = "boolean NOT NULL DEFAULT false")
     private boolean restDayActive = false;
 
     /**
-     * Day-of-week (1=Mon â€¦ 7=Sun, ISO-8601) treated as rest day.
+     * Day-of-week (1=Mon … 7=Sun, ISO-8601) treated as rest day.
      * Default 6 = Saturday, matching the player's regular work schedule.
+     *
+     * BUG-1 FIX: was @Transient — now persisted.
      */
-    @jakarta.persistence.Transient
+    @Column(name = "rest_day_dow", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 6")
     private int restDayDayOfWeek = 6;
 
     /**
-     * Cached morning energy score (0â€“100) updated when today's health log is saved.
+     * Cached morning energy score (0–100) updated when today's health log is saved.
      * Drives the XP multiplier in QuestService: low energy reduces XP earned.
+     *
+     * BUG-1 FIX: was @Transient — now persisted so XP multiplier reflects real data.
      */
-    @jakarta.persistence.Transient
+    @Column(name = "current_energy", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 70")
     private int currentEnergy = 70;
 
     @Column(name = "in_penalty_zone")
@@ -76,7 +83,29 @@ public class Player {
     @Column(name = "consecutive_days_below_threshold")
     private int consecutiveDaysBelowThreshold = 0;
 
-    // Getters & setters
+    /**
+     * Phase 1D (PERF-3 FIX): Cached all-time longest quest streak.
+     * Updated incrementally in PlayerService.calculateStreak() — eliminates
+     * loading ALL quest completions to find the longest streak.
+     */
+    @Column(name = "longest_quest_streak", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
+    private int longestQuestStreak = 0;
+
+    @Column(name = "clarity_buff_end")
+    private LocalDateTime clarityBuffEnd;
+
+    /**
+     * System Gold earned from completing quests. New column added after initial schema —
+     * columnDefinition provides DEFAULT 0 so PostgreSQL can ALTER TABLE on existing rows.
+     */
+    @Column(name = "system_gold", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
+    private int systemGold = 0;
+
+    @Column(name = "archetype")
+    private String archetype;
+
+    // ── Getters & Setters ──────────────────────────────────────────────────────
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
@@ -115,41 +144,12 @@ public class Player {
     public void setPenaltyZoneEndTime(LocalDateTime penaltyZoneEndTime) { this.penaltyZoneEndTime = penaltyZoneEndTime; }
     public int getConsecutiveDaysBelowThreshold() { return consecutiveDaysBelowThreshold; }
     public void setConsecutiveDaysBelowThreshold(int consecutiveDaysBelowThreshold) { this.consecutiveDaysBelowThreshold = consecutiveDaysBelowThreshold; }
-
-    @Column(name = "clarity_buff_end")
-    private java.time.LocalDateTime clarityBuffEnd;
-
-    public java.time.LocalDateTime getClarityBuffEnd() {
-        return clarityBuffEnd;
-    }
-
-    public void setClarityBuffEnd(java.time.LocalDateTime clarityBuffEnd) {
-        this.clarityBuffEnd = clarityBuffEnd;
-    }
-
-    /**
-     * System Gold earned from completing quests. New column added after initial schema —
-     * columnDefinition provides DEFAULT 0 so PostgreSQL can ALTER TABLE on existing rows.
-     */
-    @Column(name = "system_gold", nullable = false, columnDefinition = "integer NOT NULL DEFAULT 0")
-    private int systemGold = 0;
-
-    public int getSystemGold() {
-        return systemGold;
-    }
-
-    public void setSystemGold(int systemGold) {
-        this.systemGold = systemGold;
-    }
-
-    @Column(name = "archetype")
-    private String archetype;
-
-    public String getArchetype() {
-        return archetype;
-    }
-
-    public void setArchetype(String archetype) {
-        this.archetype = archetype;
-    }
+    public int getLongestQuestStreak() { return longestQuestStreak; }
+    public void setLongestQuestStreak(int longestQuestStreak) { this.longestQuestStreak = longestQuestStreak; }
+    public LocalDateTime getClarityBuffEnd() { return clarityBuffEnd; }
+    public void setClarityBuffEnd(LocalDateTime clarityBuffEnd) { this.clarityBuffEnd = clarityBuffEnd; }
+    public int getSystemGold() { return systemGold; }
+    public void setSystemGold(int systemGold) { this.systemGold = systemGold; }
+    public String getArchetype() { return archetype; }
+    public void setArchetype(String archetype) { this.archetype = archetype; }
 }

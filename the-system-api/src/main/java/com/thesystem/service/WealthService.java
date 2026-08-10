@@ -118,7 +118,8 @@ public class WealthService {
             }
         }
         
-        double changePercent = 0;
+        // UX-4 FIX: when lastWeekTotal == 0, return null (not 0) to signal "N/A" to the frontend.
+        Double changePercent = null;
         if (lastWeekTotal > 0) {
             changePercent = ((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100;
         }
@@ -386,7 +387,9 @@ public class WealthService {
         if ("COMPLETED".equals(chit.getStatus())) throw new ApiException("Chit is already completed", HttpStatus.BAD_REQUEST);
 
         chit.setCurrentMonth(chit.getCurrentMonth() + 1);
-        chit.setTotalPaid(chit.getCurrentMonth() * chit.getMonthlyContribution());
+        // DATA-3 FIX: use additive increment instead of multiplication.
+        // Multiplication breaks on late/partial payments and race conditions.
+        chit.setTotalPaid(chit.getTotalPaid() + chit.getMonthlyContribution());
         chit.setLastPaymentDate(LocalDate.now());
 
         if (chit.getCurrentMonth() >= chit.getTotalMonths()) {
@@ -496,5 +499,73 @@ public class WealthService {
             for (int i = 0; i < particulars.size(); i++) fallback.add("MISC");
             return fallback;
         }
+    }
+
+    // ── Phase 2A: Recurring Expense Auto-Detection ────────────────────────────
+
+    /**
+     * Analyses the last 90 days of expense logs and identifies recurring patterns.
+     * Groups by normalised description (lowercase, trimmed). A pattern qualifies
+     * if it appears 3+ times and the amount variance is ≤ 40% of the average
+     * (fuzzy matching to handle minor price changes like delivery fees).
+     *
+     * Returns results sorted by total spend descending so the most costly
+     * recurring drains appear at the top.
+     */
+    public List<com.thesystem.dto.RecurringExpenseDTO> detectRecurringExpenses(Long playerId) {
+        LocalDate since = LocalDate.now().minusDays(90);
+        List<ExpenseLog> recent = expenseRepo.findByPlayerIdAndExpenseDateBetweenOrderByExpenseDateDesc(
+                playerId, since, LocalDate.now());
+
+        // Group by normalised description
+        Map<String, List<ExpenseLog>> grouped = new java.util.LinkedHashMap<>();
+        for (ExpenseLog e : recent) {
+            if (e.getDescription() == null || e.getDescription().isBlank()) continue;
+            String key = e.getDescription().trim().toLowerCase()
+                    .replaceAll("\\s+", " ")
+                    .replaceAll("[^a-z0-9 ]", ""); // strip special chars
+            grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(e);
+        }
+
+        List<com.thesystem.dto.RecurringExpenseDTO> results = new ArrayList<>();
+
+        for (Map.Entry<String, List<ExpenseLog>> entry : grouped.entrySet()) {
+            List<ExpenseLog> group = entry.getValue();
+            if (group.size() < 3) continue; // at least 3 occurrences
+
+            // Amount stats
+            double avg = group.stream().mapToDouble(ExpenseLog::getAmount).average().orElse(0);
+            double min = group.stream().mapToDouble(ExpenseLog::getAmount).min().orElse(0);
+            double max = group.stream().mapToDouble(ExpenseLog::getAmount).max().orElse(0);
+            double variance = avg > 0 ? (max - min) / avg : 1.0;
+
+            // Only qualify if amount doesn't vary by more than 40%
+            if (variance > 0.4) continue;
+
+            // Sort by date to compute average interval
+            group.sort(java.util.Comparator.comparing(ExpenseLog::getExpenseDate));
+            int intervalDays = 0;
+            if (group.size() >= 2) {
+                long totalDays = java.time.temporal.ChronoUnit.DAYS.between(
+                        group.get(0).getExpenseDate(),
+                        group.get(group.size() - 1).getExpenseDate());
+                intervalDays = (int) (totalDays / (group.size() - 1));
+            }
+
+            double totalSpent = group.stream().mapToDouble(ExpenseLog::getAmount).sum();
+            LocalDate lastSeen = group.get(group.size() - 1).getExpenseDate();
+            String category = group.get(0).getCategory();
+
+            // Use the most common description casing for display
+            String displayDesc = group.get(0).getDescription().trim();
+
+            results.add(new com.thesystem.dto.RecurringExpenseDTO(
+                    displayDesc, avg, min, max, intervalDays, lastSeen,
+                    group.size(), totalSpent, category));
+        }
+
+        // Sort by total spend descending — biggest drains first
+        results.sort((a, b) -> Double.compare(b.totalSpent(), a.totalSpent()));
+        return results;
     }
 }

@@ -77,9 +77,11 @@ public class DungeonService {
         List<QuestCompletion> weekCompletions =
                 completionRepository.findByPlayerIdAndCompletedAtBetween(playerId, weekStart, today);
 
-        // Build a map of questId → bossDamage for efficient lookup
+        // PERF-1 FIX: use lightweight projection instead of loading all Quest entities.
+        // findAllBossDamageValues() returns only (id, bossDamage) pairs — much less data.
         java.util.Map<Long, Integer> damageMap = new java.util.HashMap<>();
-        questRepository.findAll().forEach(q -> damageMap.put(q.getId(), q.getBossDamage()));
+        questRepository.findAllBossDamageValues().forEach(row ->
+                damageMap.put((Long) row[0], row[1] != null ? (Integer) row[1] : FALLBACK_DMG));
 
         int damage = Math.min(dungeon.getTotalHp(),
                 weekCompletions.stream()
@@ -112,15 +114,17 @@ public class DungeonService {
 
     private void grantReward(Player player, Dungeon dungeon) {
         int xp = dungeon.getRewardXp();
-        player.setCurrentXp(player.getCurrentXp() + xp);
-        player.setTotalXp(player.getTotalXp() + xp);
-        LevelUpDTO levelUp = levelService.checkLevelUp(player);
-        playerRepository.save(player);
+
+        // BUG-2 FIX: use centralized addXp() instead of manual XP math.
+        // This ensures the SSE event includes xpGained and follows the same
+        // format as quest completions, so the frontend XP toast works correctly.
+        LevelUpDTO levelUp = levelService.addXp(player, xp, "GATE_CLEAR");
 
         notificationService.push(player.getId(), "◈ GATE CLEARED",
                 "You felled " + dungeon.getBossName() + " and cleared " + dungeon.getName()
                         + ". Reward: +" + xp + " XP. The System acknowledges your raid.", "SYSTEM");
 
+        // Send additional gate-specific SSE data
         sseService.send(player.getId(), "player-update", Map.of(
                 "currentXp", player.getCurrentXp(),
                 "totalXp", player.getTotalXp(),

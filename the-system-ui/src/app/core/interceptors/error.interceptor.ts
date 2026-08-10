@@ -27,12 +27,13 @@ export const errorInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, n
 
   return next(req).pipe(
     catchError((err) => {
-      // Only intercept 401s that are NOT from the auth endpoints themselves
+      // Only intercept 401s that are NOT from the auth endpoints themselves.
+      // UX-5 FIX: 403 (Forbidden) means "authenticated but not authorized" —
+      // it should NOT trigger a token refresh. Show the error directly.
       const isAuthEndpoint = req.url.includes('/auth/');
       const is401 = err.status === 401;
-      const is403 = err.status === 403;
 
-      if ((is401 || is403) && !isAuthEndpoint) {
+      if (is401 && !isAuthEndpoint) {
         const refreshToken = localStorage.getItem(REFRESH_KEY);
 
         // No refresh token stored → hard logout

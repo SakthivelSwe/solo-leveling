@@ -48,5 +48,18 @@ public class RelationshipController {
     public com.thesystem.entity.SocialConnection updateContact(Principal p, @PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
         return relationshipService.updateContact(currentPlayer.id(p), id, java.time.LocalDate.parse(body.get("date")));
     }
+
+    /**
+     * PUT /api/v1/relationship/connections/{id}/dates
+     * Phase 2C: Store birthday and/or anniversary for a social connection.
+     * Body: { "birthday": "2000-08-15", "anniversary": "2024-02-14" } — both optional.
+     * The scheduler checks these each morning at 8 AM and pushes reminders.
+     */
+    @PutMapping("/connections/{id}/dates")
+    public com.thesystem.entity.SocialConnection updateSpecialDates(
+            Principal p, @PathVariable Long id,
+            @RequestBody java.util.Map<String, String> body) {
+        return relationshipService.updateSpecialDates(currentPlayer.id(p), id, body);
+    }
 }
 

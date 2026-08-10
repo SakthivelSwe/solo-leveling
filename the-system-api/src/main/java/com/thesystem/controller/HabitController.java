@@ -129,5 +129,18 @@ public class HabitController {
     private Long playerId(Principal principal) {
         return playerService.getByUsername(principal.getName()).getId();
     }
+
+    /**
+     * PATCH /api/v1/habits/stack
+     * Phase 2B: Batch-update habit chain groupings.
+     * Body: [{"id": 42, "stackGroup": "MORNING_ROUTINE", "stackOrder": 0}, ...]
+     * Habits sharing the same stackGroup form a visual chain in the UI.
+     */
+    @PatchMapping("/stack")
+    public List<com.thesystem.dto.HabitDTO> updateStack(
+            Principal principal,
+            @RequestBody List<java.util.Map<String, Object>> stackRequests) {
+        return habitService.updateStack(playerId(principal), stackRequests);
+    }
 }
 

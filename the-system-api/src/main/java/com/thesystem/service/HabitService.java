@@ -148,7 +148,10 @@ public class HabitService {
         }
 
         int q = Math.max(1, Math.min(5, quality));
-        int streakBefore = currentStreak(habitId, today.minusDays(1));
+        
+        // PERF-3: Avoid full history scan. If yesterday was done, streak carries over.
+        boolean yesterdayDone = completionRepository.existsByPlayerIdAndHabitIdAndCompletedAt(playerId, habitId, today.minusDays(1));
+        int streakBefore = yesterdayDone ? h.getCurrentStreak() : 0;
         int streakAfter = streakBefore + 1;
         int streakBonus = 1 + Math.min(streakAfter / 7, 5); // +1 every 7 days, capped +5
 
@@ -159,15 +162,16 @@ public class HabitService {
         completionRepository.save(new HabitCompletion(playerId, habitId, today,
                 q, xp, twoMinute, note));
 
-        // Award XP + level check
+        // BUG-2 FIX: use centralized addXp() instead of manual XP math + checkLevelUp.
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
-        player.setCurrentXp(player.getCurrentXp() + xp);
-        player.setTotalXp(player.getTotalXp() + xp);
-        LevelUpDTO up = levelService.checkLevelUp(player);
-        playerRepository.save(player);
+        LevelUpDTO up = levelService.addXp(player, xp, "HABIT_" + h.getName());
 
-        int newLongest = Math.max(longestStreak(habitId), streakAfter);
+        // Phase 1C FIX: update cached streak on Habit entity — avoids full history scan.
+        h.setCurrentStreak(streakAfter);
+        int newLongest = Math.max(h.getLongestStreak(), streakAfter);
+        h.setLongestStreak(newLongest);
+        habitRepository.save(h);
 
         // Real-time push to every open tab.
         sseService.send(playerId, "habit-update", Map.of(
@@ -214,8 +218,14 @@ public class HabitService {
                 .collect(Collectors.toMap(HabitCompletion::getCompletedAt, c -> c, (a, b) -> a));
 
         boolean completedToday = doneDates.contains(today);
-        int current = currentStreak(h.getId(), today);
-        int longest = longestStreak(h.getId());
+        
+        // PERF-3: Read cached streak. If missed yesterday and today, streak is broken.
+        int current = h.getCurrentStreak();
+        if (!completedToday && !doneDates.contains(today.minusDays(1))) {
+            current = 0;
+        }
+        int longest = h.getLongestStreak();
+        
         long total = completionRepository.countByHabitId(h.getId());
 
         // 30-day mini-heat
@@ -239,30 +249,7 @@ public class HabitService {
                 Math.round(consistency * 10) / 10.0, Math.round(mastery * 10) / 10.0, last30);
     }
 
-    private int currentStreak(Long habitId, LocalDate anchor) {
-        List<HabitCompletion> all = completionRepository.findByHabitIdOrderByCompletedAtDesc(habitId);
-        Set<LocalDate> days = all.stream().map(HabitCompletion::getCompletedAt).collect(Collectors.toSet());
-        LocalDate cursor = anchor;
-        int streak = 0;
-        // If anchor not done, streak still counts if yesterday was (grace).
-        if (!days.contains(cursor)) cursor = cursor.minusDays(1);
-        while (days.contains(cursor)) { streak++; cursor = cursor.minusDays(1); }
-        return streak;
-    }
 
-    private int longestStreak(Long habitId) {
-        Set<LocalDate> days = completionRepository.findByHabitIdOrderByCompletedAtDesc(habitId).stream()
-                .map(HabitCompletion::getCompletedAt).collect(Collectors.toSet());
-        int best = 0;
-        for (LocalDate d : days) {
-            if (!days.contains(d.minusDays(1))) {
-                int run = 0; LocalDate c = d;
-                while (days.contains(c)) { run++; c = c.plusDays(1); }
-                best = Math.max(best, run);
-            }
-        }
-        return best;
-    }
 
     private boolean isDueOn(Habit h, DayOfWeek dow) {
         int bit = 1 << (dow.getValue() - 1); // Mon=1 → bit0
@@ -276,6 +263,35 @@ public class HabitService {
             throw new ApiException("Not your habit", HttpStatus.FORBIDDEN);
         }
         return h;
+    }
+
+    /**
+     * Phase 2B: Batch-update habit stacking configuration.
+     * Each entry: { "id": 42, "stackGroup": "MORNING_ROUTINE", "stackOrder": 0 }.
+     * All habits must belong to the player — throws FORBIDDEN otherwise.
+     */
+    @Transactional
+    public List<HabitDTO> updateStack(Long playerId, List<Map<String, Object>> stackRequests) {
+        LocalDate today = LocalDate.now();
+        List<Habit> toSave = new ArrayList<>();
+
+        for (Map<String, Object> req : stackRequests) {
+            Long habitId = Long.valueOf(req.get("id").toString());
+            Habit h = ownedOrThrow(playerId, habitId);
+            if (req.containsKey("stackGroup")) {
+                h.setStackGroup(req.get("stackGroup") != null
+                        ? req.get("stackGroup").toString() : null);
+            }
+            if (req.containsKey("stackOrder")) {
+                h.setStackOrder(Integer.parseInt(req.get("stackOrder").toString()));
+            }
+            toSave.add(h);
+        }
+
+        habitRepository.saveAll(toSave);
+
+        // Return updated overview sorted with stacking groups intact
+        return list(playerId);
     }
 }
 

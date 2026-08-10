@@ -245,6 +245,9 @@ public class QuestService {
                     playerId, "Completed discipline quest: " + quest.getLabel(), "CHARACTER"));
         }
 
+        // BUG-3 FIX: wire up recordEvidence() for specific quest keys (CODE_NO_AI, LEETCODE, etc.)
+        recordEvidence(playerId, quest);
+
         int goldEarned = xp / 5;
         player.setSystemGold(player.getSystemGold() + goldEarned);
         playerRepository.save(player);
@@ -327,14 +330,22 @@ public class QuestService {
             default        -> "DAILY";
         };
 
-        // Default XP per timeType (Option C)
-        int xp = req.xpReward() != null && req.xpReward() > 0
-                ? req.xpReward()
-                : switch (timeType) {
-                    case "WEEKLY"  -> 150;
-                    case "MONTHLY" -> 300;
-                    default        -> 50;
-                };
+        // Default XP per timeType (Option C), with SEC-2 FIX: server-side cap
+        // to prevent XP farming exploit (user could set xpReward=999999).
+        // Also reject non-positive values.
+        int maxXp = switch (timeType) {
+            case "WEEKLY"  -> 300;
+            case "MONTHLY" -> 500;
+            default        -> 100;  // DAILY cap
+        };
+        int defaultXp = switch (timeType) {
+            case "WEEKLY"  -> 150;
+            case "MONTHLY" -> 300;
+            default        -> 50;
+        };
+        int xp = (req.xpReward() != null && req.xpReward() > 0)
+                ? Math.min(req.xpReward(), maxXp)
+                : defaultXp;
 
         // Generate unique key from label
         String baseKey = "CUSTOM_" + req.label().replaceAll("[^a-zA-Z0-9]", "_").toUpperCase();
