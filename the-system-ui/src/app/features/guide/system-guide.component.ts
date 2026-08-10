@@ -21,93 +21,93 @@ import { RouterLink } from '@angular/router';
 
         <section class="panel">
           <h2 class="tech">I. THE SYSTEM: AN OVERVIEW</h2>
-          <p>Welcome, Hunter. You have been selected by <strong>THE SYSTEM</strong>. This is not a habit tracker — it is a full RPG engine for your real life. Your goal: grow from <span class="rank-e">E-Rank</span> to <span class="rank-s">S-Rank</span> by mastering your daily habits, career skills, and physical discipline.</p>
+          <p>Welcome, Hunter. You have been selected by <strong>THE SYSTEM</strong>. This is not a habit tracker â€” it is a full RPG engine for your real life. Your goal: grow from <span class="rank-e">E-Rank</span> to <span class="rank-s">S-Rank</span> by mastering your daily habits, career skills, and physical discipline.</p>
           <div class="info-chip">
             <span class="k">AWAKENING DATE</span>
-            <span class="v">Shown on your Status card — the day you first registered in THE SYSTEM</span>
+            <span class="v">Shown on your Status card â€” the day you first registered in THE SYSTEM</span>
           </div>
         </section>
 
         <section class="panel">
-          <h2 class="tech">II. NAVIGATION — ALL SCREENS</h2>
+          <h2 class="tech">II. NAVIGATION â€” ALL SCREENS</h2>
           <div class="highlight-box">
-            <h3 class="tech">? STATUS (/system) — Home Dashboard</h3>
+            <h3 class="tech">? STATUS (/system) â€” Home Dashboard</h3>
             <ul>
               <li>Hunter Rank badge, Level, XP ring, HP bar, Awakening Date</li>
               <li>All 6 stats (STR, INT, VIT, AGI, PER, DIS) with live progress bars</li>
-              <li>Today's quest log — Daily / Weekly / Monthly / Milestones tabs</li>
-              <li>Quest category filter chips: All · Daily Habits · Skill Grind · Discipline · Testosterone</li>
+              <li>Today's quest log â€” Daily / Weekly / Monthly / Milestones tabs</li>
+              <li>Quest category filter chips: All Â· Daily Habits Â· Skill Grind Â· Discipline Â· Testosterone</li>
               <li>Weekly 7-day progress chart (quests + XP per day)</li>
-              <li>AI Quest Sync button — generates 4 personalized AI quests (24hr cooldown)</li>
+              <li>AI Quest Sync button â€” generates 4 personalized AI quests (24hr cooldown)</li>
               <li>Deep Work Pomodoro timer (25-min focus sessions)</li>
-              <li>DSA Grind log — quick LeetCode solve tracker + stats</li>
+              <li>DSA Grind log â€” quick LeetCode solve tracker + stats</li>
               <li>Job Applications tracker</li>
-              <li>Daily Mission mode — curated 8-quest focus set based on your weakest stats</li>
+              <li>Daily Mission mode â€” curated 8-quest focus set based on your weakest stats</li>
             </ul>
           </div>
           <div class="highlight-box">
-            <h3 class="tech">? QUESTS (/habits) — Atomic Habits Engine</h3>
+            <h3 class="tech">? QUESTS (/habits) â€” Atomic Habits Engine</h3>
             <ul>
               <li>View, complete, and track all Habits with streak tracking</li>
               <li>Current streak + longest streak + 30-day history dots</li>
               <li>Consistency % and Mastery % per habit</li>
-              <li>Shadow Army — mastered habits become Shadows with permanent XP bonuses</li>
+              <li>Shadow Army â€” mastered habits become Shadows with permanent XP bonuses</li>
               <li>Habit Templates: Hunter / Scholar / Monk / Warrior packs</li>
               <li>Identity Score per tag (Hunter, Scholar, Monk, Warrior)</li>
             </ul>
           </div>
           <div class="highlight-box">
-            <h3 class="tech">?? LIFE OS (/life) — 9 Modules</h3>
+            <h3 class="tech">?? LIFE OS (/life) â€” 9 Modules</h3>
             <ul>
-              <li><strong>Career OS</strong> — Job applications (status tracking), interview rounds, LeetCode logs, course progress</li>
-              <li><strong>Health OS</strong> — Sleep quality, water intake, meal tracking, energy levels (morning/afternoon/evening)</li>
-              <li><strong>Mind OS</strong> — Mood journal, anxiety level, gratitude, dark thought reframing + counter-evidence</li>
-              <li><strong>Wealth OS</strong> — Budget entries, savings goals, SIP amount tracking</li>
-              <li><strong>English OS</strong> — Speaking minutes, vocabulary, mock interview log, self-rating</li>
-              <li><strong>Body OS</strong> — Testosterone pillars: cold shower, morning sun, zinc meal, no soda, no porn, exercise, sleep before 11:30</li>
-              <li><strong>Relationship OS</strong> — GF call log (duration + quality), family contact, friend messages</li>
-              <li><strong>Dopamine OS</strong> — Social media minutes, reels, gaming, junk food ? calculates Focus Multiplier for XP</li>
-              <li><strong>Deep Work OS</strong> — Focus session logs, coding minutes, mobile pickups, interruptions ? Focus Score</li>
+              <li><strong>Career OS</strong> â€” Job applications (status tracking), interview rounds, LeetCode logs, course progress</li>
+              <li><strong>Health OS</strong> â€” Sleep quality, water intake, meal tracking, energy levels (morning/afternoon/evening)</li>
+              <li><strong>Mind OS</strong> â€” Mood journal, anxiety level, gratitude, dark thought reframing + counter-evidence</li>
+              <li><strong>Wealth OS</strong> â€” Budget entries, savings goals, SIP amount tracking</li>
+              <li><strong>English OS</strong> â€” Speaking minutes, vocabulary, mock interview log, self-rating</li>
+              <li><strong>Body OS</strong> â€” Testosterone pillars: cold shower, morning sun, zinc meal, no soda, no porn, exercise, sleep before 11:30</li>
+              <li><strong>Relationship OS</strong> â€” GF call log (duration + quality), family contact, friend messages</li>
+              <li><strong>Dopamine OS</strong> â€” Social media minutes, reels, gaming, junk food ? calculates Focus Multiplier for XP</li>
+              <li><strong>Deep Work OS</strong> â€” Focus session logs, coding minutes, mobile pickups, interruptions ? Focus Score</li>
             </ul>
           </div>
           <div class="highlight-box">
-            <h3 class="tech">?? BODY (/physical) — Physical Tracker</h3>
+            <h3 class="tech">?? BODY (/physical) â€” Physical Tracker</h3>
             <ul>
               <li>Daily weight log (kg) with 30-day trend chart</li>
               <li>Body fat % tracking</li>
               <li>Sleep log (bedtime + wake time ? auto duration)</li>
-              <li>Workout entries — exercise, sets, reps, weight (kg), notes</li>
+              <li>Workout entries â€” exercise, sets, reps, weight (kg), notes</li>
               <li>30-day mood trend line</li>
             </ul>
           </div>
           <div class="highlight-box">
-            <h3 class="tech">?? LEARNING (/learning) — Dev Mastery Path</h3>
+            <h3 class="tech">?? LEARNING (/learning) â€” Dev Mastery Path</h3>
             <ul>
               <li>Structured learning paths: Angular, Spring Boot, DSA, System Design</li>
               <li>Topic-by-topic progress with XP rewards per topic</li>
-              <li>Skill gap analysis — CRITICAL / HIGH / ON_TRACK urgency ratings</li>
+              <li>Skill gap analysis â€” CRITICAL / HIGH / ON_TRACK urgency ratings</li>
               <li>Interview Readiness % (per skill + overall verdict)</li>
-              <li>Diet Tracker — food log (calories, protein, vitamins)</li>
+              <li>Diet Tracker â€” food log (calories, protein, vitamins)</li>
             </ul>
           </div>
           <div class="highlight-box">
             <h3 class="tech">?? AI MENTOR (/ai)</h3>
             <ul>
-              <li><strong>Morning Briefing</strong> — Reviews yesterday, gives today's priorities and feedback</li>
-              <li><strong>AI Chat</strong> — Ask coding, career, or discipline questions. AI knows your stats and tech stack</li>
-              <li><strong>Memory</strong> — AI remembers your past sessions for context continuity</li>
+              <li><strong>Morning Briefing</strong> â€” Reviews yesterday, gives today's priorities and feedback</li>
+              <li><strong>AI Chat</strong> â€” Ask coding, career, or discipline questions. AI knows your stats and tech stack</li>
+              <li><strong>Memory</strong> â€” AI remembers your past sessions for context continuity</li>
             </ul>
           </div>
           <div class="highlight-box">
-            <h3 class="tech">?? INSIGHTS (/insights) — Analytics</h3>
+            <h3 class="tech">?? INSIGHTS (/insights) â€” Analytics</h3>
             <ul>
               <li>GitHub-style XP heatmap (last 90 / 180 / 365 days)</li>
-              <li>Monthly report card — days active, XP, perfect days, streak, System Verdict</li>
+              <li>Monthly report card â€” days active, XP, perfect days, streak, System Verdict</li>
               <li>Best stat, weakest stat, rank target narrative</li>
             </ul>
           </div>
           <div class="highlight-box">
-            <h3 class="tech">?? RANKS (/achievements) — Achievements & Titles</h3>
+            <h3 class="tech">?? RANKS (/achievements) â€” Achievements & Titles</h3>
             <ul>
               <li>All unlocked achievements with unlock dates</li>
               <li>Equipped title shown in topbar (e.g. "The Awakened", "Iron-Willed", "Gate Breaker")</li>
@@ -117,13 +117,13 @@ import { RouterLink } from '@angular/router';
         </section>
 
         <section class="panel">
-          <h2 class="tech">III. QUEST SYSTEM — COMPLETE REFERENCE</h2>
+          <h2 class="tech">III. QUEST SYSTEM â€” COMPLETE REFERENCE</h2>
           <p>You have <strong>26 system daily quests</strong> plus unlimited custom quests you can create. Full breakdown:</p>
 
-          <h3 class="tech cat-daily">?? DAILY — Physical Habits (reset every midnight)</h3>
+          <h3 class="tech cat-daily">?? DAILY â€” Physical Habits (reset every midnight)</h3>
           <table class="quest-table">
             <tr><th>Quest</th><th>Task</th><th>XP</th><th>Key Stat Boosts</th></tr>
-            <tr><td>Courage of the Weak ?</td><td>Push-ups, Sit-ups, Squats, Walk/Run (scales with level)</td><td>50–200</td><td>STR+3, VIT+3, AGI+2</td></tr>
+            <tr><td>Courage of the Weak ?</td><td>Push-ups, Sit-ups, Squats, Walk/Run (scales with level)</td><td>50â€“200</td><td>STR+3, VIT+3, AGI+2</td></tr>
             <tr><td>Breakfast</td><td>Eat breakfast before 9:30 AM</td><td>40</td><td>VIT+2</td></tr>
             <tr><td>Water</td><td>Drink 2 bottles of water</td><td>30</td><td>VIT+2</td></tr>
             <tr><td>Exercise ?</td><td>20-min exercise or walk outside</td><td>80</td><td>STR+4, DIS+5</td></tr>
@@ -133,7 +133,7 @@ import { RouterLink } from '@angular/router';
             <tr><td>Mock Interview Daily ?</td><td>Answer 1 behavioral question on video</td><td>150</td><td>AGI+5, INT+2</td></tr>
           </table>
 
-          <h3 class="tech cat-skill">?? SKILL — Career Growth (reset every midnight)</h3>
+          <h3 class="tech cat-skill">?? SKILL â€” Career Growth (reset every midnight)</h3>
           <table class="quest-table">
             <tr><th>Quest</th><th>Task</th><th>XP</th><th>Key Stat Boosts</th></tr>
             <tr><td>Code No AI ?</td><td>1 hour coding WITHOUT AI or Copilot</td><td>150</td><td>INT+5, PER+3</td></tr>
@@ -150,18 +150,18 @@ import { RouterLink } from '@angular/router';
             <tr><td>Angular Mastery</td><td>Work on production Angular at TVM Infotech</td><td>150</td><td>INT+4, PER+3</td></tr>
           </table>
 
-          <h3 class="tech cat-disc">?? DISCIPLINE — Mental Fortitude (reset every midnight)</h3>
+          <h3 class="tech cat-disc">?? DISCIPLINE â€” Mental Fortitude (reset every midnight)</h3>
           <table class="quest-table">
             <tr><th>Quest</th><th>Task</th><th>XP</th><th>Key Stat Boosts</th></tr>
             <tr><td>Morning Sun</td><td>20 min sunlight before 10 AM</td><td>70</td><td>STR+2, VIT+3, DIS+4</td></tr>
             <tr><td>Cold Shower</td><td>Cold water last 30 sec of shower</td><td>60</td><td>STR+3, VIT+2, DIS+3</td></tr>
             <tr><td>Zinc Meal</td><td>Ate eggs / nuts / dhal today</td><td>50</td><td>VIT+3, STR+1, DIS+3</td></tr>
             <tr><td>No Soda</td><td>No soft drinks or junk today</td><td>50</td><td>VIT+4, DIS+5</td></tr>
-            <tr><td>Breathing</td><td>5 min deep breathing — cortisol reset</td><td>40</td><td>VIT+2, DIS+2</td></tr>
-            <tr><td>No Porn</td><td>No pornography — dopamine reset</td><td>80</td><td>STR+3, PER+4, DIS+4</td></tr>
+            <tr><td>Breathing</td><td>5 min deep breathing â€” cortisol reset</td><td>40</td><td>VIT+2, DIS+2</td></tr>
+            <tr><td>No Porn</td><td>No pornography â€” dopamine reset</td><td>80</td><td>STR+3, PER+4, DIS+4</td></tr>
           </table>
 
-          <h3 class="tech cat-week">?? WEEKLY — Reset every Monday</h3>
+          <h3 class="tech cat-week">?? WEEKLY â€” Reset every Monday</h3>
           <table class="quest-table">
             <tr><th>Quest</th><th>Goal</th><th>XP</th></tr>
             <tr><td>Weekly LeetCode 5</td><td>Solve 5 LeetCode problems this week</td><td>400</td></tr>
@@ -171,7 +171,7 @@ import { RouterLink } from '@angular/router';
             <tr><td>Weekly Body</td><td>Exercise 4 out of 7 days this week</td><td>350</td></tr>
           </table>
 
-          <h3 class="tech cat-month">?? MONTHLY — Reset on 1st of each month</h3>
+          <h3 class="tech cat-month">?? MONTHLY â€” Reset on 1st of each month</h3>
           <table class="quest-table">
             <tr><th>Quest</th><th>Goal</th><th>XP</th></tr>
             <tr><td>Monthly Job Apps</td><td>Apply to 10 jobs this month</td><td>800</td></tr>
@@ -179,7 +179,7 @@ import { RouterLink } from '@angular/router';
             <tr><td>Monthly LeetCode 20</td><td>Solve 20 LeetCode problems this month</td><td>900</td></tr>
           </table>
 
-          <h3 class="tech cat-mile">?? MILESTONES — One-time achievements (never reset)</h3>
+          <h3 class="tech cat-mile">?? MILESTONES â€” One-time achievements (never reset)</h3>
           <table class="quest-table">
             <tr><th>Quest</th><th>Achievement</th><th>XP</th></tr>
             <tr><td>First LeetCode</td><td>Solve your very first LeetCode problem</td><td>200</td></tr>
@@ -194,7 +194,7 @@ import { RouterLink } from '@angular/router';
           </table>
 
           <p style="margin-top:14px;font-size:0.82rem;color:#8a8a9a;">
-            ? = Critical quest — always shown in Daily Mission mode regardless of stats.
+            ? = Critical quest â€” always shown in Daily Mission mode regardless of stats.
             Use the + button in the quest log to add unlimited Custom Quests.
           </p>
         </section>
@@ -203,14 +203,14 @@ import { RouterLink } from '@angular/router';
           <h2 class="tech">IV. DAILY MISSION MODE vs SHOW ALL QUESTS</h2>
           <div class="highlight-box">
             <h3 class="tech cat-daily">SHOW ALL QUESTS (Default)</h3>
-            <p>Shows all 26 system quests + your custom quests. Filter by category chips: <strong>All · Daily Habits · Skill Grind · Discipline · Testosterone</strong></p>
+            <p>Shows all 26 system quests + your custom quests. Filter by category chips: <strong>All Â· Daily Habits Â· Skill Grind Â· Discipline Â· Testosterone</strong></p>
           </div>
           <div class="highlight-box">
             <h3 class="tech cat-skill">SHOW MISSIONS (Smart Filter)</h3>
             <p>The System analyses your 6 stats and curates 8 quests:</p>
             <ul>
-              <li><strong>5 Main Quests</strong> — always includes ? critical quests + quests targeting your weakest stat</li>
-              <li><strong>3 Side Quests</strong> — recovery and support for your 2nd weakest stat</li>
+              <li><strong>5 Main Quests</strong> â€” always includes ? critical quests + quests targeting your weakest stat</li>
+              <li><strong>3 Side Quests</strong> â€” recovery and support for your 2nd weakest stat</li>
               <li>Shows directive: e.g. "? Today's focus: CODE. Your INT is weakest. LeetCode mandatory."</li>
             </ul>
           </div>
@@ -219,7 +219,7 @@ import { RouterLink } from '@angular/router';
             <li>Generates 3 SKILL + 1 DISCIPLINE quest using AI</li>
             <li>AI knows: your name, city (Chennai), goal (high-paying dev role), current job (TVM Infotech, Angular + Spring Boot)</li>
             <li>AI uses your exact stat values and skill levels for accurate quests</li>
-            <li>Example output: "[SKILL] Solve 1 LeetCode Medium (Two Pointers) — no AI — 35 min"</li>
+            <li>Example output: "[SKILL] Solve 1 LeetCode Medium (Two Pointers) â€” no AI â€” 35 min"</li>
             <li>Old AI quests are automatically deactivated on each new sync</li>
           </ul>
         </section>
@@ -229,8 +229,8 @@ import { RouterLink } from '@angular/router';
           <h3 class="tech">XP Multipliers on Every Quest</h3>
           <table class="quest-table">
             <tr><th>Multiplier</th><th>Source (where to log)</th><th>Effect</th></tr>
-            <tr><td>Energy Multiplier</td><td>Life OS ? Health ? Morning Energy</td><td>below 40 = 0.80x · 40-60 = 0.90x · 60-80 = 1.00x · above 80 = 1.10x</td></tr>
-            <tr><td>Focus Multiplier</td><td>Life OS ? Dopamine ? Daily log</td><td>Low dopamine score = 0.80-0.90x · High score = 1.10-1.20x</td></tr>
+            <tr><td>Energy Multiplier</td><td>Life OS ? Health ? Morning Energy</td><td>below 40 = 0.80x Â· 40-60 = 0.90x Â· 60-80 = 1.00x Â· above 80 = 1.10x</td></tr>
+            <tr><td>Focus Multiplier</td><td>Life OS ? Dopamine ? Daily log</td><td>Low dopamine score = 0.80-0.90x Â· High score = 1.10-1.20x</td></tr>
           </table>
           <p><em>Log your sleep, water, and dopamine data daily to earn significantly more XP from every quest!</em></p>
           <h3 class="tech">Rank Ladder</h3>
@@ -242,13 +242,13 @@ import { RouterLink } from '@angular/router';
             <span class="rbadge rank-a">A</span>
             <span class="rbadge rank-s">S</span>
           </div>
-          <h3 class="tech" style="margin-top:20px;">Progressive Overload — Courage of the Weak</h3>
+          <h3 class="tech" style="margin-top:20px;">Progressive Overload â€” Courage of the Weak</h3>
           <table class="quest-table">
             <tr><th>Level</th><th>Rank</th><th>Required Exercise</th><th>XP</th></tr>
-            <tr><td>1-5</td><td><span class="rank-e">E</span></td><td>10 Push-ups · 10 Sit-ups · 10 Squats · 1km Walk</td><td>50</td></tr>
-            <tr><td>6-10</td><td><span class="rank-d">D</span></td><td>25 Push-ups · 25 Sit-ups · 25 Squats · 2.5km Jog</td><td>100</td></tr>
-            <tr><td>11-20</td><td><span class="rank-c">C</span></td><td>50 Push-ups · 50 Sit-ups · 50 Squats · 5km Run</td><td>150</td></tr>
-            <tr><td>21+</td><td><span class="rank-b">B-S</span></td><td>100 Push-ups · 100 Sit-ups · 100 Squats · 10km Run</td><td>200</td></tr>
+            <tr><td>1-5</td><td><span class="rank-e">E</span></td><td>10 Push-ups Â· 10 Sit-ups Â· 10 Squats Â· 1km Walk</td><td>50</td></tr>
+            <tr><td>6-10</td><td><span class="rank-d">D</span></td><td>25 Push-ups Â· 25 Sit-ups Â· 25 Squats Â· 2.5km Jog</td><td>100</td></tr>
+            <tr><td>11-20</td><td><span class="rank-c">C</span></td><td>50 Push-ups Â· 50 Sit-ups Â· 50 Squats Â· 5km Run</td><td>150</td></tr>
+            <tr><td>21+</td><td><span class="rank-b">B-S</span></td><td>100 Push-ups Â· 100 Sit-ups Â· 100 Squats Â· 10km Run</td><td>200</td></tr>
           </table>
         </section>
 
@@ -257,27 +257,27 @@ import { RouterLink } from '@angular/router';
           <p>Every quest grants stat boosts. Your stats reflect your real-life growth:</p>
           <div class="stats-grid">
             <div class="stat-item">
-              <span class="tech stat-name str">STR — Strength</span>
+              <span class="tech stat-name str">STR â€” Strength</span>
               Physical fitness. Boosted by: EXERCISE, COURAGE_OF_THE_WEAK, COLD_SHOWER, MORNING_SUN, NO_PORN
             </div>
             <div class="stat-item">
-              <span class="tech stat-name intel">INT — Intelligence</span>
+              <span class="tech stat-name intel">INT â€” Intelligence</span>
               Technical knowledge and coding depth. Boosted by: CODE_NO_AI, LEETCODE, TECH_LEARN, SYSTEM_DESIGN, ANGULAR_BUILD
             </div>
             <div class="stat-item">
-              <span class="tech stat-name vit">VIT — Vitality</span>
+              <span class="tech stat-name vit">VIT â€” Vitality</span>
               Health, sleep, nutrition, recovery. Boosted by: SLEEP, WATER, BREAKFAST, ZINC_MEAL, NO_SODA, MORNING_SUN
             </div>
             <div class="stat-item">
-              <span class="tech stat-name agi">AGI — Agility</span>
+              <span class="tech stat-name agi">AGI â€” Agility</span>
               Communication and English speaking. Boosted by: ENGLISH, MOCK_INTERVIEW, LINKEDIN_UPDATE, BREATHING
             </div>
             <div class="stat-item">
-              <span class="tech stat-name per">PER — Perception</span>
+              <span class="tech stat-name per">PER â€” Perception</span>
               Problem solving and analytical thinking. Boosted by: LEETCODE, SELF_DEBUG, SYSTEM_DESIGN, DOPAMINE_DETOX
             </div>
             <div class="stat-item">
-              <span class="tech stat-name dis">DIS — Discipline</span>
+              <span class="tech stat-name dis">DIS â€” Discipline</span>
               Mental fortitude and consistency. Boosted by: SLEEP, NO_PORN, EXERCISE, COLD_SHOWER, NO_SODA, BREATHING
             </div>
           </div>
@@ -289,7 +289,7 @@ import { RouterLink } from '@angular/router';
             <li><strong>Starting HP:</strong> 100 HP</li>
             <li><strong>Midnight Reset:</strong> Every night the System evaluates your day</li>
             <li><strong>HP Loss:</strong> Missing critical quests causes HP to drop</li>
-            <li><strong>Perfect Day Bonus:</strong> Complete ALL daily quests — HP +5 at midnight</li>
+            <li><strong>Perfect Day Bonus:</strong> Complete ALL daily quests â€” HP +5 at midnight</li>
             <li><strong>Rank Drop:</strong> If HP hits 0, Hunter Rank drops one level</li>
           </ul>
           <div class="highlight-box" style="border-color:#E24B4A;">
@@ -302,24 +302,24 @@ import { RouterLink } from '@angular/router';
         <section class="panel">
           <h2 class="tech">VIII. ATOMIC HABITS ENGINE (/habits)</h2>
           <ul>
-            <li><strong>Cue</strong> — What triggers this habit (time, location, event)</li>
-            <li><strong>Craving</strong> — The deeper reason this habit matters to you</li>
-            <li><strong>Routine</strong> — The exact action you perform</li>
-            <li><strong>Reward</strong> — What you do right after to reinforce it</li>
-            <li><strong>2-Minute Version</strong> — The minimum version for hard days</li>
-            <li><strong>Keystone Habits</strong> — High-impact habits that trigger other positive habits</li>
+            <li><strong>Cue</strong> â€” What triggers this habit (time, location, event)</li>
+            <li><strong>Craving</strong> â€” The deeper reason this habit matters to you</li>
+            <li><strong>Routine</strong> â€” The exact action you perform</li>
+            <li><strong>Reward</strong> â€” What you do right after to reinforce it</li>
+            <li><strong>2-Minute Version</strong> â€” The minimum version for hard days</li>
+            <li><strong>Keystone Habits</strong> â€” High-impact habits that trigger other positive habits</li>
           </ul>
           <div class="highlight-box">
             <h3 class="tech">?? Shadow Army</h3>
-            <p>When a habit reaches mastery, it transforms into a <strong>Shadow</strong> — a permanent ally with a power bonus (e.g., +10% SKILL XP). View your Shadow Army on the Status page.</p>
+            <p>When a habit reaches mastery, it transforms into a <strong>Shadow</strong> â€” a permanent ally with a power bonus (e.g., +10% SKILL XP). View your Shadow Army on the Status page.</p>
           </div>
           <div class="highlight-box">
             <h3 class="tech">Habit Template Packs</h3>
             <ul>
-              <li>?? <strong>Hunter Pack</strong> — Cold shower, Morning sun, Body training</li>
-              <li>?? <strong>Scholar Pack</strong> — LeetCode, Book reading, English speaking</li>
-              <li>?? <strong>Monk Pack</strong> — Meditation, Evening journal</li>
-              <li>? <strong>Warrior Pack</strong> — No junk food, Track spending, No PMO</li>
+              <li>?? <strong>Hunter Pack</strong> â€” Cold shower, Morning sun, Body training</li>
+              <li>?? <strong>Scholar Pack</strong> â€” LeetCode, Book reading, English speaking</li>
+              <li>?? <strong>Monk Pack</strong> â€” Meditation, Evening journal</li>
+              <li>? <strong>Warrior Pack</strong> â€” No junk food, Track spending, No PMO</li>
             </ul>
           </div>
         </section>
@@ -329,21 +329,21 @@ import { RouterLink } from '@angular/router';
           <ul>
             <li>A dungeon boss resets every Monday in the right panel of Status</li>
             <li>Each quest deals <strong>Boss Damage</strong> to the boss (5-80 per quest)</li>
-            <li>Clearing <strong>33+ quests per week</strong> defeats the boss — bonus XP reward</li>
+            <li>Clearing <strong>33+ quests per week</strong> defeats the boss â€” bonus XP reward</li>
             <li>Current: <strong>E-Rank Gate: The Awakening</strong> (Boss: Lesser Wraith, 600 HP)</li>
             <li>Boss difficulty scales with your Rank as you grow stronger</li>
           </ul>
         </section>
 
         <section class="panel">
-          <h2 class="tech">X. AI FEATURES — COMPLETE GUIDE</h2>
+          <h2 class="tech">X. AI FEATURES â€” COMPLETE GUIDE</h2>
           <div class="highlight-box">
             <h3 class="tech">?? AI Morning Commander</h3>
-            <p>Modal on the Status page. Reviews yesterday's quest performance, your current stats and skills, and today's quest list. Outputs: Greeting · Yesterday Recap · Today's Top 3 Priorities · Feedback · Estimated Level-Up Timeline.</p>
+            <p>Modal on the Status page. Reviews yesterday's quest performance, your current stats and skills, and today's quest list. Outputs: Greeting Â· Yesterday Recap Â· Today's Top 3 Priorities Â· Feedback Â· Estimated Level-Up Timeline.</p>
           </div>
           <div class="highlight-box">
             <h3 class="tech">? AI Quest Sync (24hr cooldown)</h3>
-            <p>Generates 4 quests. The AI knows your name, city (Chennai), career goal, current job (TVM Infotech — Angular + Spring Boot), your exact stats, and skill levels. Generates quests only for your real tech stack: Angular (Signals, Guards, Routing), Spring Boot, Java, DSA/LeetCode, System Design, English speaking.</p>
+            <p>Generates 4 quests. The AI knows your name, city (Chennai), career goal, current job (TVM Infotech â€” Angular + Spring Boot), your exact stats, and skill levels. Generates quests only for your real tech stack: Angular (Signals, Guards, Routing), Spring Boot, Java, DSA/LeetCode, System Design, English speaking.</p>
           </div>
           <div class="highlight-box">
             <h3 class="tech">?? AI Mentor Chat (/ai)</h3>
@@ -354,8 +354,8 @@ import { RouterLink } from '@angular/router';
         <section class="panel">
           <h2 class="tech">XI. LIVE SYNC AND CONNECTIVITY</h2>
           <ul>
-            <li><span class="live-on">? LIVE</span> — Connected to backend via real-time Server-Sent Events. Quest completions update all devices instantly.</li>
-            <li><span class="live-off">? SYNC</span> — Reconnecting. The backend on Render's free tier sleeps after 15 min of inactivity. Wait 30-60 seconds for it to wake, then click RETRY CONNECTION.</li>
+            <li><span class="live-on">? LIVE</span> â€” Connected to backend via real-time Server-Sent Events. Quest completions update all devices instantly.</li>
+            <li><span class="live-off">? SYNC</span> â€” Reconnecting. The backend on Render's free tier sleeps after 15 min of inactivity. Wait 30-60 seconds for it to wake, then click RETRY CONNECTION.</li>
           </ul>
         </section>
 
@@ -363,20 +363,54 @@ import { RouterLink } from '@angular/router';
           <h2 class="tech">XII. AWAKENING DATE AND JOURNEY TRACKING</h2>
           <p>Your <strong>Awakening Date</strong> is shown on your Status card:</p>
           <div class="code-block">AWAKENED: JULY 22, 2026</div>
-          <p>Track your full journey on the <strong>Insights</strong> page — a GitHub-style heatmap shows every day you completed quests. The monthly report gives a System Verdict on how your month performed.</p>
+          <p>Track your full journey on the <strong>Insights</strong> page â€” a GitHub-style heatmap shows every day you completed quests. The monthly report gives a System Verdict on how your month performed.</p>
         </section>
 
         <section class="panel">
-          <h2 class="tech">XIII. CHEAT DAYS / VACATION MODE</h2>
+          <h2 class="tech">XIII. OFFLINE MODE & RESILIENCE</h2>
+          <div class="highlight-box">
+            <h3 class="tech">ðŸ“² Offline Quest Queue</h3>
+            <p>If you lose connection (e.g. on the subway), you can still complete quests! The system will cache your completions locally. Once you reconnect to the internet, the queue automatically syncs to the server, so you never lose XP.</p>
+          </div>
+
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">XIV. RECURRING EXPENSES & WEALTH OS</h2>
+          <div class="highlight-box">
+            <h3 class="tech">ðŸ’¸ Silent Wealth Drains</h3>
+            <p>The Wealth OS automatically scans your past 90 days of expenses. If it detects a pattern (3+ purchases of the same item within a 40% price variance), it flags it as a recurring subscription to help you track silent wealth drains.</p>
+          </div>
+
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">XV. HABIT STACKING & CHAINS</h2>
+          <div class="highlight-box">
+            <h3 class="tech">ðŸ”— Atomic Chains</h3>
+            <p>Group habits together into a <strong>Stack</strong> (e.g., "Morning Routine"). Completing the first habit in a stack makes it easier to complete the rest, building unshakeable momentum.</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">XVI. NOFAP DISCIPLINE PROTOCOL</h2>
+          <div class="highlight-box">
+            <h3 class="tech">ðŸš¨ Emergency SOS Panel</h3>
+            <p>When the urge hits, press the SOS button. It instantly loads 8 hardcoded, evidence-based coping strategies (like 20 push-ups, cold exposure, or 5-4-3-2-1 grounding) to help you survive the moment without relapsing.</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="tech">XVII. CHEAT DAYS / VACATION MODE</h2>
           <div class="highlight-box" style="border-color:#FAC775;">
-            <h3 class="tech" style="color:#FAC775;">? Coming Soon — Not Yet Implemented</h3>
+            <h3 class="tech" style="color:#FAC775;">? Coming Soon â€” Not Yet Implemented</h3>
             <p>A planned feature will let you mark days as Cheat Days (Sunday, trips, special occasions) so missed quests do not count against your HP or streak.</p>
-            <p>For now on rest days: complete at least the <strong>Recovery Quests</strong> (BREATHING, READ_NO_SCROLL, MORNING_SUN) — these count double toward the daily minimum and do not trigger the Penalty Zone.</p>
+            <p>For now on rest days: complete at least the <strong>Recovery Quests</strong> (BREATHING, READ_NO_SCROLL, MORNING_SUN) â€” these count double toward the daily minimum and do not trigger the Penalty Zone.</p>
           </div>
         </section>
 
         <div class="footer tech">
-          <p>? E-RANK ? S-RANK · ARISE, HUNTER · THE SYSTEM IS WATCHING ?</p>
+          <p>? E-RANK ? S-RANK Â· ARISE, HUNTER Â· THE SYSTEM IS WATCHING ?</p>
         </div>
       </div>
     </div>
