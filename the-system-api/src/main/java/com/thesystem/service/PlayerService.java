@@ -154,6 +154,14 @@ public class PlayerService {
                         "(SELECT j.id FROM JobApplication j WHERE j.playerId = :id)")
                 .setParameter("id", playerId).executeUpdate();
 
+        // Bank statement transactions hang off bank statement records
+        em.createQuery("DELETE FROM BankStatementTxn tx WHERE tx.statement.id IN " +
+                        "(SELECT b.id FROM BankStatementRecord b WHERE b.player.id = :id)")
+                .setParameter("id", playerId).executeUpdate();
+
+        em.createQuery("DELETE FROM BankStatementRecord b WHERE b.player.id = :id")
+                .setParameter("id", playerId).executeUpdate();
+
         // All remaining player-scoped entities (completions/logs first, then parents).
         String[] entities = {
                 "HabitCompletion", "Habit",
@@ -169,7 +177,7 @@ public class PlayerService {
                 "DevMasteryProgress", "DietEntry", "SubscriptionEntry", "SocialConnection",
                 "ShopItem", "QuestSkip", "QuestGenerationLog", "PlayerConfig",
                 "NetWorthLog", "JobChangeQuest", "IncomeLog", "Flashcard",
-                "FinancialAsset", "ExpenseLog", "EmiEntry"
+                "FinancialAsset", "ExpenseLog", "EmiEntry", "ChitFund"
         };
         for (String entity : entities) {
             em.createQuery("DELETE FROM " + entity + " e WHERE e.playerId = :id")
