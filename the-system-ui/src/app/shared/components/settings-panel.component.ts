@@ -236,6 +236,26 @@ interface QuestItem {
       <p class="tech hint" style="margin-top:8px;">JSON is the complete backup. CSV is spreadsheet-friendly (one section per dataset).</p>
     </section>
 
+    <!-- Data Transfer -->
+    <section class="section">
+      <h3 class="mono sh">◈ DATA TRANSFER</h3>
+      <p class="tech hint">Clone your data to another account. (NoFap data is strictly excluded).</p>
+      <div class="add-form" style="flex-direction: column; gap: 8px;">
+        <input class="fin" placeholder="Target Account Email" [(ngModel)]="dtEmail" />
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+          <label class="chk tech"><input type="checkbox" (change)="dtToggle('CORE')" [checked]="dtModules.includes('CORE')" /> CORE</label>
+          <label class="chk tech"><input type="checkbox" (change)="dtToggle('QUESTS')" [checked]="dtModules.includes('QUESTS')" /> QUESTS</label>
+          <label class="chk tech"><input type="checkbox" (change)="dtToggle('HABITS')" [checked]="dtModules.includes('HABITS')" /> HABITS</label>
+          <label class="chk tech"><input type="checkbox" (change)="dtToggle('FINANCE')" [checked]="dtModules.includes('FINANCE')" /> FINANCE</label>
+          <label class="chk tech"><input type="checkbox" (change)="dtToggle('LEARNING')" [checked]="dtModules.includes('LEARNING')" /> LEARNING</label>
+          <label class="chk tech"><input type="checkbox" (change)="dtToggle('LIFE_OS')" [checked]="dtModules.includes('LIFE_OS')" /> LIFE_OS</label>
+        </div>
+        <button class="sys-btn" (click)="doDataTransfer()" [disabled]="dtTransferring()">
+          {{ dtTransferring() ? 'TRANSFERRING...' : '⚡ INITIATE TRANSFER' }}
+        </button>
+      </div>
+    </section>
+
     <!-- Danger Zone -->
     <section class="section danger-zone">
       <h3 class="mono sh danger">◈ DANGER ZONE</h3>
@@ -737,6 +757,42 @@ export class SettingsPanelComponent implements OnInit {
         this.download(parts.join('\n'), 'the-system-backup.csv', 'text/csv');
       },
       error: () => { this.exporting.set(false); this.snack.open('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
+    });
+  }
+
+  /* ===== Phase 5 — Data Transfer ===== */
+  dtEmail = '';
+  dtModules: string[] = ['CORE', 'QUESTS', 'HABITS', 'FINANCE', 'LEARNING', 'LIFE_OS'];
+  dtTransferring = signal(false);
+
+  dtToggle(mod: string): void {
+    if (this.dtModules.includes(mod)) {
+      this.dtModules = this.dtModules.filter(m => m !== mod);
+    } else {
+      this.dtModules.push(mod);
+    }
+  }
+
+  doDataTransfer(): void {
+    if (!this.dtEmail || !this.dtEmail.includes('@')) {
+      this.snack.open('⚠ Invalid email', '✕', { duration: 2500, panelClass: 'system-snack-warn' });
+      return;
+    }
+    if (this.dtModules.length === 0) {
+      this.snack.open('⚠ Select at least one module', '✕', { duration: 2500, panelClass: 'system-snack-warn' });
+      return;
+    }
+    this.dtTransferring.set(true);
+    this.players.transferData({ targetEmail: this.dtEmail.trim(), modules: this.dtModules, transferMode: 'COPY' }).subscribe({
+      next: (res) => {
+        this.dtTransferring.set(false);
+        this.snack.open(`◈ Transfer Success!`, '✕', { duration: 3500, panelClass: 'system-snack' });
+        this.dtEmail = '';
+      },
+      error: () => {
+        this.dtTransferring.set(false);
+        this.snack.open('⚠ Transfer failed.', '✕', { duration: 3000, panelClass: 'system-snack-warn' });
+      }
     });
   }
 

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import {
   StatusWindow, Quest, QuestCompletionResult, PlayerSkill, CustomQuestRequest,
-  Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon
+  Achievement, DayProgress, Player, HeatmapDay, MonthlyReport, Title, Dungeon, DataTransferRequest, DataTransferResponse
 } from '../models/models';
 import { environment } from '../../../environments/environment';
 
@@ -37,6 +37,10 @@ export class PlayerService {
   /** Permanently deletes the account and all server-side data. */
   deleteAccount(): Observable<void> {
     return this.http.delete<void>(`${this.api}/player/account`);
+  }
+
+  transferData(req: DataTransferRequest): Observable<DataTransferResponse> {
+    return this.http.post<DataTransferResponse>(`${this.api}/player/transfer-data`, req);
   }
 
   getTodayQuests(): Observable<Quest[]> {

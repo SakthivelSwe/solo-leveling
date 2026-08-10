@@ -843,3 +843,14 @@ export interface PlayerConfig {
   monthlyBaselineExpenses: number;
 }
 
+export interface DataTransferRequest {
+  targetEmail: string;
+  modules: string[];
+  transferMode: string;
+}
+
+export interface DataTransferResponse {
+  success: boolean;
+  message: string;
+  transferStats: { [key: string]: number };
+}
