@@ -83,12 +83,11 @@ public class QuestService {
 
         boolean isRecoveryMode = player.getHp() < 40;
 
-        List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel()).stream()
+        List<QuestDTO> allEligible = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .filter(q -> "sakthiveltony@gmail.com".equals(player.getEmail()) || !("NO_PORN".equals(q.getQuestKey()) || "TESTOSTERONE".equals(q.getCategory().name())))
                 // PHASE 4: Recovery Mode
                 .filter(q -> {
                     if (isRecoveryMode) {
-                        // Allow custom quests, or quests explicitly marked as recovery
                         return q.isCustom() || Boolean.TRUE.equals(q.isRecoveryQuest());
                     }
                     return true;
@@ -96,13 +95,42 @@ public class QuestService {
                 .map(q -> toDto(q, completedIds.contains(q.getId()), skipMap.containsKey(q.getId()), skipMap.get(q.getId()), player))
                 .collect(Collectors.toList());
 
+        // PHASE 8: Progressive Habit Stacking (Quest Cap)
+        int limit = player.getLevel() >= 10 ? 999 : Math.max(3, player.getLevel() + 2);
+
+        List<QuestDTO> finalQuests = new ArrayList<>();
+        List<QuestDTO> pendingQuests = new ArrayList<>();
+
+        for (QuestDTO q : allEligible) {
+            if (q.isCompleted() || q.isSkipped()) {
+                finalQuests.add(q);
+            } else {
+                pendingQuests.add(q);
+            }
+        }
+
+        // Sort pending quests: AI Custom Quests first, then by priority
+        pendingQuests.sort(Comparator
+                .comparing(QuestDTO::isCustom).reversed()
+                .thenComparing(QuestDTO::priority)
+                .thenComparing(QuestDTO::id));
+
+        for (QuestDTO q : pendingQuests) {
+            if (finalQuests.size() < limit) {
+                finalQuests.add(q);
+            }
+        }
+
+        // Re-sort the final list for UI display (Priority)
+        finalQuests.sort(Comparator.comparing(QuestDTO::priority).thenComparing(QuestDTO::id));
+
         if (player.isInPenaltyZone()) {
-            dtos.add(0, new QuestDTO(-1L, "PENALTY_SURVIVAL",
+            finalQuests.add(0, new QuestDTO(-1L, "PENALTY_SURVIVAL",
                     "[PENALTY] Survival: 20 Burpees or No Screen Time for 1 Hour",
                     "DAILY", 0, null, null, false, 999, true, 0, false, "DAILY", false, 0, 0, null, null, null, false, null));
         }
 
-        return dtos;
+        return finalQuests;
     }
 
     /**
