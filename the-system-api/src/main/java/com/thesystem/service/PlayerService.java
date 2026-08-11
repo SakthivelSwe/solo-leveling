@@ -68,13 +68,18 @@ public class PlayerService {
                 levelService.xpToNextLevel(p.getLevel()), p.getHp(), p.getMaxHp(), p.getEquippedTitle(),
                 p.isInPenaltyZone(), p.getPenaltyZoneEndTime() != null ? p.getPenaltyZoneEndTime().toString() : "",
                 p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : "",
-                p.getSystemGold());
+                p.getSystemGold(), p.isOnboardingComplete());
     }
 
 
 
     public PlayerDTO getProfile(Long playerId) {
         return toDto(find(playerId));
+    }
+
+    public Player findByUsername(String username) {
+        return playerRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
     }
 
     public PlayerDTO updateProfile(Long playerId, UpdateProfileRequest req) {

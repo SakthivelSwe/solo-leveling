@@ -17,7 +17,9 @@ export interface Player {
   inPenaltyZone?: boolean;
   penaltyZoneEndTime?: string;
   createdAt?: string;
+  onboardingComplete?: boolean;
 }
+
 
 export interface AuthResponse {
   accessToken: string;

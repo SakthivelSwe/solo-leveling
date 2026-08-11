@@ -64,6 +64,16 @@ export class AuthService {
     this.player.set(player);
   }
 
+  /** Called after onboarding completes to update the local player state. */
+  markOnboardingComplete(): void {
+    const p = this.player();
+    if (p) {
+      const updated = { ...p, onboardingComplete: true };
+      localStorage.setItem(PLAYER_KEY, JSON.stringify(updated));
+      this.player.set(updated);
+    }
+  }
+
   private persist(res: AuthResponse): void {
     localStorage.setItem(TOKEN_KEY, res.accessToken);
     localStorage.setItem(REFRESH_KEY, res.refreshToken);

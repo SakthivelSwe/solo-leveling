@@ -19,20 +19,20 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
 
     /** All active DAILY-type quests visible to this player (system + player's own custom). */
     @Query("SELECT q FROM Quest q WHERE q.active = true AND q.timeType = 'DAILY' " +
-           "AND ((q.ownerId IS NULL AND q.minLevel <= :playerLevel) OR q.ownerId = :playerId) " +
+           "AND ((q.ownerId IS NULL AND q.minLevel <= :playerLevel AND q.maxLevel >= :playerLevel) OR q.ownerId = :playerId) " +
            "AND q.category NOT IN ('SIDE','MILESTONE') " +
            "ORDER BY q.priority DESC, q.xpReward DESC")
     List<Quest> findDailyQuestsForPlayer(@Param("playerId") Long playerId, @Param("playerLevel") int playerLevel);
 
     /** All active WEEKLY quests visible to this player. */
     @Query("SELECT q FROM Quest q WHERE q.active = true AND q.timeType = 'WEEKLY' " +
-           "AND ((q.ownerId IS NULL AND q.minLevel <= :playerLevel) OR q.ownerId = :playerId) " +
+           "AND ((q.ownerId IS NULL AND q.minLevel <= :playerLevel AND q.maxLevel >= :playerLevel) OR q.ownerId = :playerId) " +
            "ORDER BY q.priority DESC, q.xpReward DESC")
     List<Quest> findWeeklyQuestsForPlayer(@Param("playerId") Long playerId, @Param("playerLevel") int playerLevel);
 
     /** All active MONTHLY quests visible to this player. */
     @Query("SELECT q FROM Quest q WHERE q.active = true AND q.timeType = 'MONTHLY' " +
-           "AND ((q.ownerId IS NULL AND q.minLevel <= :playerLevel) OR q.ownerId = :playerId) " +
+           "AND ((q.ownerId IS NULL AND q.minLevel <= :playerLevel AND q.maxLevel >= :playerLevel) OR q.ownerId = :playerId) " +
            "ORDER BY q.priority DESC, q.xpReward DESC")
     List<Quest> findMonthlyQuestsForPlayer(@Param("playerId") Long playerId, @Param("playerLevel") int playerLevel);
 

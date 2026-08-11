@@ -94,6 +94,14 @@ public class Quest {
     @Column(name = "min_level", columnDefinition = "integer default 1")
     private int minLevel = 1;
 
+    /**
+     * Maximum player level for which this quest is still shown.
+     * Beginner-tier quests (e.g., LEETCODE_INTRO) stop appearing once the player
+     * has levelled up to the real version. Default 999 = always shown.
+     */
+    @Column(name = "max_level", columnDefinition = "integer default 999")
+    private int maxLevel = 999;
+
     // --- GEO-FENCING ---
     @Column(name = "latitude")
     private Double latitude;
@@ -150,6 +158,8 @@ public class Quest {
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
     public int getMinLevel() { return minLevel; }
     public void setMinLevel(int minLevel) { this.minLevel = minLevel; }
+    public int getMaxLevel() { return maxLevel; }
+    public void setMaxLevel(int maxLevel) { this.maxLevel = maxLevel; }
     public Double getLatitude() { return latitude; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }

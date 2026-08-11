@@ -62,6 +62,8 @@ public class AuthService {
         player.setPassword(passwordEncoder.encode(req.password()));
         player.setDisplayName((req.displayName() == null || req.displayName().isBlank())
                 ? username : req.displayName());
+        // New players must complete onboarding before seeing quests
+        player.setOnboardingComplete(false);
         player = playerRepository.save(player);
 
         // Default stats

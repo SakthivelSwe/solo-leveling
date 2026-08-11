@@ -104,6 +104,14 @@ public class Player {
     @Column(name = "archetype")
     private String archetype;
 
+    /**
+     * True once the player has completed the initial onboarding assessment.
+     * DEFAULT true for existing accounts (safe migration — existing users skip onboarding).
+     * Set to false in AuthService.register() so new registrations go through onboarding.
+     */
+    @Column(name = "onboarding_complete", nullable = false, columnDefinition = "boolean NOT NULL DEFAULT true")
+    private boolean onboardingComplete = true;
+
     // ── Getters & Setters ──────────────────────────────────────────────────────
 
     public Long getId() { return id; }
@@ -152,4 +160,6 @@ public class Player {
     public void setSystemGold(int systemGold) { this.systemGold = systemGold; }
     public String getArchetype() { return archetype; }
     public void setArchetype(String archetype) { this.archetype = archetype; }
+    public boolean isOnboardingComplete() { return onboardingComplete; }
+    public void setOnboardingComplete(boolean onboardingComplete) { this.onboardingComplete = onboardingComplete; }
 }
