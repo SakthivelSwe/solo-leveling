@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/shop")
@@ -40,11 +39,7 @@ public class ShopController {
 
     @PostMapping("/{itemId}/purchase")
     public ResponseEntity<?> purchaseItem(Principal p, @PathVariable Long itemId) {
-        try {
-            ShopItem purchased = shopService.purchaseItem(itemId, currentPlayer.id(p));
-            return ResponseEntity.ok(purchased);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        ShopItem purchased = shopService.purchaseItem(itemId, currentPlayer.id(p));
+        return ResponseEntity.ok(purchased);
     }
 }

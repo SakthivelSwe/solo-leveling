@@ -21,7 +21,7 @@ spring:
       pool-name: TheSystemPool
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # TODO: switch to 'validate' once V11 migration has fully synced schema
     show-sql: false
     properties:
       hibernate:

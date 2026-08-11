@@ -206,7 +206,9 @@ public class WealthController {
     }
 
     @PostMapping("/statement/parse-pdf")
-    public org.springframework.http.ResponseEntity<?> parsePdfStatement(@RequestParam("file") MultipartFile file) {
+    public org.springframework.http.ResponseEntity<?> parsePdfStatement(Principal p, @RequestParam("file") MultipartFile file) {
+        // SEC FIX: Enforce authentication — prevents anonymous DoS via large file uploads
+        currentPlayer.id(p);
         try {
             StatementParseResponse result = statementParserService.parseAxisBankPdf(file);
             if (result.getRows() == null || result.getRows().isEmpty()) {

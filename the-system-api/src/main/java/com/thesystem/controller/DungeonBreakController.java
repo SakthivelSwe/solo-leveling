@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/dungeon-breaks")
@@ -38,10 +37,6 @@ public class DungeonBreakController {
 
     @PostMapping("/{breakId}/clear")
     public ResponseEntity<?> clearBreak(Principal p, @PathVariable Long breakId) {
-        try {
-            return ResponseEntity.ok(breakService.clearBreak(breakId, currentPlayer.id(p)));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(breakService.clearBreak(breakId, currentPlayer.id(p)));
     }
 }

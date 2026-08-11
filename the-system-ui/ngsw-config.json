@@ -50,13 +50,24 @@
       "urls": [
         "/api/v1/achievements",
         "/api/v1/titles",
-        "/api/v1/skills",
-        "/api/v1/dungeon"
+        "/api/v1/skills"
       ],
       "cacheConfig": {
         "strategy": "performance",
         "maxAge": "5m",
         "maxSize": 20
+      }
+    },
+    {
+      "name": "dungeon-api-freshness",
+      "urls": [
+        "/api/v1/dungeon"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxAge": "60s",
+        "timeout": "5s",
+        "maxSize": 5
       }
     }
   ]

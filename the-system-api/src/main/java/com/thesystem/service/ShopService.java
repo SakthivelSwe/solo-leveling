@@ -2,9 +2,12 @@ package com.thesystem.service;
 
 import com.thesystem.entity.Player;
 import com.thesystem.entity.ShopItem;
+import com.thesystem.exception.ApiException;
 import com.thesystem.repository.PlayerRepository;
 import com.thesystem.repository.ShopItemRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,21 +41,23 @@ public class ShopService {
         }
     }
 
+    @Transactional
     public ShopItem purchaseItem(Long itemId, Long playerId) {
-        ShopItem item = shopRepo.findById(itemId).orElseThrow(() -> new IllegalArgumentException("Item not found"));
-        
+        ShopItem item = shopRepo.findById(itemId)
+                .orElseThrow(() -> new ApiException("Item not found", HttpStatus.NOT_FOUND));
+
         if (!item.getPlayerId().equals(playerId)) {
-            throw new IllegalArgumentException("Unauthorized");
+            throw new ApiException("You do not have permission to purchase this item", HttpStatus.FORBIDDEN);
         }
         
         if (item.isOneTime() && item.isPurchased()) {
-            throw new IllegalArgumentException("Item already purchased");
+            throw new ApiException("Item already purchased", HttpStatus.CONFLICT);
         }
 
         Player player = playerRepo.findById(playerId).orElseThrow();
-        
+
         if (player.getSystemGold() < item.getCost()) {
-            throw new IllegalArgumentException("Not enough System Gold");
+            throw new ApiException("Not enough System Gold", HttpStatus.PAYMENT_REQUIRED);
         }
 
         player.setSystemGold(player.getSystemGold() - item.getCost());

@@ -17,7 +17,11 @@ public record PlayerDTO(
         String penaltyZoneEndTime,
         String createdAt,
         int systemGold,
-        boolean onboardingComplete
+        boolean onboardingComplete,
+        /** The player's awakened class (e.g. "SHADOW_MONARCH") — set on Job Change quest completion. */
+        String archetype,
+        /** Today's morning energy score (0–100) — drives XP multiplier in QuestService. */
+        int currentEnergy
 ) {}
 
 

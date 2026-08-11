@@ -39,10 +39,4 @@ public class JobChangeQuest {
     public LocalDateTime getDeadline() { return deadline; }
     public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
 
-    public boolean isIsActive() { return isActive; }
-    public void setIsActive(boolean isActive) { this.isActive = isActive; }
-
-    public boolean isIsCompleted() { return isCompleted; }
-    public void setIsCompleted(boolean isCompleted) { this.isCompleted = isCompleted; }
-
-}
+}

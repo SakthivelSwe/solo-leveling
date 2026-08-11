@@ -1,13 +1,15 @@
 package com.thesystem.controller;
 
 import com.thesystem.dto.NoFapStatusDTO;
-import com.thesystem.security.JwtService;
+import com.thesystem.exception.ApiException;
+import com.thesystem.security.CurrentPlayer;
 import com.thesystem.service.NoFapService;
 import com.thesystem.service.PlayerService;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -28,30 +30,30 @@ import java.util.Map;
 public class NoFapController {
 
     private final NoFapService noFapService;
-    private final JwtService jwtService;
     private final PlayerService playerService;
+    private final CurrentPlayer currentPlayer;
 
     public NoFapController(NoFapService noFapService,
-                           JwtService jwtService,
-                           PlayerService playerService) {
+                           PlayerService playerService,
+                           CurrentPlayer currentPlayer) {
         this.noFapService = noFapService;
-        this.jwtService = jwtService;
         this.playerService = playerService;
+        this.currentPlayer = currentPlayer;
     }
 
     @GetMapping("/status")
-    public ResponseEntity<NoFapStatusDTO> getStatus(HttpServletRequest request) {
-        return ResponseEntity.ok(noFapService.getStatus(playerId(request)));
+    public ResponseEntity<NoFapStatusDTO> getStatus(Principal p) {
+        return ResponseEntity.ok(noFapService.getStatus(playerId(p)));
     }
 
     @PostMapping("/confirm-clean")
-    public ResponseEntity<NoFapStatusDTO> confirmClean(HttpServletRequest request) {
-        return ResponseEntity.ok(noFapService.confirmCleanDay(playerId(request)));
+    public ResponseEntity<NoFapStatusDTO> confirmClean(Principal p) {
+        return ResponseEntity.ok(noFapService.confirmCleanDay(playerId(p)));
     }
 
     @PostMapping("/relapse")
-    public ResponseEntity<NoFapStatusDTO> relapse(HttpServletRequest request) {
-        return ResponseEntity.ok(noFapService.reportRelapse(playerId(request)));
+    public ResponseEntity<NoFapStatusDTO> relapse(Principal p) {
+        return ResponseEntity.ok(noFapService.reportRelapse(playerId(p)));
     }
 
     /**
@@ -63,7 +65,7 @@ public class NoFapController {
      * yesterday (skipping any days already logged). Returns the updated status.
      */
     @PostMapping("/set-start-date")
-    public ResponseEntity<?> setStartDate(HttpServletRequest request,
+    public ResponseEntity<?> setStartDate(Principal p,
                                           @RequestBody Map<String, String> body) {
         String dateStr = body.get("startDate");
         if (dateStr == null || dateStr.isBlank()) {
@@ -71,7 +73,7 @@ public class NoFapController {
         }
         try {
             LocalDate startDate = LocalDate.parse(dateStr);
-            return ResponseEntity.ok(noFapService.setStartDate(playerId(request), startDate));
+            return ResponseEntity.ok(noFapService.setStartDate(playerId(p), startDate));
         } catch (java.time.format.DateTimeParseException e) {
             return ResponseEntity.badRequest().body("Invalid date format. Use YYYY-MM-DD.");
         } catch (IllegalArgumentException e) {
@@ -80,26 +82,25 @@ public class NoFapController {
     }
 
     @PostMapping("/nightfall")
-    public ResponseEntity<Map<String, Object>> logNightfall(HttpServletRequest request) {
-        return ResponseEntity.ok(noFapService.logNightfall(playerId(request)));
+    public ResponseEntity<Map<String, Object>> logNightfall(Principal p) {
+        return ResponseEntity.ok(noFapService.logNightfall(playerId(p)));
     }
 
     @PostMapping("/urge-survived")
-    public ResponseEntity<Map<String, Object>> urgeSurvived(HttpServletRequest request) {
-        return ResponseEntity.ok(noFapService.urgeSurvived(playerId(request)));
+    public ResponseEntity<Map<String, Object>> urgeSurvived(Principal p) {
+        return ResponseEntity.ok(noFapService.urgeSurvived(playerId(p)));
     }
 
     @GetMapping("/urge-truth-bomb")
-    public ResponseEntity<Map<String, String>> urgeTruthBomb(HttpServletRequest request) {
-        String bomb = noFapService.generateUrgeTruthBomb(playerId(request));
+    public ResponseEntity<Map<String, String>> urgeTruthBomb(Principal p) {
+        String bomb = noFapService.generateUrgeTruthBomb(playerId(p));
         return ResponseEntity.ok(Map.of("truthBomb", bomb));
     }
 
-    private Long playerId(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").replace("Bearer ", "");
-        com.thesystem.entity.Player player = playerService.getByUsername(jwtService.extractUsername(token));
+    private Long playerId(Principal p) {
+        var player = playerService.getByUsername(p.getName());
         if (!"sakthiveltony@gmail.com".equals(player.getEmail())) {
-            throw new com.thesystem.exception.ApiException("NoFap module is strictly gated.", org.springframework.http.HttpStatus.FORBIDDEN);
+            throw new ApiException("NoFap module is strictly gated.", HttpStatus.FORBIDDEN);
         }
         return player.getId();
     }

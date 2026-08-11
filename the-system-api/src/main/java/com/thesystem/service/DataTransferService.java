@@ -71,8 +71,22 @@ public class DataTransferService {
     public DataTransferResponse transferData(Long sourcePlayerId, DataTransferRequest req) {
         Player source = playerRepo.findById(sourcePlayerId).orElseThrow();
         Player target = playerRepo.findByEmail(req.getTargetEmail())
-                .orElseThrow(() -> new RuntimeException("Target player not found with email: " + req.getTargetEmail()));
-        
+                .orElseThrow(() -> new com.thesystem.exception.ApiException(
+                        "Target player not found with email: " + req.getTargetEmail(),
+                        org.springframework.http.HttpStatus.NOT_FOUND));
+
+        // SEC FIX: Prevent cross-account data injection.
+        // A player may only transfer their own data to their own account (device migration).
+        // The target account must share the same email as the source account — i.e., they
+        // own both accounts (a secondary device/test account with the same email).
+        // This prevents malicious data injection into another player's account.
+        if (!source.getEmail().equals(target.getEmail())) {
+            throw new com.thesystem.exception.ApiException(
+                    "Data transfer is only permitted between accounts sharing the same email address. " +
+                    "This prevents unauthorized data injection into other players' accounts.",
+                    org.springframework.http.HttpStatus.FORBIDDEN);
+        }
+
         Long sId = source.getId();
         Long tId = target.getId();
         List<String> mods = req.getModules();
