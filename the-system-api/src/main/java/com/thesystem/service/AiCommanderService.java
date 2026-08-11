@@ -169,6 +169,7 @@ public class AiCommanderService {
                "3. Ensure the schedule is realistic and spaces out the tasks.\n" +
                "4. Output format MUST be strictly a JSON array (no markdown code blocks, no backticks, just the array `[ {...} ]`).\n" +
                "5. For non-anchor items, DO NOT provide an 'anchorKey'. Give them a unique 'id' like 'q_1', 'q_2', etc.\n" +
-               "6. Keep tags brief (1-2 words max, uppercase).";
+               "6. Keep tags brief (1-2 words max, uppercase).\n" +
+               "7. CRITICAL RULE: DO NOT INVENT, ADD, OR HALLUCINATE ANY TASKS THAT ARE NOT LISTED IN 'Active Quests'. Your generated timeline must ONLY consist of the 4 anchors plus the exact items from the 'Active Quests' list. NO EXCEPTIONS.";
     }
 }

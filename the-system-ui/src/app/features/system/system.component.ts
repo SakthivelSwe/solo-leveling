@@ -545,7 +545,7 @@ export class SystemComponent implements OnInit, OnDestroy {
         this.uiState.triggerLevelUp({ newLevel: res.newLevel, newRank: res.newRank, rankChanged: res.rankChanged });
       }, 400);
     }
-    this.load();
+    this.loadLive();
     this.notifications.refreshUnread();
   }
 
