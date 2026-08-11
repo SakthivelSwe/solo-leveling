@@ -12,6 +12,10 @@ import com.thesystem.repository.PlayerRepository;
 import com.thesystem.repository.PlayerSkillRepository;
 import com.thesystem.repository.PlayerStatsRepository;
 import com.thesystem.repository.QuestRepository;
+import com.thesystem.repository.QuestCompletionRepository;
+import com.thesystem.repository.OnboardingAssessmentRepository;
+import com.thesystem.entity.OnboardingAssessment;
+import com.thesystem.entity.QuestCompletion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,8 @@ public class AiQuestGeneratorService {
     private final PlayerSkillRepository skillRepository;
     private final QuestRepository questRepository;
     private final com.thesystem.repository.QuestSkipRepository skipRepository;
+    private final QuestCompletionRepository completionRepository;
+    private final OnboardingAssessmentRepository onboardingRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public AiQuestGeneratorService(AiProviderService aiProviderService,
@@ -40,13 +46,17 @@ public class AiQuestGeneratorService {
                                    PlayerStatsRepository statsRepository,
                                    PlayerSkillRepository skillRepository,
                                    com.thesystem.repository.QuestSkipRepository skipRepository,
-                                   QuestRepository questRepository) {
+                                   QuestRepository questRepository,
+                                   QuestCompletionRepository completionRepository,
+                                   OnboardingAssessmentRepository onboardingRepository) {
         this.aiProviderService = aiProviderService;
         this.playerRepository = playerRepository;
         this.statsRepository = statsRepository;
         this.skillRepository = skillRepository;
         this.skipRepository = skipRepository;
         this.questRepository = questRepository;
+        this.completionRepository = completionRepository;
+        this.onboardingRepository = onboardingRepository;
     }
 
     /**
@@ -98,9 +108,25 @@ public class AiQuestGeneratorService {
             physicalExamples = "Standard bodyweight quests are appropriate: push-ups, squats, planks, running.";
         }
 
+        // Fetch Onboarding Assessment limits
+        int maxMins = 60; // Default
+        String barrierStr = "";
+        Optional<OnboardingAssessment> optAssessment = onboardingRepository.findByPlayerId(playerId);
+        if (optAssessment.isPresent()) {
+            maxMins = optAssessment.get().getAvailableTimeMinutes();
+            barrierStr = "Primary Barrier: " + optAssessment.get().getPrimaryBarrier() + "\n";
+        }
+
+        // Check if player is in recovery mode (HP < 40)
+        boolean isRecoveryMode = player.getHp() < 40;
+        String recoveryInstruction = isRecoveryMode ? 
+            "CRITICAL ALARM: The Hunter is in RECOVERY MODE (HP < 40). They are burned out or missed several days. DO NOT assign heavy/hard technical or physical tasks. Focus ONLY on extremely light habits to rebuild momentum (e.g. Drink 1L water, 5 min stretch, read 1 page)." 
+            : "";
+
         String systemPrompt = """
                 You are THE SYSTEM from Solo Leveling — a ruthless but accurate mentor.
                 Generate hyper-specific, actionable daily quests for a Hunter with the following EXACT profile:
+
 
                 HUNTER PROFILE:
                 - Name: Sakthivel (26 years old, male, based in Chennai, India)
@@ -166,7 +192,24 @@ public class AiQuestGeneratorService {
             skipContext.append("If a reason implies injury or illness, DO NOT assign heavy physical tasks today. If they were busy/overworked, give lighter tasks.\n");
         }
 
-        String userPrompt = "Generate today's 4 quests based on my profile and current stats. Focus on my weakest areas." + skipContext.toString();
+        // Fetch Recent Quest Difficulty Feedback
+        List<QuestCompletion> recentFeedback = completionRepository.findTop5ByPlayerIdAndDifficultyFeedbackIsNotNullOrderByCompletedAtDesc(playerId);
+        StringBuilder feedbackContext = new StringBuilder();
+        if (!recentFeedback.isEmpty()) {
+            feedbackContext.append("\nRECENT QUEST DIFFICULTY FEEDBACK (Scale future quests based on this):\n");
+            for (QuestCompletion qc : recentFeedback) {
+                String questLabel = questRepository.findById(qc.getQuestId()).map(q -> q.getLabel()).orElse("Unknown Quest");
+                feedbackContext.append("- Rated '").append(questLabel).append("' as: ").append(qc.getDifficultyFeedback()).append("\n");
+            }
+            feedbackContext.append("RULE: If they rated a quest TOO_EASY, make similar tasks harder (increase reps or complexity). If they rated it HARD, reduce the difficulty next time.\n");
+        }
+
+        String userPrompt = "Generate today's 4 quests based on my profile and current stats. Focus on my weakest areas.\n" 
+                + barrierStr
+                + "Maximum total time allowed for ALL 4 quests combined today: " + maxMins + " minutes.\n"
+                + recoveryInstruction
+                + skipContext.toString() 
+                + feedbackContext.toString();
 
         try {
             // Use Gemini for structured JSON

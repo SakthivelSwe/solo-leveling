@@ -55,5 +55,8 @@ public interface QuestCompletionRepository extends JpaRepository<QuestCompletion
            "WHERE qc.playerId = :playerId AND qc.completedAt = :date AND q.questKey = :questKey")
     boolean existsByPlayerIdAndQuestKeyAndCompletedAt(
             @Param("playerId") Long playerId, @Param("questKey") String questKey, @Param("date") LocalDate date);
+
+    /** Fetch recent difficulty feedback to tune the AI */
+    List<QuestCompletion> findTop5ByPlayerIdAndDifficultyFeedbackIsNotNullOrderByCompletedAtDesc(Long playerId);
 }
 
