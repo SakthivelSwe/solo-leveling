@@ -106,7 +106,7 @@ export class QuestLogComponent implements OnInit, OnChanges {
   private api = environment.apiUrl;
 
   ngOnInit() {
-    this.http.get<JobChangeQuest>(`${this.api}/job-change`).subscribe({
+    this.http.get<JobChangeQuest>(`${this.api}/job-change?t=${Date.now()}`).subscribe({
       next: (q) => this.jobChangeQuest.set(q),
       error: () => {}
     });

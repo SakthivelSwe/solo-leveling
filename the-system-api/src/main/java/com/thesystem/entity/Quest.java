@@ -38,7 +38,7 @@ public class Quest {
     private Map<String, Integer> skillBoosts = new HashMap<>();
 
     @Column(name = "is_active")
-    private boolean active = true;
+    private Boolean active = true;
 
     /**
      * Priority tier for the Daily Mission Generator (1=lowest ... 5=critical).
@@ -52,7 +52,7 @@ public class Quest {
      * of stat weighting — they directly drive the job-switch goal.
      */
     @Column(name = "is_critical", columnDefinition = "boolean default false")
-    private boolean critical = false;
+    private Boolean critical = false;
 
     /**
      * Damage this quest deals to the weekly dungeon boss.
@@ -64,7 +64,7 @@ public class Quest {
      * Recovery quests count double toward the minimum daily threshold on rest days.
      */
     @Column(name = "is_recovery_quest", columnDefinition = "boolean default false")
-    private boolean recoveryQuest = false;
+    private Boolean recoveryQuest = false;
 
     /**
      * Reset frequency: DAILY (midnight), WEEKLY (Monday), MONTHLY (1st), ONE_TIME (never resets).
@@ -78,7 +78,7 @@ public class Quest {
      * Custom quests are owned by one player and can be deleted by them.
      */
     @Column(name = "is_custom", columnDefinition = "boolean default false")
-    private boolean custom = false;
+    private Boolean custom = false;
 
     /**
      * Owner player ID for custom quests. Null for global system quests.

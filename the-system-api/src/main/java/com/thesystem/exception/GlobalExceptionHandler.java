@@ -67,7 +67,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         // Ignore client aborts (e.g., broken pipe from closed SSE connections)
-        if (ex.getClass().getName().contains("ClientAbortException")) {
+        if (ex.getClass().getName().contains("ClientAbortException") 
+            || (ex instanceof java.io.IOException && ex.getMessage() != null && ex.getMessage().toLowerCase().contains("broken pipe"))) {
             return null;
         }
         String ref = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
