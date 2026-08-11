@@ -95,8 +95,9 @@ public class QuestService {
                 .map(q -> toDto(q, completedIds.contains(q.getId()), skipMap.containsKey(q.getId()), skipMap.get(q.getId()), player))
                 .collect(Collectors.toList());
 
-        // PHASE 8: Progressive Habit Stacking (Quest Cap)
-        int limit = player.getLevel() >= 10 ? 999 : Math.max(3, player.getLevel() + 2);
+        // PHASE 8: Progressive Habit Stacking (Per-Category Cap)
+        // Ensure the player is not overwhelmed, but still gets to progress in all categories.
+        int perCategoryLimit = player.getLevel() >= 10 ? 999 : Math.max(1, (player.getLevel() / 3) + 2);
 
         List<QuestDTO> finalQuests = new ArrayList<>();
         List<QuestDTO> pendingQuests = new ArrayList<>();
@@ -115,9 +116,15 @@ public class QuestService {
                 .thenComparing(QuestDTO::priority)
                 .thenComparing(QuestDTO::id));
 
+        Map<String, Integer> categoryCounts = new HashMap<>();
+        // Note: We don't count completed quests against the pending limit so players
+        // aren't punished with empty tabs for finishing quests early in the day.
+
         for (QuestDTO q : pendingQuests) {
-            if (finalQuests.size() < limit) {
+            int currentCount = categoryCounts.getOrDefault(q.category(), 0);
+            if (currentCount < perCategoryLimit) {
                 finalQuests.add(q);
+                categoryCounts.put(q.category(), currentCount + 1);
             }
         }
 
