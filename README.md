@@ -4,6 +4,14 @@ A gamified, Solo Leveling anime-inspired personal life-tracking platform. Comple
 quests to earn XP, raise your stats (STR / INT / VIT / AGI / PER / HOR), grow your skill tree,
 and climb the ranks from **E-Rank → S-Rank**.
 
+**Features:**
+- **Adaptive Onboarding:** Assesses your baseline and locks your time constraints.
+- **Progressive Habit Stacking:** Limits initial quests to prevent overwhelm, mathematically scaling as you level up.
+- **Recovery Mode:** Auto-hides intense tasks and provides restorative quests when your HP drops below 40.
+- **Urge Truth Bombs:** The Discipline Protocol uses AI to generate brutal, personalized interventions based on your real-world goals.
+- **Difficulty Feedback:** Rate your quests to dynamically adjust the AI Commander's difficulty curve.
+- **Zero-to-Hunter Calisthenics:** Step-by-step progressions (e.g., Wall Push-ups) for complete beginners.
+
 > 📖 **[Read the Official SYSTEM MANUAL](SYSTEM_MANUAL.md)** for a complete step-by-step guide on how to use every feature and maximize your progression.
 
 > This build intentionally **excludes** the Gemini AI mentor, Redis/Valkey cache, and Docker.

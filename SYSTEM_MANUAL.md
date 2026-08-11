@@ -7,14 +7,33 @@ This is your complete guide to utilizing the Solo Leveling Life OS to gamify you
 
 ## 1. Introduction: The Gamification of Life
 
-The System is not just a to-do list; it is a full **Life Operating System** inspired by the anime *Solo Leveling*. It converts your daily routines, long-term goals, financial decisions, and physical habits into **Quests, XP, Stats, and Ranks**. 
+The System is not just a to-do list; it is a full **Adaptive Life Operating System** inspired by the anime *Solo Leveling*. It converts your daily routines, long-term goals, financial decisions, and physical habits into **Quests, XP, Stats, and Ranks**. 
 
 Your objective is simple: **Survive and level up.**
 Consistency is rewarded with power (Shadows, Titles, XP). Laziness is punished (HP drains, rank demotions).
 
 ---
 
-## 2. Core Mechanics
+## 2. The Adaptive Core (Getting Started)
+
+The System is designed to meet you exactly where you are. It will never crush you with an impossible workload on Day 1.
+
+### 📋 Adaptive Onboarding
+When you create an account, you must complete the **Onboarding Assessment**. The System will evaluate your current baseline across your Body, Mind, Career, Discipline, and English skills. It will also ask for your **Primary Goal**, your **Biggest Obstacle**, and your **Daily Available Time**.
+
+Based on your honest answers, your starting stats will be calibrated, and the AI will lock these parameters to guide your entire journey.
+
+### 🛡️ Progressive Habit Stacking (Anti-Overwhelm)
+If you are Level 1, you will only receive a maximum of **3 quests** per day. 
+The System prevents burnout by enforcing a strict **Quest Cap**. As you level up and prove your consistency, the cap mathematically scales up (up to Level 10 where it becomes uncapped). You build the habit one by one.
+
+### 📉 Recovery Mode
+You have a maximum of 100 HP. If you neglect your quests, your HP drains. 
+If your HP drops **below 40**, The System initiates **Recovery Mode**. All intense skill-building quests are temporarily hidden, and you will only be issued light, momentum-building quests (e.g., Drink Water, Sleep 8 Hours) until your HP recovers. 
+
+---
+
+## 3. Quests & Progression Mechanics
 
 ### 📈 Ranks & Levels
 You begin as an **E-Rank Hunter**. As you accumulate XP (100 XP per level), your level increases and you climb the ranks:
@@ -26,12 +45,7 @@ You begin as an **E-Rank Hunter**. As you accumulate XP (100 XP per level), your
 - `LV 26+`  → **S-Rank**
 
 ### ⚔️ The HP System (Survival)
-You have a maximum of 100 HP. 
-At midnight, the System evaluates your performance from the previous day based on the number of completed quests:
-- **10+ Quests:** +5 HP (Healing)
-- **7–9 Quests:** 0 HP (Stable)
-- **4–6 Quests:** -5 HP (System Warning)
-- **< 4 Quests:** -20 HP (Critical Damage)
+At midnight, the System evaluates your performance from the previous day based on your completion rate. Completing your dashboard heals you (+5 HP), while ignoring it damages you (-5 to -20 HP).
 
 > [!CAUTION]
 > If your HP drops to 0, you will be **demoted by an entire Rank**, and your HP will reset to 50. The System does not forgive prolonged weakness.
@@ -43,72 +57,48 @@ Completing specific quests will level up your six base stats:
 - **AGI (Agility):** Cardio, stretching, reflexes, speed tasks.
 - **INT (Intelligence):** Deep work, studying, LeetCode, reading, learning.
 - **PER (Sense/Perception):** Meditation, focus sessions, journaling.
-- **HOR (Testosterone/Hormonal):** NoFap, cold showers, sunlight, extreme discipline.
+- **HOR (Testosterone/Hormonal):** Discipline, cold showers, sunlight.
+
+### 🧠 Difficulty Feedback Engine
+Whenever you complete a quest, you can rate it: **Too Easy, Just Right, or Hard**. The System's AI constantly reads this feedback. If you rate a coding quest as "Hard", the AI will dynamically lower the difficulty of your coding quests for the next few days.
 
 ---
 
-## 3. The Quests System
+## 4. The Discipline Protocol (Mind Mastery)
 
-Quests are your daily actionable items. They are broken down into four categories:
-1. **DAILY:** Your repeating core habits (e.g., wake up at 6 AM, cold shower).
-2. **SKILL:** Tasks related to specific proficiencies (e.g., coding, English practice).
-3. **TESTOSTERONE:** Intense physical or mental challenges that boost your HOR stat.
-4. **SIDE:** One-time milestone tasks or errands.
+The most advanced sub-system in the OS is the **Discipline Protocol**, an exact-time stopwatch built to help you conquer your deepest urges.
 
-Complete a quest by clicking it in your Status Window. A slight haptic buzz will confirm your success, and XP/Stat bonuses will be immediately applied to your character.
-
-### 🛡️ Job Change Quests
-At certain milestones, the System will offer a **Job Change Quest**. These are grueling, multi-step challenges that, once completed, permanently unlock a new class or massive rewards.
-
----
-
-## 4. The Discipline Protocol (NoFap Mastery)
-
-The most advanced system in the Life OS is the **Discipline Protocol**, an exact-time stopwatch built to help you conquer your deepest urges and rebuild your brain's dopamine baseline.
-
-### ⏱️ Exact 24h Elapsed Timer
-Unlike other systems that just count calendar days, the Discipline Protocol acts like a **live stopwatch**. If you start your journey at 10:00 PM, you will not earn a "Day" until exactly 10:00 PM the next day. The main dashboard and NoFap screens are perfectly synchronized to the exact second.
-
-### 🧠 Brain State & Recovery Velocity
-- **Science Timeline:** Scroll through the timeline to see exactly what is physically happening inside your brain (dopamine receptor healing, grey matter changes) based on exactly what day you are currently on.
-- **Recovery Velocity (RV):** A momentum metric based on how many clean days you've secured out of the last 90. High RV means your brain is rewiring faster.
-
-### 🚨 Emergency Urge Protocol
+### 🚨 Emergency Urge Protocol & AI Truth Bombs
 When a massive urge hits, click the **Emergency Urge Protocol** button:
-1. The screen will lock into a dark mode.
-2. The **4-7-8 Breathing Technique** visualizer will guide your breathing.
-3. Your own personalized "Addiction Insights" (letters from your past self) will be presented to you.
+1. The screen locks into a dark mode.
+2. The **4-7-8 Breathing Technique** visualizer activates.
+3. The System instantly queries your **exact current streak** and your **Primary Goal** (from your onboarding). It then generates a brutal, personalized **AI Truth Bomb** telling you exactly what you are throwing away if you relapse right now.
+
 *Surviving an urge using this protocol grants you a massive XP bonus.*
 
-### 🌙 Nightfalls & Relapses
-- **Log Nightfall:** A natural biological reflex. Does NOT reset your streak, but logs it for tracking.
-- **Honest Relapse:** Completely resets your timer, drains HP, and forces you to perform a post-mortem to log what triggered you (Boredom, Stress, etc.).
-
 ---
 
-## 5. The Discipline Grid (Habits & The Shadow Army)
+## 5. The Shadow Army (Mastered Habits)
 
-### Habit Loops
-The System uses a robust Habit engine (Cue → Craving → Routine → Reward). You log your habits in the **Habits** tab. Consistency builds your "Streak". Keystone habits grant 2x XP multipliers.
-
-### 🌑 The Shadow Army (Mastered Habits)
 This is THE SYSTEM's most powerful long-term motivation mechanic. 
 When you maintain a habit streak for **25 consecutive days**, that habit is deemed "mastered" and transforms into a **Shadow**.
 
 - **Shadow Archetypes:** Shadows take forms based on their stat (FIGHTER, SCHOLAR, MONK, WARRIOR).
-- **Power Level:** A Shadow's strength is based on the habit's difficulty multiplied by the streak duration.
-- **Leveling Up:** Shadows level up for every 7 additional days of streak (`floor(streak / 7)`).
+- **Leveling Up:** Shadows level up for every 7 additional days of streak.
 - **Deployment:** You can "Deploy" Shadows in your dashboard. Active Shadows grant a passive XP bonus (e.g., +1% XP) for all quests matching their archetype. You are literally building an army of your own mastered habits to fight for you.
 
 ---
 
 ## 6. Life OS Ecosystem (Modules)
 
-Beyond the dashboard, the **Life OS** acts as the central command for every facet of your life. Access it via the top navigation bar.
+Beyond the dashboard, the **Life OS** acts as the central command for every facet of your life.
+
+### 💪 Physical OS (Zero-to-Hunter)
+Cannot do a single push-up or pull-up? The Physical Tracking tab contains the **Zero-to-Hunter Beginner Protocol**. It provides a scientifically accurate, step-by-step progression guide (e.g., Wall Push-ups → Incline Push-ups → Knee Push-ups → Full Push-ups).
 
 ### 💼 Career OS
 - **Job Applications:** Track interviews, rounds, and application statuses.
-- **LeetCode Log:** Monitor your algorithm solving streak and difficulty breakdown.
+- **LeetCode Log:** Monitor your algorithm solving streak.
 - **Deep Work Sessions:** Log focused, uninterrupted work blocks.
 
 ### 💰 Wealth OS
@@ -116,15 +106,9 @@ Beyond the dashboard, the **Life OS** acts as the central command for every face
 - **Net Worth Log:** Visualize your wealth trajectory over time.
 - **Budgeting:** Track every penny going in and out.
 
-### 🧠 Mind & Body OS
-- **Dopamine Detox Logs:** Track your resistance against cheap dopamine triggers.
-- **Testosterone (7 Pillars):** Log daily adherence to the 7 pillars of raw energy.
-- **Self-Doubt Ledger:** Write down negative thoughts and immediately crush them.
-- **Health Logs:** Daily sleep, energy, mood, and water intake tracking.
-
 ---
 
-## 7. Dungeons, Raids, & The System Shop
+## 7. Dungeons & The System Shop
 
 ### ⚔️ Weekly Gate Raids (Boss Battles)
 Every Monday, a **Gate** opens on your dashboard containing a Boss scaled to your current rank. 
@@ -138,26 +122,9 @@ You can spend this currency in the **Shop** for real-life rewards you define (e.
 
 ---
 
-## 8. Hunter's Protocol (Efficiency Guide)
+## 8. AI Commander
 
-To maximize your progression and avoid HP drain, follow this optimal daily loop:
-
-**☀️ Morning Routine (The Awakening)**
-1. Wake up and check your **Notifications**. The System will deliver your morning brief.
-2. Complete your morning anchor quests: *Cold Shower, Sunlight, Hydration*.
-3. Go to **Mind OS** and log your daily intention or clear any lingering mental fog.
-
-**🛠️ The Grind (Daytime)**
-1. Check the **Discipline Protocol**. If you are feeling an urge, trigger the Emergency Breathing protocol immediately. If you made it through yesterday clean, hit **Confirm Clean Day**.
-2. Use **Career OS** to start a **Deep Work Session**. Do not break focus.
-3. Knock out your **SKILL** quests. If studying or coding, log your LeetCode progress.
-4. Eat clean and log your meals in **Health OS**.
-
-**🌑 Evening Consolidation**
-1. Check your **Status Window**. Ensure you have hit the **10+ Quest threshold** to heal/maintain HP.
-2. Use **Wealth OS** to quickly log any expenses made during the day.
-3. If you have reached a 25-day streak on any habit, visit the **Shadow Army** tab and **Extract your new Shadow**. Deploy it immediately.
-4. Read the **Daily System Quote**, close the app, and sleep before 11:30 PM.
+Every morning, navigate to the **AI Commander**. It will read your entire life state—your stats, your sleep logs, your finances, your current streak, and your time availability—and generate a highly personalized daily briefing and custom quests. It knows when you are weak and need rest, and it knows when it's time for you to push harder.
 
 > *"I am not a hero. I am a player. And I will keep leveling up."*
 > — **◈ THE SYSTEM**
