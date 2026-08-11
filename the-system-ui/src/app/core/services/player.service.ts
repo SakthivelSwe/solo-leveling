@@ -62,10 +62,19 @@ export class PlayerService {
     return this.http.get<Quest[]>(`${this.api}/quests/milestones`);
   }
 
-  completeQuest(key: string, lat?: number, lng?: number): Observable<QuestCompletionResult> {
+  completeQuest(key: string, lat?: number, lng?: number, difficultyFeedback?: string | null): Observable<QuestCompletionResult> {
     let url = `${this.api}/quests/${key}/complete`;
+    const params = new URLSearchParams();
     if (lat !== undefined && lng !== undefined) {
-      url += `?lat=${lat}&lng=${lng}`;
+      params.append('lat', lat.toString());
+      params.append('lng', lng.toString());
+    }
+    if (difficultyFeedback) {
+      params.append('difficultyFeedback', difficultyFeedback);
+    }
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
     }
     return this.http.post<QuestCompletionResult>(url, {});
   }

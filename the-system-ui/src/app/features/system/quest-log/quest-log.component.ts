@@ -11,6 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CATEGORY_META } from '../../../shared/system.constants';
 import { listStagger } from '../../../shared/animations';
 import { SkipPromptModalComponent } from '../../../shared/components/skip-prompt-modal.component';
+import { DifficultyPromptModalComponent } from '../../../shared/components/difficulty-prompt-modal.component';
 
 /** Active tab in the quest log */
 type QuestTab = 'today' | 'weekly' | 'monthly' | 'milestones';
@@ -50,7 +51,7 @@ export class QuestLogComponent implements OnInit, OnChanges {
   @Input() milestoneQuests: Quest[] = [];
   @Input() pendingKey: string | null = null;
   @Input() pressureLevel = 'STANDARD';
-  @Output() complete = new EventEmitter<Quest>();
+  @Output() complete = new EventEmitter<{ quest: Quest; difficultyFeedback?: string | null }>();
   @Output() skip = new EventEmitter<{ quest: Quest; reason: string }>();
   @Output() verify = new EventEmitter<{ quest: Quest; imageBase64: string; mimeType: string }>();
   @Output() questAdded = new EventEmitter<Quest>();
@@ -218,13 +219,21 @@ export class QuestLogComponent implements OnInit, OnChanges {
   onComplete(q: Quest, event?: MouseEvent): void {
     if (q.isCompleted || this.pendingKey || q.isSkipped) return;
     
-    // Trigger XP particle effect if we have mouse coordinates
-    if (event) {
-      this.uiState.spawnXpParticle(q.xpReward || 50, 0, event.clientX, event.clientY);
-    }
-    
-    this.complete.emit(q);
-    this.skipWarningKey = null;
+    const dialogRef = this.dialog.open(DifficultyPromptModalComponent, {
+      data: { questName: q.label },
+      panelClass: 'transparent-panel',
+      hasBackdrop: false,
+    });
+
+    dialogRef.afterClosed().subscribe((feedback: string | null | undefined) => {
+      if (feedback !== undefined) {
+        if (event) {
+          this.uiState.spawnXpParticle(q.xpReward || 50, 0, event.clientX, event.clientY);
+        }
+        this.complete.emit({ quest: q, difficultyFeedback: feedback });
+        this.skipWarningKey = null;
+      }
+    });
   }
 
   private readonly dialog = inject(MatDialog);

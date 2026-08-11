@@ -452,7 +452,8 @@ export class SystemComponent implements OnInit, OnDestroy {
     }
   }
 
-  onComplete(quest: Quest): void {
+  onComplete(event: { quest: Quest; difficultyFeedback?: string | null }): void {
+    const { quest, difficultyFeedback } = event;
     if (quest.latitude !== undefined && quest.longitude !== undefined) {
       this.pendingKey.set(quest.questKey);
       this.toast('◈ Validating coordinates...');
@@ -463,7 +464,7 @@ export class SystemComponent implements OnInit, OnDestroy {
       }
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          this.playerService.completeQuest(quest.questKey, pos.coords.latitude, pos.coords.longitude).subscribe({
+          this.playerService.completeQuest(quest.questKey, pos.coords.latitude, pos.coords.longitude, difficultyFeedback).subscribe({
             next: (res: QuestCompletionResult) => this.handleQuestCompletionSuccess(res),
             error: (err) => {
               this.pendingKey.set(null);
@@ -479,7 +480,7 @@ export class SystemComponent implements OnInit, OnDestroy {
       );
     } else {
       this.pendingKey.set(quest.questKey);
-      this.playerService.completeQuest(quest.questKey).subscribe({
+      this.playerService.completeQuest(quest.questKey, undefined, undefined, difficultyFeedback).subscribe({
         next: (res: QuestCompletionResult) => this.handleQuestCompletionSuccess(res),
         error: () => this.pendingKey.set(null),
       });
