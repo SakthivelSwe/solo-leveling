@@ -89,6 +89,12 @@ public class NoFapController {
         return ResponseEntity.ok(noFapService.urgeSurvived(playerId(request)));
     }
 
+    @GetMapping("/urge-truth-bomb")
+    public ResponseEntity<Map<String, String>> urgeTruthBomb(HttpServletRequest request) {
+        String bomb = noFapService.generateUrgeTruthBomb(playerId(request));
+        return ResponseEntity.ok(Map.of("truthBomb", bomb));
+    }
+
     private Long playerId(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         com.thesystem.entity.Player player = playerService.getByUsername(jwtService.extractUsername(token));

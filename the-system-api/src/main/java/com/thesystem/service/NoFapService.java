@@ -36,15 +36,21 @@ public class NoFapService {
     private final PlayerRepository playerRepo;
     private final LevelService levelService;
     private final AiMemoryService aiMemoryService;
+    private final AiProviderService aiProviderService;
+    private final com.thesystem.repository.OnboardingAssessmentRepository onboardingRepo;
 
     public NoFapService(DopamineLogRepository logRepo,
                         PlayerRepository playerRepo,
                         LevelService levelService,
-                        AiMemoryService aiMemoryService) {
+                        AiMemoryService aiMemoryService,
+                        AiProviderService aiProviderService,
+                        com.thesystem.repository.OnboardingAssessmentRepository onboardingRepo) {
         this.logRepo = logRepo;
         this.playerRepo = playerRepo;
         this.levelService = levelService;
         this.aiMemoryService = aiMemoryService;
+        this.aiProviderService = aiProviderService;
+        this.onboardingRepo = onboardingRepo;
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -878,6 +884,29 @@ public class NoFapService {
                 "Brain scans show this addiction is as damaging as hard drugs",
                 "Your brain takes about 14–21 days to start enjoying normal things again"
         );
+    }
+
+    /**
+     * Generates a ruthless, personalized AI Truth Bomb for Urge Emergencies.
+     */
+    public String generateUrgeTruthBomb(Long playerId) {
+        int currentStreak = getStatus(playerId).getCurrentStreak();
+        
+        String goalStr = "higher-paying developer role";
+        java.util.Optional<com.thesystem.entity.OnboardingAssessment> opt = onboardingRepo.findByPlayerId(playerId);
+        if (opt.isPresent() && opt.get().getPrimaryGoal() != null) {
+            goalStr = opt.get().getPrimaryGoal();
+        }
+
+        String systemPrompt = "You are THE SYSTEM from Solo Leveling. The Hunter is experiencing a severe dopamine craving right now and is about to relapse. Generate a ruthless, hard-hitting 2-sentence truth bomb designed to snap them out of it.";
+        
+        String userPrompt = "I am on Day " + currentStreak + " of my clean streak. My ultimate real-life goal is: " + goalStr + ". Remind me exactly what I am throwing away if I give in. Be aggressive. Do NOT use markdown or quotes, just raw text.";
+
+        try {
+            return aiProviderService.generate(AiProviderService.Scenario.EVALUATION, systemPrompt, userPrompt).trim().replaceAll("^\"|\"$", "");
+        } catch (Exception e) {
+            return "SYSTEM ERROR: Dopamine override detected. Do not engage. Protect the streak.";
+        }
     }
 }
 

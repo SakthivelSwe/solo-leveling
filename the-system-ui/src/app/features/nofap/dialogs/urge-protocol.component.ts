@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { AddictionInsight } from '../../../core/models/models';
+import { LifeOsService } from '../../../core/services/life-os.service';
 
 @Component({
   selector: 'app-urge-protocol',
@@ -26,7 +27,8 @@ import { AddictionInsight } from '../../../core/models/models';
       <!-- Rotating Truth Bomb -->
       <div class="truth-bomb-box system-card">
         <h3 class="mono">SYSTEM WARNING</h3>
-        <p class="truth-text tech">{{ currentTruth()?.description }}</p>
+        <p *ngIf="aiTruthBomb() === null" class="truth-text tech">CONNECTING TO THE SYSTEM... GENERATING PROFILE-SPECIFIC WARNING...</p>
+        <p *ngIf="aiTruthBomb() !== null" class="truth-text tech ai-text">{{ aiTruthBomb() }}</p>
       </div>
 
       <!-- Timer and Actions -->
@@ -96,6 +98,7 @@ import { AddictionInsight } from '../../../core/models/models';
     }
     .truth-bomb-box h3 { color: #ff3333; margin-top: 0; letter-spacing: 2px; }
     .truth-text { font-size: 1rem; line-height: 1.6; color: #e2e8f0; }
+    .ai-text { font-size: 1.2rem; font-weight: bold; color: #ff3333; text-shadow: 0 0 10px rgba(255,51,51,0.5); }
 
     /* Footer / Timer */
     .timer { font-size: 3.5rem; color: #FAC775; text-shadow: 0 0 20px rgba(250,199,117,0.5); margin-bottom: 10px; }
@@ -124,6 +127,7 @@ export class UrgeProtocolComponent implements OnInit, OnDestroy {
   
   timeLeft = signal(120); // 2 minutes
   currentTruth = signal<AddictionInsight | null>(null);
+  aiTruthBomb = signal<string | null>(null);
   
   private breathTimer: any;
   private mainTimer: any;
@@ -131,13 +135,19 @@ export class UrgeProtocolComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialogRef: MatDialogRef<UrgeProtocolComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { insights: AddictionInsight[] }
+    @Inject(MAT_DIALOG_DATA) public data: { insights: AddictionInsight[] },
+    private lifeOs: LifeOsService
   ) {}
 
   ngOnInit() {
     this.startBreathing();
     this.startMainTimer();
-    this.cycleTruths();
+    
+    // Fetch personalized AI Truth Bomb
+    this.lifeOs.getUrgeTruthBomb().subscribe({
+      next: (res) => this.aiTruthBomb.set(res.truthBomb),
+      error: () => this.aiTruthBomb.set("SYSTEM ERROR: Dopamine override detected. Do not engage. Protect the streak.")
+    });
   }
 
   ngOnDestroy() {

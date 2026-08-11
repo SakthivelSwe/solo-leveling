@@ -238,6 +238,7 @@ export class LifeOsService {
     return this.http.post<any>(`${this.api}/nofap/set-start-date`, { startDate });
   }
   reportUrgeSurvived(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/urge-survived`, {}); }
+  getUrgeTruthBomb(): Observable<{ truthBomb: string }> { return this.http.get<{ truthBomb: string }>(`${this.api}/nofap/urge-truth-bomb`); }
   logNightfall(): Observable<any> { return this.http.post<any>(`${this.api}/nofap/nightfall`, {}); }
 
   /* ===== Penalty Zone ===== */
