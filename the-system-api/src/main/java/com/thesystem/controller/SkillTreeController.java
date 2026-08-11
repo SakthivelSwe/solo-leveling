@@ -14,13 +14,15 @@ import java.util.List;
 public class SkillTreeController {
 
     private final SkillTreeService skillTreeService;
+    private final com.thesystem.security.CurrentPlayer currentPlayer;
 
-    public SkillTreeController(SkillTreeService skillTreeService) {
+    public SkillTreeController(SkillTreeService skillTreeService, com.thesystem.security.CurrentPlayer currentPlayer) {
         this.skillTreeService = skillTreeService;
+        this.currentPlayer = currentPlayer;
     }
 
     @GetMapping
-    public List<SkillTreeNode> getNodes(@RequestHeader("X-Player-Id") Long playerId) {
-        return skillTreeService.getNodes(playerId);
+    public List<SkillTreeNode> getNodes(java.security.Principal principal) {
+        return skillTreeService.getNodes(currentPlayer.id(principal));
     }
 }
