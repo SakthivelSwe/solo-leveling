@@ -1,13 +1,12 @@
 package com.thesystem.controller;
 
 import com.thesystem.entity.DeepWorkSession;
-import com.thesystem.security.JwtService;
+import com.thesystem.security.CurrentPlayer;
 import com.thesystem.service.DeepWorkService;
-import com.thesystem.service.PlayerService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,40 +15,32 @@ import java.util.Map;
 public class DeepWorkController {
 
     private final DeepWorkService deepWorkService;
-    private final JwtService jwtService;
-    private final PlayerService playerService;
+    private final CurrentPlayer currentPlayer;
 
     public DeepWorkController(DeepWorkService deepWorkService,
-                              JwtService jwtService,
-                              PlayerService playerService) {
+                              CurrentPlayer currentPlayer) {
         this.deepWorkService = deepWorkService;
-        this.jwtService = jwtService;
-        this.playerService = playerService;
+        this.currentPlayer = currentPlayer;
     }
 
     @PostMapping("/log")
-    public ResponseEntity<DeepWorkSession> logSession(HttpServletRequest request,
+    public ResponseEntity<DeepWorkSession> logSession(Principal p,
                                                        @RequestBody DeepWorkSession input) {
-        return ResponseEntity.ok(deepWorkService.logSession(playerId(request), input));
+        return ResponseEntity.ok(deepWorkService.logSession(currentPlayer.id(p), input));
     }
 
     @GetMapping("/weekly")
-    public ResponseEntity<List<DeepWorkSession>> getWeekly(HttpServletRequest request) {
-        return ResponseEntity.ok(deepWorkService.getWeeklySessions(playerId(request)));
+    public ResponseEntity<List<DeepWorkSession>> getWeekly(Principal p) {
+        return ResponseEntity.ok(deepWorkService.getWeeklySessions(currentPlayer.id(p)));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<DeepWorkSession>> getHistory(HttpServletRequest request) {
-        return ResponseEntity.ok(deepWorkService.getHistory(playerId(request)));
+    public ResponseEntity<List<DeepWorkSession>> getHistory(Principal p) {
+        return ResponseEntity.ok(deepWorkService.getHistory(currentPlayer.id(p)));
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getStats(HttpServletRequest request) {
-        return ResponseEntity.ok(deepWorkService.getStats(playerId(request)));
-    }
-
-    private Long playerId(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return playerService.getByUsername(jwtService.extractUsername(token)).getId();
+    public ResponseEntity<Map<String, Object>> getStats(Principal p) {
+        return ResponseEntity.ok(deepWorkService.getStats(currentPlayer.id(p)));
     }
 }

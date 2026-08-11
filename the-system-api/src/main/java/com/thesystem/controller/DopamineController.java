@@ -1,13 +1,12 @@
 package com.thesystem.controller;
 
 import com.thesystem.entity.DopamineLog;
-import com.thesystem.security.JwtService;
+import com.thesystem.security.CurrentPlayer;
 import com.thesystem.service.DopamineService;
-import com.thesystem.service.PlayerService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,36 +15,28 @@ import java.util.Map;
 public class DopamineController {
 
     private final DopamineService dopamineService;
-    private final JwtService jwtService;
-    private final PlayerService playerService;
+    private final CurrentPlayer currentPlayer;
 
     public DopamineController(DopamineService dopamineService,
-                              JwtService jwtService,
-                              PlayerService playerService) {
+                              CurrentPlayer currentPlayer) {
         this.dopamineService = dopamineService;
-        this.jwtService = jwtService;
-        this.playerService = playerService;
+        this.currentPlayer = currentPlayer;
     }
 
     @PostMapping("/log")
-    public ResponseEntity<DopamineLog> logToday(HttpServletRequest request,
+    public ResponseEntity<DopamineLog> logToday(Principal p,
                                                  @RequestBody DopamineLog input) {
-        return ResponseEntity.ok(dopamineService.logToday(playerId(request), input));
+        return ResponseEntity.ok(dopamineService.logToday(currentPlayer.id(p), input));
     }
 
     @GetMapping("/today")
-    public ResponseEntity<Map<String, Object>> getToday(HttpServletRequest request) {
-        return ResponseEntity.ok(dopamineService.getTodaySummary(playerId(request)));
+    public ResponseEntity<Map<String, Object>> getToday(Principal p) {
+        return ResponseEntity.ok(dopamineService.getTodaySummary(currentPlayer.id(p)));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<DopamineLog>> getHistory(HttpServletRequest request,
-                                                        @RequestParam(defaultValue = "30") int days) {
-        return ResponseEntity.ok(dopamineService.getHistory(playerId(request), days));
-    }
-
-    private Long playerId(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return playerService.getByUsername(jwtService.extractUsername(token)).getId();
+    public ResponseEntity<List<DopamineLog>> getHistory(Principal p,
+                                                         @RequestParam(defaultValue = "30") int days) {
+        return ResponseEntity.ok(dopamineService.getHistory(currentPlayer.id(p), days));
     }
 }
