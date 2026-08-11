@@ -29,6 +29,107 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           <span class="diamond">◈</span> COURAGE OF THE WEAK
         </h3>
         <p class="tech quest-desc">The System demands daily physical conditioning. Failure to complete this quest will result in penalties. No gym required—only your resolve.</p>
+        <div class="beginner-note tech">
+          <span class="bn-icon">⚠️</span>
+          <span>Cannot do push-ups yet? <strong>That is normal.</strong> Follow the Beginner Protocol below — Wall Push-ups are the correct starting point. Every S-Rank Hunter started at zero.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BEGINNER PROGRESSION GUIDE ══════════════════════════════════ -->
+    <div class="bg-panel system-card">
+      <div class="card-glow" style="background:radial-gradient(circle at 70% -20%,rgba(31,190,142,0.15) 0%,transparent 70%)"></div>
+      <div class="bg-header" (click)="toggleBeginnerGuide()">
+        <div>
+          <h3 class="mono bg-title"><span class="diamond" style="color:#1FBE8E">◈</span> BEGINNER PROTOCOL — ZERO TO HUNTER</h3>
+          <p class="tech bg-sub">Cannot do push-ups or pull-ups? Start here. Science-backed progression.</p>
+        </div>
+        <button class="bg-toggle mono" [attr.aria-label]="beginnerGuideOpen() ? 'Collapse' : 'Expand'">
+          {{ beginnerGuideOpen() ? '▲ COLLAPSE' : '▼ EXPAND' }}
+        </button>
+      </div>
+
+      <div class="bg-body" *ngIf="beginnerGuideOpen()">
+
+        <!-- PUSH-UP TRACK -->
+        <div class="bg-track">
+          <div class="bg-track-header">
+            <span class="bg-track-icon">💪</span>
+            <div>
+              <div class="mono bg-track-name">PUSH-UP TRACK</div>
+              <div class="tech bg-track-desc">Same muscles as real push-ups — just easier angle. Do this daily until ready to advance.</div>
+            </div>
+          </div>
+          <div class="bg-stages">
+            <div class="bg-stage" *ngFor="let stage of pushupStages; let i = index"
+                 [class.bg-stage--active]="pushupStageIndex() === i"
+                 [class.bg-stage--done]="pushupStageIndex() > i">
+              <div class="bg-stage-num mono">{{ pushupStageIndex() > i ? '✓' : (i + 1) }}</div>
+              <div class="bg-stage-info">
+                <div class="mono bg-stage-title">{{ stage.name }}</div>
+                <div class="tech bg-stage-target">{{ stage.target }}</div>
+                <div class="tech bg-stage-when" *ngIf="pushupStageIndex() === i">⟶ {{ stage.readyWhen }}</div>
+              </div>
+              <div class="bg-stage-badge tech" *ngIf="pushupStageIndex() === i">CURRENT</div>
+            </div>
+          </div>
+          <button class="bg-advance mono spring-hover"
+                  *ngIf="pushupStageIndex() < pushupStages.length - 1"
+                  (click)="advancePushupStage()">
+            ⬆ ADVANCE STAGE — I'm ready for {{ pushupStages[pushupStageIndex() + 1]?.name }}
+          </button>
+          <div class="bg-complete tech" *ngIf="pushupStageIndex() >= pushupStages.length - 1">
+            🏆 FULL PUSH-UPS UNLOCKED — You have come a long way, Hunter.
+          </div>
+        </div>
+
+        <!-- PULL-UP TRACK -->
+        <div class="bg-track">
+          <div class="bg-track-header">
+            <span class="bg-track-icon">🧗</span>
+            <div>
+              <div class="mono bg-track-name">PULL-UP TRACK</div>
+              <div class="tech bg-track-desc">Build grip, back and shoulder strength before attempting a pull-up. No shortcuts.</div>
+            </div>
+          </div>
+          <div class="bg-stages">
+            <div class="bg-stage" *ngFor="let stage of pullupStages; let i = index"
+                 [class.bg-stage--active]="pullupStageIndex() === i"
+                 [class.bg-stage--done]="pullupStageIndex() > i">
+              <div class="bg-stage-num mono">{{ pullupStageIndex() > i ? '✓' : (i + 1) }}</div>
+              <div class="bg-stage-info">
+                <div class="mono bg-stage-title">{{ stage.name }}</div>
+                <div class="tech bg-stage-target">{{ stage.target }}</div>
+                <div class="tech bg-stage-when" *ngIf="pullupStageIndex() === i">⟶ {{ stage.readyWhen }}</div>
+              </div>
+              <div class="bg-stage-badge tech" *ngIf="pullupStageIndex() === i">CURRENT</div>
+            </div>
+          </div>
+          <button class="bg-advance mono spring-hover"
+                  *ngIf="pullupStageIndex() < pullupStages.length - 1"
+                  (click)="advancePullupStage()">
+            ⬆ ADVANCE STAGE — I'm ready for {{ pullupStages[pullupStageIndex() + 1]?.name }}
+          </button>
+          <div class="bg-complete tech" *ngIf="pullupStageIndex() >= pullupStages.length - 1">
+            🏆 FIRST PULL-UP ACHIEVED — S-Rank physical potential unlocked.
+          </div>
+        </div>
+
+        <!-- KEY FACTS -->
+        <div class="bg-facts">
+          <div class="bg-fact">
+            <span class="bg-fact-icon">🧬</span>
+            <div class="tech bg-fact-text"><strong>Why wall push-ups work:</strong> They train the exact same muscle groups (chest, triceps, shoulders) as a full push-up — your body doesn't know the difference. The angle just reduces how much bodyweight you lift.</div>
+          </div>
+          <div class="bg-fact">
+            <span class="bg-fact-icon">🧠</span>
+            <div class="tech bg-fact-text"><strong>Atomic Habits rule (James Clear):</strong> Start so small it feels embarrassing. 3×10 wall push-ups daily = 30 reps of real training. After 2-3 weeks the habit IS the win — not the reps.</div>
+          </div>
+          <div class="bg-fact">
+            <span class="bg-fact-icon">📈</span>
+            <div class="tech bg-fact-text"><strong>When to advance:</strong> When the current stage feels too easy for 3 consecutive days, advance to the next stage. Do NOT rush — form beats speed.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -284,6 +385,54 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   }
   .pt-topbar .spacer { width: 90px; }
+
+  /* Beginner Note */
+  .beginner-note {
+    margin-top: 14px; padding: 10px 14px; border-radius: 8px;
+    background: rgba(250,199,117,0.08); border: 1px solid rgba(250,199,117,0.25);
+    display: flex; gap: 10px; align-items: flex-start; font-size: 0.75rem;
+    color: rgba(255,255,255,0.7); line-height: 1.5;
+  }
+  .beginner-note .bn-icon { font-size: 1rem; flex-shrink:0; margin-top:1px; }
+  .beginner-note strong { color: #FAC775; }
+
+  /* Beginner Progression Guide */
+  .bg-panel { position:relative; overflow:hidden; padding:24px 28px; border:1px solid rgba(31,190,142,0.25); border-radius:12px; background:linear-gradient(135deg,rgba(31,190,142,0.06),rgba(13,13,28,0.85)); }
+  .bg-header { display:flex; justify-content:space-between; align-items:flex-start; cursor:pointer; gap:16px; }
+  .bg-title { margin:0 0 4px; font-size:1rem; letter-spacing:3px; color:#5DCAA5; display:flex; align-items:center; gap:8px; }
+  .bg-sub { margin:0; font-size:0.73rem; color:var(--text-secondary); }
+  .bg-toggle { padding:8px 16px; border-radius:8px; border:1px solid rgba(31,190,142,0.4); background:rgba(31,190,142,0.1); color:#5DCAA5; font-size:0.7rem; letter-spacing:2px; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .bg-toggle:hover { background:rgba(31,190,142,0.22); box-shadow:0 0 12px rgba(31,190,142,0.3); }
+  .bg-body { margin-top:24px; display:flex; flex-direction:column; gap:24px; }
+
+  .bg-track { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:20px; }
+  .bg-track-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:16px; }
+  .bg-track-icon { font-size:1.8rem; flex-shrink:0; }
+  .bg-track-name { font-size:0.95rem; letter-spacing:2px; color:#fff; margin-bottom:4px; }
+  .bg-track-desc { font-size:0.72rem; color:var(--text-secondary); line-height:1.5; }
+
+  .bg-stages { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .bg-stage { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.02); transition:all 0.3s; }
+  .bg-stage--active { border-color:rgba(31,190,142,0.5); background:rgba(31,190,142,0.08); box-shadow:0 0 15px rgba(31,190,142,0.12); }
+  .bg-stage--done { opacity:0.5; }
+  .bg-stage-num { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0; color:var(--text-secondary); }
+  .bg-stage--active .bg-stage-num { background:rgba(31,190,142,0.25); color:#1FBE8E; }
+  .bg-stage--done .bg-stage-num { background:rgba(31,190,142,0.15); color:#1FBE8E; }
+  .bg-stage-info { flex:1; }
+  .bg-stage-title { font-size:0.88rem; color:#fff; font-weight:600; margin-bottom:3px; }
+  .bg-stage-target { font-size:0.7rem; color:var(--text-secondary); margin-bottom:3px; }
+  .bg-stage-when { font-size:0.68rem; color:#5DCAA5; font-style:italic; }
+  .bg-stage-badge { font-size:0.58rem; letter-spacing:2px; color:#1FBE8E; background:rgba(31,190,142,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(31,190,142,0.3); white-space:nowrap; flex-shrink:0; margin-top:2px; }
+
+  .bg-advance { width:100%; padding:12px; border-radius:10px; border:1px solid rgba(31,190,142,0.4); background:rgba(31,190,142,0.1); color:#5DCAA5; font-size:0.75rem; letter-spacing:1.5px; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .bg-advance:hover { background:rgba(31,190,142,0.25); box-shadow:0 0 15px rgba(31,190,142,0.3); }
+  .bg-complete { text-align:center; padding:12px; color:#FAC775; font-size:0.8rem; border:1px solid rgba(250,199,117,0.2); border-radius:10px; background:rgba(250,199,117,0.05); }
+
+  .bg-facts { display:flex; flex-direction:column; gap:10px; }
+  .bg-fact { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); }
+  .bg-fact-icon { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
+  .bg-fact-text { font-size:0.72rem; color:rgba(255,255,255,0.65); line-height:1.6; }
+  .bg-fact-text strong { color:rgba(255,255,255,0.9); }
 
   /* Intro Panel */
   .intro-panel { 
@@ -647,6 +796,93 @@ export class PhysicalTrackingComponent implements OnInit {
   history = signal<WorkoutEntry[]>([]);
   Math = Math;
 
+  // ── Beginner Progression Guide ──────────────────────────────────────────
+  beginnerGuideOpen = signal<boolean>(true);
+
+  readonly pushupStages = [
+    {
+      name: 'Wall Push-ups',
+      target: '3 sets × 10 reps (against a wall, arms straight, lower chest toward wall)',
+      readyWhen: 'When 3×10 feels easy for 3 days in a row → Advance'
+    },
+    {
+      name: 'Incline Push-ups (high surface)',
+      target: '3 sets × 10 reps (hands on counter or table — waist height)',
+      readyWhen: 'When 3×10 on table feels easy for 3 days → Advance'
+    },
+    {
+      name: 'Incline Push-ups (low surface)',
+      target: '3 sets × 8 reps (hands on couch or low chair — knee height)',
+      readyWhen: 'When 3×8 on chair feels easy for 3 days → Advance'
+    },
+    {
+      name: 'Knee Push-ups',
+      target: '3 sets × 8 reps (on floor, knees touching — keep back straight)',
+      readyWhen: 'When 3×8 knee push-ups feel easy for 3 days → Advance'
+    },
+    {
+      name: 'Full Push-ups ⚡',
+      target: 'Start with 1 rep, build to 3 sets × 10 reps over time',
+      readyWhen: 'You have arrived. Keep pushing further.'
+    }
+  ];
+
+  readonly pullupStages = [
+    {
+      name: 'Dead Hang',
+      target: '3 sets × 10 seconds hang from bar (builds grip and shoulder stability)',
+      readyWhen: 'When you can hang 30 seconds comfortably for 3 days → Advance'
+    },
+    {
+      name: 'Scapular Pull-up',
+      target: '3 sets × 8 reps (hang, then pull shoulder blades DOWN — arms stay straight)',
+      readyWhen: 'When 3×8 scap pulls feel controlled for 3 days → Advance'
+    },
+    {
+      name: 'Inverted Row (under a table)',
+      target: '3 sets × 8 reps (lie under table, grab edge, pull chest up — feet on floor)',
+      readyWhen: 'When 3×8 rows feel easy with feet forward for 3 days → Advance'
+    },
+    {
+      name: 'Negative Pull-up',
+      target: '3 sets × 3 reps (jump or step to chin-over-bar position, lower yourself in 5 seconds)',
+      readyWhen: 'When 3×5 negative pull-ups at 5-second lower feel strong → Advance'
+    },
+    {
+      name: 'Full Pull-up ⚡',
+      target: 'Start with 1 rep. Build to 3 sets × 5 reps. You have the strength.',
+      readyWhen: 'You earned this. Keep climbing.'
+    }
+  ];
+
+  pushupStageIndex = signal<number>(0);
+  pullupStageIndex = signal<number>(0);
+
+  toggleBeginnerGuide(): void {
+    this.beginnerGuideOpen.set(!this.beginnerGuideOpen());
+  }
+
+  advancePushupStage(): void {
+    const next = Math.min(this.pushupStageIndex() + 1, this.pushupStages.length - 1);
+    this.pushupStageIndex.set(next);
+    localStorage.setItem('lifeos.pushupStage', String(next));
+    this.snack.open(`◈ ADVANCED to ${this.pushupStages[next].name}! Keep going, Hunter.`, 'OK', { duration: 3000 });
+  }
+
+  advancePullupStage(): void {
+    const next = Math.min(this.pullupStageIndex() + 1, this.pullupStages.length - 1);
+    this.pullupStageIndex.set(next);
+    localStorage.setItem('lifeos.pullupStage', String(next));
+    this.snack.open(`◈ ADVANCED to ${this.pullupStages[next].name}! The system acknowledges your growth.`, 'OK', { duration: 3000 });
+  }
+
+  private loadBeginnerStages(): void {
+    const ps = localStorage.getItem('lifeos.pushupStage');
+    const pl = localStorage.getItem('lifeos.pullupStage');
+    if (ps !== null) this.pushupStageIndex.set(Number(ps));
+    if (pl !== null) this.pullupStageIndex.set(Number(pl));
+  }
+
   // List of exercises the user has added to their dashboard
   trackedExercises = signal<string[]>([]);
   
@@ -662,6 +898,7 @@ export class PhysicalTrackingComponent implements OnInit {
   async ngOnInit() {
     this.loadPreferences();
     this.loadHistory();
+    this.loadBeginnerStages();
     await this.health.checkAvailability();
   }
 

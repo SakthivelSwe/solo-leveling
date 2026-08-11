@@ -1,4 +1,4 @@
-﻿<div class="nf-shell">
+<div class="nf-shell">
 
   <!-- ═══ LOADING ═══════════════════════════════════════════════ -->
   @if (loading()) {
@@ -301,21 +301,70 @@
     </section>
 
     <!-- ════════════════════════════════════════════════════════════
-         SECTION 2 — TODAY'S BRAIN SCIENCE CARD
+         SECTION 2 — YOUR BRAIN RIGHT NOW (Dynamic, Science-based)
+         Reads your actual streak day. Accurate neuroscience, not random text.
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section glass-panel spring-hover" style="overflow: hidden;">
-      <div class="card-glow"></div>
-      <h2 class="section-title mono">◈ YOUR BRAIN RIGHT NOW — DAY {{ displayDay() || s.currentStreak }}</h2>
-      <div class="science-today-card" [attr.data-category]="s.scienceCategory">
-        <div class="stc-icon">{{ getCategoryIcon(s.scienceCategory) }}</div>
-        <div class="stc-body">
-          <div class="stc-category tech">{{ s.scienceCategory }}</div>
-          <h3 class="stc-title mono">{{ s.scienceTitle }}</h3>
-          <p class="stc-desc">{{ s.scienceFact }}</p>
+    <section class="nf-section brain-panel glass-panel spring-hover" style="overflow: hidden;">
+      <div class="card-glow" [style.background]="'radial-gradient(circle at 30% -10%,' + brainPhase().color + '22 0%, transparent 70%)'"></div>
+
+      <div class="brain-header">
+        <div class="brain-header-left">
+          <span class="brain-icon">{{ brainPhase().icon }}</span>
+          <div>
+            <h2 class="mono brain-title">◈ YOUR BRAIN RIGHT NOW</h2>
+            <p class="tech brain-sub">Day {{ displayDay() || s.currentStreak }} — Accurate neuroscience analysis</p>
+          </div>
         </div>
-        <div class="stc-pulse"></div>
+        <div class="brain-phase-badge tech" [style.color]="brainPhase().color" [style.borderColor]="brainPhase().color + '55'">
+          {{ brainPhase().name | uppercase }}
+        </div>
+      </div>
+
+      <div class="brain-body">
+        <div class="brain-desc-card" [style.borderColor]="brainPhase().color + '44'">
+          <p class="tech brain-desc">{{ brainPhase().description }}</p>
+        </div>
+        <div class="brain-grid">
+          <div class="brain-col">
+            <div class="brain-col-title tech">⚡ WHAT YOU MAY FEEL</div>
+            <div class="brain-symptom-list">
+              <div class="brain-symptom tech" *ngFor="let sym of brainPhase().symptoms">
+                <span class="sym-dot" [style.background]="brainPhase().color"></span>
+                {{ sym }}
+              </div>
+            </div>
+          </div>
+          <div class="brain-col">
+            <div class="brain-col-title tech">🎯 DO THIS RIGHT NOW</div>
+            <div class="brain-action-card" [style.borderColor]="brainPhase().color + '55'">
+              <div class="mono brain-action-text" [style.color]="brainPhase().color">{{ brainPhase().action }}</div>
+            </div>
+            <div class="brain-science tech">{{ brainPhase().scienceFact }}</div>
+          </div>
+        </div>
+        <div class="brain-recovery">
+          <div class="br-label tech">
+            <span>DOPAMINE RECEPTOR RECOVERY ESTIMATE</span>
+            <span [style.color]="brainPhase().color">{{ brainPhase().recoveryPct }}%</span>
+          </div>
+          <div class="br-bar-bg">
+            <div class="br-bar-fill" [style.width]="brainPhase().recoveryPct + '%'" [style.background]="brainPhase().color"></div>
+          </div>
+          <p class="br-hint tech">Receptors numbed by overstimulation are recovering. This cannot be faked — only time and discipline heals them.</p>
+        </div>
+        <div class="stc-divider tech">◈ SPECIFIC BRAIN CHANGE TODAY:</div>
+        <div class="science-today-card" [attr.data-category]="s.scienceCategory">
+          <div class="stc-icon">{{ getCategoryIcon(s.scienceCategory) }}</div>
+          <div class="stc-body">
+            <div class="stc-category tech">{{ s.scienceCategory }}</div>
+            <h3 class="stc-title mono">{{ s.scienceTitle }}</h3>
+            <p class="stc-desc">{{ s.scienceFact }}</p>
+          </div>
+          <div class="stc-pulse"></div>
+        </div>
       </div>
     </section>
+
 
     <!-- ════════════════════════════════════════════════════════════
          SECTION 3 — FULL 90-DAY BRAIN JOURNEY (Every Day)

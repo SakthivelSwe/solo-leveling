@@ -1,4 +1,4 @@
-﻿/* ════════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    NO FAP CHALLENGE — Styles
    Dark, premium solo-leveling aesthetic with phase-color theming
    ════════════════════════════════════════════════════════════════ */
@@ -2321,3 +2321,182 @@
   transition: transform .3s cubic-bezier(.4,0,.2,1), background .3s;
 }
 /* ===== END LANGUAGE TOGGLE ===== */
+
+/* ══════════════════════════════════════════════════
+   BRAIN PHASE PANEL — "YOUR BRAIN RIGHT NOW"
+   Dynamic panel driven by brainPhase() computed signal
+   ══════════════════════════════════════════════════ */
+.brain-panel {
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(135deg, rgba(13,13,28,0.95) 0%, rgba(20,20,40,0.95) 100%);
+}
+
+.brain-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.brain-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.brain-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+.brain-title {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  letter-spacing: 3px;
+  color: var(--text-primary);
+}
+.brain-sub {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+.brain-phase-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.brain-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brain-desc-card {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid;
+  background: rgba(255,255,255,0.02);
+}
+.brain-desc {
+  margin: 0;
+  font-size: 0.73rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.65;
+}
+
+.brain-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+.brain-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.brain-col-title {
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.brain-symptom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.brain-symptom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.71rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+}
+.sym-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.brain-action-card {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid;
+  background: rgba(255,255,255,0.02);
+  margin-bottom: 8px;
+}
+.brain-action-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+.brain-science {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.brain-recovery {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.br-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.br-bar-bg {
+  height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.br-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 0 10px currentColor;
+}
+.br-hint {
+  margin: 0;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.stc-divider {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 2px;
+}

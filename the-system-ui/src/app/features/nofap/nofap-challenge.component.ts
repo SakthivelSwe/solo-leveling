@@ -132,6 +132,54 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
     return s.currentStreak >= 14 && s.currentStreak <= 45;
   });
 
+  /** Science-based brain phase computed from the live streak day.
+   *  Based on global neuroscience research on dopamine receptor recovery
+   *  and withdrawal patterns from compulsive behaviours.
+   */
+  readonly BRAIN_PHASES = [
+    {
+      minDay: 0, maxDay: 7,
+      name: 'Withdrawal', icon: '🌪️', color: '#E24B4A',
+      description: 'Your brain is in WITHDRAWAL. Dopamine receptors that were flooded daily are now starving. This causes irritability, cravings, restlessness and brain fog. This is NOT a sign of weakness — it is your brain physically adapting. Days 1–7 are the hardest. Every hour you hold is the system healing.',
+      symptoms: ['Strong cravings and urges', 'Irritability and mood swings', 'Brain fog, hard to concentrate', 'Restlessness, hard to sit still', 'Low energy or excessive sleep'],
+      action: 'Cold shower NOW (2 min). Then 10 Wall Push-ups. Physical action breaks the craving loop.',
+      scienceFact: 'Research: Day 1-7 withdrawal is identical in brain scans to substance withdrawal. Your dopamine system is recalibrating. Hold on.',
+      recoveryPct: 5
+    },
+    {
+      minDay: 8, maxDay: 20,
+      name: 'Re-calibration', icon: '⚡', color: '#FAC775',
+      description: 'The worst is behind you. Your brain is in RE-CALIBRATION. Dopamine receptors are slowly recovering sensitivity. The fog is starting to lift. You may feel occasional clarity followed by flatline periods — this is normal. Your reward system is resetting to natural baseline levels.',
+      symptoms: ['Energy slowly improving', 'Mental fog beginning to lift', 'Occasional strong urges (test)', 'Some days feel flat (flatline)', 'Starting to notice natural pleasures'],
+      action: 'Exercise today for at least 10 minutes. Natural movement produces the dopamine your brain is craving.',
+      scienceFact: 'Science: After 2 weeks, D2 dopamine receptor density begins measurably increasing. Your baseline for pleasure is rising.',
+      recoveryPct: 25
+    },
+    {
+      minDay: 21, maxDay: 89,
+      name: 'Neuroplasticity', icon: '🧠', color: '#A855F7',
+      description: 'You are in the NEUROPLASTICITY WINDOW — the most powerful period of brain rewiring. Prefrontal cortex activity (willpower, decision-making) is strengthening. The neural pathways that fed compulsive behaviour are weakening. New habits formed NOW have dramatically higher success rates. This window is rare. Use it.',
+      symptoms: ['Noticeable increase in clarity', 'Motivation returning slowly', 'Natural confidence emerging', 'Easier to focus on work/goals', 'Occasional temptation (normal)'],
+      action: 'BUILD A NEW HABIT TODAY. Your brain is literally more malleable right now. Learn something, train, or create.',
+      scienceFact: 'Science: Days 21-90 show measurable grey matter changes in the prefrontal cortex — the region responsible for impulse control and long-term planning.',
+      recoveryPct: 65
+    },
+    {
+      minDay: 90, maxDay: 9999,
+      name: 'Freedom', icon: '👑', color: '#1FBE8E',
+      description: 'You have entered FREEDOM MODE. Your brain has completed a full neurological reboot. Dopamine receptors are restored. The compulsive neural pathway is now a faint signal, not a highway. Natural confidence, motivation, and emotional stability are your new baseline. Protect this state.',
+      symptoms: ['Stable, consistent energy', 'Clear thinking and focus', 'Natural confidence baseline', 'Stronger relationships drive', 'Urges manageable and rare'],
+      action: 'MAINTAIN the system. Identify your trigger situations and create a prevention plan for each one.',
+      scienceFact: 'Science: 90+ days shows full receptor density recovery in fMRI studies. You have rewired your brain. This is permanent if maintained.',
+      recoveryPct: 95
+    }
+  ];
+
+  brainPhase = computed(() => {
+    const day = this.displayDay() || this.status()?.currentStreak || 0;
+    return this.BRAIN_PHASES.find(p => day >= p.minDay && day <= p.maxDay) ?? this.BRAIN_PHASES[0];
+  });
+
   // Milestone definitions
   readonly milestones = [
     { day: 7,   label: 'Week Warrior',       xp: 500,   icon: '⚔️' },

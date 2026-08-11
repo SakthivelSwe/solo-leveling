@@ -72,6 +72,32 @@ public class AiQuestGeneratorService {
         }
 
         // Build the prompt with REAL user context
+        // Determine physical capacity tier for accurate quest generation
+        int strStat = stats.getStrength();
+        String physicalTier;
+        String physicalExamples;
+        if (strStat < 10) {
+            physicalTier = "TRUE BEGINNER (STR < 10)";
+            physicalExamples = """
+                    FORBIDDEN physical quests: standard push-ups, pull-ups, burpees, jump squats.
+                    REQUIRED beginner alternatives:
+                      - Push-up equivalent: "Wall Push-ups 3×10" or "Incline Push-ups (on table) 3×8"
+                      - Pull-up equivalent: "Dead Hang from bar 3×10 seconds" or "Inverted Row under a table 3×8"
+                      - Core: "Knee Sit-ups 3×10" or "Plank hold 3×15 seconds"
+                      - Legs: "Bodyweight Squats 3×10" or "Wall Sit 3×20 seconds"
+                      - Cardio: "10-min brisk walk outside"
+                    WHY: At STR < 10, the Hunter cannot perform full push-ups. Wall push-ups train the EXACT same muscles with less bodyweight — this is the scientifically correct starting point.""";
+        } else if (strStat < 25) {
+            physicalTier = "INTERMEDIATE BEGINNER (STR 10-24)";
+            physicalExamples = """
+                    Physical quests: Use incline push-ups, knee push-ups, assisted squats, inverted rows.
+                    AVOID: standard pull-ups, heavy weighted exercises.
+                    ALLOWED: "Knee Push-Ups 3×10", "Incline Push-Ups (chair height) 3×10", "Negative Pull-Up 1×3 (slow lower)", "Squats 3×15".""";
+        } else {
+            physicalTier = "INTERMEDIATE (STR >= 25)";
+            physicalExamples = "Standard bodyweight quests are appropriate: push-ups, squats, planks, running.";
+        }
+
         String systemPrompt = """
                 You are THE SYSTEM from Solo Leveling — a ruthless but accurate mentor.
                 Generate hyper-specific, actionable daily quests for a Hunter with the following EXACT profile:
@@ -85,6 +111,9 @@ public class AiQuestGeneratorService {
 
                 CURRENT STATS (0 = untrained, higher = stronger):
                 STR(Fitness)=%d  INT(Tech)=%d  VIT(Health/Sleep)=%d  AGI(English)=%d  PER(Problem-Solving)=%d  DIS(Discipline)=%d
+
+                PHYSICAL CAPACITY: %s
+                %s
 
                 ACTIVE SKILLS:
                 %s
@@ -102,8 +131,9 @@ public class AiQuestGeneratorService {
                 3. REALISTIC TIME: Each quest must be completable in 20-60 min after a full workday.
                 4. STAT ALIGNMENT: Quest xpReward and statBoosts must directly match the quest activity.
                 5. DYNAMIC DIFFICULTY: If Level < 3, quests MUST be beginner-friendly (e.g., "Read 1 article", "Watch 1 tutorial"). If Level >= 5, increase difficulty (e.g., "Build a component"). If Level >= 10, use advanced tasks ("Mock interview", "System Architecture").
-                6. Generate exactly 3 SKILL quests + 1 DISCIPLINE or DAILY habit quest.
-                7. Output ONLY a raw JSON array. NO markdown, NO backticks, NO explanation.
+                6. PHYSICAL ACCURACY: Follow the PHYSICAL CAPACITY rules above with absolute strictness. Assigning "10 push-ups" when STR < 10 is a system error — it causes the Hunter to fail and quit.
+                7. Generate exactly 3 SKILL quests + 1 DISCIPLINE or DAILY habit quest.
+                8. Output ONLY a raw JSON array. NO markdown, NO backticks, NO explanation.
 
                 JSON SCHEMA (follow exactly):
                 [
@@ -119,6 +149,7 @@ public class AiQuestGeneratorService {
                         player.getLevel(), player.getRankLevel(),
                         stats.getStrength(), stats.getIntelligence(), stats.getVitality(),
                         stats.getAgility(), stats.getPerception(), stats.getDis(),
+                        physicalTier, physicalExamples,
                         formatSkills(skills)
                 );
 
