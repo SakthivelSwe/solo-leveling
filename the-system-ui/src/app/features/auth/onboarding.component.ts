@@ -479,7 +479,7 @@ export class OnboardingComponent {
     this.loading.set(true);
     const token = this.auth.token;
     this.http.post<OnboardingResult>(
-      `${environment.apiUrl}/api/onboarding/submit`,
+      `${environment.apiUrl}/onboarding/submit`,
       this.answers(),
       { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
     ).subscribe({

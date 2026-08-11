@@ -16,7 +16,7 @@ import java.util.Map;
  * GET  /api/onboarding/status — check if current player has completed onboarding
  */
 @RestController
-@RequestMapping("/api/onboarding")
+@RequestMapping("/api/v1/onboarding")
 public class OnboardingController {
 
     private final OnboardingService onboardingService;
