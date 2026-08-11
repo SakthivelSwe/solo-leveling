@@ -54,19 +54,19 @@ public class DataTransferServiceTest {
 
         targetPlayer = new Player();
         targetPlayer.setId(2L);
-        targetPlayer.setEmail("target@gmail.com");
+        targetPlayer.setEmail("source@gmail.com");
     }
 
     @Test
     void testTransferData_excludesNoFapAndTestosteroneQuests() {
         // Arrange
         DataTransferRequest req = new DataTransferRequest();
-        req.setTargetEmail("target@gmail.com");
+        req.setTargetEmail("source@gmail.com");
         req.setModules(Arrays.asList("QUESTS"));
         req.setTransferMode("COPY");
 
         when(playerRepo.findById(1L)).thenReturn(Optional.of(sourcePlayer));
-        when(playerRepo.findByEmail("target@gmail.com")).thenReturn(Optional.of(targetPlayer));
+        when(playerRepo.findByEmail("source@gmail.com")).thenReturn(Optional.of(targetPlayer));
 
         Quest q1 = new Quest();
         q1.setId(10L);
