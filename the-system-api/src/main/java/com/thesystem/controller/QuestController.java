@@ -46,6 +46,12 @@ public class QuestController {
         return Map.of("status", "success", "message", "AI quests generated");
     }
 
+    /** Gets AI quest suggestions for manual quest creation. */
+    @GetMapping("/suggestions")
+    public List<String> getQuestSuggestions(Principal principal, @RequestParam String category) {
+        return aiQuestGeneratorService.generateQuestSuggestions(playerId(principal), category);
+    }
+
     public static class SkipRequest {
         public String reason;
     }

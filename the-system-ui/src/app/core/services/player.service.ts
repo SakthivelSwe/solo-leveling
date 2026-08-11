@@ -141,4 +141,8 @@ export class PlayerService {
   skipQuest(questKey: string, reason: string): Observable<{status: string, message: string}> {
     return this.http.post<{status: string, message: string}>(`${this.api}/quests/${questKey}/skip`, { reason });
   }
+
+  getQuestSuggestions(category: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.api}/quests/suggestions`, { params: { category } });
+  }
 }

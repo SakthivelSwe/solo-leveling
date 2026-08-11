@@ -301,7 +301,11 @@ export class QuestLogComponent implements OnInit, OnChanges {
 
   toggleAddForm(): void {
     this.showAddForm.set(!this.showAddForm());
-    if (!this.showAddForm()) this.resetForm();
+    if (!this.showAddForm()) {
+      this.resetForm();
+    } else {
+      this.fetchSuggestions();
+    }
   }
 
   submitAddQuest(): void {
@@ -353,6 +357,34 @@ export class QuestLogComponent implements OnInit, OnChanges {
     this.newQuestXp = null;
     this.newQuestStatBoosts = '';
     this.addError.set(null);
+  }
+
+  // ── AI Suggestions ────────────────────────────────────────────────────────────
+
+  suggestions = signal<string[]>([]);
+  suggestionsLoading = signal<boolean>(false);
+
+  onCategoryChange() {
+    this.newQuestXp = null;
+    this.fetchSuggestions();
+  }
+
+  fetchSuggestions() {
+    this.suggestionsLoading.set(true);
+    this.playerService.getQuestSuggestions(this.newQuestCategory).subscribe({
+      next: (res) => {
+        this.suggestions.set(res);
+        this.suggestionsLoading.set(false);
+      },
+      error: () => {
+        this.suggestions.set([]);
+        this.suggestionsLoading.set(false);
+      }
+    });
+  }
+
+  useSuggestion(suggestion: string) {
+    this.newQuestLabel = suggestion;
   }
 
   // ── Utilities ────────────────────────────────────────────────────────────────

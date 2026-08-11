@@ -67,7 +67,7 @@
              maxlength="120"
              aria-label="Quest label" />
       <div class="add-form-row">
-        <select class="add-select" [(ngModel)]="newQuestCategory" (ngModelChange)="newQuestXp = null">
+        <select class="add-select" [(ngModel)]="newQuestCategory" (ngModelChange)="onCategoryChange()">
           <option value="DAILY">DAILY</option>
           <option value="SKILL">SKILL</option>
           <option value="DISCIPLINE">DISCIPLINE</option>
@@ -86,6 +86,21 @@
         </button>
       </div>
       <div class="add-err tech" *ngIf="addError()">{{ addError() }}</div>
+      
+      <!-- AI Suggestions -->
+      <div class="ai-suggestions-container" *ngIf="suggestionsLoading() || suggestions().length > 0">
+        <p class="tech add-hint ai-sparkle">✨ AI Suggestions</p>
+        <div class="ai-suggestions" *ngIf="!suggestionsLoading()">
+          <button class="suggestion-pill tech" *ngFor="let s of suggestions()" (click)="useSuggestion(s)">
+            {{ s }}
+          </button>
+        </div>
+        <div class="ai-suggestions loading-skeleton" *ngIf="suggestionsLoading()">
+          <div class="skeleton-pill"></div>
+          <div class="skeleton-pill"></div>
+          <div class="skeleton-pill"></div>
+        </div>
+      </div>
     </div>
   </div>
 

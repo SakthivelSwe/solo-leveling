@@ -116,7 +116,7 @@ public class QuestService {
                 .thenComparing(QuestDTO::id));
 
         for (QuestDTO q : pendingQuests) {
-            if (finalQuests.size() < limit) {
+            if (q.isCustom() || finalQuests.size() < limit) {
                 finalQuests.add(q);
             }
         }
@@ -411,8 +411,8 @@ public class QuestService {
     }
 
     /**
-     * Deletes a custom quest — only if it's owned by this player.
-     * Cascades: removes all past completions of this quest by this player.
+     * Removes a custom quest from future days — only if it's owned by this player.
+     * Soft-deletes (active = false) so that past completions and XP are preserved.
      */
     @Transactional
     public void deleteCustomQuest(Long playerId, String questKey) {
@@ -423,9 +423,8 @@ public class QuestService {
             throw new ApiException("Cannot delete a system quest", HttpStatus.FORBIDDEN);
         }
 
-        // Cascade: remove all completions for this quest by this player
-        completionRepository.deleteByPlayerIdAndQuestId(playerId, quest.getId());
-        questRepository.delete(quest);
+        quest.setActive(false);
+        questRepository.save(quest);
     }
 
     

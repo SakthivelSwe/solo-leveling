@@ -246,6 +246,43 @@ public class AiQuestGeneratorService {
         }
     }
 
+    /**
+     * Generates context-aware quest suggestions for the manual Add Quest form.
+     */
+    public List<String> generateQuestSuggestions(Long playerId, String category) {
+        Optional<Player> pOpt = playerRepository.findById(playerId);
+        if (pOpt.isEmpty()) return List.of();
+        Player player = pOpt.get();
+
+        PlayerStats stats = statsRepository.findByPlayerId(playerId).orElse(new PlayerStats());
+
+        String systemPrompt = """
+                You are THE SYSTEM from Solo Leveling.
+                The Hunter is manually creating a custom quest for the category: %s.
+                Based on their stats (Level %d, STR: %d, INT: %d, VIT: %d, DIS: %d), 
+                generate exactly 5 short, actionable quest labels (max 50 chars each).
+                Make them realistic habits for a developer.
+                Return ONLY a JSON array of strings. No markdown, no explanation.
+                Example output:
+                ["Drink 1L of water", "Read 5 pages", "Do 20 push-ups"]
+                """;
+        
+        String prompt = String.format(systemPrompt, category, player.getLevel(), 
+                                      stats.getStrength(), stats.getIntelligence(), 
+                                      stats.getVitality(), stats.getDis());
+
+        try {
+            String rawResponse = aiProviderService.generate(
+                    AiProviderService.Scenario.SUGGESTION, prompt, "Give me 5 quest suggestions.");
+            String clean = cleanJson(rawResponse);
+            return objectMapper.readValue(clean, new TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            log.error("Failed to generate quest suggestions for category {}", category, e);
+            // Fallback suggestions
+            return List.of("Read 5 pages", "10 min stretch", "Deep work session");
+        }
+    }
+
     private String formatSkills(List<PlayerSkill> skills) {
         if (skills.isEmpty()) return "None";
         StringBuilder sb = new StringBuilder();
