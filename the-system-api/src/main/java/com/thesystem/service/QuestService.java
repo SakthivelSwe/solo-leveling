@@ -81,8 +81,18 @@ public class QuestService {
         List<QuestSkip> skips = skipRepository.findByPlayerIdAndSkippedAt(playerId, date);
         Map<Long, String> skipMap = skips.stream().collect(Collectors.toMap(QuestSkip::getQuestId, QuestSkip::getReason));
 
+        boolean isRecoveryMode = player.getHp() < 40;
+
         List<QuestDTO> dtos = questRepository.findDailyQuestsForPlayer(playerId, player.getLevel()).stream()
                 .filter(q -> "sakthiveltony@gmail.com".equals(player.getEmail()) || !("NO_PORN".equals(q.getQuestKey()) || "TESTOSTERONE".equals(q.getCategory().name())))
+                // PHASE 4: Recovery Mode
+                .filter(q -> {
+                    if (isRecoveryMode) {
+                        // Allow custom quests, or quests explicitly marked as recovery
+                        return q.isCustom() || Boolean.TRUE.equals(q.isRecoveryQuest());
+                    }
+                    return true;
+                })
                 .map(q -> toDto(q, completedIds.contains(q.getId()), skipMap.containsKey(q.getId()), skipMap.get(q.getId()), player))
                 .collect(Collectors.toList());
 
@@ -174,7 +184,7 @@ public class QuestService {
     // ── Quest Completion ───────────────────────────────────────────────────────
 
     @Transactional
-    public QuestCompletionResult completeQuest(Long playerId, String questKey, Double lat, Double lng) {
+    public QuestCompletionResult completeQuest(Long playerId, String questKey, Double lat, Double lng, String difficultyFeedback) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ApiException("Player not found", HttpStatus.NOT_FOUND));
 
@@ -238,7 +248,9 @@ public class QuestService {
         applySkillBoosts(playerId, quest.getSkillBoosts());
 
         // Save completion
-        completionRepository.save(new QuestCompletion(playerId, quest.getId(), today, xp));
+        QuestCompletion completion = new QuestCompletion(playerId, quest.getId(), today, xp);
+        completion.setDifficultyFeedback(difficultyFeedback);
+        completionRepository.save(completion);
 
         // Evaluate achievements
         List<AchievementDTO> newAchievements = achievementService.evaluate(player);

@@ -131,8 +131,9 @@ public class QuestController {
             Principal principal, 
             @PathVariable String key,
             @RequestParam(required = false) Double lat,
-            @RequestParam(required = false) Double lng) {
-        return questService.completeQuest(playerId(principal), key, lat, lng);
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false) String difficultyFeedback) {
+        return questService.completeQuest(playerId(principal), key, lat, lng, difficultyFeedback);
     }
 
     @PostMapping("/{key}/verify")
@@ -154,7 +155,7 @@ public class QuestController {
             String reason = node.path("reason").asText("");
             
             if (verified) {
-                QuestCompletionResult res = questService.completeQuest(playerId(principal), key, null, null);
+                QuestCompletionResult res = questService.completeQuest(playerId(principal), key, null, null, null);
                 return Map.of("verified", true, "reason", reason, "result", res);
             } else {
                 return Map.of("verified", false, "reason", reason);

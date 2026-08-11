@@ -26,6 +26,9 @@ public class QuestCompletion {
     @Column(name = "xp_gained", nullable = false)
     private int xpGained;
 
+    @Column(name = "difficulty_feedback", length = 20)
+    private String difficultyFeedback;
+
     public QuestCompletion() {}
 
     public QuestCompletion(Long playerId, Long questId, LocalDate completedAt, int xpGained) {
@@ -45,5 +48,7 @@ public class QuestCompletion {
     public void setCompletedAt(LocalDate completedAt) { this.completedAt = completedAt; }
     public int getXpGained() { return xpGained; }
     public void setXpGained(int xpGained) { this.xpGained = xpGained; }
+    public String getDifficultyFeedback() { return difficultyFeedback; }
+    public void setDifficultyFeedback(String difficultyFeedback) { this.difficultyFeedback = difficultyFeedback; }
 }
 
