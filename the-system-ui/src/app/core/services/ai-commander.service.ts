@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AiCommanderService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/v1/ai/commander`;
+  private apiUrl = `${environment.apiUrl}/ai/commander`;
 
   getMorningBriefing(): Observable<AiCommanderBriefingDTO> {
     return this.http.get<AiCommanderBriefingDTO>(`${this.apiUrl}/briefing`);
