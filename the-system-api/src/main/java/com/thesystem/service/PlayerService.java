@@ -186,7 +186,8 @@ public class PlayerService {
                 "DevMasteryProgress", "DietEntry", "SubscriptionEntry", "SocialConnection",
                 "ShopItem", "QuestSkip", "QuestGenerationLog", "PlayerConfig",
                 "NetWorthLog", "JobChangeQuest", "IncomeLog", "Flashcard",
-                "FinancialAsset", "ExpenseLog", "EmiEntry", "ChitFund"
+                "FinancialAsset", "ExpenseLog", "EmiEntry", "ChitFund",
+                "OnboardingAssessment"
         };
         for (String entity : entities) {
             em.createQuery("DELETE FROM " + entity + " e WHERE e.playerId = :id")
