@@ -21,7 +21,7 @@ export class PlayerService {
   }
 
   getStatus(): Observable<StatusWindow> {
-    return this.http.get<StatusWindow>(`${this.api}/player/status`).pipe(
+    return this.http.get<StatusWindow>(`${this.api}/player/status?t=${Date.now()}`).pipe(
       tap(s => localStorage.setItem(this.CACHE_KEY, JSON.stringify(s)))
     );
   }
@@ -44,22 +44,22 @@ export class PlayerService {
   }
 
   getTodayQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/today`);
+    return this.http.get<Quest[]>(`${this.api}/quests/today?t=${Date.now()}`);
   }
 
   /** WEEKLY quests — resets every Monday. Includes weeklyDoneCount. */
   getWeeklyQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/weekly`);
+    return this.http.get<Quest[]>(`${this.api}/quests/weekly?t=${Date.now()}`);
   }
 
   /** MONTHLY quests — resets on the 1st. Includes monthlyDoneCount. */
   getMonthlyQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/monthly`);
+    return this.http.get<Quest[]>(`${this.api}/quests/monthly?t=${Date.now()}`);
   }
 
   /** ONE_TIME milestone quests — completed ones remain visible as achievements. */
   getMilestoneQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/milestones`);
+    return this.http.get<Quest[]>(`${this.api}/quests/milestones?t=${Date.now()}`);
   }
 
   completeQuest(key: string, lat?: number, lng?: number, difficultyFeedback?: string | null): Observable<QuestCompletionResult> {

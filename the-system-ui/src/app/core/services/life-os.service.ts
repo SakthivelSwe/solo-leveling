@@ -146,7 +146,7 @@ export class LifeOsService {
   updateSocialContact(id: number, date: string): Observable<SocialConnection> { return this.http.put<SocialConnection>(`${this.api}/relationship/connections/${id}/contact`, { date }); }
 
   /* ===== Daily Missions ===== */
-  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission`); }
+  getDailyMissions(): Observable<DailyMissionDTO> { return this.http.get<DailyMissionDTO>(`${this.api}/daily-mission?t=${Date.now()}`); }
 
 
   /* ===== System Notes ===== */
@@ -228,7 +228,7 @@ export class LifeOsService {
   exportData(): Observable<Record<string, unknown>> { return this.http.get<Record<string, unknown>>(`${this.api}/export`); }
 
   /* ===== No Fap Challenge ===== */
-  getNoFapStatus(): Observable<any> { return this.http.get<any>(`${this.api}/nofap/status`); }
+  getNoFapStatus(): Observable<any> { return this.http.get<any>(`${this.api}/nofap/status?t=${Date.now()}`); }
   confirmCleanDay(): Observable<NoFapStatus> {
     return this.http.post<NoFapStatus>(`${this.api}/nofap/confirm-clean`, {});
   }
