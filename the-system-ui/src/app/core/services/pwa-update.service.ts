@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from './toast.service';
 import { filter } from 'rxjs';
 
 /**
@@ -10,7 +10,7 @@ import { filter } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class PwaUpdateService {
   private updates = inject(SwUpdate);
-  private snack = inject(MatSnackBar);
+  private toast = inject(ToastService);
 
   init(): void {
     if (!this.updates.isEnabled) return;
@@ -18,18 +18,12 @@ export class PwaUpdateService {
     this.updates.versionUpdates
       .pipe(filter((e): e is VersionReadyEvent => e.type === 'VERSION_READY'))
       .subscribe(() => {
-        const ref = this.snack.open(
+        this.toast.action(
           '◈ A new version of THE SYSTEM is ready.',
           'RELOAD',
-          {
-            duration: 0,
-            panelClass: 'system-snack',
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-          },
+          () => document.location.reload(),
+          0  // persist until dismissed or reloaded
         );
-        ref.onAction().subscribe(() => document.location.reload());
       });
   }
 }
-

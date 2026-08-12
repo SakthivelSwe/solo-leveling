@@ -113,12 +113,12 @@ export class EveningReviewComponent {
     this.lifeOs.upsertMind(payload).subscribe({
       next: () => {
         this.saving.set(false);
-        this.toast.show('◈ DAY SEALED — rest well, Hunter', '✕', { duration: 3500 });
+        this.toast.show('◈ DAY SEALED — rest well, Hunter', 3500);
         this.closed.emit();
       },
       error: () => {
         this.saving.set(false);
-        this.toast.warn('⚠ Could not save. Try again.', '✕', { duration: 2800 });
+        this.toast.warn('⚠ Could not save. Try again.');
       },
     });
   }

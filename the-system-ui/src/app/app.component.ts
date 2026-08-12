@@ -14,6 +14,7 @@ import { EveningReviewComponent } from './shared/components/evening-review.compo
 import { XpParticlesComponent } from './shared/components/xp-particles.component';
 import { SystemBroadcastComponent } from './shared/components/system-broadcast/system-broadcast.component';
 import { DailyBriefingModalComponent } from './shared/components/daily-briefing-modal/daily-briefing-modal.component';
+import { AppToastComponent } from './shared/components/app-toast.component';
 import { UiStateService } from './core/services/ui-state.service';
 import { AuthService } from './core/services/auth.service';
 import { LifeOsService } from './core/services/life-os.service';
@@ -37,7 +38,8 @@ const AUTH_ROUTES = new Set(['/login', '/register', '/']);
     EveningReviewComponent,
     BiometricLockComponent,
     XpParticlesComponent,
-    SystemBroadcastComponent
+    SystemBroadcastComponent,
+    AppToastComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

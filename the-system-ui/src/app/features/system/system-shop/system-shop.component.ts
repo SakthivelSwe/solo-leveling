@@ -59,7 +59,7 @@ export class SystemShopComponent implements OnInit {
   // --- REWARDS LOGIC ---
   buy(item: ShopItem) {
     if (this.systemGold() < item.cost) {
-      this.toast.warn('Not enough System Gold ◈', '', { duration: 3000 });
+      this.toast.warn('Not enough System Gold ◈', 3000);
       return;
     }
     
@@ -70,9 +70,9 @@ export class SystemShopComponent implements OnInit {
           const arr = this.items().map(i => i.id === purchased.id ? purchased : i);
           this.items.set(arr);
         }
-        this.toast.success('Item purchased! ◈', '', { duration: 2000 });
+        this.toast.success('Item purchased! ◈', 2000);
       },
-      error: (e) => this.toast.warn('Error: ' + (e.error?.error || 'Purchase failed'), '', { duration: 3000 })
+      error: (e) => this.toast.warn('Error: ' + (e.error?.error || 'Purchase failed'), 3000)
     });
   }
 
@@ -110,7 +110,7 @@ export class SystemShopComponent implements OnInit {
   buyAsset() {
     const totalCost = this.newAsset.shares * this.newAsset.cost;
     if (this.systemGold() < totalCost) {
-      this.toast.warn('Not enough System Gold ◈', '', { duration: 3000 });
+      this.toast.warn('Not enough System Gold ◈', 3000);
       return;
     }
     this.wealth.buyAsset(
@@ -124,9 +124,9 @@ export class SystemShopComponent implements OnInit {
         this.systemGold.update(g => g - totalCost);
         this.wealth.getAssets().subscribe(v => this.assets.set(v));
         this.closeBuyAssetModal();
-        this.toast.success('Asset acquired! 📈', '', { duration: 2000 });
+        this.toast.success('Asset acquired! 📈', 2000);
       },
-      error: (e) => this.toast.warn('Error: ' + (e.error?.error || 'Purchase failed'), '', { duration: 3000 })
+      error: (e) => this.toast.warn('Error: ' + (e.error?.error || 'Purchase failed'), 3000)
     });
   }
 }

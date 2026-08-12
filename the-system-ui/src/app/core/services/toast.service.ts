@@ -1,65 +1,71 @@
-import { Injectable, inject } from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import { Injectable, signal } from '@angular/core';
+
+export type ToastType = 'info' | 'success' | 'warn' | 'action';
+
+export interface Toast {
+  id: number;
+  message: string;
+  type: ToastType;
+  /** Label for the action button (optional) */
+  actionLabel?: string;
+  /** Callback when action button is clicked */
+  onAction?: () => void;
+  /** Auto-dismiss duration in ms. 0 = persist until manually closed */
+  duration: number;
+}
+
+let _id = 0;
 
 /**
- * ToastService — single source of truth for ALL toast/snackbar notifications.
+ * ToastService — 100% custom, zero Angular Material / CDK dependency.
  *
- * WHY: Angular CDK's GlobalPositionStrategy applies inline styles to the overlay
- * wrapper. When callers pass no position config, the default is bottom-center.
- * The MAT_SNACK_BAR_DEFAULT_OPTIONS token should fix this, but callers passing
- * their own partial config override only what they pass, resetting everything else
- * to CDK defaults (= bottom). This service ALWAYS forces top-right, regardless of
- * what the caller passes.
+ * Toasts are rendered by <app-toast> in the app root template via a fixed
+ * CSS overlay (top-right), so positioning is entirely in our hands.
+ *
+ * Usage:
+ *   toastSvc.show('Quest completed!');
+ *   toastSvc.warn('Something failed.');
+ *   toastSvc.success('XP gained!');
+ *   toastSvc.action('New version ready', 'RELOAD', () => location.reload());
  */
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  private snack = inject(MatSnackBar);
+  /** Reactive list of active toasts — consumed by AppToastComponent */
+  readonly toasts = signal<Toast[]>([]);
 
-  /** Standard info/success toast (purple glow, top-right) */
-  show(message: string, action = '✕', config: Partial<MatSnackBarConfig> = {}): void {
-    this.snack.open(message, action, {
-      duration: 2800,
-      panelClass: 'system-snack',
-      ...config,
-      // These two MUST always be last — never let callers override position
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
+  /** Info / neutral toast */
+  show(message: string, duration = 2800): void {
+    this._push({ message, type: 'info', duration });
   }
 
-  /** Warning/error toast (red glow, top-right) */
-  warn(message: string, action = '✕', config: Partial<MatSnackBarConfig> = {}): void {
-    this.snack.open(message, action, {
-      duration: 3200,
-      panelClass: 'snack-danger',
-      ...config,
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
+  /** Error / warning toast */
+  warn(message: string, duration = 3200): void {
+    this._push({ message, type: 'warn', duration });
   }
 
-  /** Success confirmation toast (green glow, top-right) */
-  success(message: string, action = '✕', config: Partial<MatSnackBarConfig> = {}): void {
-    this.snack.open(message, action, {
-      duration: 2800,
-      panelClass: 'snack-success',
-      ...config,
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
+  /** Success / green toast */
+  success(message: string, duration = 2800): void {
+    this._push({ message, type: 'success', duration });
   }
 
   /**
-   * Open a snackbar and return the ref — use when you need .onAction().subscribe().
-   * Positions are still forced top-right.
+   * Toast with an action button (e.g. RELOAD, ALLOW).
+   * duration = 0 keeps it open until the user acts or dismisses.
    */
-  openWithAction(message: string, action: string, config: Partial<MatSnackBarConfig> = {}): MatSnackBarRef<TextOnlySnackBar> {
-    return this.snack.open(message, action, {
-      duration: 8000,
-      panelClass: 'system-snack',
-      ...config,
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
+  action(message: string, actionLabel: string, onAction: () => void, duration = 0): void {
+    this._push({ message, type: 'action', actionLabel, onAction, duration });
+  }
+
+  dismiss(id: number): void {
+    this.toasts.update(list => list.filter(t => t.id !== id));
+  }
+
+  private _push(partial: Omit<Toast, 'id'>): void {
+    const toast: Toast = { id: ++_id, ...partial };
+    this.toasts.update(list => [toast, ...list].slice(0, 5)); // max 5 stacked
+
+    if (toast.duration > 0) {
+      setTimeout(() => this.dismiss(toast.id), toast.duration);
+    }
   }
 }

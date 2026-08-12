@@ -410,30 +410,29 @@ export class SystemComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Use snackbar with action instead of window.confirm (blocked in Android WebView)
-    const ref = this.toastSvc.openWithAction(
+    // Use toast.action() instead of window.confirm (blocked in Android WebView)
+    this.toastSvc.action(
       '◈ Initiate AI Quest Sync? Analyzes your stats and generates personalized quests.',
       'CONFIRM',
-      { duration: 8000 }
+      () => {
+        this.isGeneratingAi.set(true);
+        this.toast('◈ Generating personalized AI quests...');
+        this.playerService.generateAiQuests().subscribe({
+          next: () => {
+            this.isGeneratingAi.set(false);
+            localStorage.setItem('last_ai_sync', new Date().toISOString());
+            this.toast('◈ AI Sync Complete! New quests locked in.');
+            this.loadQuestTabs();
+            this.load();
+          },
+          error: () => {
+            this.isGeneratingAi.set(false);
+            this.toast('⚠ AI Sync Failed. Check your API key configuration.');
+          }
+        });
+      },
+      8000
     );
-
-    ref.onAction().subscribe(() => {
-      this.isGeneratingAi.set(true);
-      this.toast('◈ Generating personalized AI quests...');
-      this.playerService.generateAiQuests().subscribe({
-        next: () => {
-          this.isGeneratingAi.set(false);
-          localStorage.setItem('last_ai_sync', new Date().toISOString());
-          this.toast('◈ AI Sync Complete! New quests locked in.');
-          this.loadQuestTabs();
-          this.load();
-        },
-        error: () => {
-          this.isGeneratingAi.set(false);
-          this.toast('⚠ AI Sync Failed. Check your API key configuration.');
-        }
-      });
-    });
   }
 
   /** Called when user adds a custom quest — reload the relevant tab. */
@@ -531,10 +530,10 @@ export class SystemComponent implements OnInit, OnDestroy {
     // Native haptic — success buzz on level-up, light tap on plain XP.
     if (res.leveledUp) { this.haptics.success(); } else { this.haptics.light(); }
     const statStr = res.statsGained?.length ? ' · ' + res.statsGained.join(' ') : '';
-    this.toastSvc.show(`◈ +${res.xpGained} XP${statStr}`, '✕', { duration: 3400 });
+    this.toastSvc.show(`◈ +${res.xpGained} XP${statStr}`, 3400);
     res.newAchievements?.forEach((a: Achievement, i: number) => {
       setTimeout(() => {
-        this.toastSvc.show(`🏆 ACHIEVEMENT — ${a.title}`, '✕', { duration: 4200 });
+        this.toastSvc.show(`🏆 ACHIEVEMENT — ${a.title}`, 4200);
       }, 700 * (i + 1));
     });
     if (res.leveledUp) {
@@ -551,7 +550,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     this.pendingKey.set(null);
     this.haptics.warning();
     const msg = e?.error?.message ?? 'Quest failed';
-    this.toastSvc.warn(`⚠ ${msg}`, '✕', { duration: 2800 });
+    this.toastSvc.warn(`⚠ ${msg}`, 2800);
   }
 
   logout(): void { this.auth.logout(); }
@@ -619,11 +618,11 @@ export class SystemComponent implements OnInit, OnDestroy {
   clearBreak(id: number) {
     this.dungeonBreakService.clearBreak(id).subscribe({
       next: () => {
-        this.toastSvc.success('Dungeon Break Cleared! Rewards Added.', 'OK', { duration: 3000 });
+        this.toastSvc.success('Dungeon Break Cleared! Rewards Added.', 3000);
         this.activeDungeonBreaks.update(arr => arr.filter(b => b.id !== id));
         this.playerService.getStatus().subscribe(s => this.status.set(s));
       },
-      error: (e) => this.toastSvc.warn(e.error?.error || 'Failed to clear', 'OK', { duration: 3000 })
+      error: (e) => this.toastSvc.warn(e.error?.error || 'Failed to clear', 3000)
     });
   }
 }
