@@ -13,13 +13,13 @@ import { LevelUpModalComponent } from './shared/components/level-up-modal.compon
 import { EveningReviewComponent } from './shared/components/evening-review.component';
 import { XpParticlesComponent } from './shared/components/xp-particles.component';
 import { SystemBroadcastComponent } from './shared/components/system-broadcast/system-broadcast.component';
-import { DailyBriefingModalComponent } from './shared/components/daily-briefing-modal/daily-briefing-modal.component';
+
 import { AppToastComponent } from './shared/components/app-toast.component';
 import { UiStateService } from './core/services/ui-state.service';
 import { AuthService } from './core/services/auth.service';
 import { LifeOsService } from './core/services/life-os.service';
 import { PlayerService } from './core/services/player.service';
-import { AiCommanderService } from './core/services/ai-commander.service';
+
 import { MatDialog } from '@angular/material/dialog';
 import { routeFade } from './shared/animations';
 
@@ -51,7 +51,7 @@ export class AppComponent {
   private router    = inject(Router);
   public uiState    = inject(UiStateService);
   public auth       = inject(AuthService);
-  private aiCommander = inject(AiCommanderService);
+
   private dialog    = inject(MatDialog);
 
   /** Expose network service to template for offline indicator */
@@ -84,7 +84,7 @@ export class AppComponent {
     this.pwaUpdate.init();
     // Native glue (status bar, hardware back button, splash hide, biometric init). No-ops on web.
     this.native.init();
-    this.maybePromptMorningBriefing();
+
     this.maybePromptEveningReview();
 
     // Badge polling: defer until AFTER biometric resolves and app is stable.
@@ -112,30 +112,7 @@ export class AppComponent {
     setInterval(poll, 120_000);
   }
 
-  /**
-   * Auto-opens the AI Morning Briefing on first app load of the day.
-   */
-  private maybePromptMorningBriefing(): void {
-    if (!this.auth.isAuthenticated()) return;
-    const todayKey = new Date().toISOString().slice(0, 10);
-    const lastDone = localStorage.getItem('sys_morning_briefing_date');
-    if (lastDone !== todayKey) {
-      this.aiCommander.getMorningBriefing().subscribe({
-        next: (briefing) => {
-          this.dialog.open(DailyBriefingModalComponent, {
-            data: { briefing },
-            panelClass: 'transparent-panel',
-            hasBackdrop: true,
-            disableClose: true,
-            maxWidth: '90vw',
-            width: '600px'
-          });
-          localStorage.setItem('sys_morning_briefing_date', todayKey);
-        },
-        error: () => console.error("Failed to load morning briefing")
-      });
-    }
-  }
+
 
   /**
    * Auto-opens the Evening Review after 9 PM, once per day, for a logged-in

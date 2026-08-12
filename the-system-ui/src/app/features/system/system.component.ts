@@ -28,7 +28,7 @@ import { DailyScheduleComponent } from '../../shared/components/daily-schedule.c
 import { SettingsPanelComponent } from '../../shared/components/settings-panel.component';
 import { DungeonCardComponent } from '../dungeon/dungeon-card.component';
 import { PomodoroComponent } from './pomodoro.component';
-import { AiCommanderComponent } from './ai-commander/ai-commander.component';
+
 import { PenaltyZoneComponent } from './penalty-zone/penalty-zone.component';
 import { BossBattleComponent } from '../dungeon/boss-battle/boss-battle.component';
 import { RankUpModalComponent } from '../../shared/components/rank-up-modal.component';
@@ -42,7 +42,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule, RouterLink, RouterLinkActive, FormsModule,
     StatusWindowComponent, QuestLogComponent, SkillTreeComponent, ProgressChartComponent,
     DailyScheduleComponent, SettingsPanelComponent, DungeonCardComponent, PomodoroComponent,
-    AiCommanderComponent, PenaltyZoneComponent, BossBattleComponent
+    PenaltyZoneComponent, BossBattleComponent
   ],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.scss'],
@@ -448,6 +448,9 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:click')
+  private questQueue: { quest: Quest; difficultyFeedback?: string | null }[] = [];
+  private isProcessingQueue = false;
+
   onDocumentClick() {
     if (this.profileMenuOpen()) {
       this.profileMenuOpen.set(false);
@@ -455,7 +458,17 @@ export class SystemComponent implements OnInit, OnDestroy {
   }
 
   onComplete(event: { quest: Quest; difficultyFeedback?: string | null }): void {
-    const { quest, difficultyFeedback } = event;
+    this.questQueue.push(event);
+    this.processQuestQueue();
+  }
+
+  private processQuestQueue(): void {
+    if (this.isProcessingQueue || this.questQueue.length === 0) return;
+    this.isProcessingQueue = true;
+    
+    const next = this.questQueue.shift()!;
+    const { quest, difficultyFeedback } = next;
+
     if (quest.latitude !== undefined && quest.longitude !== undefined) {
       this.pendingKey.set(quest.questKey);
       this.toast('◈ Validating coordinates...');
@@ -467,24 +480,40 @@ export class SystemComponent implements OnInit, OnDestroy {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           this.playerService.completeQuest(quest.questKey, pos.coords.latitude, pos.coords.longitude, difficultyFeedback).subscribe({
-            next: (res: QuestCompletionResult) => this.handleQuestCompletionSuccess(res),
+            next: (res: QuestCompletionResult) => {
+              this.handleQuestCompletionSuccess(res);
+              this.isProcessingQueue = false;
+              this.processQuestQueue();
+            },
             error: (err) => {
               this.pendingKey.set(null);
               this.toast(`⚠ ${err.error?.message || 'Geo-verification failed.'}`);
+              this.isProcessingQueue = false;
+              this.processQuestQueue();
             }
           });
         },
         (err) => {
           this.pendingKey.set(null);
           this.toast('⚠ Failed to get location. Enable GPS permissions.');
+          this.isProcessingQueue = false;
+          this.processQuestQueue();
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       this.pendingKey.set(quest.questKey);
       this.playerService.completeQuest(quest.questKey, undefined, undefined, difficultyFeedback).subscribe({
-        next: (res: QuestCompletionResult) => this.handleQuestCompletionSuccess(res),
-        error: () => this.pendingKey.set(null),
+        next: (res: QuestCompletionResult) => {
+          this.handleQuestCompletionSuccess(res);
+          this.isProcessingQueue = false;
+          this.processQuestQueue();
+        },
+        error: () => {
+          this.pendingKey.set(null);
+          this.isProcessingQueue = false;
+          this.processQuestQueue();
+        }
       });
     }
   }

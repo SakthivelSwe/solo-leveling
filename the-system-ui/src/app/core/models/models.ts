@@ -27,14 +27,7 @@ export interface AuthResponse {
   player: Player;
 }
 
-export interface AiCommanderBriefingDTO {
-  greeting: string;
-  yesterdayRecap: string;
-  todayPriorities: string[];
-  feedback: string;
-  estimatedCompletionPct: number;
-  expectedLevelUp: string;
-}
+
 
 export interface Stats {
   str: number;
@@ -748,14 +741,7 @@ export interface FoodItem {
   icon: string;
 }
 
-export interface AiCommanderBriefing {
-  greeting: string;
-  yesterdayRecap: string;
-  todayPriorities: string[];
-  feedback: string;
-  estimatedCompletionPct: number;
-  expectedLevelUp: string;
-}
+
 
 /* ============ No Fap Challenge ============ */
 
