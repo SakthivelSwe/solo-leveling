@@ -20,7 +20,7 @@
           <div class="milestone-text">
             <span class="milestone-emoji">{{ s.phaseIcon }}</span>
             <span class="milestone-label mono">MILESTONE CLEARED</span>
-            <span class="milestone-day tech">DAY {{ displayDay() || s.currentStreak }}</span>
+            <span class="milestone-day tech">DAY {{ activeStreakDay() }}</span>
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@
           <span class="quote-author tech">— {{ s.dailyQuoteAuthor }}</span>
         </div>
       </div>
-      <div class="quote-day-tag tech">DAY {{ displayDay() || s.currentStreak }}</div>
+      <div class="quote-day-tag tech">DAY {{ activeStreakDay() }}</div>
     </section>
 
     <!-- ════════════════════════════════════════════════════════════
@@ -144,8 +144,8 @@
     <!-- ════════════════════════════════════════════════════════════
          SECTION 1 — STREAK COUNTER
          ════════════════════════════════════════════════════════════ -->
-    <section class="nf-section nf-hero glass-panel spring-hover" style="overflow: hidden;" [class.monarch-aura]="(displayDay() || s.currentStreak) >= 30">
-      <div class="monarch-particles" *ngIf="(displayDay() || s.currentStreak) >= 30"></div>
+    <section class="nf-section nf-hero glass-panel spring-hover" style="overflow: hidden;" [class.monarch-aura]="(activeStreakDay()) >= 30">
+      <div class="monarch-particles" *ngIf="(activeStreakDay()) >= 30"></div>
       <div class="card-glow"></div>
       <div class="hero-layout">
 
@@ -159,7 +159,7 @@
                     [style.strokeDashoffset]="circleOffset()"/>
           </svg>
           <div class="streak-center">
-            <span class="streak-num mono">{{ displayDay() || s.currentStreak }}</span>
+            <span class="streak-num mono">{{ activeStreakDay() }}</span>
             <span class="streak-lbl tech">DAYS</span>
           </div>
         </div>
@@ -194,7 +194,7 @@
             <div class="s-badge" [class.clean]="s.todayClean" [class.relapse]="!s.todayClean">
               {{ s.todayConfirmed ? (s.todayClean ? '✅ CLEAN TODAY' : '☠ RELAPSED') : '⏳ NOT CONFIRMED' }}
             </div>
-            <div class="s-badge percentile">{{ percentileLabel(displayDay() || s.currentStreak) }}</div>
+            <div class="s-badge percentile">{{ percentileLabel(activeStreakDay()) }}</div>
           </div>
 
           <!-- ── LIVE ELAPSED TIMER ─────────────────────────────────────── -->
@@ -312,7 +312,7 @@
           <span class="brain-icon">{{ brainPhase().icon }}</span>
           <div>
             <h2 class="mono brain-title">◈ YOUR BRAIN RIGHT NOW</h2>
-            <p class="tech brain-sub">Day {{ displayDay() || s.currentStreak }} — Accurate neuroscience analysis</p>
+            <p class="tech brain-sub">Day {{ activeStreakDay() }} — Accurate neuroscience analysis</p>
           </div>
         </div>
         <div class="brain-phase-badge tech" [style.color]="brainPhase().color" [style.borderColor]="brainPhase().color + '55'">
@@ -407,8 +407,8 @@
         <div class="timeline-scroll">
           @for (card of filteredTimelineCards(); track card.day) {
             <div class="tl-card"
-                 [class.tl-active]="(displayDay() || s.currentStreak) >= card.day"
-                 [class.tl-current]="isTodayCard(card, (displayDay() || s.currentStreak))"
+                 [class.tl-active]="(activeStreakDay()) >= card.day"
+                 [class.tl-current]="isTodayCard(card, (activeStreakDay()))"
                  [attr.data-phase]="card.phase"
                  (click)="selectScienceDay(card)">
               <div class="tl-day mono">D{{ card.day }}</div>
@@ -425,8 +425,8 @@
         <div class="timeline-grid">
           @for (card of filteredTimelineCards(); track card.day) {
             <div class="tg-card"
-                 [class.tg-active]="(displayDay() || s.currentStreak) >= card.day"
-                 [class.tg-current]="isTodayCard(card, (displayDay() || s.currentStreak))"
+                 [class.tg-active]="(activeStreakDay()) >= card.day"
+                 [class.tg-current]="isTodayCard(card, (activeStreakDay()))"
                  [attr.data-phase]="card.phase"
                  (click)="selectScienceDay(card)">
               <div class="tg-day mono">{{ card.day }}</div>
@@ -467,12 +467,12 @@
       <div class="stat-grid">
         <div class="stat-card">
           <span class="stat-lbl tech">CURRENT STREAK</span>
-          <span class="stat-val mono">{{ displayDay() || s.currentStreak }}</span>
+          <span class="stat-val mono">{{ activeStreakDay() }}</span>
           <span class="stat-unit tech">DAYS</span>
         </div>
         <div class="stat-card">
           <span class="stat-lbl tech">LONGEST STREAK</span>
-          <span class="stat-val mono">{{ s.longestStreak }}</span>
+          <span class="stat-val mono">{{ displayLongestStreak() }}</span>
           <span class="stat-unit tech">DAYS</span>
         </div>
         <div class="stat-card">

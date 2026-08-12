@@ -53,6 +53,35 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
    * (Backend streak counts calendar days; this counts real elapsed 24h blocks.)
    */
   displayDay = signal<number>(0);
+  /**
+   * The single source of truth for the active day currently being traversed.
+   * Prefers the precise 24-hour timer if running, otherwise falls back to the backend's calendar count.
+   */
+  activeStreakDay = computed(() => {
+    const s = this.status();
+    if (!s) return 0;
+    const display = this.displayDay();
+    if (display > 0) return display;
+    return s.currentStreak;
+  });
+
+  /**
+   * Safe longest streak display that doesn't jump prematurely if the backend 
+   * advances currentStreak + 1 upon confirming today.
+   */
+  displayLongestStreak = computed(() => {
+    const s = this.status();
+    if (!s) return 0;
+    const active = this.activeStreakDay();
+    // If backend longest is exactly 1 day ahead of our active timer streak, 
+    // AND it equals the backend current streak, it's the exact same streak 
+    // that the backend prematurely advanced due to a calendar day confirmation.
+    if (s.longestStreak === s.currentStreak && s.longestStreak === active + 1) {
+      return active;
+    }
+    return s.longestStreak;
+  });
+
   private timerInterval: any = null;
 
   // Breathing widget
@@ -176,7 +205,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   ];
 
   brainPhase = computed(() => {
-    const day = this.displayDay() || this.status()?.currentStreak || 0;
+    const day = this.activeStreakDay();
     return this.BRAIN_PHASES.find(p => day >= p.minDay && day <= p.maxDay) ?? this.BRAIN_PHASES[0];
   });
 
@@ -258,7 +287,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
         // Use the ELAPSED-based day count for milestone checks, NOT the calendar count.
         // This prevents a false "Day 7 milestone!" if the calendar says 7 but only 6
         // full 24h periods have passed since the exact start time.
-        const elapsedDay = this.displayDay() || s.currentStreak;
+        const elapsedDay = this.activeStreakDay();
         if ([7, 30, 90, 365].includes(elapsedDay) && elapsedDay > prevDisplay) {
           this.triggerMilestone();
         }
