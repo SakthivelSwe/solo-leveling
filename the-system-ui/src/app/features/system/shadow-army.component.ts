@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Shadow } from '../../core/models/models';
 import { environment } from '../../../environments/environment';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
 
 @Component({
@@ -129,7 +129,7 @@ export class ShadowArmyComponent implements OnInit {
   extracting = signal(false);
   private api = environment.apiUrl;
 
-  constructor(private http: HttpClient, private snack: MatSnackBar) {}
+  constructor(private http: HttpClient, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadShadows();
@@ -147,11 +147,11 @@ export class ShadowArmyComponent implements OnInit {
     this.http.post<Shadow>(`${this.api}/shadows/extract-discipline`, {}).subscribe({
       next: (s) => {
         this.shadows.update(arr => [s, ...arr]);
-        this.snack.open('ARISE... Discipline Shadow extracted!', 'OK', { duration: 4000 });
+        this.toast.show('ARISE... Discipline Shadow extracted!');
         this.extracting.set(false);
       },
       error: (err) => {
-        this.snack.open(err.error?.message || 'Extraction failed or already active.', 'OK', { duration: 3000 });
+        this.toast.show(err.error?.message || 'Extraction failed or already active.');
         this.extracting.set(false);
       }
     });
@@ -161,9 +161,9 @@ export class ShadowArmyComponent implements OnInit {
     this.http.post<Shadow>(`${this.api}/shadows/${id}/dispatch?hours=${hours}`, {}).subscribe({
       next: (s) => {
         this.shadows.update(arr => arr.map(x => x.id === id ? s : x));
-        this.snack.open(`Shadow deployed for ${hours} hours!`, 'OK', { duration: 3000 });
+        this.toast.show(`Shadow deployed for ${hours} hours!`);
       },
-      error: (e) => this.snack.open(e.error?.error || 'Failed to dispatch.', 'OK', { duration: 3000 })
+      error: (e) => this.toast.show(e.error?.error || 'Failed to dispatch.')
     });
   }
 

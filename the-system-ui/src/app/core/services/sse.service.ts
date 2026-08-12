@@ -1,6 +1,6 @@
 import { Injectable, NgZone, effect, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from './toast.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
@@ -46,7 +46,7 @@ export class SseService {
   constructor(
     private auth: AuthService,
     private notifications: NotificationService,
-    private snack: MatSnackBar,
+    private toast: ToastService,
     private zone: NgZone,
     private localNotifs: LocalNotificationsService,
     private http: HttpClient,
@@ -167,10 +167,7 @@ export class SseService {
     if (!queue.includes(questKey)) {
       queue.push(questKey);
       localStorage.setItem(this.OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-      this.snack.open(
-        `◈ Queued — "${questKey}" will sync when online`,
-        '✕', { duration: 5000, panelClass: 'system-snack' }
-      );
+      this.toast.show(`◈ Queued — "${questKey}" will sync when online`);
     }
   }
 
@@ -189,16 +186,13 @@ export class SseService {
     const queue = this.getOfflineQueue();
     if (queue.length === 0) return;
 
-    this.snack.open(
-      `◈ Syncing ${queue.length} offline quest${queue.length > 1 ? 's' : ''}…`,
-      '', { duration: 3000, panelClass: 'system-snack' }
-    );
+    this.toast.show(`◈ Syncing ${queue.length} offline quest${queue.length > 1 ? 's' : ''}…`);
 
     // Replay in sequence — each queued key re-fires the complete POST
     const replay = (keys: string[]) => {
       if (keys.length === 0) {
         localStorage.removeItem(this.OFFLINE_QUEUE_KEY);
-        this.snack.open('◈ Offline queue synced ✓', '', { duration: 2000, panelClass: 'system-snack' });
+        this.toast.show('◈ Offline queue synced ✓');
         this.playerTick.update(v => v + 1); // refresh dashboard
         return;
       }
@@ -208,7 +202,7 @@ export class SseService {
         error: () => {
           // Re-queue only failed items
           localStorage.setItem(this.OFFLINE_QUEUE_KEY, JSON.stringify(keys));
-          this.snack.open('◈ Partial sync — some quests remain queued', '', { duration: 3000, panelClass: 'system-snack' });
+          this.toast.show('◈ Partial sync — some quests remain queued');
         }
       });
     };
@@ -226,12 +220,7 @@ export class SseService {
       const n = payload.notification;
 
       // In-app snackbar
-      this.snack.open(`◈ ${n.title} — ${n.message}`, '✕', {
-        duration: 8000,
-        panelClass: 'system-snack',
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
+      this.toast.show(`◈ ${n.title} — ${n.message}`);
 
       // Desktop Web Notification (if app is hidden)
       if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {

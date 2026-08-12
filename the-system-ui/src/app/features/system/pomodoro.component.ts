@@ -1,6 +1,6 @@
 import { Component, OnDestroy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { HapticsService } from '../../core/services/haptics.service';
 
@@ -93,7 +93,7 @@ export class PomodoroComponent implements OnDestroy {
   constructor(
     private lifeOs: LifeOsService,
     private haptics: HapticsService,
-    private snack: MatSnackBar,
+    private toast: ToastService,
   ) {}
 
   dashOffset = computed(() => {
@@ -149,9 +149,7 @@ export class PomodoroComponent implements OnDestroy {
     const minutes = this.durationMin();
     this.sessionsToday.update(n => n + 1);
     this.haptics.success();
-    this.snack.open(`✅ FOCUS BLOCK COMPLETE — ${minutes} MIN LOGGED`, '✕', {
-      duration: 4000, panelClass: 'system-snack',
-    });
+    this.toast.show(`✅ FOCUS BLOCK COMPLETE — ${minutes} MIN LOGGED`);
     // Log the Deep Work session so it counts toward focus XP + Career OS stats.
     this.lifeOs.logDeepWork({
       codingMinutes: minutes,

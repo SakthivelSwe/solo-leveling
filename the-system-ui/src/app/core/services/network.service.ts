@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, inject, signal, computed } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Network, ConnectionStatus } from '@capacitor/network';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from './toast.service';
 
 /**
  * NetworkService — reactive Android-native connectivity detection.
@@ -19,7 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
  */
 @Injectable({ providedIn: 'root' })
 export class NetworkService implements OnDestroy {
-  private snack = inject(MatSnackBar);
+  private toast = inject(ToastService);
 
   // Reactive signal — true when the device has an active network connection.
   private readonly _isOnline = signal<boolean>(true);
@@ -73,17 +73,11 @@ export class NetworkService implements OnDestroy {
 
     if (!connected && !this.offlineFired) {
       this.offlineFired = true;
-      this.snack.open('⚠ No network connection — working offline', '', {
-        duration: 0,
-        panelClass: ['system-snack', 'system-snack-warn'],
-      });
+      this.toast.show('⚠ No network connection — working offline');
     } else if (connected && this.offlineFired) {
       this.offlineFired = false;
-      this.snack.dismiss();
-      this.snack.open('✅ Connection restored', '', {
-        duration: 2500,
-        panelClass: ['system-snack'],
-      });
+
+      this.toast.show('✅ Connection restored');
     }
   }
 

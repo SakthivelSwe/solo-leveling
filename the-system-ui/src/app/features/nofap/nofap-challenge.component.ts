@@ -4,7 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { LifeOsService } from '../../core/services/life-os.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { NoFapStatus, ScienceDayCard, AddictionInsight } from '../../core/models/models';
 import { RelapseDialogComponent } from './dialogs/relapse-dialog.component';
@@ -219,7 +219,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
 
   constructor(
     private lifeOs: LifeOsService,
-    private snack: MatSnackBar,
+    private toastSvc: ToastService,
     private dialog: MatDialog,
     private auth: AuthService,
     private router: Router
@@ -836,12 +836,7 @@ export class NoFapChallengeComponent implements OnInit, OnDestroy {
   }
 
   private toast(msg: string): void {
-    this.snack.open(msg, '✕', {
-      duration: 3500,
-      panelClass: 'system-snack',
-      horizontalPosition: 'right',
-      verticalPosition: 'top',
-    });
+    this.toastSvc.show(msg);
   }
 
   // ── Nightfall Tracker Methods ─────────────────────────────────

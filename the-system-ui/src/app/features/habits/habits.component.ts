@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal, computed, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { HabitService, HabitHistoryEntry } from '../../core/services/habit.service';
 import { HapticsService } from '../../core/services/haptics.service';
 import { LocalNotificationsService } from '../../core/services/local-notifications.service';
@@ -27,7 +27,7 @@ export class HabitsComponent implements OnInit {
   private haptics = inject(HapticsService);
   private localNotifs = inject(LocalNotificationsService);
   private sse = inject(SseService);
-  private snack = inject(MatSnackBar);
+  private toast = inject(ToastService);
 
   overview = this.habitService.overview;
   loading = this.habitService.loading;
@@ -117,16 +117,12 @@ export class HabitsComponent implements OnInit {
       next: (res) => {
         this.haptics[twoMinute ? 'light' : 'success']();
         this.checkStreak(res);
-        this.snack.open(
-          `◈ +${res.xpGained} XP · streak ${res.newCurrentStreak} — ${res.systemMessage}`,
-          '✕',
-          { duration: 5000, panelClass: 'system-snack' },
-        );
+        this.toast.show(`◈ +${res.xpGained} XP · streak ${res.newCurrentStreak} — ${res.systemMessage}`);
         this.reload();
       },
       error: (e) => {
         this.haptics.warning();
-        this.snack.open(`◈ ${e.error?.message || 'Could not complete'}`, '✕', { duration: 4000 });
+        this.toast.show(`◈ ${e.error?.message || 'Could not complete'}`);
       },
     });
   }
@@ -152,16 +148,13 @@ export class HabitsComponent implements OnInit {
       next: (res) => {
         this.haptics[this.completeTwoMin() ? 'light' : 'success']();
         this.checkStreak(res);
-        this.snack.open(
-          `◈ +${res.xpGained} XP · streak ${res.newCurrentStreak} — ${res.systemMessage}`,
-          '✕', { duration: 5000, panelClass: 'system-snack' },
-        );
+        this.toast.show(`◈ +${res.xpGained} XP · streak ${res.newCurrentStreak} — ${res.systemMessage}`);
         this.showComplete.set(false);
         this.reload();
       },
       error: (e) => {
         this.haptics.warning();
-        this.snack.open(`◈ ${e.error?.message || 'Could not complete'}`, '✕', { duration: 4000 });
+        this.toast.show(`◈ ${e.error?.message || 'Could not complete'}`);
       },
     });
   }
@@ -230,7 +223,7 @@ export class HabitsComponent implements OnInit {
   saveHabit(): void {
     const f = this.form();
     if (!f.name || !f.name.trim()) {
-      this.snack.open('◈ Habit name required', '✕', { duration: 3000 });
+      this.toast.show('◈ Habit name required');
       return;
     }
     const req = this.editorMode() === 'create'
@@ -238,18 +231,18 @@ export class HabitsComponent implements OnInit {
       : this.habitService.update(f.id!, f);
     req.subscribe({
       next: () => {
-        this.snack.open('◈ Habit saved. Identity vote registered.', '✕', { duration: 3500 });
+        this.toast.show('◈ Habit saved. Identity vote registered.');
         this.showEditor.set(false);
         this.reload();
       },
-      error: (e) => this.snack.open(`◈ ${e.error?.message || 'Save failed'}`, '✕', { duration: 3500 }),
+      error: (e) => this.toast.show(`◈ ${e.error?.message || 'Save failed'}`),
     });
   }
 
   archive(h: Habit): void {
     if (!confirm(`Archive "${h.name}"? Streak history is preserved.`)) return;
     this.habitService.archive(h.id).subscribe({
-      next: () => { this.snack.open('◈ Habit archived.', '✕', { duration: 3000 }); this.reload(); },
+      next: () => { this.toast.show('◈ Habit archived.'); this.reload(); },
     });
   }
 
@@ -270,10 +263,10 @@ export class HabitsComponent implements OnInit {
     this.habitService.adopt(t.key).subscribe({
       next: () => {
         this.haptics.success();
-        this.snack.open(`◈ "${t.name}" adopted. Cue set at ${t.cueTime}.`, '✕', { duration: 4000 });
+        this.toast.show(`◈ "${t.name}" adopted. Cue set at ${t.cueTime}.`);
         this.reload();
       },
-      error: (e) => this.snack.open(`◈ ${e.error?.message || 'Adopt failed'}`, '✕', { duration: 3500 }),
+      error: (e) => this.toast.show(`◈ ${e.error?.message || 'Adopt failed'}`),
     });
   }
 

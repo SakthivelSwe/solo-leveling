@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { HealthService } from '../../core/services/health.service';
 import { WorkoutEntry } from '../../core/models/models';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-physical-tracking',
@@ -866,14 +866,14 @@ export class PhysicalTrackingComponent implements OnInit {
     const next = Math.min(this.pushupStageIndex() + 1, this.pushupStages.length - 1);
     this.pushupStageIndex.set(next);
     localStorage.setItem('lifeos.pushupStage', String(next));
-    this.snack.open(`◈ ADVANCED to ${this.pushupStages[next].name}! Keep going, Hunter.`, 'OK', { duration: 3000 });
+    this.toast.show(`◈ ADVANCED to ${this.pushupStages[next].name}! Keep going, Hunter.`);
   }
 
   advancePullupStage(): void {
     const next = Math.min(this.pullupStageIndex() + 1, this.pullupStages.length - 1);
     this.pullupStageIndex.set(next);
     localStorage.setItem('lifeos.pullupStage', String(next));
-    this.snack.open(`◈ ADVANCED to ${this.pullupStages[next].name}! The system acknowledges your growth.`, 'OK', { duration: 3000 });
+    this.toast.show(`◈ ADVANCED to ${this.pullupStages[next].name}! The system acknowledges your growth.`);
   }
 
   private loadBeginnerStages(): void {
@@ -893,7 +893,7 @@ export class PhysicalTrackingComponent implements OnInit {
   isNewCardio = false;
   syncing = signal(false);
 
-  constructor(private lifeOs: LifeOsService, private snack: MatSnackBar, public health: HealthService) {}
+  constructor(private lifeOs: LifeOsService, private toast: ToastService, public health: HealthService) {}
 
   async ngOnInit() {
     this.loadPreferences();
@@ -940,7 +940,7 @@ export class PhysicalTrackingComponent implements OnInit {
     const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
 
     if (this.trackedExercises().includes(formattedName)) {
-      this.snack.open('Exercise already exists.', 'OK', { duration: 2000 });
+      this.toast.show('Exercise already exists.');
       return;
     }
 
@@ -950,7 +950,7 @@ export class PhysicalTrackingComponent implements OnInit {
 
     this.newWorkoutName = '';
     this.isNewCardio = false;
-    this.snack.open(`${formattedName} added to dashboard.`, 'OK', { duration: 2000 });
+    this.toast.show(`${formattedName} added to dashboard.`);
   }
 
   removeExercise(name: string) {
@@ -975,12 +975,12 @@ export class PhysicalTrackingComponent implements OnInit {
       next: (saved) => {
         this.history.update(h => [saved, ...h]);
         this.saving.set(false);
-        this.snack.open(`+${value} ${cardio ? 'KM' : 'reps'} of ${exercise} logged.`, 'OK', { duration: 2000 });
+        this.toast.show(`+${value} ${cardio ? 'KM' : 'reps'} of ${exercise} logged.`);
       },
       error: (err) => {
         console.error(err);
         this.saving.set(false);
-        this.snack.open('Failed to log training.', 'OK', { duration: 3000 });
+        this.toast.show('Failed to log training.');
       }
     });
   }
@@ -989,7 +989,7 @@ export class PhysicalTrackingComponent implements OnInit {
     this.syncing.set(true);
     const available = await this.health.checkAvailability();
     if (!available) {
-      this.snack.open('Health Connect/Google Fit is not available or permission denied.', 'OK', { duration: 3000 });
+      this.toast.show('Health Connect/Google Fit is not available or permission denied.');
       this.syncing.set(false);
       return;
     }
@@ -1026,7 +1026,7 @@ export class PhysicalTrackingComponent implements OnInit {
     }
 
     if (!dataSynced) {
-      this.snack.open('Health data is already up to date.', 'OK', { duration: 2000 });
+      this.toast.show('Health data is already up to date.');
     }
     this.syncing.set(false);
   }
@@ -1106,7 +1106,7 @@ export class PhysicalTrackingComponent implements OnInit {
     const entry = { exercise: this.poExercise.trim(), sets: this.poSets || 1, reps: this.poReps || 1, weight: this.poWeight || 0, ts: new Date() };
     this.poLogs = [entry, ...this.poLogs.filter(l => l.exercise !== entry.exercise || l.ts.toDateString() === entry.ts.toDateString())];
     this.savePoLogs();
-    this.snack.open(`◈ ${entry.sets}×${entry.reps} @ ${entry.weight}kg logged for ${entry.exercise}`, 'OK', { duration: 2500 });
+    this.toast.show(`◈ ${entry.sets}×${entry.reps} @ ${entry.weight}kg logged for ${entry.exercise}`);
     this.poExercise = '';
   }
 
@@ -1148,7 +1148,7 @@ export class PhysicalTrackingComponent implements OnInit {
     const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
     this.sleepLogs = [{ date: today, hours: Math.round(hours * 10) / 10, quality: Number(this.sleepQuality) }, ...this.sleepLogs.slice(0, 29)];
     localStorage.setItem('lifeos.sleepLogs', JSON.stringify(this.sleepLogs));
-    this.snack.open(`◈ Sleep logged: ${hours.toFixed(1)}h · Quality ${this.sleepQuality}⭐`, 'OK', { duration: 2500 });
+    this.toast.show(`◈ Sleep logged: ${hours.toFixed(1)}h · Quality ${this.sleepQuality}⭐`);
     this.sleepBedTime = '';
     this.sleepWakeTime = '';
   }

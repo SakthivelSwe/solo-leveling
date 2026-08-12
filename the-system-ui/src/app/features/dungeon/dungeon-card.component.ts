@@ -1,6 +1,6 @@
 import { Component, OnInit, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { PlayerService } from '../../core/services/player.service';
 import { SseService } from '../../core/services/sse.service';
 import { Dungeon } from '../../core/models/models';
@@ -74,7 +74,7 @@ export class DungeonCardComponent implements OnInit {
   constructor(
     private playerService: PlayerService,
     private sse: SseService,
-    private snack: MatSnackBar,
+    private toast: ToastService,
   ) {
     let last = 0;
     effect(() => {
@@ -91,10 +91,7 @@ export class DungeonCardComponent implements OnInit {
       next: d => {
         this.dungeon.set(d);
         if (d.justCleared) {
-          this.snack.open(`⚔ GATE CLEARED — ${d.bossName} felled · +${d.rewardXp} XP`, '✕', {
-            duration: 5000, panelClass: 'system-snack',
-            horizontalPosition: 'right', verticalPosition: 'top',
-          });
+          this.toast.show(`⚔ GATE CLEARED — ${d.bossName} felled · +${d.rewardXp} XP`);
         }
       },
       error: () => {},

@@ -2,7 +2,7 @@ import { Component, OnInit, signal, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import * as XLSX from 'xlsx';
@@ -242,7 +242,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   readonly statuses = ['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'GHOSTED'];
 
-  constructor(private life: LifeOsService, private snack: MatSnackBar) {}
+  constructor(private life: LifeOsService, private toastSvc: ToastService) {}
 
   ngOnInit(): void { this.loadTab('CAREER'); }
 
@@ -302,7 +302,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   }
 
   private toast(msg: string): void {
-    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
+    this.toastSvc.show(msg);
   }
 
   /** Compute total protein consumed today from diet history */
