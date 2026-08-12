@@ -1,22 +1,21 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ShopService, ShopItem } from '../../../core/services/shop.service';
 import { WealthService, FinancialAsset } from '../../../core/services/wealth.service';
 import { PlayerService } from '../../../core/services/player.service';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-system-shop',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSnackBarModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './system-shop.component.html',
   styleUrls: ['./system-shop.component.scss']
 })
 export class SystemShopComponent implements OnInit {
+  private toast = inject(ToastService);
   activeTab = signal<'REWARDS' | 'ASSETS'>('REWARDS');
-  
   items = signal<ShopItem[]>([]);
   assets = signal<FinancialAsset[]>([]);
   systemGold = signal<number>(0);
@@ -38,8 +37,7 @@ export class SystemShopComponent implements OnInit {
   constructor(
     private shop: ShopService, 
     private wealth: WealthService,
-    private playerService: PlayerService,
-    private snack: MatSnackBar
+    private playerService: PlayerService
   ) {}
 
   ngOnInit() {
@@ -61,7 +59,7 @@ export class SystemShopComponent implements OnInit {
   // --- REWARDS LOGIC ---
   buy(item: ShopItem) {
     if (this.systemGold() < item.cost) {
-      this.snack.open('Not enough System Gold ◈', '', { duration: 3000, panelClass: ['snack-danger'] });
+      this.toast.warn('Not enough System Gold ◈', '', { duration: 3000 });
       return;
     }
     
@@ -72,9 +70,9 @@ export class SystemShopComponent implements OnInit {
           const arr = this.items().map(i => i.id === purchased.id ? purchased : i);
           this.items.set(arr);
         }
-        this.snack.open('Item purchased! ◈', '', { duration: 2000, panelClass: ['snack-success'] });
+        this.toast.success('Item purchased! ◈', '', { duration: 2000 });
       },
-      error: (e) => this.snack.open('Error: ' + (e.error?.error || 'Purchase failed'), '', { duration: 3000, panelClass: ['snack-danger'] })
+      error: (e) => this.toast.warn('Error: ' + (e.error?.error || 'Purchase failed'), '', { duration: 3000 })
     });
   }
 
@@ -112,7 +110,7 @@ export class SystemShopComponent implements OnInit {
   buyAsset() {
     const totalCost = this.newAsset.shares * this.newAsset.cost;
     if (this.systemGold() < totalCost) {
-      this.snack.open('Not enough System Gold ◈', '', { duration: 3000, panelClass: ['snack-danger'] });
+      this.toast.warn('Not enough System Gold ◈', '', { duration: 3000 });
       return;
     }
     this.wealth.buyAsset(
@@ -124,12 +122,11 @@ export class SystemShopComponent implements OnInit {
     ).subscribe({
       next: (asset) => {
         this.systemGold.update(g => g - totalCost);
-        // Refresh assets list
         this.wealth.getAssets().subscribe(v => this.assets.set(v));
         this.closeBuyAssetModal();
-        this.snack.open('Asset acquired! 📈', '', { duration: 2000, panelClass: ['snack-success'] });
+        this.toast.success('Asset acquired! 📈', '', { duration: 2000 });
       },
-      error: (e) => this.snack.open('Error: ' + (e.error?.error || 'Purchase failed'), '', { duration: 3000, panelClass: ['snack-danger'] })
+      error: (e) => this.toast.warn('Error: ' + (e.error?.error || 'Purchase failed'), '', { duration: 3000 })
     });
   }
 }

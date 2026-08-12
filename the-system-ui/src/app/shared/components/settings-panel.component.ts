@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { Capacitor } from '@capacitor/core';
 import { environment } from '../../../environments/environment';
 import { slideInRight } from '../../shared/animations';
@@ -475,7 +475,7 @@ export class SettingsPanelComponent implements OnInit {
   private readonly players = inject(PlayerService);
   private readonly auth = inject(AuthService);
   private readonly localNotifs = inject(LocalNotificationsService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly toast = inject(ToastService);
   private readonly lifeOs = inject(LifeOsService);
   public readonly biometric = inject(BiometricService);
   exporting = signal(false);
@@ -541,13 +541,13 @@ export class SettingsPanelComponent implements OnInit {
       { active: this.restDayActive, dayOfWeek: this.restDayDow },
       { headers: { Authorization: `Bearer ${token}` } }
     ).subscribe({
-      next: () => this.snack.open(
+      next: () => this.toast.show(
         this.restDayActive
           ? `◈ REST DAY SET — ${this.restDayLabel()} thresholds halved`
           : '◈ REST DAY DISABLED',
         '✕', { duration: 3000 }
       ),
-      error: () => this.snack.open('◈ Failed to save rest day settings', '✕', { duration: 3000 })
+      error: () => this.toast.show('◈ Failed to save rest day settings', '✕', { duration: 3000 })
     });
   }
 
@@ -585,7 +585,7 @@ export class SettingsPanelComponent implements OnInit {
 
   setAlarm(): void {
     const time = this.alarmTime;
-    if (!time) { this.snack.open('Set a time first.', '✕', { duration: 2500, panelClass: 'system-snack' }); return; }
+    if (!time) { this.toast.show('Set a time first.', '✕', { duration: 2500, panelClass: 'system-snack' }); return; }
 
     const [hourStr, minStr] = time.split(':');
     const hour = parseInt(hourStr, 10);
@@ -622,7 +622,7 @@ export class SettingsPanelComponent implements OnInit {
           this.localNotifs.scheduleAlarm(hour, minute, label, this.alarmDays);
         });
       const soundMsg = this.alarmSoundName ? ` — ${this.alarmSoundName}` : '';
-      this.snack.open(
+      this.toast.show(
         `◈ ALARM SET — ${time}${soundMsg} — rings + vibrates full-screen`,
         '✕',
         { duration: 4000, panelClass: 'system-snack' }
@@ -634,14 +634,14 @@ export class SettingsPanelComponent implements OnInit {
       fire.setHours(hour, minute, 0, 0);
       if (fire <= now) fire.setDate(fire.getDate() + 1);
       this.localNotifs.scheduleTimer(Math.round((fire.getTime() - now.getTime()) / 60000));
-      this.snack.open(`◈ ALARM SET FOR ${time} — ${label}`, '✕', { duration: 4000, panelClass: 'system-snack' });
+      this.toast.show(`◈ ALARM SET FOR ${time} — ${label}`, '✕', { duration: 4000, panelClass: 'system-snack' });
     }
   }
 
   /** Let the Hunter pick any local audio file as the alarm ringtone. */
   chooseSound(): void {
     if (!this.isAndroid) {
-      this.snack.open('Custom ringtones need the Android app.', '✕', { duration: 3000, panelClass: 'system-snack' });
+      this.toast.show('Custom ringtones need the Android app.', '✕', { duration: 3000, panelClass: 'system-snack' });
       return;
     }
     SystemAlarm.pickSound().then(res => {
@@ -649,7 +649,7 @@ export class SettingsPanelComponent implements OnInit {
       this.alarmSoundName = res.name;
       localStorage.setItem('sys_alarm_sound_uri', res.uri);
       localStorage.setItem('sys_alarm_sound_name', res.name);
-      this.snack.open(`◈ RINGTONE SET — ${res.name}`, '✕', { duration: 3000, panelClass: 'system-snack' });
+      this.toast.show(`◈ RINGTONE SET — ${res.name}`, '✕', { duration: 3000, panelClass: 'system-snack' });
       // If an alarm is already active, re-schedule so the new sound takes effect.
       if (this.alarmActive) this.setAlarm();
     }).catch(() => { /* user cancelled the picker — ignore */ });
@@ -669,8 +669,8 @@ export class SettingsPanelComponent implements OnInit {
     if (!this.isAndroid) return;
     SystemAlarm.canUseFullScreenIntent().then(({ allowed }) => {
       if (!allowed) {
-        this.snack.open('Allow "full-screen alarms" so it rings over the lock screen.', 'ALLOW', {
-          duration: 8000, panelClass: 'system-snack'
+        this.toast.openWithAction('Allow "full-screen alarms" so it rings over the lock screen.', 'ALLOW', {
+          duration: 8000
         }).onAction().subscribe(() => SystemAlarm.openFullScreenIntentSettings());
       }
     }).catch(() => {});
@@ -683,12 +683,12 @@ export class SettingsPanelComponent implements OnInit {
     this.localNotifs.cancelAlarm();
     localStorage.removeItem('sys_alarm_active');
     this.alarmActive = false;
-    this.snack.open('◈ ALARM CANCELLED', '✕', { duration: 2500, panelClass: 'system-snack' });
+    this.toast.show('◈ ALARM CANCELLED', '✕', { duration: 2500, panelClass: 'system-snack' });
   }
 
   setNativeTimer(minutes: number): void {
     this.localNotifs.scheduleTimer(minutes);
-    this.snack.open(`◈ FOCUS TIMER SET: ${minutes} MIN`, '✕', { duration: 3000, panelClass: 'system-snack' });
+    this.toast.show(`◈ FOCUS TIMER SET: ${minutes} MIN`, '✕', { duration: 3000, panelClass: 'system-snack' });
   }
 
   saveSettings(): void {
@@ -700,9 +700,9 @@ export class SettingsPanelComponent implements OnInit {
   toggleBiometric(): void {
     this.biometric.setBiometricEnabled(this.biometricEnabled);
     if (this.biometricEnabled) {
-      this.snack.open('◈ BIOMETRIC LOCK ENABLED', '✕', { duration: 3000, panelClass: 'system-snack' });
+      this.toast.show('◈ BIOMETRIC LOCK ENABLED', '✕', { duration: 3000, panelClass: 'system-snack' });
     } else {
-      this.snack.open('◈ BIOMETRIC LOCK DISABLED', '✕', { duration: 3000, panelClass: 'system-snack' });
+      this.toast.show('◈ BIOMETRIC LOCK DISABLED', '✕', { duration: 3000, panelClass: 'system-snack' });
     }
   }
 
@@ -737,7 +737,7 @@ export class SettingsPanelComponent implements OnInit {
         this.exporting.set(false);
         this.download(JSON.stringify(data, null, 2), 'the-system-backup.json', 'application/json');
       },
-      error: () => { this.exporting.set(false); this.snack.open('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
+      error: () => { this.exporting.set(false); this.toast.show('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
     });
   }
 
@@ -756,7 +756,7 @@ export class SettingsPanelComponent implements OnInit {
         }
         this.download(parts.join('\n'), 'the-system-backup.csv', 'text/csv');
       },
-      error: () => { this.exporting.set(false); this.snack.open('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
+      error: () => { this.exporting.set(false); this.toast.show('⚠ Export failed.', '✕', { duration: 2800, panelClass: 'system-snack-warn' }); },
     });
   }
 
@@ -775,23 +775,23 @@ export class SettingsPanelComponent implements OnInit {
 
   doDataTransfer(): void {
     if (!this.dtEmail || !this.dtEmail.includes('@')) {
-      this.snack.open('⚠ Invalid email', '✕', { duration: 2500, panelClass: 'system-snack-warn' });
+      this.toast.show('⚠ Invalid email', '✕', { duration: 2500, panelClass: 'system-snack-warn' });
       return;
     }
     if (this.dtModules.length === 0) {
-      this.snack.open('⚠ Select at least one module', '✕', { duration: 2500, panelClass: 'system-snack-warn' });
+      this.toast.show('⚠ Select at least one module', '✕', { duration: 2500, panelClass: 'system-snack-warn' });
       return;
     }
     this.dtTransferring.set(true);
     this.players.transferData({ targetEmail: this.dtEmail.trim(), modules: this.dtModules, transferMode: 'COPY' }).subscribe({
       next: (res) => {
         this.dtTransferring.set(false);
-        this.snack.open(`◈ Transfer Success!`, '✕', { duration: 3500, panelClass: 'system-snack' });
+        this.toast.show(`◈ Transfer Success!`, '✕', { duration: 3500, panelClass: 'system-snack' });
         this.dtEmail = '';
       },
       error: () => {
         this.dtTransferring.set(false);
-        this.snack.open('⚠ Transfer failed.', '✕', { duration: 3000, panelClass: 'system-snack-warn' });
+        this.toast.show('⚠ Transfer failed.', '✕', { duration: 3000, panelClass: 'system-snack-warn' });
       }
     });
   }
@@ -820,9 +820,9 @@ export class SettingsPanelComponent implements OnInit {
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      this.snack.open(`◈ EXPORTED — ${filename}`, '✕', { duration: 3000, panelClass: 'system-snack' });
+      this.toast.show(`◈ EXPORTED — ${filename}`, '✕', { duration: 3000, panelClass: 'system-snack' });
     } catch {
-      this.snack.open('⚠ Could not save. Try the web/PWA version.', '✕', { duration: 4000, panelClass: 'system-snack-warn' });
+      this.toast.show('⚠ Could not save. Try the web/PWA version.', '✕', { duration: 4000, panelClass: 'system-snack-warn' });
     }
   }
 

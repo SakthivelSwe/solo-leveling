@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '../../core/services/toast.service';
 import { LifeOsService } from '../../core/services/life-os.service';
 import { MindLog } from '../../core/models/models';
 
@@ -97,27 +97,28 @@ export class EveningReviewComponent {
   mood = signal<number | null>(null);
   saving = signal(false);
 
-  constructor(private lifeOs: LifeOsService, private snack: MatSnackBar) {}
+  private toast = inject(ToastService);
+
+  constructor(private lifeOs: LifeOsService) {}
 
   save(): void {
     this.saving.set(true);
-    // Only send the mind fields the review captures.
     const payload: MindLog = {
       todayWin: this.win.trim() || undefined,
       gratitude: this.gratitude.trim() || undefined,
-      morningIntention: this.intention.trim() || undefined,   // tomorrow's intention
+      morningIntention: this.intention.trim() || undefined,
       eveningReflection: this.win.trim() || undefined,
       moodEvening: this.mood() ?? undefined,
     };
     this.lifeOs.upsertMind(payload).subscribe({
       next: () => {
         this.saving.set(false);
-        this.snack.open('◈ DAY SEALED — rest well, Hunter', '✕', { duration: 3500, panelClass: 'system-snack' });
+        this.toast.show('◈ DAY SEALED — rest well, Hunter', '✕', { duration: 3500 });
         this.closed.emit();
       },
       error: () => {
         this.saving.set(false);
-        this.snack.open('⚠ Could not save. Try again.', '✕', { duration: 2800, panelClass: 'system-snack-warn' });
+        this.toast.warn('⚠ Could not save. Try again.', '✕', { duration: 2800 });
       },
     });
   }

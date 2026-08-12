@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, signal, computed, effect, HostListener, N
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { HapticsService } from '../../core/services/haptics.service';
+import { ToastService } from '../../core/services/toast.service';
 
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -49,7 +49,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class SystemComponent implements OnInit, OnDestroy {
   private rankDialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private toastSvc = inject(ToastService);
   private dungeonBreakService = inject(DungeonBreakService);
 
   activeDungeonBreaks = signal<DungeonBreak[]>([]);
@@ -166,7 +166,6 @@ export class SystemComponent implements OnInit, OnDestroy {
     private lifeOsService: LifeOsService,
     public auth: AuthService,
     private dialog: MatDialog,
-    private snack: MatSnackBar,
     public notifications: NotificationService,
     public sse: SseService,
     private haptics: HapticsService,
@@ -359,8 +358,12 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
   }
 
-  private toast(msg: string): void {
-    this.snack.open(msg, '✕', { duration: 2600, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' });
+  private toast(msg: string, warn = false): void {
+    if (warn) {
+      this.toastSvc.warn(msg);
+    } else {
+      this.toastSvc.show(msg);
+    }
   }
 
   onPenaltySurvived(): void {
@@ -408,10 +411,10 @@ export class SystemComponent implements OnInit, OnDestroy {
     }
 
     // Use snackbar with action instead of window.confirm (blocked in Android WebView)
-    const ref = this.snack.open(
+    const ref = this.toastSvc.openWithAction(
       '◈ Initiate AI Quest Sync? Analyzes your stats and generates personalized quests.',
       'CONFIRM',
-      { duration: 8000, panelClass: 'system-snack', horizontalPosition: 'right', verticalPosition: 'top' }
+      { duration: 8000 }
     );
 
     ref.onAction().subscribe(() => {
@@ -528,16 +531,10 @@ export class SystemComponent implements OnInit, OnDestroy {
     // Native haptic — success buzz on level-up, light tap on plain XP.
     if (res.leveledUp) { this.haptics.success(); } else { this.haptics.light(); }
     const statStr = res.statsGained?.length ? ' · ' + res.statsGained.join(' ') : '';
-    this.snack.open(`◈ +${res.xpGained} XP${statStr}`, '✕', {
-      duration: 3400, panelClass: 'system-snack',
-      horizontalPosition: 'right', verticalPosition: 'top',
-    });
+    this.toastSvc.show(`◈ +${res.xpGained} XP${statStr}`, '✕', { duration: 3400 });
     res.newAchievements?.forEach((a: Achievement, i: number) => {
       setTimeout(() => {
-        this.snack.open(`🏆 ACHIEVEMENT — ${a.title}`, '✕', {
-          duration: 4200, panelClass: 'system-snack',
-          horizontalPosition: 'right', verticalPosition: 'top',
-        });
+        this.toastSvc.show(`🏆 ACHIEVEMENT — ${a.title}`, '✕', { duration: 4200 });
       }, 700 * (i + 1));
     });
     if (res.leveledUp) {
@@ -554,10 +551,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     this.pendingKey.set(null);
     this.haptics.warning();
     const msg = e?.error?.message ?? 'Quest failed';
-    this.snack.open(`⚠ ${msg}`, '✕', {
-      duration: 2800, panelClass: 'system-snack-warn',
-      horizontalPosition: 'right', verticalPosition: 'top',
-    });
+    this.toastSvc.warn(`⚠ ${msg}`, '✕', { duration: 2800 });
   }
 
   logout(): void { this.auth.logout(); }
@@ -625,11 +619,11 @@ export class SystemComponent implements OnInit, OnDestroy {
   clearBreak(id: number) {
     this.dungeonBreakService.clearBreak(id).subscribe({
       next: () => {
-        this.snackBar.open("Dungeon Break Cleared! Rewards Added.", "OK", { duration: 3000 });
+        this.toastSvc.success('Dungeon Break Cleared! Rewards Added.', 'OK', { duration: 3000 });
         this.activeDungeonBreaks.update(arr => arr.filter(b => b.id !== id));
         this.playerService.getStatus().subscribe(s => this.status.set(s));
       },
-      error: (e) => this.snackBar.open(e.error?.error || 'Failed to clear', 'OK', { duration: 3000 })
+      error: (e) => this.toastSvc.warn(e.error?.error || 'Failed to clear', 'OK', { duration: 3000 })
     });
   }
 }
