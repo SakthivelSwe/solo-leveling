@@ -1,35 +1,47 @@
 <div class="commander-overlay" *ngIf="isOpen && (briefing || loading || error)" @fadeInUp>
   <div class="commander-modal">
+
+    <!-- ── HEADER ──────────────────────────────────────────────── -->
     <div class="commander-header">
       <div class="title-group">
-        <i class="fas fa-robot commander-icon"></i>
-        <h2>AI COMMANDER BRIEFING</h2>
+        <div class="commander-icon-wrap">
+          <i class="fas fa-robot commander-icon"></i>
+          <span class="pulse-ring"></span>
+        </div>
+        <div class="title-text">
+          <h2>AI Commander Briefing</h2>
+          <span class="subtitle">◈ SYSTEM INTELLIGENCE REPORT ◈</span>
+        </div>
       </div>
-      <button class="close-btn" (click)="close()">
+      <button class="close-btn" (click)="close()" title="Dismiss">
         <i class="fas fa-times"></i>
       </button>
     </div>
 
+    <!-- ── CONTENT ─────────────────────────────────────────────── -->
     <div class="commander-content">
+
       <!-- Loading State -->
       <div class="loading-state" *ngIf="loading">
         <div class="spinner"></div>
-        <p>Establishing connection with AI Commander...</p>
+        <p>ESTABLISHING LINK...</p>
       </div>
 
       <!-- Error State -->
       <div class="error-state" *ngIf="error">
-        <i class="fas fa-exclamation-triangle"></i>
+        <div class="error-icon">⚠</div>
         <p>{{ error }}</p>
-        <button class="retry-btn" (click)="fetchBriefing()">Retry Connection</button>
+        <button class="retry-btn" (click)="fetchBriefing()">⟳ RETRY CONNECTION</button>
       </div>
 
-      <!-- Briefing State -->
+      <!-- Briefing Data -->
       <div class="briefing-data" *ngIf="briefing && !loading">
+
         <div class="greeting">
           <h3>{{ briefing.greeting }}</h3>
         </div>
 
+        <!-- Yesterday's Assessment -->
         <div class="section">
           <h4><i class="fas fa-history"></i> Yesterday's Assessment</h4>
           <p class="recap">{{ briefing.yesterdayRecap }}</p>
@@ -39,26 +51,35 @@
           </div>
         </div>
 
+        <!-- Today's Directives -->
         <div class="section">
           <h4><i class="fas fa-crosshairs"></i> Today's Directives</h4>
           <ul class="priorities">
-            <li *ngFor="let priority of briefing.todayPriorities">
-              <i class="fas fa-angle-right"></i> {{ priority }}
+            <li *ngFor="let priority of briefing.todayPriorities; let i = index">
+              <span class="li-num">{{ i + 1 }}.</span>
+              {{ priority }}
             </li>
           </ul>
         </div>
 
+        <!-- Metrics -->
         <div class="metrics-section">
           <div class="metric-card">
-            <span class="label">Projected Completion</span>
+            <span class="label">Est. Completion</span>
             <span class="value success">{{ briefing.estimatedCompletionPct }}%</span>
           </div>
           <div class="metric-card">
-            <span class="label">Expected Growth</span>
+            <span class="label">Level-Up ETA</span>
             <span class="value highlight">{{ briefing.expectedLevelUp }}</span>
           </div>
         </div>
+
+        <!-- Acknowledge CTA -->
+        <button class="acknowledge-btn" (click)="close()">
+          ◈ ACKNOWLEDGE &amp; PROCEED ◈
+        </button>
       </div>
     </div>
+
   </div>
 </div>

@@ -389,24 +389,59 @@ $sys-theme: mat.define-dark-theme((
    SOLUTION: Use position:fixed directly on the snackbar container with explicit
    top/right coordinates. This pulls it out of the CDK layout flow entirely and
    pins it exactly where we want it Ã¢â‚¬â€ top-right corner, 16px from edges.       */
+/* -- Snackbar / Toast position: forced top-right on ALL platforms ----------------
+   PROBLEM: Angular CDK sets position via inline styles on the overlay wrapper.
+   On Android WebView, bottom-positioning is the default and !important on the
+   container alone is sometimes not enough.
+   SOLUTION (multi-layer defense):
+     1. Force position:fixed on the snackbar container itself (escapes CDK flow).
+     2. Force position on the CDK overlay pane wrapping snackbars.
+     3. Force the global wrapper to align flex-start / flex-end (top-right).
+   safe-area-inset-top keeps it below Android status bar.                   */
+
+/* Layer 1: snackbar container */
 .mat-mdc-snack-bar-container {
   position: fixed    !important;
-  top:   16px        !important;
+  top:   max(env(safe-area-inset-top, 0px), 16px) !important;
   right: 16px        !important;
   bottom: auto       !important;
   left:  auto        !important;
-  pointer-events: auto;
-  /* Prevent snackbar from being full-width (handset breakpoint override) */
+  transform: none    !important;
   width: auto        !important;
-  max-width: 420px   !important;
+  max-width: min(420px, calc(100vw - 32px)) !important;
   margin: 0          !important;
+  pointer-events: auto;
+  z-index: 100000    !important;
 }
 
-/* Fallback wrapper rules (kept for reference, not relied upon) */
+/* Layer 2: CDK overlay pane that wraps snackbars */
+.cdk-overlay-pane:has(.mat-mdc-snack-bar-container) {
+  position: fixed    !important;
+  top:   max(env(safe-area-inset-top, 0px), 16px) !important;
+  right: 16px        !important;
+  bottom: auto       !important;
+  left:  auto        !important;
+  transform: none    !important;
+  height: auto       !important;
+  width: auto        !important;
+  max-width: min(420px, calc(100vw - 32px)) !important;
+}
+
+/* Layer 3: CDK global wrapper - prevent bottom alignment */
+.cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
+  align-items: flex-start  !important;
+  justify-content: flex-end !important;
+  padding-top:   max(env(safe-area-inset-top, 0px), 16px) !important;
+  padding-right: 16px      !important;
+  pointer-events: none;
+}
+
+/* Fallback: generic CDK wrapper */
 .cdk-global-overlay-wrapper {
   display: flex !important;
   pointer-events: none;
 }
+
 
 
 
@@ -583,6 +618,31 @@ body.native-platform .mat-mdc-snack-bar-container.system-snack .mdc-snackbar__su
   animation: none !important;                 /* stop the 2s infinite pulse + its big box-shadow */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+/* Android: forcibly pin snackbar to top-right regardless of CDK inline styles */
+body.native-platform .mat-mdc-snack-bar-container {
+  position: fixed  !important;
+  top:    max(env(safe-area-inset-top, 48px), 48px) !important;
+  right:  12px     !important;
+  bottom: auto     !important;
+  left:   auto     !important;
+  transform: none  !important;
+  width:  auto     !important;
+  max-width: calc(100vw - 24px) !important;
+  z-index: 200000  !important;
+}
+body.native-platform .cdk-overlay-pane:has(.mat-mdc-snack-bar-container) {
+  position: fixed !important;
+  top:    max(env(safe-area-inset-top, 48px), 48px) !important;
+  right:  12px   !important;
+  bottom: auto   !important;
+  left:   auto   !important;
+  transform: none !important;
+  height: auto   !important;
+}
+body.native-platform .cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
+  align-items:     flex-start !important;
+  justify-content: flex-end   !important;
 }
 body.native-platform .cdk-overlay-dark-backdrop {
   backdrop-filter: none !important;
