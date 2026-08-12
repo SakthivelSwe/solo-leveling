@@ -1069,3 +1069,89 @@ body.native-platform {
   font-weight: 600 !important;
   letter-spacing: 1px !important;
 }
+
+/* ============================================================
+   GLOBAL: Bottom nav safe-area padding for ALL component shells
+   Ensures no page content is hidden under the fixed bottom nav.
+   Applied globally to common shell/page-root patterns.
+   ============================================================ */
+@media (max-width: 760px) {
+  .dt-shell,
+  .ai-shell,
+  .life-shell,
+  .physical-shell,
+  .shop-shell,
+  .nofap-shell,
+  .learning-shell,
+  .insights-shell,
+  .notif-shell,
+  .ach-shell,
+  .progress-shell,
+  .settings-shell {
+    padding-bottom: var(--bottom-nav-total, 80px) !important;
+  }
+}
+
+/* ============================================================
+   ANDROID PERFORMANCE — Issue 5
+   Additional native-platform rules beyond the existing block.
+   Target: eliminate GPU-heavy CSS that causes heat + lag on
+   Android WebView (Capacitor). Applied via body.native-platform.
+   ============================================================ */
+
+/* 1. Kill backdrop-filter on ANY non-critical element on native */
+body.native-platform .glass-panel,
+body.native-platform .dt-card,
+body.native-platform .quest-log,
+body.native-platform .ai-sugg-header,
+body.native-platform .batch-action-bar {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 2. Remove box-shadows from large card areas (expensive on WebView) */
+body.native-platform .glass-panel {
+  box-shadow: none !important;
+}
+
+/* 3. Reduce card background complexity — opaque gradient instead of blur */
+body.native-platform .card-glow {
+  display: none !important;
+}
+
+/* 4. Disable will-change on static elements — it forces GPU layer allocation */
+body.native-platform * {
+  will-change: auto !important;
+}
+
+/* 5. Kill heavy infinite glow animations on badges and cards */
+body.native-platform .diff-legendary .diff-badge,
+body.native-platform .xp-badge,
+body.native-platform .stat-bar-fill,
+body.native-platform .system-snack {
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+/* 6. Disable CSS transitions on scroll-heavy lists (paint cost) */
+body.native-platform .quest-item,
+body.native-platform .habit-row,
+body.native-platform .metric-row {
+  transition: background 0.1s linear !important;
+  box-shadow: none !important;
+}
+
+/* 7. content-visibility for long list items — defers off-screen paint */
+.quest-item,
+.habit-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 72px;
+}
+
+/* 8. Snackbar backdrop-filter disabled on native (already in native block, extra insurance) */
+body.native-platform .snack-success .mdc-snackbar__surface,
+body.native-platform .snack-danger .mdc-snackbar__surface {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(0,0,0,0.92) !important;
+}

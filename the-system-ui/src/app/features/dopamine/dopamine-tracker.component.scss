@@ -7,9 +7,10 @@
   min-height: 100vh;
   background: #090912;
   color: #e0e0f0;
-  padding: 0 0 60px;
+  padding: 0 0 var(--bottom-nav-total, 80px);
   font-family: 'Outfit', sans-serif;
 }
+
 
 /* ══ TOPBAR ══ */
 .dt-topbar {

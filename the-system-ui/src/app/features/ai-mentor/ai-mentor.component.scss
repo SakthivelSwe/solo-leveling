@@ -1,5 +1,6 @@
 :host { display: block; }
-.ai-shell { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+.ai-shell { max-width: 1080px; margin: 0 auto; padding: 0 20px var(--bottom-nav-total, 80px); }
+
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;

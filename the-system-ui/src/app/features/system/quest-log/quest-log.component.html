@@ -71,6 +71,7 @@
           <option value="DAILY">DAILY</option>
           <option value="SKILL">SKILL</option>
           <option value="DISCIPLINE">DISCIPLINE</option>
+          <option value="TESTOSTERONE" *ngIf="isSakthi">TESTOSTERONE</option>
           <option value="WEEKLY">WEEKLY</option>
           <option value="MONTHLY">MONTHLY</option>
         </select>
@@ -89,13 +90,17 @@
       
       <!-- AI Suggestions -->
       <div class="ai-suggestions-container" *ngIf="suggestionsLoading() || suggestions().length > 0">
-        <p class="tech add-hint ai-sparkle">✨ AI Suggestions</p>
+        <div class="ai-sugg-header">
+          <p class="tech add-hint ai-sparkle">✨ AI Suggestions <span class="tech" style="font-size:0.7rem;opacity:0.6;">(tap to use · long-press quests below to multi-select)</span></p>
+          <button class="sugg-refresh-btn tech" (click)="fetchSuggestions()" [disabled]="suggestionsLoading()" title="Refresh suggestions">↺</button>
+        </div>
         <div class="ai-suggestions" *ngIf="!suggestionsLoading()">
           <button class="suggestion-pill tech" *ngFor="let s of suggestions()" (click)="useSuggestion(s)">
             {{ s }}
           </button>
         </div>
         <div class="ai-suggestions loading-skeleton" *ngIf="suggestionsLoading()">
+          <div class="skeleton-pill"></div>
           <div class="skeleton-pill"></div>
           <div class="skeleton-pill"></div>
           <div class="skeleton-pill"></div>
@@ -119,6 +124,15 @@
     <span class="mono">⚠</span> {{ skipMsg }}
   </div>
 
+  <!-- ══ MULTI-SELECT ACTION BAR ════════════════════════════ -->
+  <div class="batch-action-bar" *ngIf="multiSelectMode()">
+    <span class="tech batch-count">◈ {{ selectedCount }} SELECTED</span>
+    <button class="batch-complete-btn mono" (click)="batchComplete()" [disabled]="selectedCount === 0 || batchLoading()">
+      {{ batchLoading() ? 'COMPLETING...' : '⚡ COMPLETE ALL (' + selectedCount + ')' }}
+    </button>
+    <button class="batch-cancel-btn tech" (click)="exitMultiSelect()">✕ CANCEL</button>
+  </div>
+
   <!-- ══════════════════════════════════════════════════════════
        TODAY TAB - Daily quests (DAILY / SKILL / DISCIPLINE)
        ══════════════════════════════════════════════════════════ -->
@@ -127,10 +141,22 @@
          [class.done]="q.isCompleted"
          [class.pending]="pendingKey === q.questKey"
          [class.custom-quest]="q.isCustom"
+         [class.multi-selected]="isSelected(q)"
+         [class.multi-mode]="multiSelectMode()"
          [class]="getDifficultyClass(q.xpReward)"
          [style.--cat]="categoryColor(q.category)"
+         (touchstart)="onQuestTouchStart(q, $event)"
+         (touchend)="onQuestTouchEnd()"
+         (touchcancel)="onQuestTouchEnd()"
          (click)="onComplete(q, $event)">
-      <div class="checkbox">
+      <!-- Multi-select checkbox (shown in multi-select mode) -->
+      <div class="multi-checkbox" *ngIf="multiSelectMode() && !q.isCompleted && !q.isSkipped"
+           (click)="toggleQuestSelection(q, $event)">
+        <span class="mc-box" [class.mc-checked]="isSelected(q)">
+          <span *ngIf="isSelected(q)">✓</span>
+        </span>
+      </div>
+      <div class="checkbox" *ngIf="!multiSelectMode() || q.isCompleted || q.isSkipped">
         <span *ngIf="q.isCompleted" class="check">✓</span>
         <span *ngIf="q.isSkipped" class="check" style="color: var(--text-dim);">⊘</span>
         <span *ngIf="pendingKey === q.questKey" class="spinner"></span>

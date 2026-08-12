@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -31,6 +31,90 @@ const SKIP_MSGS: Record<string, string[]> = {
   MILD: [
     'Try to complete this one.',
     'This helps. Give it a shot.',
+  ],
+};
+
+// ── Rich local suggestion bank (Issue 1) ────────────────────────────────────
+const LOCAL_SUGGESTIONS: Record<string, string[]> = {
+  DAILY: [
+    'Wake up at 5:30 AM without snoozing — 0 mins',
+    'Drink 3 litres of water throughout the day',
+    'Take a 10-min walk after lunch — no phone',
+    'Write 3 daily goals + 3 gratitude entries in journal',
+    'Sleep by 10:30 PM — full 7-hour recovery',
+    'Meditate for 10 minutes — no guided audio',
+    'Do 50 push-ups (any time of day) — 5 sets of 10',
+    'Eat a protein-rich breakfast within 1 hour of waking',
+    'No social media before 9 AM — start day with focus',
+    'Cold shower for 2 minutes after workout',
+    'Read 10 pages of a non-fiction book',
+    'Track all meals for the day in any app or notebook',
+  ],
+  SKILL: [
+    '[SKILL] Watch 1 beginner-friendly tutorial on Angular Guards — 15 min',
+    '[SKILL] Practice writing 5 Java functions using OOP principles — 15 min',
+    '[SKILL] Read 1 article on System Design basics (e.g. load balancing)',
+    '[SKILL] Solve 1 LeetCode EASY problem without hints — 20 min',
+    '[SKILL] Build a simple REST endpoint in Spring Boot — 30 min',
+    '[SKILL] Study microservices: read about Kafka and event-driven patterns',
+    '[SKILL] Watch a YouTube video on SQL indexing and query optimization',
+    '[SKILL] Write 1 small React component from scratch — no copy-paste',
+    '[SKILL] Learn and use 3 new Git commands you haven\'t used before',
+    '[SKILL] Explain any tech concept you learned today in your own words',
+    '[SKILL] Set up a Docker container for a sample Spring Boot app',
+    '[SKILL] Practice speaking about a project you built — 5 min out loud',
+  ],
+  DISCIPLINE: [
+    '[DISCIPLINE] No YouTube shorts or Instagram reels today — entire day',
+    '[DISCIPLINE] Sit with boredom for 15 minutes — no phone, no music',
+    '[DISCIPLINE] Complete your top 3 tasks before checking any social media',
+    '[DISCIPLINE] Write down every urge you had today and how you resisted it',
+    '[DISCIPLINE] Wake up within 5 minutes of your alarm — no snooze',
+    '[DISCIPLINE] 30-minute deep work block — phone in another room',
+    '[DISCIPLINE] Eat only what you planned — no random snacking',
+    '[DISCIPLINE] Go 24 hours without complaining (even internally)',
+    '[DISCIPLINE] Write a 5-sentence reflection on where you wasted time today',
+    '[DISCIPLINE] Spend 0 minutes on entertainment until all quests are done',
+    '[DISCIPLINE] Decline one comfortable shortcut today — choose the hard path',
+    '[DISCIPLINE] Log your sleep time and wake-up time — track your recovery',
+  ],
+  TESTOSTERONE: [
+    '[TESTO] Heavy compound lift: Deadlifts 4×5 with progressive overload',
+    '[TESTO] Cold shower — 2 minutes cold, no warm water — first thing AM',
+    '[TESTO] 30-minute sunlight exposure before 9 AM — no sunglasses',
+    '[TESTO] Intermittent fasting: 16-hour fast (e.g. 8 PM to 12 PM next day)',
+    '[TESTO] Eat 200g+ of red meat or eggs today — quality protein',
+    '[TESTO] Zero alcohol, zero seed oils, zero processed sugar today',
+    '[TESTO] Sprint intervals: 8 × 30-second all-out sprints with 90s rest',
+    '[TESTO] Sleep by 10 PM — testosterone peaks during deep sleep before midnight',
+    '[TESTO] No porn, no arousal content — dopamine reset for hormonal health',
+    '[TESTO] Zinc + Vitamin D supplement today — foundational hormone support',
+    '[TESTO] One social challenge: start a conversation with a stranger today',
+    '[TESTO] Heavy squat session: 4×6 back squats — most testosterone-boosting lift',
+  ],
+  WEEKLY: [
+    'Complete 5 LeetCode problems (mix of Easy + Medium) this week',
+    'Build one full feature end-to-end in a side project this week',
+    'Read one full tech article or chapter per day — 5 articles by Sunday',
+    'Hit the gym at least 4 times this week — no excuses',
+    'Write a weekly review: what worked, what failed, what to improve',
+    'Practice English speaking for 30 mins daily — record yourself once',
+    'Apply to at least 3 job positions with customized resumes',
+    'Complete all 5 daily quest logs without missing a single day',
+    'Spend 0 money on non-essentials this week — track every expense',
+    'Finish one online course module or certification chapter',
+  ],
+  MONTHLY: [
+    'Complete a full LeetCode study plan topic (e.g. Arrays, Trees)',
+    'Build and deploy a mini-project to GitHub with a proper README',
+    'Read one entire tech book or career development book',
+    'Achieve a 30-day streak on at least one daily habit',
+    'Apply to 15+ jobs this month with tailored cover letters',
+    'Lose 1–2 kg of body fat through consistent diet + training',
+    'Set up one new income stream or skill certification',
+    'Complete all daily quests for 25+ days this month',
+    'Write a technical blog post or LinkedIn article and publish it',
+    'Review your stats and rank up in at least 2 skill areas',
   ],
 };
 
@@ -71,7 +155,13 @@ export class QuestLogComponent implements OnInit, OnChanges {
   newQuestXp: number | null = null;
   newQuestStatBoosts = '';
 
-  /** XP default shown in the form based on selected category (Option C) */
+  // ── Multi-select (Issue 3) ─────────────────────────────────────────────────
+  multiSelectMode = signal(false);
+  selectedKeys = signal<Set<string>>(new Set());
+  batchLoading = signal(false);
+  private longPressTimer: any = null;
+
+  /** XP default shown in the form based on selected category */
   get xpPlaceholder(): string {
     if (this.newQuestCategory === 'WEEKLY')  return '150 (default)';
     if (this.newQuestCategory === 'MONTHLY') return '300 (default)';
@@ -86,17 +176,20 @@ export class QuestLogComponent implements OnInit, OnChanges {
 
   readonly cats = CATEGORY_META;
   private auth = inject(AuthService);
-  
+
+  get isSakthi(): boolean {
+    return this.auth.player()?.email === 'sakthiveltony@gmail.com';
+  }
+
   get dailyCategories() {
-    const isSakthi = this.auth.player()?.email === 'sakthiveltony@gmail.com';
     const cats = [
       { key: 'ALL',          label: 'All Quests',      color: '#4fc3f7' },
       { key: 'DAILY',        label: 'Daily Habits',    color: CATEGORY_META['DAILY'].color },
       { key: 'SKILL',        label: 'Skill Grind',     color: CATEGORY_META['SKILL'].color },
       { key: 'DISCIPLINE',   label: 'Discipline',      color: CATEGORY_META['DISCIPLINE'].color }
     ];
-    if (isSakthi) {
-      cats.push({ key: 'TESTOSTERONE', label: 'Testosterone',    color: '#D85A30' });
+    if (this.isSakthi) {
+      cats.push({ key: 'TESTOSTERONE', label: 'Testosterone', color: '#D85A30' });
     }
     return cats;
   }
@@ -128,12 +221,12 @@ export class QuestLogComponent implements OnInit, OnChanges {
     this.recalculateArrays();
   }
 
-  // ── Cached lists ────────────────────────────────────────────────────────────
+  // ── Cached lists ─────────────────────────────────────────────────────────
   _filteredDaily: Quest[] = [];
   _filteredWeekly: Quest[] = [];
   _filteredMonthly: Quest[] = [];
   _filteredMilestones: Quest[] = [];
-  
+
   _doneCount = 0;
   _pendingCount = 0;
   _weeklyDone = 0;
@@ -145,11 +238,11 @@ export class QuestLogComponent implements OnInit, OnChanges {
       ? this.quests
       : this.quests.filter(q => q.category === this.selectedCategory);
     this._filteredDaily = [...list].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
-    
+
     this._filteredWeekly = [...this.weeklyQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
     this._filteredMonthly = [...this.monthlyQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
     this._filteredMilestones = [...this.milestoneQuests].sort((a, b) => Number(a.isCompleted) - Number(b.isCompleted));
-    
+
     this._doneCount = this.quests.filter(q => q.isCompleted).length;
     this._pendingCount = this.quests.filter(q => !q.isCompleted).length;
     this._weeklyDone = this.weeklyQuests.filter(q => q.isCompleted).length;
@@ -157,18 +250,18 @@ export class QuestLogComponent implements OnInit, OnChanges {
     this._milestonesDone = this.milestoneQuests.filter(q => q.isCompleted).length;
   }
 
-  /** Expose Math to template for progress calculations. */
+  /** Expose Math to template */
   readonly Math = Math;
 
-
-  // ── Tab helpers ─────────────────────────────────────────────────────────────
+  // ── Tab helpers ──────────────────────────────────────────────────────────
 
   setTab(tab: QuestTab): void {
     this.activeTab = tab;
     this.skipWarningKey = null;
+    this.exitMultiSelect();
     if (tab === 'today') {
-       this.selectedCategory = 'ALL';
-       this.recalculateArrays();
+      this.selectedCategory = 'ALL';
+      this.recalculateArrays();
     }
   }
 
@@ -190,14 +283,14 @@ export class QuestLogComponent implements OnInit, OnChanges {
     }
   }
 
-  // ── Quest lists ─────────────────────────────────────────────────────────────
+  // ── Quest lists ──────────────────────────────────────────────────────────
 
   get filteredDaily(): Quest[] { return this._filteredDaily; }
   get filteredWeekly(): Quest[] { return this._filteredWeekly; }
   get filteredMonthly(): Quest[] { return this._filteredMonthly; }
   get filteredMilestones(): Quest[] { return this._filteredMilestones; }
 
-  // ── Counts ──────────────────────────────────────────────────────────────────
+  // ── Counts ───────────────────────────────────────────────────────────────
 
   get doneCount():      number { return this._doneCount; }
   get pendingCount():   number { return this._pendingCount; }
@@ -214,11 +307,72 @@ export class QuestLogComponent implements OnInit, OnChanges {
     }
   }
 
-  // ── Quest actions ────────────────────────────────────────────────────────────
+  // ── Multi-select logic (Issue 3) ─────────────────────────────────────────
+
+  onQuestTouchStart(q: Quest, event: TouchEvent): void {
+    if (q.isCompleted || q.isSkipped) return;
+    this.longPressTimer = setTimeout(() => {
+      this.longPressTimer = null;
+      this.enterMultiSelect(q);
+    }, 480);
+  }
+
+  onQuestTouchEnd(): void {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+  }
+
+  enterMultiSelect(q: Quest): void {
+    this.multiSelectMode.set(true);
+    const keys = new Set<string>();
+    if (q.questKey) keys.add(q.questKey);
+    this.selectedKeys.set(keys);
+    // Haptic feedback if available
+    if ((navigator as any).vibrate) {
+      (navigator as any).vibrate(30);
+    }
+  }
+
+  exitMultiSelect(): void {
+    this.multiSelectMode.set(false);
+    this.selectedKeys.set(new Set());
+    this.batchLoading.set(false);
+  }
+
+  toggleQuestSelection(q: Quest, event: Event): void {
+    event.stopPropagation();
+    if (!this.multiSelectMode() || q.isCompleted || q.isSkipped) return;
+    const keys = new Set(this.selectedKeys());
+    if (keys.has(q.questKey)) {
+      keys.delete(q.questKey);
+      if (keys.size === 0) {
+        this.exitMultiSelect();
+        return;
+      }
+    } else {
+      keys.add(q.questKey);
+    }
+    this.selectedKeys.set(keys);
+  }
+
+  isSelected(q: Quest): boolean {
+    return this.selectedKeys().has(q.questKey);
+  }
+
+  get selectedCount(): number { return this.selectedKeys().size; }
+
+  // ── Single quest complete ────────────────────────────────────────────────
 
   onComplete(q: Quest, event?: MouseEvent): void {
+    // If multi-select mode is active, toggle selection instead
+    if (this.multiSelectMode()) {
+      this.toggleQuestSelection(q, event || new Event('click'));
+      return;
+    }
     if (q.isCompleted || this.pendingKey || q.isSkipped) return;
-    
+
     const dialogRef = this.dialog.open(DifficultyPromptModalComponent, {
       data: { questName: q.label },
       panelClass: 'transparent-panel',
@@ -236,12 +390,48 @@ export class QuestLogComponent implements OnInit, OnChanges {
     });
   }
 
+  // ── Batch complete (Issue 3 — Option B) ─────────────────────────────────
+
+  batchComplete(): void {
+    if (this.selectedCount === 0 || this.batchLoading()) return;
+
+    const pendingQuests = this._filteredDaily.filter(q =>
+      this.selectedKeys().has(q.questKey) && !q.isCompleted && !q.isSkipped
+    );
+    if (pendingQuests.length === 0) { this.exitMultiSelect(); return; }
+
+    // Show ONE difficulty dialog for the whole batch
+    const dialogRef = this.dialog.open(DifficultyPromptModalComponent, {
+      data: { questName: `${pendingQuests.length} selected quests` },
+      panelClass: 'transparent-panel',
+      hasBackdrop: false,
+    });
+
+    dialogRef.afterClosed().subscribe((feedback: string | null | undefined) => {
+      if (feedback === undefined) return; // user cancelled
+
+      this.batchLoading.set(true);
+      // Emit complete for each selected quest with the same difficulty feedback
+      for (const q of pendingQuests) {
+        this.complete.emit({ quest: q, difficultyFeedback: feedback });
+      }
+      // Exit multi-select after a short delay
+      setTimeout(() => this.exitMultiSelect(), 600);
+    });
+  }
+
+  // ── Escape key exits multi-select ────────────────────────────────────────
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.multiSelectMode()) this.exitMultiSelect();
+  }
+
   private readonly dialog = inject(MatDialog);
 
   onSkip(q: Quest, event: Event): void {
     event.stopPropagation();
     if (q.isCompleted || this.pendingKey || q.isSkipped) return;
-    
+
     const dialogRef = this.dialog.open(SkipPromptModalComponent, {
       data: { questName: q.label },
       panelClass: 'transparent-panel',
@@ -297,7 +487,7 @@ export class QuestLogComponent implements OnInit, OnChanges {
 
   dismissWarning(): void { this.skipWarningKey = null; }
 
-  // ── Add Quest form ──────────────────────────────────────────────────────────
+  // ── Add Quest form ────────────────────────────────────────────────────────
 
   toggleAddForm(): void {
     this.showAddForm.set(!this.showAddForm());
@@ -339,7 +529,6 @@ export class QuestLogComponent implements OnInit, OnChanges {
         this.questAdded.emit(quest);
         this.resetForm();
         this.showAddForm.set(false);
-        // Switch to the appropriate tab after adding
         if (req.category === 'WEEKLY')  this.setTab('weekly');
         else if (req.category === 'MONTHLY') this.setTab('monthly');
         else this.setTab('today');
@@ -359,7 +548,7 @@ export class QuestLogComponent implements OnInit, OnChanges {
     this.addError.set(null);
   }
 
-  // ── AI Suggestions ────────────────────────────────────────────────────────────
+  // ── AI Suggestions — Rich local engine + API (Issue 1) ───────────────────
 
   suggestions = signal<string[]>([]);
   suggestionsLoading = signal<boolean>(false);
@@ -371,15 +560,28 @@ export class QuestLogComponent implements OnInit, OnChanges {
 
   fetchSuggestions() {
     this.suggestionsLoading.set(true);
+
+    // 1. Immediately show local rich suggestions (instant, no network)
+    const localPool = LOCAL_SUGGESTIONS[this.newQuestCategory] ?? LOCAL_SUGGESTIONS['DAILY'];
+    // Shuffle and pick 10
+    const shuffled = [...localPool].sort(() => Math.random() - 0.5).slice(0, 10);
+    this.suggestions.set(shuffled);
+    this.suggestionsLoading.set(false);
+
+    // 2. Also fetch from backend to get AI-personalized extras (non-blocking)
     this.playerService.getQuestSuggestions(this.newQuestCategory).subscribe({
-      next: (res) => {
-        this.suggestions.set(res);
-        this.suggestionsLoading.set(false);
+      next: (aiSuggestions) => {
+        if (aiSuggestions && aiSuggestions.length > 0) {
+          // Merge AI suggestions at the top (deduplicated), keep max 12 total
+          const existing = new Set(this.suggestions().map(s => s.toLowerCase().slice(0, 30)));
+          const fresh = aiSuggestions.filter(s =>
+            s.trim().length > 5 && !existing.has(s.toLowerCase().slice(0, 30))
+          );
+          const merged = [...fresh.slice(0, 4), ...this.suggestions()].slice(0, 12);
+          this.suggestions.set(merged);
+        }
       },
-      error: () => {
-        this.suggestions.set([]);
-        this.suggestionsLoading.set(false);
-      }
+      error: () => { /* local suggestions already showing — ignore */ }
     });
   }
 
@@ -387,7 +589,7 @@ export class QuestLogComponent implements OnInit, OnChanges {
     this.newQuestLabel = suggestion;
   }
 
-  // ── Utilities ────────────────────────────────────────────────────────────────
+  // ── Utilities ─────────────────────────────────────────────────────────────
 
   trackByKey(_: number, q: Quest) { return q.questKey; }
 
@@ -401,19 +603,17 @@ export class QuestLogComponent implements OnInit, OnChanges {
     } catch { return ''; }
   }
 
-  /** Weekly progress fraction label e.g. "3/5 this week" */
   weeklyProgress(q: Quest): string {
     const done = q.weeklyDoneCount ?? 0;
     return `${done} completed this week`;
   }
 
-  /** Monthly progress fraction label */
   monthlyProgress(q: Quest): string {
     const done = q.monthlyDoneCount ?? 0;
     return `${done} completed this month`;
   }
 
-  // ── Solo Leveling Ranks ───────────────────────────────────────────────────────
+  // ── Solo Leveling Ranks ───────────────────────────────────────────────────
 
   getRank(xpReward: number | undefined): string {
     const xp = xpReward || 0;
@@ -427,12 +627,12 @@ export class QuestLogComponent implements OnInit, OnChanges {
 
   getRankColor(xpReward: number | undefined): string {
     const xp = xpReward || 0;
-    if (xp <= 50) return '#94a3b8'; // E-Rank gray
-    if (xp <= 100) return '#1FBE8E'; // D-Rank green
-    if (xp <= 200) return '#4fc3f7'; // C-Rank blue
-    if (xp <= 500) return '#A855F7'; // B-Rank purple
-    if (xp <= 1000) return '#FAC775'; // A-Rank gold
-    return '#E24B4A'; // S-Rank red
+    if (xp <= 50) return '#94a3b8';
+    if (xp <= 100) return '#1FBE8E';
+    if (xp <= 200) return '#4fc3f7';
+    if (xp <= 500) return '#A855F7';
+    if (xp <= 1000) return '#FAC775';
+    return '#E24B4A';
   }
 
   getDifficulty(xp: number | undefined): string {
