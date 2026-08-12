@@ -358,29 +358,9 @@ $sys-theme: mat.define-dark-theme((
   100% { box-shadow: 0 0 15px rgba(31,190,142,0.6), inset 0 0 10px rgba(31,190,142,0.2); border-color: rgba(31,190,142, 0.8); }
 }
 
-.mat-mdc-snack-bar-container.system-snack {
-  --mdc-snackbar-container-color:       rgba(10, 10, 24, 0.95);
-  --mdc-snackbar-supporting-text-color: #EEF3FA;
-  --mat-snack-bar-button-color:         #FAC775;
-  /* NOTE: Do NOT add position:fixed here Ã¢â‚¬â€ it overrides Angular CDK overlay positioning.
-     The verticalPosition / horizontalPosition options on snack.open() control placement. */
-  z-index: 9999 !important;
-}
-.mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
-  border: 1px solid var(--accent-teal);
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(10, 10, 24, 0.95), rgba(31, 190, 142, 0.15));
-  backdrop-filter: blur(10px);
-  animation: systemSnackPulse 2s infinite ease-in-out;
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 1px;
-}
-.mat-mdc-snack-bar-container.system-snack-warn .mdc-snackbar__surface {
-  border: 1px solid #E24B4A;
-  background: linear-gradient(135deg, rgba(10, 10, 24, 0.95), rgba(226, 75, 74, 0.15));
-  box-shadow: 0 0 28px rgba(226,75,74,0.65), inset 0 0 12px rgba(226,75,74,0.2);
-  font-family: 'Orbitron', sans-serif;
-}
+
+
+
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Snackbar position: top-right Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
    Angular CDK's GlobalPositionStrategy uses inline styles on the overlay
@@ -400,41 +380,13 @@ $sys-theme: mat.define-dark-theme((
    safe-area-inset-top keeps it below Android status bar.                   */
 
 /* Layer 1: snackbar container */
-.mat-mdc-snack-bar-container {
-  position: fixed    !important;
-  top:   max(env(safe-area-inset-top, 0px), 16px) !important;
-  right: 16px        !important;
-  bottom: auto       !important;
-  left:  auto        !important;
-  transform: none    !important;
-  width: auto        !important;
-  max-width: min(420px, calc(100vw - 32px)) !important;
-  margin: 0          !important;
-  pointer-events: auto;
-  z-index: 100000    !important;
-}
+
 
 /* Layer 2: CDK overlay pane that wraps snackbars */
-.cdk-overlay-pane:has(.mat-mdc-snack-bar-container) {
-  position: fixed    !important;
-  top:   max(env(safe-area-inset-top, 0px), 16px) !important;
-  right: 16px        !important;
-  bottom: auto       !important;
-  left:  auto        !important;
-  transform: none    !important;
-  height: auto       !important;
-  width: auto        !important;
-  max-width: min(420px, calc(100vw - 32px)) !important;
-}
+.cdk-overlay-pane:has(
 
 /* Layer 3: CDK global wrapper - prevent bottom alignment */
-.cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
-  align-items: flex-start  !important;
-  justify-content: flex-end !important;
-  padding-top:   max(env(safe-area-inset-top, 0px), 16px) !important;
-  padding-right: 16px      !important;
-  pointer-events: none;
-}
+.cdk-global-overlay-wrapper:has(
 
 /* Fallback: generic CDK wrapper */
 .cdk-global-overlay-wrapper {
@@ -614,36 +566,11 @@ body.native-platform .glass-panel {
   -webkit-backdrop-filter: none !important;
   background: linear-gradient(160deg, rgba(22,22,42,0.98), rgba(12,12,26,0.99));
 }
-body.native-platform .mat-mdc-snack-bar-container.system-snack .mdc-snackbar__surface {
-  animation: none !important;                 /* stop the 2s infinite pulse + its big box-shadow */
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
+body.native-platform 
 /* Android: forcibly pin snackbar to top-right regardless of CDK inline styles */
-body.native-platform .mat-mdc-snack-bar-container {
-  position: fixed  !important;
-  top:    max(env(safe-area-inset-top, 48px), 48px) !important;
-  right:  12px     !important;
-  bottom: auto     !important;
-  left:   auto     !important;
-  transform: none  !important;
-  width:  auto     !important;
-  max-width: calc(100vw - 24px) !important;
-  z-index: 200000  !important;
-}
-body.native-platform .cdk-overlay-pane:has(.mat-mdc-snack-bar-container) {
-  position: fixed !important;
-  top:    max(env(safe-area-inset-top, 48px), 48px) !important;
-  right:  12px   !important;
-  bottom: auto   !important;
-  left:   auto   !important;
-  transform: none !important;
-  height: auto   !important;
-}
-body.native-platform .cdk-global-overlay-wrapper:has(.mat-mdc-snack-bar-container) {
-  align-items:     flex-start !important;
-  justify-content: flex-end   !important;
-}
+body.native-platform 
+body.native-platform .cdk-overlay-pane:has(
+body.native-platform .cdk-global-overlay-wrapper:has(
 body.native-platform .cdk-overlay-dark-backdrop {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
