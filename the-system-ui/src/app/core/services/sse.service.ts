@@ -226,7 +226,7 @@ export class SseService {
       if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
         new Notification(`◈ ${n.title}`, {
           body: n.message,
-          icon: '/assets/icons/icon-192x192.png' // Default PWA icon
+          icon: '/assets/icons/icon-192.webp' // Default PWA icon
         });
       }
     } catch {

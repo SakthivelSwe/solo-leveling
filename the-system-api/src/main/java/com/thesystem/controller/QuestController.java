@@ -68,9 +68,19 @@ public class QuestController {
 
     @PostMapping("/boss-battle/evaluate")
     public Map<String, Object> evaluateBossBattle(Principal principal, @RequestBody CodeSubmission submission) {
+        // Guard: reject empty or oversized submissions before spending an AI call.
+        // Caps prompt size (cost + latency) and blocks a trivial DoS vector.
+        String code = submission == null ? null : submission.code;
+        if (code == null || code.isBlank()) {
+            throw new ApiException("No code submitted", HttpStatus.BAD_REQUEST);
+        }
+        if (code.length() > 5000) {
+            throw new ApiException("Submission too large (max 5000 characters)", HttpStatus.PAYLOAD_TOO_LARGE);
+        }
+
         // Lightweight AI evaluation logic for the code snippet
         String prompt = "You are Igris, the boss. The player is writing an algorithmic solution. " +
-                        "Here is their code:\n" + submission.code + "\n\n" +
+                        "Here is their code:\n" + code + "\n\n" +
                         "If it has a compilation error or is O(n^2), mock them (max 1 sentence) and deal 10 damage to player (0 to boss). " +
                         "If it is correct and O(n), express fear/anger and deal 50 damage to boss (0 to player). " +
                         "Output JSON EXACTLY like: {\"feedback\": \"...\", \"damageToPlayer\": 10, \"damageToBoss\": 0}";
@@ -95,7 +105,10 @@ public class QuestController {
             
             return result;
         } catch (Exception e) {
-            return Map.of("feedback", "Silence from the boss... (" + e.getMessage() + ")", "damageToPlayer", 0, "damageToBoss", 0);
+            // Don't leak internal exception details to the client — log server-side only.
+            org.slf4j.LoggerFactory.getLogger(QuestController.class)
+                    .warn("Boss battle evaluation failed", e);
+            return Map.of("feedback", "Silence from the boss...", "damageToPlayer", 0, "damageToBoss", 0);
         }
     }
 

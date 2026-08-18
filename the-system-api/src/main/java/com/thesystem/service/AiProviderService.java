@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,20 @@ public class AiProviderService {
     @Value("${thesystem.ai.gemini-model:gemini-2.0-flash}")
     private String geminiModel;
 
-    private final RestClient http = RestClient.create();
+    // CRITICAL: an explicit connect/read timeout prevents a hung AI provider from
+    // blocking a request thread indefinitely. With a Hikari pool of only 5, a few
+    // stuck AI calls would otherwise exhaust the pool and make the whole API (and
+    // therefore the Android app) appear frozen.
+    private final RestClient http = RestClient.builder()
+            .requestFactory(buildTimeoutFactory())
+            .build();
+
+    private static SimpleClientHttpRequestFactory buildTimeoutFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout((int) Duration.ofSeconds(10).toMillis());
+        factory.setReadTimeout((int) Duration.ofSeconds(45).toMillis());
+        return factory;
+    }
 
     public enum Scenario { CHAT, COACHING, BOSS_BATTLE, EVALUATION, SUGGESTION, NOTEBOOK }
 

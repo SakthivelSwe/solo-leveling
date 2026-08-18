@@ -99,6 +99,9 @@ export class AppComponent {
       // Guard: don't poll when the user is not authenticated or app is offline.
       if (!this.auth.isAuthenticated()) return;
       if (this.network.isOffline()) return;
+      // Battery/perf: skip polling while the app is backgrounded (Android WebView
+      // keeps the radio + CPU awake otherwise, which adds to on-resume lag).
+      if (typeof document !== 'undefined' && document.hidden) return;
 
       this.lifeOs.getDueFlashcards().subscribe(cards =>
         this.uiState.dueFlashcardsCount.set(cards.length));
@@ -108,8 +111,15 @@ export class AppComponent {
 
     // Initial fetch.
     poll();
-    // Refresh every 2 minutes.
+    // Refresh every 2 minutes (skipped automatically while backgrounded).
     setInterval(poll, 120_000);
+    // Refresh immediately when the app returns to the foreground so the badge
+    // is up to date the moment the Hunter resumes — without waiting for the tick.
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) poll();
+      });
+    }
   }
 
 

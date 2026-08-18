@@ -26,7 +26,9 @@
   <!-- Preconnect to font origins so DNS+TLS is resolved before the CSS is parsed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Preconnect to the API backend so the first API call doesn't pay TLS setup cost -->
+  <!-- Preconnect to the API backends so the first API call doesn't pay TLS setup cost.
+       Primary is contacted first; secondary is the fallback used by fallbackInterceptor. -->
+  <link rel="preconnect" href="https://solo-leveling-psjy.onrender.com">
   <link rel="preconnect" href="https://solo-leveling-0rpl.onrender.com">
   <!-- Non-render-blocking font load: preload as style, swap to stylesheet on load.
        This prevents fonts from blocking the First Contentful Paint. -->

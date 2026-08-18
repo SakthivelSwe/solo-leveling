@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.12</version>
+        <version>3.3.13</version>
         <relativePath/>
     </parent>
 
@@ -57,9 +57,13 @@
         </dependency>
 
         <!-- PostgreSQL (Supabase / Render production) -->
+        <!-- Pinned to 42.7.12 to remediate CVE-2026-42198 (HIGH, SCRAM DoS)
+             and CVE-2026-54291 (HIGH, channel-binding downgrade). Overrides the
+             42.6.2 version managed by the Spring Boot 3.2.12 parent. -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>42.7.12</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -102,12 +106,6 @@
             <version>2.5.0</version>
         </dependency>
 
-        <!-- Playwright for Autonomous Browser Agent (Phase 3) -->
-        <dependency>
-            <groupId>com.microsoft.playwright</groupId>
-            <artifactId>playwright</artifactId>
-            <version>1.40.0</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

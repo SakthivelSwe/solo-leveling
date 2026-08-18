@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, effect, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SseService } from '../../../core/services/sse.service';
@@ -22,7 +22,7 @@ interface BossChallenge {
   templateUrl: './boss-battle.component.html',
   styleUrls: ['./boss-battle.component.scss']
 })
-export class BossBattleComponent implements OnInit {
+export class BossBattleComponent implements OnInit, OnDestroy {
   challenge: BossChallenge = {
     title: 'The Gatekeeper of Igris',
     description: 'Write a Java method `public int[] twoSum(int[] nums, int target)` that returns the indices of the two numbers such that they add up to target. The shadow army approaches. If your code is unoptimized (O(n^2)), Igris will deal 50 damage.',
@@ -30,7 +30,7 @@ export class BossBattleComponent implements OnInit {
   };
 
   code = this.challenge.initialCode;
-  
+
   aiFeedback = signal<string[]>([]);
   isEvaluating = signal<boolean>(false);
   bossHp = signal<number>(100);
@@ -46,11 +46,19 @@ export class BossBattleComponent implements OnInit {
 
   ngOnInit(): void {
     // We could listen for live SSE from the mentor during the battle
-    window.addEventListener('agentLog', (e: any) => {
-      if (e.detail?.type === 'BOSS_BATTLE') {
-        this.aiFeedback.update(f => [...f, e.detail.message]);
-      }
-    });
+    window.addEventListener('agentLog', this.agentLogHandler);
+  }
+
+  /** Stored so the listener can be removed on destroy (previously it leaked). */
+  private agentLogHandler = (e: any) => {
+    if (e.detail?.type === 'BOSS_BATTLE') {
+      this.aiFeedback.update(f => [...f, e.detail.message]);
+    }
+  };
+
+  ngOnDestroy(): void {
+    window.removeEventListener('agentLog', this.agentLogHandler);
+    this.codeSubject.complete();
   }
 
   onCodeChange(newCode: string): void {

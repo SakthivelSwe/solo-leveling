@@ -32,6 +32,10 @@ export class NetworkService implements OnDestroy {
   private listenerHandle: any = null;
   private offlineFired = false;
 
+  // Bound web handlers kept as fields so they can be removed on destroy.
+  private readonly _onlineHandler = () => this._handleChange(true);
+  private readonly _offlineHandler = () => this._handleChange(false);
+
   async init(): Promise<void> {
     if (Capacitor.isNativePlatform()) {
       await this._initNative();
@@ -62,8 +66,8 @@ export class NetworkService implements OnDestroy {
 
   private _initWeb(): void {
     this._isOnline.set(navigator.onLine);
-    window.addEventListener('online',  () => this._handleChange(true));
-    window.addEventListener('offline', () => this._handleChange(false));
+    window.addEventListener('online',  this._onlineHandler);
+    window.addEventListener('offline', this._offlineHandler);
   }
 
   // ── Shared change handler ─────────────────────────────────────────────────
@@ -85,5 +89,8 @@ export class NetworkService implements OnDestroy {
     if (this.listenerHandle) {
       this.listenerHandle.remove?.();
     }
+    // Remove web fallback listeners to avoid duplicate handlers / leaks.
+    window.removeEventListener('online',  this._onlineHandler);
+    window.removeEventListener('offline', this._offlineHandler);
   }
 }

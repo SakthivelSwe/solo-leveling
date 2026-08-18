@@ -184,9 +184,16 @@ public class AiQuestGeneratorService {
 
         StringBuilder skipContext = new StringBuilder();
         if (!recentSkips.isEmpty()) {
+            // Batch-load quest labels in ONE query instead of one findById per skip (avoids N+1).
+            java.util.Set<Long> skipQuestIds = recentSkips.stream()
+                    .map(com.thesystem.entity.QuestSkip::getQuestId)
+                    .collect(java.util.stream.Collectors.toSet());
+            Map<Long, String> skipLabels = questRepository.findAllById(skipQuestIds).stream()
+                    .collect(java.util.stream.Collectors.toMap(Quest::getId, Quest::getLabel));
+
             skipContext.append("\nRECENT SKIPS (Take these reasons into account):\n");
             for (com.thesystem.entity.QuestSkip skip : recentSkips) {
-                String questLabel = questRepository.findById(skip.getQuestId()).map(q -> q.getLabel()).orElse("Unknown Quest");
+                String questLabel = skipLabels.getOrDefault(skip.getQuestId(), "Unknown Quest");
                 skipContext.append("- Skipped '").append(questLabel).append("' because: ").append(skip.getReason()).append("\n");
             }
             skipContext.append("If a reason implies injury or illness, DO NOT assign heavy physical tasks today. If they were busy/overworked, give lighter tasks.\n");
@@ -196,9 +203,16 @@ public class AiQuestGeneratorService {
         List<QuestCompletion> recentFeedback = completionRepository.findTop5ByPlayerIdAndDifficultyFeedbackIsNotNullOrderByCompletedAtDesc(playerId);
         StringBuilder feedbackContext = new StringBuilder();
         if (!recentFeedback.isEmpty()) {
+            // Batch-load quest labels in ONE query instead of one findById per completion (avoids N+1).
+            java.util.Set<Long> feedbackQuestIds = recentFeedback.stream()
+                    .map(QuestCompletion::getQuestId)
+                    .collect(java.util.stream.Collectors.toSet());
+            Map<Long, String> feedbackLabels = questRepository.findAllById(feedbackQuestIds).stream()
+                    .collect(java.util.stream.Collectors.toMap(Quest::getId, Quest::getLabel));
+
             feedbackContext.append("\nRECENT QUEST DIFFICULTY FEEDBACK (Scale future quests based on this):\n");
             for (QuestCompletion qc : recentFeedback) {
-                String questLabel = questRepository.findById(qc.getQuestId()).map(q -> q.getLabel()).orElse("Unknown Quest");
+                String questLabel = feedbackLabels.getOrDefault(qc.getQuestId(), "Unknown Quest");
                 feedbackContext.append("- Rated '").append(questLabel).append("' as: ").append(qc.getDifficultyFeedback()).append("\n");
             }
             feedbackContext.append("RULE: If they rated a quest TOO_EASY, make similar tasks harder (increase reps or complexity). If they rated it HARD, reduce the difficulty next time.\n");
@@ -221,9 +235,19 @@ public class AiQuestGeneratorService {
             for (Map<String, Object> gq : generatedQuests) {
                 String label = (String) gq.get("label");
                 String categoryStr = (String) gq.get("category");
-                int xpReward = (Integer) gq.get("xpReward");
-                Map<String, Integer> statBoosts = (Map<String, Integer>) gq.get("statBoosts");
-                Map<String, Integer> skillBoosts = (Map<String, Integer>) gq.get("skillBoosts");
+                if (label == null || label.isBlank() || categoryStr == null) {
+                    log.warn("Skipping malformed AI quest (missing label/category): {}", gq);
+                    continue;
+                }
+
+                // Safe numeric parse — Jackson may hand back Integer, Long or Double.
+                Object rawXp = gq.get("xpReward");
+                int xpReward = (rawXp instanceof Number n) ? n.intValue() : 100;
+                // Clamp so a hallucinated reward can never inflate the XP economy.
+                xpReward = Math.max(10, Math.min(300, xpReward));
+
+                Map<String, Integer> statBoosts = sanitizeBoosts(gq.get("statBoosts"));
+                Map<String, Integer> skillBoosts = sanitizeBoosts(gq.get("skillBoosts"));
 
                 QuestCategory category;
                 try { category = QuestCategory.valueOf(categoryStr); }
@@ -290,6 +314,23 @@ public class AiQuestGeneratorService {
             sb.append(s.getSkillName()).append(" (Lv ").append(s.getSkillLevel()).append("), ");
         }
         return sb.toString();
+    }
+
+    /**
+     * Coerces an AI-supplied boosts object into a clean Map<String,Integer>,
+     * dropping non-numeric values and clamping each boost to a sane range so a
+     * hallucinated value can never distort a player's stats.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Integer> sanitizeBoosts(Object raw) {
+        if (!(raw instanceof Map<?, ?> map)) return Map.of();
+        Map<String, Integer> clean = new java.util.HashMap<>();
+        for (Map.Entry<?, ?> e : map.entrySet()) {
+            if (e.getKey() == null || !(e.getValue() instanceof Number n)) continue;
+            int v = Math.max(0, Math.min(10, n.intValue()));
+            if (v > 0) clean.put(String.valueOf(e.getKey()), v);
+        }
+        return clean;
     }
 
     private String cleanJson(String raw) {

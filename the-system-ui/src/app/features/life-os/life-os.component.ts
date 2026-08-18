@@ -5,7 +5,9 @@ import { RouterLink } from '@angular/router';
 import { ToastService } from '../../core/services/toast.service';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import * as XLSX from 'xlsx';
+// NOTE: 'xlsx' (SheetJS) is ~800 KB. It is loaded lazily via dynamic import() only
+// when the user actually imports/exports a bank statement, keeping it out of the
+// initial bundle (faster first load on web + Android WebView).
 
 import { LifeOsService } from '../../core/services/life-os.service';
 import {
@@ -555,7 +557,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     const expenses = summary.totalExpenses;
     const savings = summary.totalSaved;
     const emis = summary.emiTotal;
-    
+
     this.doughnutChartData = {
       labels: [ 'Expenses', 'Savings', 'EMIs' ],
       datasets: [ {
@@ -677,7 +679,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
       this.statementFileName.set('');
       return;
     }
-    
+
     const statementId = Number(id);
     this.selectedStatementId.set(statementId);
     this.life.getStatement(statementId).subscribe(record => {
@@ -739,14 +741,15 @@ export class LifeOsComponent implements OnInit, OnDestroy {
       });
     } else if (ext === 'csv' || ext === 'xls' || ext === 'xlsx') {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
+          const XLSX = await import('xlsx');
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const wb = XLSX.read(data, { type: 'array' });
           const sheet = wb.Sheets[wb.SheetNames[0]];
           const rows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
           this.parseAxisBankXlsRows(rows);
-          
+
           // Construct payload for saving
           const parsed = {
              header: this.statementHeader(),
@@ -841,7 +844,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         // Axis Bank XLS: SRL NO | Tran Date | CHQNO | PARTICULARS | DR | CR | BAL | SOL
         tranDate = row[1] || '';
         particulars = row[3] || '';
-        
+
         let debitVal = 0;
         let creditVal = 0;
         let balVal = 0;
@@ -1062,11 +1065,13 @@ export class LifeOsComponent implements OnInit, OnDestroy {
         Credit: r.credit || '', Balance: r.balance,
         'My Label': r.myLabel || '', Category: r.aiCategory || ''
       }));
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Statement');
-      XLSX.writeFile(wb, 'statement.xlsx');
-      this.toast('◈ Excel exported');
+      import('xlsx').then(XLSX => {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Statement');
+        XLSX.writeFile(wb, 'statement.xlsx');
+        this.toast('◈ Excel exported');
+      });
     }
   }
 
@@ -1244,7 +1249,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   /* ===== Body actions ===== */
   saveBody(): void {
     const b = this.body(); if (!b) return;
-    
+
     // Calculate Pillars
     let pillars = 0;
     if (b.coldShower) pillars++;
@@ -1264,7 +1269,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     const r = this.relationship(); if (!r) return;
     this.life.upsertRelationship(r).subscribe(v => { this.relationship.set(v); this.toast('◈ Bonds updated'); });
   }
-  
+
   addCallTime(mins: number): void {
     const r = this.relationship(); if (!r) return;
     r.callDurationMin = (r.callDurationMin || 0) + mins;
@@ -1304,7 +1309,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
 
   // --- Meditation Logic ---
   meditationSeconds = 0;
-  
+
   startMeditation() {
     this.life.startMeditation().subscribe({
       next: () => console.log('Meditation started on backend'),
@@ -1312,11 +1317,11 @@ export class LifeOsComponent implements OnInit, OnDestroy {
     });
     this.isMeditating.set(true);
     this.meditationSeconds = this.meditationMinutes() * 60;
-    
+
     if (this.meditationInterval) {
       clearInterval(this.meditationInterval);
     }
-    
+
     this.meditationInterval = setInterval(() => {
       this.meditationSeconds--;
       if (this.meditationSeconds <= 0) {
@@ -1336,21 +1341,21 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   completeMeditation() {
     this.cancelMeditation();
     this.toast('◈ Meditation Complete! Clarity Buff Applied (2h)');
-    
+
     // Set buff for 2 hours
     const end = new Date();
     end.setHours(end.getHours() + 2);
     this.clarityBuffEnd.set(end.toISOString());
-    
+
     if (this.clarityInterval) {
       clearInterval(this.clarityInterval);
     }
-    
+
     this.clarityInterval = setInterval(() => {
       this.updateClarityTimer();
     }, 1000);
     this.updateClarityTimer();
-    
+
     // Call backend
     this.life.completeMeditation(this.meditationMinutes()).subscribe({
       next: () => console.log('Meditation synced to backend'),
@@ -1361,7 +1366,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
   updateClarityTimer() {
     const end = this.clarityBuffEnd();
     if (!end) return;
-    
+
     const diff = new Date(end).getTime() - new Date().getTime();
     if (diff <= 0) {
       this.clarityRemaining.set('');
@@ -1372,7 +1377,7 @@ export class LifeOsComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    
+
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);

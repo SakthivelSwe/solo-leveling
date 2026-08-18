@@ -81,7 +81,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   displayDay = signal<number>(0);
   heatmap = signal<HeatmapDay[]>([]);
   currentStreak = signal<number>(0);
-  
+
   todayDateStr = signal<string>('');
   tomorrowDateStr = signal<string>('');
   private timeInterval: any;
@@ -120,7 +120,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     if (this.isAgentRunning()) return;
     this.isAgentRunning.set(true);
     this.agentLogs.set(['[SYSTEM] INITIALIZING AUTONOMOUS AGENT...']);
-    
+
     // Listen for SSE logs via window event (dispatched by SseService)
     const logListener = (e: any) => {
       if (e.detail?.message) {
@@ -158,6 +158,15 @@ export class SystemComponent implements OnInit, OnDestroy {
 
   /** Debounce handle for coalescing bursts of live SSE events into one reload. */
   private reloadTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** Stored so the global 'penaltyTriggered' listener can be removed on destroy
+   *  (previously it leaked — a new listener stacked up on every visit to /system). */
+  private penaltyHandler = (e: any) => {
+    const app = e.detail?.app || 'a distracting app';
+    this.haptics.warning();
+    this.toast(`⚠ PENALTY TRIGGERED! You opened ${app} while HP is critical. FOCUS!`);
+    // Optionally trigger HP deduction here via playerService if backend supports it.
+  };
 
   private zone = inject(NgZone);
 
@@ -199,12 +208,7 @@ export class SystemComponent implements OnInit, OnDestroy {
     });
 
     // Listen for penalty trigger from Android ScreenTimeService
-    window.addEventListener('penaltyTriggered', (e: any) => {
-      const app = e.detail?.app || 'a distracting app';
-      this.haptics.warning();
-      this.toast(`⚠ PENALTY TRIGGERED! You opened ${app} while HP is critical. FOCUS!`);
-      // Optionally trigger HP deduction here via playerService if backend supports it.
-    });
+    window.addEventListener('penaltyTriggered', this.penaltyHandler);
 
     this.loadFull(); // full initial load
     this.notifications.refreshUnread();
@@ -218,13 +222,15 @@ export class SystemComponent implements OnInit, OnDestroy {
       clearInterval(this.timeInterval);
     }
     if (this.reloadTimer) { clearTimeout(this.reloadTimer); this.reloadTimer = null; }
+    // Remove the global penalty listener so it doesn't accumulate across visits.
+    window.removeEventListener('penaltyTriggered', this.penaltyHandler);
   }
 
   private handleStatusUpdate(s: StatusWindow) {
     const oldStatus = this.status();
     this.status.set(s);
     this.auth.updatePlayer(s.player);
-    
+
     // Check for Rank Up
     if (oldStatus && oldStatus.player.rankLevel && s.player.rankLevel && oldStatus.player.rankLevel !== s.player.rankLevel) {
       this.dialog.open(RankUpModalComponent, {
@@ -326,7 +332,7 @@ export class SystemComponent implements OnInit, OnDestroy {
       }
     }
     if (!stored) return s.currentStreak;
-    
+
     const startDate = new Date(stored);
     const now = new Date();
     const diffMs = Math.max(0, now.getTime() - startDate.getTime());
@@ -381,7 +387,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   extractShadow(): void {
     if (this.extractingShadow()) return;
     this.extractingShadow.set(true);
-    
+
     this.lifeOsService.extractDisciplineShadow().subscribe({
       next: (shadow) => {
         this.extractingShadow.set(false);
@@ -465,7 +471,7 @@ export class SystemComponent implements OnInit, OnDestroy {
   private processQuestQueue(): void {
     if (this.isProcessingQueue || this.questQueue.length === 0) return;
     this.isProcessingQueue = true;
-    
+
     const next = this.questQueue.shift()!;
     const { quest, difficultyFeedback } = next;
 

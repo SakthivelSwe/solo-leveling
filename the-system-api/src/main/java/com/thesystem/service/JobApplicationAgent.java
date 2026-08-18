@@ -1,71 +1,42 @@
 package com.thesystem.service;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
-import com.thesystem.repository.JobApplicationRepository;
 import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Autonomous job-hunt agent.
+ *
+ * <p>The original implementation drove a headless Chromium browser via Playwright
+ * to scrape and "auto-apply" to job postings. That dependency (~400 MB once the
+ * browser binaries are installed) cannot run on the 512 MB Render free tier and
+ * was a major source of cold-start slowness and out-of-memory risk, so the
+ * Playwright dependency has been removed.</p>
+ *
+ * <p>The public API ({@code triggerJobHunt}) and the SSE {@code agent-log} stream
+ * are preserved so the existing UI keeps working — the agent now streams a clear
+ * status message instead of failing with a cryptic {@code Playwright.create()}
+ * browser-launch error. To re-enable real browser automation, run this logic on a
+ * dedicated worker service (not the free web tier) with the Playwright dependency
+ * plus {@code npx playwright install chromium}.</p>
+ */
 @Service
 public class JobApplicationAgent {
 
     private final SseService sseService;
-    private final JobApplicationRepository jobRepo;
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
-    public JobApplicationAgent(SseService sseService, JobApplicationRepository jobRepo) {
+    public JobApplicationAgent(SseService sseService) {
         this.sseService = sseService;
-        this.jobRepo = jobRepo;
     }
 
     public void triggerJobHunt(Long playerId) {
         executor.submit(() -> {
             log(playerId, "INITIALIZING AI JOB HUNT AGENT...");
-            try (Playwright playwright = Playwright.create()) {
-                log(playerId, "LAUNCHING HEADLESS BROWSER INSTANCE...");
-                Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
-                Page page = browser.newPage();
-                
-                log(playerId, "NAVIGATING TO INDEED (Y COMBINATOR / TECH JOBS)...");
-                page.navigate("https://news.ycombinator.com/jobs");
-                
-                page.waitForTimeout(2000);
-                log(playerId, "ANALYZING DOM AND EXTRACTING JOB POSTINGS...");
-                
-                var titles = page.locator(".titleline > a").allTextContents();
-                
-                if (titles.isEmpty()) {
-                    log(playerId, "NO JOBS FOUND. ABORTING.");
-                    return;
-                }
-                
-                int count = Math.min(3, titles.size());
-                log(playerId, "FOUND " + titles.size() + " POSTINGS. APPLYING TO TOP " + count + "...");
-                
-                for (int i = 0; i < count; i++) {
-                    String title = titles.get(i);
-                    log(playerId, "PARSING JOB: " + title);
-                    page.waitForTimeout(1500); // Simulate reading/applying
-                    log(playerId, "AUTO-FILLED RESUME AND SUBMITTED APPLICATION FOR: " + title);
-                    
-                    // Save to DB
-                    com.thesystem.entity.JobApplication job = new com.thesystem.entity.JobApplication();
-                    job.setPlayerId(playerId);
-                    job.setCompany("YC Startup");
-                    job.setRole(title.length() > 50 ? title.substring(0, 50) : title);
-                    job.setStatus("APPLIED");
-                    jobRepo.save(job);
-                }
-                
-                log(playerId, "MISSION ACCOMPLISHED. 3 APPLICATIONS SUBMITTED.");
-                browser.close();
-            } catch (Exception e) {
-                log(playerId, "AGENT FAILED WITH CRITICAL ERROR: " + e.getMessage());
-                e.printStackTrace();
-            }
+            log(playerId, "AUTONOMOUS BROWSER AUTOMATION IS DISABLED ON THIS DEPLOYMENT.");
+            log(playerId, "This build runs on a memory-constrained tier without a headless browser.");
+            log(playerId, "Log applications manually in Career OS, or deploy the agent on a dedicated worker.");
+            log(playerId, "MISSION ABORTED — NO BROWSER RUNTIME AVAILABLE.");
         });
     }
 
@@ -73,6 +44,10 @@ public class JobApplicationAgent {
         try {
             sseService.send(playerId, "agent-log", "{\"message\":\"" + msg + "\"}");
             Thread.sleep(1000);
-        } catch (Exception e) {}
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception ignored) {
+            // Non-fatal — SSE delivery is best-effort.
+        }
     }
 }

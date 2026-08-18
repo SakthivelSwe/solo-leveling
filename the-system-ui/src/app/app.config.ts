@@ -1,9 +1,8 @@
-import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withPreloading, PreloadAllModules } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -28,11 +27,6 @@ export const appConfig: ApplicationConfig = {
 
     // fallbackInterceptor must run BEFORE errorInterceptor so it catches raw network errors
     provideHttpClient(withInterceptors([jwtInterceptor, fallbackInterceptor, errorInterceptor])),
-
-    importProvidersFrom(MonacoEditorModule.forRoot({
-      baseUrl: 'assets/monaco',
-      defaultOptions: { scrollBeyondLastLine: false, theme: 'vs-dark' }
-    })),
 
     provideServiceWorker('ngsw-worker.js', {
       // Disabled inside the native WebView (environment.native) — Capacitor

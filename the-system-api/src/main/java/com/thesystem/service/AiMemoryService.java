@@ -77,12 +77,18 @@ public class AiMemoryService {
         List<com.thesystem.entity.QuestCompletion> completions =
                 completionRepository.findByPlayerIdAndCompletedAtBetween(playerId, weekStart, weekEnd);
 
-        // Count completions per quest key this week
+        // Count completions per quest key this week.
+        // Batch-load all referenced quests in ONE query to avoid a findById per completion (N+1).
+        Map<Long, String> questKeyById = questRepository.findAllById(
+                        completions.stream()
+                                .map(com.thesystem.entity.QuestCompletion::getQuestId)
+                                .collect(Collectors.toSet())).stream()
+                .collect(Collectors.toMap(com.thesystem.entity.Quest::getId,
+                        com.thesystem.entity.Quest::getQuestKey));
         Map<String, Long> countByKey = completions.stream()
-                .collect(Collectors.groupingBy(c -> {
-                    return questRepository.findById(c.getQuestId())
-                            .map(q -> q.getQuestKey()).orElse("UNKNOWN");
-                }, Collectors.counting()));
+                .collect(Collectors.groupingBy(
+                        c -> questKeyById.getOrDefault(c.getQuestId(), "UNKNOWN"),
+                        Collectors.counting()));
 
         int daysInWeek = (int) (weekStart.until(weekEnd).getDays() + 1);
         List<AiMemoryEntry> entries = new ArrayList<>();

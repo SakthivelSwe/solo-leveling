@@ -42,9 +42,7 @@
     "@capgo/capacitor-health": "^8.10.0",
     "@capgo/capacitor-native-biometric": "^8.6.1",
     "chart.js": "^4.5.1",
-    "monaco-editor": "^0.56.0",
     "ng2-charts": "^5.0.4",
-    "ngx-monaco-editor-v2": "^17.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "xlsx": "^0.18.5",
@@ -63,8 +61,5 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.4.2"
-  },
-  "overrides": {
-    "monaco-editor": "$monaco-editor"
   }
 }

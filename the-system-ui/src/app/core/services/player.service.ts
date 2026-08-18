@@ -21,7 +21,11 @@ export class PlayerService {
   }
 
   getStatus(): Observable<StatusWindow> {
-    return this.http.get<StatusWindow>(`${this.api}/player/status?t=${Date.now()}`).pipe(
+    // NOTE: no `?t=` cache-buster — that would defeat the service-worker
+    // freshness cache (ngsw-config.json dataGroups match by exact URL). The SW
+    // uses a network-first strategy with a short timeout, so data stays fresh
+    // while still serving an instant cached copy during Render cold-starts.
+    return this.http.get<StatusWindow>(`${this.api}/player/status`).pipe(
       tap(s => localStorage.setItem(this.CACHE_KEY, JSON.stringify(s)))
     );
   }
@@ -44,22 +48,22 @@ export class PlayerService {
   }
 
   getTodayQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/today?t=${Date.now()}`);
+    return this.http.get<Quest[]>(`${this.api}/quests/today`);
   }
 
   /** WEEKLY quests — resets every Monday. Includes weeklyDoneCount. */
   getWeeklyQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/weekly?t=${Date.now()}`);
+    return this.http.get<Quest[]>(`${this.api}/quests/weekly`);
   }
 
   /** MONTHLY quests — resets on the 1st. Includes monthlyDoneCount. */
   getMonthlyQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/monthly?t=${Date.now()}`);
+    return this.http.get<Quest[]>(`${this.api}/quests/monthly`);
   }
 
   /** ONE_TIME milestone quests — completed ones remain visible as achievements. */
   getMilestoneQuests(): Observable<Quest[]> {
-    return this.http.get<Quest[]>(`${this.api}/quests/milestones?t=${Date.now()}`);
+    return this.http.get<Quest[]>(`${this.api}/quests/milestones`);
   }
 
   completeQuest(key: string, lat?: number, lng?: number, difficultyFeedback?: string | null): Observable<QuestCompletionResult> {
@@ -81,7 +85,7 @@ export class PlayerService {
 
   verifyQuest(key: string, base64Image: string, mimeType: string): Observable<{ verified: boolean, reason: string, result?: QuestCompletionResult }> {
     return this.http.post<{ verified: boolean, reason: string, result?: QuestCompletionResult }>(
-      `${this.api}/quests/${key}/verify`, 
+      `${this.api}/quests/${key}/verify`,
       { image: base64Image, mimeType: mimeType }
     );
   }

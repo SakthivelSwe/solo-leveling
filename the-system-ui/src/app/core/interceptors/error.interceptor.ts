@@ -12,6 +12,9 @@ const PLAYER_KEY  = 'system_player';
 /** Prevents multiple simultaneous refresh calls */
 let isRefreshing = false;
 const refreshDone$ = new BehaviorSubject<string | null>(null);
+/** Sentinel pushed to queued requests when the refresh itself fails, so they
+ *  error out cleanly instead of hanging forever on a spinner. */
+const REFRESH_FAILED = '__refresh_failed__';
 
 function doLogout(router: Router): void {
   isRefreshing = false;
@@ -48,6 +51,10 @@ export const errorInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, n
             filter(token => token !== null),
             take(1),
             switchMap(newToken => {
+              // Refresh failed while we were queued → error out (don't hang).
+              if (newToken === REFRESH_FAILED) {
+                return throwError(() => err);
+              }
               const retried = req.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } });
               return next(retried);
             }),
@@ -76,7 +83,9 @@ export const errorInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, n
             return next(retried);
           }),
           catchError(refreshErr => {
-            // Refresh itself failed (expired/invalid refresh token) → hard logout
+            // Refresh itself failed (expired/invalid refresh token) → hard logout.
+            // Unblock any queued requests so they error out instead of hanging.
+            refreshDone$.next(REFRESH_FAILED);
             doLogout(router);
             return throwError(() => refreshErr);
           }),
